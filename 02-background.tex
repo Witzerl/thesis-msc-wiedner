@@ -1,0 +1,61 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+\cleardoubleoddpage%  Make sure to start each chapter on a new odd page
+\chapter{Background}
+\label{ch:background}
+
+
+\section{Geographic Atrophy and OCT Imaging}
+\label{sec:background:ga-oct}
+
+% TODO: clinical background on GA; OCT volumes and en-face projections;
+% meaning of the 10 retinal layer boundaries; how masks are annotated;
+% reference to the MUW dataset structure.
+
+
+\section{Partial Differential Equations and Numerical Solvers}
+\label{sec:background:pde-solvers}
+
+% TODO: short primer on temporal PDEs, the method of lines, finite
+% differences/volumes, and mesh-based discretization - only the subset
+% that motivates what neural solvers replace.
+% Constraint: focus strictly on spatial grids and time-stepping as they
+% relate to discrete, autoregressive state updates. Use the Shallow Water
+% Equation (SWE) as the running example whenever one is needed.
+
+
+\section{Neural PDE Solvers}
+\label{sec:background:neural-pde}
+
+% TODO: neural operators (FNO, DeepONet - briefly, as context) versus
+% autoregressive solvers (MP-PDE). Explain why autoregressive is the right
+% framing for clinical longitudinal data.
+
+
+\section{MP-PDE: Message-Passing Neural PDE Solvers}
+\label{sec:background:mp-pde}
+
+% TODO: Brandstetter et al. (2022) - encode-process-decode architecture,
+% temporal bundling, the pushforward trick and its zero-stability
+% interpretation.
+
+
+\section{MM-PDE: Moving Mesh PDE Solvers}
+\label{sec:background:mm-pde}
+
+% TODO: Hu et al. (2024) - DMM (data-free mesh mover, trained on the
+% Monge--Amp\`ere equation), monitor function and equidistribution principle,
+% dual-branch architecture with ItpNet, interpolation between uniform and
+% moved meshes.
+
+
+\section{Related Work}
+\label{sec:background:related-work}
+
+% TODO: deep learning for retinal imaging; GA progression models in the
+% clinical literature; other neural solvers applied to biomedical problems
+% (if any).
+
+
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

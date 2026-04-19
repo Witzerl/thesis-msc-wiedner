@@ -1,0 +1,45 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+\cleardoubleoddpage%  Make sure to start each chapter on a new odd page
+\chapter{Discussion}
+\label{ch:discussion}
+
+
+\section{Interpretation of Results}
+\label{sec:discussion:interpretation}
+
+% TODO: broaden back out from the technical results. Which components
+% contributed most? Did the moving mesh help on slowly evolving pathology,
+% or was uniform mesh enough? Did the surrogate encoder improve
+% generalization across patients?
+
+
+\section{Clinical Implications}
+\label{sec:discussion:clinical}
+
+% TODO: which prediction horizon is reliable? What RMSE/Dice level would be
+% clinically useful? Where does the model fail, and would those failures
+% matter in practice?
+
+
+\section{Limitations}
+\label{sec:discussion:limitations}
+
+% TODO: data quantity (sample size, missing visits); normalization of the
+% binary mask channel; monitor function chosen by heuristic rather than
+% derived for vector-valued states; fixed-grid assumption discards
+% peripheral retina; encoder sees predicted (not observed) layers during
+% pushforward unrolling.
+
+
+\section{Future Work}
+\label{sec:discussion:future}
+
+% TODO: incorporating surrogate models of the next state into DMM's monitor
+% function (the future-state problem from MM-PDE's conclusion); extending
+% to 3D volumetric OCT; multi-task joint training across multiple retinal
+% pathologies; uncertainty quantification for clinical deployment.
+
+
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

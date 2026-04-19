@@ -1,0 +1,101 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+\cleardoubleoddpage%  Make sure to start each chapter on a new odd page
+\chapter{Method}
+\label{ch:method}
+
+
+\section{Overview}
+\label{sec:method:overview}
+
+% TODO: one pipeline figure: input state -> uniform-mesh GNN branch +
+% DMM-moved-mesh GNN branch with interpolation -> combined prediction.
+% Reference every component to its detailed subsection below.
+
+
+\section{\texorpdfstring{$\Delta t$}{Delta t}-Conditioned Residual Formulation}
+\label{sec:method:dt-residual}
+
+% TODO: core adaptation from SWE-style fixed-$\Delta t$ to clinical
+% variable-$\Delta t$. The model learns
+%   $u_{t+\Delta t} = u_t + \Delta t \cdot f_\theta(u_t, \Delta t)$.
+% Explain why this replaces absolute time and preserves consistency in the
+% MP-PDE sense.
+
+
+\section{Multi-Channel Pipeline}
+\label{sec:method:multichannel}
+
+% TODO: walk through how $C=11$ channels propagate through each component:
+%   - dataset layout $(N, C\cdot K)$,
+%   - GNN features,
+%   - DMM with Frobenius-norm monitor function for vector-valued state,
+%   - per-channel interpolation in ItpNet,
+%   - multi-channel res_cut Conv2d.
+% Constraint: assume clinical meaning of the 11 channels was already
+% established in Section~\ref{sec:data:state}; focus entirely on
+% mathematical/tensor propagation here.
+
+
+\section{Data-Free Mesh Mover for GA}
+\label{sec:method:dmm}
+
+% TODO: how DMM is trained on GA states: physics loss
+% (Monge--Amp\`ere + boundary + convexity), sampling strategy,
+% monitor function choice. Note that DMM is pre-trained separately and
+% frozen during MM-PDE training.
+
+
+\section{Single-Branch MP-PDE Architecture}
+\label{sec:method:mppde}
+
+% TODO: describe the baseline adaptation as a single-branch uniform-mesh
+% GNN. Explicitly note that temporal bundling from the original MP-PDE is
+% removed entirely due to the short, irregular clinical sequences.
+
+
+\section{Dual-Branch MM-PDE Architecture}
+\label{sec:method:mmpde}
+
+% TODO: main GNN branch on the uniform mesh produces the full next state;
+% correction GNN branch on the moved mesh produces a pure $\Delta t$-delta;
+% interpolation back via ItpNet; summation.
+% Explain why the correction-branch formulation is the natural
+% $\Delta t$-conditioned analogue of the original dual-branch sum.
+
+
+\section{Patient Covariate Conditioning}
+\label{sec:method:covariates}
+
+% TODO: Age and Sex as graph-level attributes broadcast per-node into the
+% GNN's \texttt{variables} vector, entering both the embedding MLP and every
+% message-passing layer.
+
+
+\section{Surrogate Equation Encoder}
+\label{sec:method:encoder}
+
+% TODO: the learnable layer encoder - CNN compressing $(10, 49, 1024)$ to
+% $\mathbb{R}^{d_{\text{embed}}}$, concatenated to \texttt{variables} alongside
+% $\Delta t$ and covariates. Framed as a learned stand-in for the PDE
+% coefficients $\theta_{\text{PDE}}$ used in MP-PDE.
+
+
+\section{Training}
+\label{sec:method:training}
+
+% TODO: pushforward trick with depth-aware sampling; ItpNet pre-training at
+% epoch 0; loss weighting across channels (mask gets higher weight);
+% optimizer setup; learning rate schedule.
+
+
+\section{Implementation Details}
+\label{sec:method:implementation}
+
+% TODO: hardware, framework versions, notable engineering choices
+% (GPU-native $k$-NN replacing sklearn, graph precomputation,
+% mixed-precision or not, etc.).
+
+
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

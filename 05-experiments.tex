@@ -1,0 +1,77 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+\cleardoubleoddpage%  Make sure to start each chapter on a new odd page
+\chapter{Experiments}
+\label{ch:experiments}
+
+
+\section{Evaluation Protocol}
+\label{sec:experiments:protocol}
+
+% TODO (crucial): before introducing the other metrics, explicitly explain
+% why per-pixel MSE is a deceptive metric for slow-moving GA pathology.
+% Then: per-timestep MSE and RMSE in normalized space; Dice and IoU on the
+% GA mask channel at a clinically meaningful 360-day horizon. Persistence
+% baseline (repeat last observed state) as the floor any learned model must
+% beat.
+
+
+\section{Baselines}
+\label{sec:experiments:baselines}
+
+% TODO:
+%   - Persistence (last-state repetition)
+%   - Single-branch GNN (MP-PDE style, no moving mesh)
+%   - Multi-branch GNN, larger parameter budget (isolate moving-mesh
+%     contribution from capacity)
+%   - Optional: simple CNN baseline (U-Net or similar) for context against
+%     standard medical imaging approaches.
+
+
+\section{Main Results}
+\label{sec:experiments:main-results}
+
+% TODO: table comparing all methods on MSE, RMSE, Dice@360d, IoU@360d.
+% Figure with example rollouts: ground-truth sequence vs each baseline's
+% predictions over several visits for a representative eye.
+
+
+\section{Ablations}
+\label{sec:experiments:ablations}
+
+% TODO: each component on/off:
+%   - DMM moving mesh vs uniform mesh
+%   - correction branch vs full second branch
+%   - ItpNet pre-training vs no pre-training
+%   - pushforward training vs no pushforward
+%   - covariates (Age, Sex) vs no covariates
+%   - layer encoder $d_{\text{embed}} \in \{0, 32, 64, 128, 256\}$
+%   - mask-channel loss-weight sweep.
+
+
+\section{Moving Mesh Quality}
+\label{sec:experiments:mesh-quality}
+
+% TODO: std/range of cell volumes under the monitor function
+% (following the MM-PDE paper's metric) to verify DMM generates physically
+% sensible meshes on GA data. Visualize example moved meshes overlaid on
+% sample states.
+
+
+\section{Qualitative Analysis}
+\label{sec:experiments:qualitative}
+
+% TODO: per-eye rollout visualizations. Success cases (accurate lesion
+% growth prediction). Failure modes (atypical progression patterns, very
+% sparse visit schedules, very short vs long $\Delta t$).
+
+
+\section{Computational Cost}
+\label{sec:experiments:cost}
+
+% TODO: training time, inference time per rollout step, memory footprint,
+% comparison with baselines.
+
+
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -1,26 +1,52 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 
+%%
 \cleardoubleoddpage%  Make sure to start each chapter on a new odd page
 \chapter{Introduction}
-\label{sec:introduction}
+\label{ch:introduction}
 
 
-\section{Motivation}
+\section{Clinical Motivation}
 \label{sec:introduction:motivation}
 
-Space for your introduction.
-A typical introduction consists of a motivation for your thesis, your objectives, your research approach, and finishes with an outlook over your work.
-Of course, different structuring and naming of sections is possible.
+% TODO: Geographic Atrophy as an advanced form of age-related macular
+% degeneration: prevalence, irreversibility, clinical relevance of predicting
+% lesion progression for patient management and treatment planning.
 
 
-\section{Objectives and Approach}
-\label{sec:introduction:objectives}
+\section{Problem Statement}
+\label{sec:introduction:problem}
+
+% TODO: Frame GA progression as a spatiotemporal prediction task on OCT en-face
+% grids: given a baseline state and elapsed time, predict the future lesion
+% configuration. Emphasize the irregular-visit-interval challenge of clinical
+% data.
 
 
-\section{Outline}
+\section{Why Neural PDE Solvers?}
+\label{sec:introduction:why-pde}
+
+% TODO: Argue that GA progression has the structural properties of a PDE system
+% (spatial state evolving over time with local dynamics) and that neural PDE
+% solvers offer a principled inductive bias compared to generic
+% segmentation-style baselines.
+
+
+\section{Contributions}
+\label{sec:introduction:contributions}
+
+% TODO: Bulleted contributions:
+%   - first application of moving-mesh neural PDE solvers to medical imaging,
+%   - $\Delta t$-conditioned residual formulation for irregular visit schedules,
+%   - multi-channel generalization of the MM-PDE pipeline,
+%   - patient covariate conditioning,
+%   - learnable layer-geometry encoder as surrogate for PDE coefficients.
+
+
+\section{Thesis Outline}
 \label{sec:introduction:outline}
 
+% TODO: one-paragraph roadmap of the remaining chapters.
 
 
-%% 
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

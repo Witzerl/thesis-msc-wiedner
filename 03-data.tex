@@ -1,0 +1,70 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+\cleardoubleoddpage%  Make sure to start each chapter on a new odd page
+\chapter{Data and Preprocessing}
+\label{ch:data}
+
+
+\section{Dataset}
+\label{sec:data:dataset}
+
+% TODO: MUW GA cohort - number of patients, eyes, visits per eye, visit
+% interval distribution, demographic breakdown. Include a figure showing an
+% example OCT en-face with GA mask and retinal layer overlays.
+
+
+\section{State Representation}
+\label{sec:data:state}
+
+% TODO: define the 11-channel state tensor:
+%   channel 0    = binary GA mask,
+%   channels 1-10 = retinal layer depths.
+% Justify this choice as capturing both the pathology and its structural
+% context.
+% Constraint: keep this strictly at the clinical/data definition level. Do
+% NOT discuss how these channels propagate through the network
+% (that is reserved for Section~\ref{sec:method:multichannel}).
+
+
+\section{Spatial Standardization}
+\label{sec:data:spatial}
+
+% TODO: center-crop/pad to the canonical $49 \times 1024$ grid corresponding
+% to the $6\times 6$\,mm macula-centered window. Explicitly state that
+% crop/pad (not resampling) is used so the en-face pixel spacing stays
+% invariant at $[0.12118, 0.00568]$\,mm across all patients. Justify the
+% $6\times 6$\,mm window: $\sim$99\% of GA pathology lies within a central
+% 3\,mm radius of the macula, so the periphery is clinically irrelevant here.
+
+
+\section{Normalization}
+\label{sec:data:normalization}
+
+% TODO: per-channel z-score normalization computed from training-split
+% statistics. Include a table of mean/std per channel.
+
+
+\section{Patient-Level Covariates}
+\label{sec:data:covariates}
+
+% TODO: extract Age and Sex from the patient index. Training-split z-score
+% for age, binary encoding for sex, mean imputation for missing values.
+
+
+\section{Temporal Structure}
+\label{sec:data:temporal}
+
+% TODO: visits ordered per eye; $\Delta t$ computed between consecutive
+% visits in years. Consecutive $(\text{state}_i, \text{state}_{i+1}, \Delta t)$
+% triples form the training windows.
+
+
+\section{Train / Validation / Test Splits}
+\label{sec:data:splits}
+
+% TODO: patient-level splitting (not eye-level) to prevent leakage across an
+% individual's two eyes. Split indices provided with the dataset.
+
+
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

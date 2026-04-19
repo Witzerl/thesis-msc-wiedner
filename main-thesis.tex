@@ -160,7 +160,7 @@
 \usepackage{import}
 \usepackage{amsfonts}
 \usepackage{subfigure}
-%\usepackage{acronym}
+\usepackage{acronym}
 
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -185,28 +185,31 @@
 %% 
 
 %% Command \title{title}: sets the title of your thesis
-\title{Space for your thesis title}
+% TODO: finalize thesis title with supervisor.
+\title{Neural PDE Solvers for Geographic Atrophy Progression Prediction from Longitudinal OCT Imaging}
 
 %% Command \titleshort{short title}: sets an abbreviated version of the thesis title for page heads
-%\titleshort{Optional space for your abbreviated title}
+\titleshort{Neural PDE Solvers for GA Progression Prediction}
 
 %% Command \subtitle{subtitle}: sets the subtitle for seminar/technical reports (not used for theses)
 %\subtitle{Seminar Report}
 
 %% Command \author{name}: sets the author's name; use \prefix{} and \suffix{} to add academic titles
 %%   and suffixes, use \matno{} to add the immatriculation number
-\author{\prefix{DI} Firstname~Lastname \suffix{BSc}\matno{12345678}}
+% TODO: fill in author name, academic prefix/suffix, and matriculation number.
+\author{Christian~Wiedner\matno{K52001455}}
 
 %% Command \supervisor[number,gender]{name}: sets the name of the supervisor (where number optionally
 %%   defines the rank of the supervisor (1-3) and gender specifies if the supervisor is male (m) or
 %%   female (f/w) to adapt gender-specific terms in German)
-\supervisor{\prefix{Prof. Dr.} Firstname~Lastname}
+\supervisor{\prefix{Assoc.~Prof. PD~Dipl.-Ing. Dr.} Hrvoje~Bogunovi\'c}
 
 %% Command \assistantsupervisor{name}: sets the name of the assistant supervisor(s)
-\assistantsupervisor{\prefix{Dr.} Firstname~Lastname \suffix{MSc}}
+\assistantsupervisor{\prefix{Dr.} Dmitrii~Lachinov}
 
 %% Command \degree{degree}{degree program}: sets the degree and degree program name
-\degree{Master of Science}{Computer Science}
+% TODO: confirm exact degree program name with JKU study handbook.
+\degree{Master of Science}{Artificial Intelligence}
 %% Please make sure to insert the _correct_ degree and degree program names for your studies before
 %% submission. Examples for degrees at JKU:
 %%  * Diplom-Ingenieurin / Diplom-Ingenieur
@@ -227,13 +230,15 @@
 %%  * Doctor of Philosophy
 
 %% Command \submissiondepartment{institute or department}: set the department that the thesis is submitted at
-\submissiondepartment{Institute of Networks~and~Security}
+% TODO: confirm submitting institute at JKU (the thesis is supervised via the
+% Medical University of Vienna but formally submitted at JKU).
+\submissiondepartment{Institute for Machine Learning}
 
 %% Command \date{YYYY-MM-DD}: set the day of submission (defaults to today)
-%\date{2020-04-09}
+%\date{2026-01-01}
 
 %% Command \keywords{text}: set the document keywords
-%\keywords{Space for your comma-separated keywords}
+\keywords{Geographic Atrophy, OCT, neural PDE solvers, MP-PDE, MM-PDE, moving mesh, graph neural networks, medical imaging, longitudinal prediction}
 
 
 %% Finally, print the title page using the above information:
@@ -257,7 +262,7 @@
 %% used to acknowledge external funding, discuss with your supvervisor if unsure)
 %% 
 
-%\import{./}{acknowledgements}
+\import{./}{acknowledgements}
 
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -283,9 +288,9 @@
 %\listoffigures
 
 %% Make sure to start the list of acronyms on a new odd page (odd is only relevant in twoside layout)
-%\cleardoubleoddpage
+\cleardoubleoddpage
 %% Include list of acronyms (optional and often not necessary)
-%\import{./}{acronyms}
+\import{./}{acronyms}
 
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -299,9 +304,12 @@
 %% 
 
 \import{./}{01-introduction}
-\import{./}{02-example}
-% ...
-\import{./}{09-conclusion}
+\import{./}{02-background}
+\import{./}{03-data}
+\import{./}{04-method}
+\import{./}{05-experiments}
+\import{./}{06-discussion}
+\import{./}{07-conclusion}
 
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
