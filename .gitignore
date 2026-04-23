@@ -29,7 +29,10 @@
 /main-*.pdf
 
 literature/
+INBOX/
+pdfs/
 CLAUDE.md
 NOTES.md
 PROJECT_CONTEXT.md
 THESIS_STRUCTURE.md
+.claude
