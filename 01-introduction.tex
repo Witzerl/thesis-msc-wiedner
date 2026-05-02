@@ -8,44 +8,276 @@
 \section{Clinical Motivation}
 \label{sec:introduction:motivation}
 
-% TODO: Geographic Atrophy as an advanced form of age-related macular
-% degeneration: prevalence, irreversibility, clinical relevance of predicting
-% lesion progression for patient management and treatment planning.
+% TODO: cite Wong2014 (Lancet Glob Health) once added to references.bib --
+% canonical reference for AMD as the leading cause of irreversible central
+% vision loss in industrialised countries; currently the sentence rests
+% indirectly on Flaxman2020.
+Age-related macular degeneration (AMD) is the leading cause of irreversible
+central vision loss in older adults in industrialised countries and ranks as
+the third most frequent cause of moderate-to-severe vision impairment and the
+fourth most frequent cause of blindness worldwide
+\citep{Flaxman2020}. Roughly 200~million people are
+estimated to live with some form of AMD today, with projections reaching
+288~million by 2050 \citep{Boopathiraj2024,Trincao2024}. Among these, the
+late dry stage --- termed \emph{Geographic Atrophy} (GA) --- is the dominant
+cause of severe visual decline in the absence of choroidal neovascularisation
+\citep{Vallino2024}. Approximately one million people in the United States and
+five million worldwide are affected by GA, with around 160{,}000 new diagnoses
+per year in the United States alone \citep{Singh2025,Vallino2024}. Crucially,
+AMD is not classified as an avoidable cause of vision loss in the WHO/GBD
+framework \citep{Flaxman2020}; the principal clinical lever therefore lies in
+\emph{managing} progression rather than in primary prevention.
+
+The disease burden is concentrated in the older population. Prevalence of GA
+rises by roughly a factor of four per decade after age fifty
+\citep{Singh2025}, and population-based screening data show overall AMD
+prevalence increasing from 3.6\,\% in the fifth decade of life to 34.0\,\%
+above the age of eighty \citep{Song2025}. GA is bilateral in approximately
+39\,\% to 50\,\% of patients at the time of initial diagnosis, with strong
+inter-eye correlation \citep{Yehoshua2011,Boyer2017}. The combination of an
+aging population, high bilaterality, and irreversible foveal involvement
+defines GA as a long-horizon, individually progressive disease for which the
+clinically relevant question is not \emph{whether} a given patient will
+deteriorate but \emph{how fast} and \emph{where} in the macula the lesion
+will expand.
+
+For decades, the therapeutic landscape for GA was empty: a series of phase
+1--3 trials targeting neuroprotection, the visual cycle, antiamyloid pathways,
+and cell replacement consistently failed to slow lesion growth
+\citep{Lad2023}. This changed in 2023 with the U.S. Food and Drug
+Administration's approval of two complement-pathway inhibitors,
+pegcetacoplan (anti-C3) and avacincaptad pegol (anti-C5)
+\citep{Lad2023,Singh2025,Trincao2024}. Both drugs reduce the rate of GA
+enlargement by roughly 14\,\% to 27\,\% over twelve to twenty-four months but
+neither arrests nor reverses the underlying atrophy, and best-corrected
+visual acuity remains unchanged at the trial endpoints
+\citep{Lad2023,Trincao2024}. The clinical implication is twofold. First,
+treatment timing now matters: an intervention that only slows progression is
+most valuable when administered before foveal involvement
+\citep{Boyer2017,Vallino2024}. Second, intravitreal injections carry both
+patient burden and procedural risk, so identifying which eyes will progress
+rapidly enough to justify therapy is the critical decision support task. As
+\citet{Vallino2024} explicitly note in their conclusions, the integration of
+artificial intelligence with structural OCT biomarkers offers the most
+promising avenue toward predictive probabilities of GA development over time.
+This thesis pursues that avenue.
 
 
 \section{Problem Statement}
 \label{sec:introduction:problem}
 
-% TODO: Frame GA progression as a spatiotemporal prediction task on OCT en-face
-% grids: given a baseline state and elapsed time, predict the future lesion
-% configuration. Emphasize the irregular-visit-interval challenge of clinical
-% data.
+Predicting GA progression from imaging is naturally framed as a
+\emph{spatiotemporal forecasting} task on the en-face projection of optical
+coherence tomography (OCT) volumes. For each eye, longitudinal imaging yields
+a sequence of macula-centred grids on which the lesion outline and the
+underlying retinal layer geometry are traced; given the most recent observed
+state and a target horizon $\Delta t$, the goal is to predict the full
+spatial configuration of the lesion at the future visit. This per-eye,
+spatially resolved framing is distinct from the cohort-level conversion-time
+prediction common in prior AMD deep-learning work \citep{Vogl2021}: the
+deliverable is not a single risk score but the entire next image of the
+disease.
+% TODO: cite SchmidtErfurth2018 (IOVS, "Prediction of individual disease
+% conversion in early AMD using artificial intelligence") and
+% Bogunovic2017 (IOVS, "Machine learning of the progression of intermediate
+% AMD based on OCT imaging") once added to references.bib -- both are
+% direct AI-on-OCT precedents for the cohort-level conversion framing,
+% Bogunovic is the supervisor's own institutional precedent.
+
+The clinical reality of OCT follow-up imposes three properties on the data
+that the model must respect. First, follow-up visits are
+\emph{irregularly spaced} in time and the spacing varies substantially
+between patients and between consecutive visits of the same patient. There
+is no shared temporal origin across eyes, which rules out methods that
+assume a fixed sampling rate or a common $t = 0$. Second, the underlying
+disease state is naturally \emph{multi-channel}: the binary lesion mask
+captures the cRORA (complete retinal pigment epithelium and outer retinal
+atrophy) region itself, while the surrounding ten retinal layer boundaries
+encode the structural cascade in which the atrophy is embedded
+\citep{Chu2022,Vallino2024}. Both information sources are required because
+prognostic biomarkers documented in the clinical literature, such as
+RPE--Bruch's-membrane thickening and outer nuclear layer thinning, are not
+contained in the lesion mask alone. Third, every patient carries
+\emph{covariates} --- in particular age and sex --- that modulate baseline
+risk and progression speed and that should enter the dynamics on equal
+footing with the imaging signal.
+
+The combination of these requirements --- a per-eye spatial state forecast,
+under arbitrary $\Delta t$, on a vector-valued field, conditioned on patient
+context --- is exactly the kind of task for which conventional segmentation
+networks are ill-suited.
+% TODO: cite Ronneberger2015 (MICCAI, "U-Net: Convolutional Networks for
+% Biomedical Image Segmentation") once added to references.bib -- the
+% U-Net mention below should carry an inline citation.
+A standard U-Net or similar dense predictor
+provides no principled mechanism for ingesting an elapsed-time scalar, no
+notion of the local-dynamics structure that drives lesion-boundary growth,
+and no separation between the static disease identity of the patient and
+the time-evolving state. The next section argues that the problem instead
+fits naturally into the framework of neural partial differential equation
+(PDE) solvers.
 
 
 \section{Why Neural PDE Solvers?}
 \label{sec:introduction:why-pde}
 
-% TODO: Argue that GA progression has the structural properties of a PDE system
-% (spatial state evolving over time with local dynamics) and that neural PDE
-% solvers offer a principled inductive bias compared to generic
-% segmentation-style baselines.
+GA expansion is, to a first approximation, a process of \emph{local boundary
+dynamics}. \citet{Yehoshua2011} demonstrated empirically that the radius of
+a GA lesion grows at a roughly constant rate while its enclosed area scales
+quadratically: writing $A(t)$ for the lesion area and $r(t)$ for an
+effective radius,
+\begin{equation}
+  \frac{\mathrm{d}r}{\mathrm{d}t} \approx \mathrm{const.}
+  \quad\Longleftrightarrow\quad
+  \sqrt{A(t)/\pi} \;=\; r_0 + v\, t,
+  \label{eq:intro:boundary-growth}
+\end{equation}
+which holds within the clinical follow-up horizon of six months to slightly
+over two years and has been re-used in subsequent biomarker work
+\citep{Chu2022}. The interior of the lesion is already atrophic and the
+exterior is healthy; both are quasi-static, and all dynamics are
+concentrated at the active boundary. This is the structural fingerprint of
+a system governed by a temporal partial differential equation with strong
+spatial localisation.
+
+The same boundary, however, does not advance uniformly in all directions.
+GA growth is \emph{anisotropic}: lesions progress faster towards the retinal
+periphery than towards the fovea, peak progression rate occurs at
+approximately one millimetre from the foveal centre when the lesion grows
+foveally, and complement inhibition has a spatially asymmetric treatment
+effect \citep{Singh2025}. The forward operator that maps the present state
+to the future state therefore has both \emph{local} and
+\emph{spatially adaptive} character --- two inductive biases that classical
+finite-difference and finite-volume PDE solvers exploit explicitly through
+local stencils and adaptive meshes, and that generic dense convolutional
+predictors must learn implicitly from data.
+
+% TODO: in the autoregressive-vs-operator contrast below, the operator
+% family (FNO, DeepONet) is intentionally deferred to Chapter 2.3
+% per THESIS_STRUCTURE.md; once Li2021 (FNO) and Lu2021 (DeepONet) are
+% added to references.bib, decide whether a one-sentence acknowledgement
+% of the operator alternative belongs here as well.
+Two recent neural PDE solver families directly encode these biases.
+\citet{Brandstetter2022} introduced \emph{message-passing neural PDE
+solvers} (MP-PDE), in which a graph neural network performs an
+% TODO: cite Battaglia2018 (relational inductive biases) and
+% SanchezGonzalez2020 (Learning to Simulate) once added to references.bib --
+% the encode--process--decode pattern predates Brandstetter2022 and is
+% conventionally attributed to those works.
+encode--process--decode rollout that produces a residual Euler update of the
+form $u_{t+\Delta t} = u_t + \Delta t \cdot f_{\theta}(u_t, \Delta t)$. The
+message-passing layers act as learned, non-linear analogues of classical
+local stencils, and the temporally conditioned residual form provides a
+natural place to inject elapsed time into the dynamics.
+\citet{Hu2024} extended this idea with the \emph{moving-mesh PDE solver}
+(MM-PDE), which couples a uniform-mesh GNN with a second GNN operating on a
+dynamically moved mesh produced by a data-free mesh mover; the moving mesh
+concentrates discretisation density in regions of large solution gradient,
+which on GA imagery is precisely the active lesion boundary. Adapting these
+two frameworks to longitudinal OCT bridges the methodological PDE-solver
+literature with the applied medical-imaging deep-learning literature
+\citep{Vogl2021,Vallino2024}, where prior work has remained anchored in
+cohort-level statistical atlases and time-to-conversion survival models
+rather than in per-eye autoregressive forward operators on the imaging
+state itself.
+
+\paragraph{Research question.}
+\label{par:introduction:research-question}
+This thesis is organised around a single question:
+
+\begin{quote}
+  \itshape Given the lack of regenerative therapies for Geographic
+  Atrophy and the recent approval of complement inhibitors that only
+  slow lesion expansion, can the adaptation of neural PDE solvers to the
+  irregular intervals of longitudinal OCT yield per-eye spatial
+  forecasts accurate enough to inform patient stratification and
+  treatment timing?
+\end{quote}
+
+The remaining chapters decompose this question into a sequence of
+methodological adaptations and empirical evaluations.
 
 
 \section{Contributions}
 \label{sec:introduction:contributions}
 
-% TODO: Bulleted contributions:
-%   - first application of moving-mesh neural PDE solvers to medical imaging,
-%   - $\Delta t$-conditioned residual formulation for irregular visit schedules,
-%   - multi-channel generalization of the MM-PDE pipeline,
-%   - patient covariate conditioning,
-%   - learnable layer-geometry encoder as surrogate for PDE coefficients.
+The work presented in this thesis makes the following contributions:
+
+\begin{itemize}
+  \item \textbf{First application of moving-mesh neural PDE solvers to
+    medical imaging.} The MM-PDE framework of \citet{Hu2024} is
+    transferred from synthetic physical benchmarks to longitudinal OCT
+    imaging of Geographic Atrophy, and is adapted to the constraints of
+    a clinical cohort drawn from the Medical University of Vienna.
+
+  \item \textbf{$\Delta t$-conditioned residual formulation for irregular
+    visit schedules.} The fixed-step rollout of the original MP-PDE and
+    MM-PDE architectures is replaced with a per-window
+    $\Delta t$-conditioned Euler residual,
+    \begin{equation}
+      u_{t+\Delta t} \;=\; u_t \;+\; \Delta t \cdot f_{\theta}(u_t, \Delta t),
+      \label{eq:intro:dt-residual}
+    \end{equation}
+    which removes the assumption of a shared temporal origin across
+    patients and supports inference at clinically arbitrary horizons.
+
+  \item \textbf{Multi-channel generalisation of the MM-PDE pipeline.}
+    The moving-mesh and interpolation components of MM-PDE are extended
+    from a scalar field to the eleven-channel disease state (binary
+    lesion mask plus ten retinal layer boundaries) by reformulating the
+    monitor function in terms of the Frobenius norm of the per-channel
+    spatial gradient.
+
+  \item \textbf{Patient covariate conditioning.} Age and sex are
+    incorporated as graph-level attributes that are broadcast per node
+    into both the embedding and every message-passing layer, so that
+    patient context modulates the dynamics on equal footing with the
+    learned per-step solver state.
+
+  \item \textbf{Surrogate equation encoder.} A lightweight convolutional
+    encoder compresses the ten retinal layer maps into a compact global
+    embedding that is concatenated to the per-node feature vector; this
+    embedding plays the role of the equation-feature vector
+    $\theta_{\mathrm{PDE}}$ used in MP-PDE \citep{Brandstetter2022} and
+    provides the GNN with a learned surrogate for the otherwise unknown
+    PDE coefficients of GA dynamics.
+
+  \item \textbf{Empirical validation on a clinical longitudinal OCT
+    cohort.} A persistence baseline, a single-branch GNN (MP-PDE style),
+    and the dual-branch MM-PDE adaptation are compared head-to-head with
+    matched parameter budgets on per-pixel error, on lesion-mask Dice
+    and IoU at a clinically meaningful horizon, and on a battery of
+    component ablations covering each of the contributions above.
+\end{itemize}
 
 
 \section{Thesis Outline}
 \label{sec:introduction:outline}
 
-% TODO: one-paragraph roadmap of the remaining chapters.
+The remainder of this thesis is organised as follows. Chapter~\ref{ch:background}
+provides the necessary background, surveying GA pathology and OCT imaging,
+the relevant subset of numerical and neural PDE solver theory, and the two
+specific architectures (MP-PDE, MM-PDE) on which the present work builds.
+Chapter~\ref{ch:data} describes the Medical University of Vienna GA cohort,
+the eleven-channel state representation, and the spatial, temporal, and
+demographic preprocessing pipeline.
+Chapter~\ref{ch:method} details the proposed adaptation: the
+$\Delta t$-conditioned residual operator, the multi-channel pipeline, the
+data-free mesh mover for vector-valued GA states, the dual-branch
+correction-style architecture, the patient covariate conditioning, the
+surrogate equation encoder, and the training protocol.
+Chapter~\ref{ch:experiments} reports the empirical evaluation, comprising
+baseline comparisons, ablations of each contribution, moving-mesh quality
+diagnostics, qualitative rollout analyses, and computational-cost
+measurements.
+Chapter~\ref{ch:discussion} interprets the results in clinical and
+methodological terms and articulates the principal limitations.
+Chapter~\ref{ch:conclusion} summarises the contributions and outlines
+directions for future work.
+
+% TODO: confirm chapter labels (\ref{ch:background} etc.) match the
+% \label commands defined in the chapter source files once they are written;
+% currently these are placeholders consistent with the planned structure.
 
 
 %%
