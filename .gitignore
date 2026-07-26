@@ -31,8 +31,12 @@
 literature/
 INBOX/
 pdfs/
-CLAUDE.md
-NOTES.md
-PROJECT_CONTEXT.md
-THESIS_STRUCTURE.md
 .claude
+
+# The four files below are intentionally TRACKED (not ignored) so they travel
+# with the repo for cross-machine thesis work. Raw material above
+# (literature/, INBOX/, pdfs/) stays out of git.
+# CLAUDE.md
+# NOTES.md
+# PROJECT_CONTEXT.md
+# THESIS_STRUCTURE.md

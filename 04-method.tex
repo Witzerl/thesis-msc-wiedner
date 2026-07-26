@@ -32,6 +32,11 @@
 %   - DMM with Frobenius-norm monitor function for vector-valued state,
 %   - per-channel interpolation in ItpNet,
 %   - multi-channel res_cut Conv2d.
+% NOTE (2026-07-26, see NOTES.md "Code-side sync"): TWO of the bullets above are
+% STALE. The final DMM trains on a single-channel SLO mask -> plain scalar monitor
+% (NOT a multi-channel Frobenius monitor); and res_cut was removed from the
+% framework entirely. The moved-branch correction is now alpha * Itilde[dt*g],
+% with a learnable scalar gate alpha (init 0) and partition-of-unity interpolation.
 % Constraint: assume clinical meaning of the 11 channels was already
 % established in Section~\ref{sec:data:state}; focus entirely on
 % mathematical/tensor propagation here.

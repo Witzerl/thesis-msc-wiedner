@@ -221,6 +221,10 @@ The work presented in this thesis makes the following contributions:
     which removes the assumption of a shared temporal origin across
     patients and supports inference at clinically arbitrary horizons.
 
+  % NOTE (2026-07-26, see NOTES.md "Code-side sync"): the final DMM trains on a
+  % single-channel SLO mask (scalar monitor), so this "multi-channel Frobenius-norm
+  % monitor" contribution is stale — it was a superseded workaround, now removed.
+  % Reframe the DMM contribution (SLO-mask train/inference-grid decoupling) before final.
   \item \textbf{Multi-channel generalisation of the MM-PDE pipeline.}
     The moving-mesh and interpolation components of MM-PDE are extended
     from a scalar field to the eleven-channel disease state (binary
