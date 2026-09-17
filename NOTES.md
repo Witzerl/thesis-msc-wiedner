@@ -144,18 +144,26 @@ Measured nulls (reportable negative results, **not** contributions):
   and re-frame.
 - [ ] TODO (⚠️): `01-introduction.tex` §1.5 outline — describes a Method chapter built
   around MP-PDE vs MM-PDE; will need to follow whatever restructure is agreed.
-- [ ] TODO (⚠️): `THESIS_STRUCTURE.md` §3.3 constraint ("justify the 6×6 mm window by
-  citing that 99 % of GA pathology occurs within a central 3 mm radius") — **false as
-  measured**; replace with the censoring census and the deliberate-trade-off framing.
-- [ ] TODO (⚠️): `THESIS_STRUCTURE.md` §4.3 / §4.6 and the `04-method.tex` placeholders
+- [x] 2026-09-17: `THESIS_STRUCTURE.md` §3.3 corrected. The old constraint told the writer to
+  "justify the 6×6 mm window by citing that 99 % of GA pathology occurs within a central 3 mm
+  radius" — **false as measured**. It now carries the censoring census (27.3 % of visits lose
+  real lesion area, 31.1 % of cropped lesions touch the border) and the deliberate-trade-off
+  framing, with an explicit instruction that the old rationale must not appear.
+- [ ] TODO (⚠️): `04-method.tex` placeholders (THESIS_STRUCTURE.md corrected 2026-09-17)
   still name the "Frobenius-norm monitor function for vector-valued state" and the
   "multi-channel res_cut Conv2d". Both are gone from the framework (the monitor is a plain
   scalar monitor on the blurred mask, trained on the **native OCT grid** since 2026-08-04
   — the SLO-256² path is itself now historical; `res_cut` was cut entirely).
-- [ ] TODO (⚠️): `THESIS_STRUCTURE.md` Chapters 4 and 5 as a whole assume a
-  two-architecture thesis (4.5 single-branch MP-PDE, 4.6 dual-branch MM-PDE; 5.2 three
-  baselines). The restructure to "one framework + a swappable slot + an ingredient survey"
-  is **pending an explicit decision** — do not restructure chapters without it.
+- [x] 2026-09-17: `THESIS_STRUCTURE.md` Chapters 4 and 5 **restructured** (user-approved). They
+  had assumed a two-architecture thesis (4.5 single-branch MP-PDE, 4.6 dual-branch MM-PDE;
+  5.2 three baselines). Ch 4 is now 4.1 overview / 4.2 the fixed framework / 4.3 Backbone I
+  (the graph solver, with graph construction as the load-bearing part) / 4.4 Backbone II (the
+  countermodel family + parameter matching) / 4.5 the moving mesh as a tested hypothesis /
+  4.6 conditioning / 4.7 training / 4.8 implementation. Ch 5 is now 5.1 protocol / 5.2 arm
+  table / 5.3 ingredient study / 5.4 negative results / 5.5 mesh quality / 5.6 validity
+  diagnostics / 5.7 qualitative + Mai comparison / 5.8 cost. A Framing block was added at the
+  top of the document, and §1.4, §2.3, §3.1, §3.7, Ch 6, Ch 7 and the appendices were updated
+  to match. The chapter .tex files have **not** been touched.
 - [ ] TODO: `02-background.tex` §2.1–§2.2 are drafted but **uncommitted** in the working
   tree (804 added lines). Commit or review before any further editing.
 
