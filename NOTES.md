@@ -2,7 +2,206 @@
 
 Single source of truth for open TODOs, supervisor feedback, pending numbers, and unresolved citations. Mirror every `% TODO:` left in the LaTeX as an entry here.
 
-## Code-side architecture & results sync (2026-07-26)
+## Code-side architecture & results sync (2026-09-17) — CURRENT
+
+Re-synced from the code repository (`masterthesis-docker`, `HEAD e3d2df7`) after a gap of
+roughly seven weeks in the thesis repo. **This section supersedes the 2026-07-26 sync
+below, which is retained only as a record of what was believed at that time.** Most of
+the 2026-07-26 items are themselves now out of date — read them as history, not as
+instructions.
+
+### What was mirrored on this date
+
+- `PROJECT_CONTEXT.md` — re-mirrored in full (13 KB → ~70 KB). It now opens with a §0
+  that states the project's question and how the document is organised, and carries a
+  measured-effect table for every ingredient.
+- `THESIS_FRAMEWORK.md` — **new mirror** (~280 KB), from
+  `masterthesis-docker/GraphPDE/demos & explanations/THESIS_FRAMEWORK.md`. This is the
+  technical source of truth for Chapters 3–5: data (§1), preprocessing (§2), DMM (§3),
+  the graph backbone (§4), the rest of the backbone family (§4b), the dual-branch
+  composition (§5), training (§6), evaluation and the **thesis-bound results table with
+  instruments and caveats (§7.5)**, reproducibility (§8), the chronology of load-bearing
+  fixes (§9), refuted ideas kept as citable negative results (§9.3), open items the
+  thesis must state honestly (§9.4), and the reference list (§10). It is deliberately not
+  `@`-auto-loaded; read the relevant `§` on demand.
+- `CLAUDE.md` — project framing updated (see next block).
+- Not mirrored (too large, and indexed by the two above): the code repo's own `NOTES.md`
+  (813 KB), `SOLVER_FINAL_RUNS.md` (435 KB, the dated run readouts), `ARCHITECTURE.md`
+  (decision → code map), `EXPERIMENTS.md` (run infrastructure), `DMM_GA_DESIGN.md`,
+  `DMM_HPSEARCH_NATIVE.md`, `COHORT_VISITS.md`, `solver_results.csv`. Read them in place
+  when a number needs its full provenance.
+
+### The framing changed — this is the big one
+
+The project no longer asks "can MP-PDE / MM-PDE be adapted to GA?". It asks **"what does
+a model need in order to predict GA progression, and what framework does it need to sit
+in?"**. The adaptation is still the largest block of engineering, but what it produced is
+a **fixed experimental framework with one swappable operator slot**, and the thesis
+reports a controlled survey through that slot.
+
+- **Fixed for every arm** (this is the framework, and the part that demonstrably
+  transfers): one visit in, no history; 11-channel state on the 49×1024 en-face grid; a
+  $\Delta t$-conditioned autoregressive residual operator $u_{t+\Delta t} = u_t + \Delta t
+  \cdot f_\theta$ on all channels with a **zero-initialised head so every model starts at
+  exact persistence**; the time-budgeted pushforward curriculum; the channel-weighted MSE
+  + soft-Dice objective; per-module gradient clipping; identical optimiser, epoch budget,
+  folds, seeds, evaluation, model selection and replicate floor.
+- **Variable**: $f_\theta$ only, via `--backbone` (+ optional `--integrator`). Nine
+  settings across six architecture classes: k-NN GNN, dilated-stencil GNN (**the locked
+  model**), U-Net at two capacities, FNO, FNO + 3×3 local bypass, graph U-Net, Finite
+  Element Network (free-form and with a learned transport term), RK4 wrapper over any of
+  them, and a per-pixel floor with no spatial context. Parameter-matched to within
+  **1.25×** of the locked model's 67,147, except two deliberate controls (the 44×-capacity
+  U-Net and the 0.22× per-pixel floor).
+- **Headline**: the framework transfers and **the architecture class does not decide the
+  outcome**. Dilated-stencil GNN 0.5258, param-matched U-Net 0.5046, T-FEN 0.5337 are
+  statistically indistinguishable at the available precision; a per-pixel model with no
+  spatial context is bit-exactly persistence (0.0000). What separates arms is which
+  *ingredients* they carry.
+
+### Measured ingredients (all change-region Dice@360d, late-epoch mean, 5-fold)
+
+Established:
+
+- **Spatial context at all** — 0 message-passing layers = 0.0000 (exactly persistence)
+  vs 0.4529 for one ring. Required, trivially.
+- **Physical reach at lesion scale (~0.12 mm/hop)** — **+0.074 ± 0.008 SE, 5/5 folds,
+  74/75 eyes**, replicated at a second seed, at **0.89× the parameters**, by changing only
+  `data.edge_index` (dilated stencil: rows ±1 × columns {0, ±7, ±14, ±21}). The largest
+  effect in the project (T7i/T7j).
+- **Global context *and* local detail together** — a global-only FNO sits *below* the
+  U-Net; +800 parameters of 3×3 local bypass bring it level and to **+0.047 ± 0.016 over
+  the k-NN GNN on 5/5 folds**, the only arm to win every fold (T7c/T7d).
+- **An explicit transport (advection) term** — **+0.053 ± 0.007, 5/5 folds**, at both
+  seeds (T8f). ⚠️ The only architecture comparison in the project that is **not
+  parameter-matched** (68,503 vs 34,785, 1.97×) — that caveat must travel with the number
+  every time it is quoted.
+
+Measured nulls (reportable negative results, **not** contributions):
+
+- **Mesh adaptation / the dual branch (the MM-PDE half)** — dual − parameter-matched
+  bypass = **−0.0001 ± 0.0060**, the tightest null in the project, at ~10× the wall-clock.
+  ⚠️ **Scope it correctly**: α stays shut in the bypass control as well as in the mesh
+  arm, so what the gate measured is *the correction branch's failure to optimise*, not
+  "mesh adaptation does not transfer to GA". Weight decay is refuted as the cause (T8g).
+- **Patient covariates (age, sex)** — T6 reads *in favour of removing them*
+  (+0.0198 ± 0.0140 fold-paired, +0.0190 ± 0.0080 per eye) but graduates on neither
+  instrument. Defensible claim: no detectable benefit, residual points against.
+- **The learned surrogate encoder (LayerEncoder)** — null at every width over an 8× range
+  (T5), at 30–55 % more compute.
+- **Parameter count** — a 44× U-Net *loses* to the parameter-matched one (T7b).
+- **Time-integration order** — RK4 − Euler null over both a local graph operator and a
+  global spectral one, at ~4.8× the cost (T8n/T9/T9b).
+- **Every GNN-internal knob** — normalisation, aggregation, edge-direction features
+  (T7e–T7g). The geometry mattered; the message function did not.
+- **The intermediate-time-point regulariser** — evaluated and removed 2026-06-11.
+
+### Vocabulary rules that now bind the writing
+
+- **No "ODE", "rate field" or "learned dynamics" language for the locked model or any
+  headline result.** The solver-swap diagnostic (T10, 2026-09-17) has the locked model
+  *failing* (Dice spread 0.0856 under refined inference schemes) and only the
+  autonomous-RK4 arm passing (0.0044) — and that arm is a 5-fold null on accuracy at
+  ~4.8× the cost. The ODE property is real, obtainable, and worth nothing on this task.
+- **Never quote raw RMSE across arms.** The dense arms decalibrate far more under
+  autoregression than the GNN does; raw-scale comparisons measure the decalibration.
+- **Quote cost as the minimum epoch time of the cheapest fold, and name the fold**
+  (`curve_sec_per_epoch_min`); the mean carries a near-constant additive overhead that
+  penalises cheap architectures. The GPU co-scheduling explanation for the spread is
+  **refuted** (2026-09-17 audit); the procedure stands for other reasons.
+- **Compare within an era** — pre-fix runs are not comparable; dual-branch runs before the
+  2026-08-06 edge fix are void.
+- **Two instruments, always quoted together**: fold-paired 5-fold mean ± between-fold SE
+  (threshold 0.016; single fold 0.036) and the pooled per-eye test over 75 eyes. A result
+  graduates only when both agree. Replicate noise floor **±0.0127**.
+- **The @360d metric has no upper horizon bound** (7/75 eyes scored at 450–720 d), and the
+  evaluation protocol is 5-fold train/val CV — **the "test" split is structurally empty**.
+  Both must be stated honestly.
+- **The 49×1024 crop is not lossless and the old justification is false as measured.** It
+  cuts real lesion area in 27.3 % of visits and 31.1 % of cropped lesions touch the crop
+  border, with growth across it censored and unflagged. The earlier rationale ("99 % of GA
+  is central, the periphery is clinically irrelevant") **must not reach the thesis text**.
+  ⚠️ This contradicts the constraint currently written into `THESIS_STRUCTURE.md` §3.3.
+- **GA is *not* monotonic growth.** The explicit monotonic penalty is 0.0 since the
+  2026-08-15 loss lock and the residual form is signed. Ground-truth shrinkage should be
+  quantified and discussed (segmentation noise vs biology).
+- The cohort-wide validity of the single `SPACING_MM` constant is **unverified** (~2 %
+  deviation, needs DICOM). Every mm² figure inherits it — state it as an assumption.
+- The **anatomical names of the 10 layer boundaries are still not recorded** in the code
+  repo; they must come from the MUW segmentation pipeline.
+
+### Committed thesis prose that is now WRONG
+
+- [ ] TODO (⚠️): `01-introduction.tex` §1.4 Contributions — **three of the six bullets are
+  now measured nulls** (multi-channel Frobenius monitor: superseded design *and* the mesh
+  itself is a null; patient covariate conditioning: null; surrogate equation encoder:
+  null), and the sixth bullet describes an experimental plan (persistence vs single-branch
+  vs dual-branch) that has been overtaken by the nine-arm survey. The whole list needs
+  rewriting against the new framing: the framework, the reach/transport findings, and the
+  nulls reported as negative results.
+- [ ] TODO (⚠️): `01-introduction.tex` §1.3 "Why neural PDE solvers" and the locked-in
+  research-question blockquote at its end — the question has changed (see above). Re-read
+  and re-frame.
+- [ ] TODO (⚠️): `01-introduction.tex` §1.5 outline — describes a Method chapter built
+  around MP-PDE vs MM-PDE; will need to follow whatever restructure is agreed.
+- [ ] TODO (⚠️): `THESIS_STRUCTURE.md` §3.3 constraint ("justify the 6×6 mm window by
+  citing that 99 % of GA pathology occurs within a central 3 mm radius") — **false as
+  measured**; replace with the censoring census and the deliberate-trade-off framing.
+- [ ] TODO (⚠️): `THESIS_STRUCTURE.md` §4.3 / §4.6 and the `04-method.tex` placeholders
+  still name the "Frobenius-norm monitor function for vector-valued state" and the
+  "multi-channel res_cut Conv2d". Both are gone from the framework (the monitor is a plain
+  scalar monitor on the blurred mask, trained on the **native OCT grid** since 2026-08-04
+  — the SLO-256² path is itself now historical; `res_cut` was cut entirely).
+- [ ] TODO (⚠️): `THESIS_STRUCTURE.md` Chapters 4 and 5 as a whole assume a
+  two-architecture thesis (4.5 single-branch MP-PDE, 4.6 dual-branch MM-PDE; 5.2 three
+  baselines). The restructure to "one framework + a swappable slot + an ingredient survey"
+  is **pending an explicit decision** — do not restructure chapters without it.
+- [ ] TODO: `02-background.tex` §2.1–§2.2 are drafted but **uncommitted** in the working
+  tree (804 added lines). Commit or review before any further editing.
+
+### Assets that now exist and should be reused
+
+- **The Practical Work report** (`masterthesis-docker/practical/`) was handed in
+  2026-08-27: a complete LaTeX report (abstract → conclusion + appendix) with
+  `results.json` as the single source of numbers and `scripts/` that regenerate every
+  figure and table (`fig_curves`, `fig_folds`, `fig_growth`, `fig_mechanism`, `fig_mesh`,
+  `fig_rollout`, `fig_scatter`, plus `main_results`, `per_fold`, `growth_dice`, `hparams`
+  tables). Much of Chapters 3–5 can be built on this rather than from scratch, and the
+  figure scripts mean thesis figures can be *generated* rather than left as placeholders.
+  ⚠️ It predates the 2026-09-03 v2 lock and the T-FEN / RK4 / solver-swap results —
+  check every number against `THESIS_FRAMEWORK.md` §7.5 before reuse.
+  `practical/CONTEXT.md` §3 lists claims that must not drift, §5 what is superseded.
+- **The supervisor deck** (`masterthesis-docker/presentation/`): a 9-slide "state of the
+  project" built from verified numbers, plus `SUPERVISOR_PRACTICAL_FINAL.md` (§0 answers
+  "why did a plain U-Net outperform the original GNN?", §7 a suggested storyline). Useful
+  as a ready-made narrative spine for the thesis.
+- **The poster** (`masterthesis-docker/poster/`) and the 2026-06-30 reviewer feedback that
+  asked for external baselines from other architecture classes — **that feedback has now
+  been answered in full** (U-Net, FNO, hybrid, graph U-Net, FEN, per-pixel floor), except
+  a plain RNN and a transformer, which remain unrun.
+
+### Still open / still pending numbers
+
+- [ ] A plain **RNN** and a **transformer** baseline remain unrun (`--backbone` offers
+  `gnn`/`unet`/`fno`/`gunet`/`anisognn`/`fen`). The supervisor asked for the RNN.
+- [ ] A **cohort-level baseline-area distribution table** comparable to Mai et al. 2024 is
+  still missing for the data chapter; growth-rate statistics exist (median √area growth
+  0.234 mm/yr, IQR 0.153–0.340, p90 0.473 over 75 eyes).
+- [ ] The **T-FEN transport term has no matched-capacity control** (a width-≈139 control
+  has never been run); the 45-day T-FEN is **not a valid long-horizon integrator** as
+  trained (5/10 runs diverge free-running, 9/10 final checkpoints exceed the Courant
+  bound) — the learned velocity map is **not quotable**, though the Dice contribution
+  stands.
+- [ ] **Mai et al. 2024** (Ophthalmology Science) remains the direct comparison paper —
+  same MUW cohort, same task. Our growth-region Dice is higher, **with the mandatory
+  caveat that this model takes pre-segmented masks as input whereas Mai works from raw
+  OCT**. Needs a `references.bib` entry.
+- [ ] Ground-truth GA **retraction/shrinkage** between visits should be quantified before
+  it is discussed in Limitations.
+
+---
+
+## Code-side architecture & results sync (2026-07-26) — SUPERSEDED by the 2026-09-17 sync above; retained as history
 
 Pulled from the code repository (`masterthesis-docker/NOTES.md` + `PROJECT_CONTEXT.md`) to bring the thesis context current for writing. `PROJECT_CONTEXT.md` in this repo has been **re-mirrored** on this date (it had been stale since 2026-04-19, predating the SLO-mask DMM redesign, the α-gate divergence fix, and the res_cut removal). The items below post-date the 2026-05-02 chapter drafts and change what several sections must say. **Consult the refreshed `PROJECT_CONTEXT.md` before drafting any technical section.**
 

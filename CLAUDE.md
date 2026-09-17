@@ -2,13 +2,19 @@
 
 ## Project
 
-Master thesis at the Johannes Kepler University in collaboration with the Medical University of Vienna: **adapting two neural PDE solver frameworks — MP-PDE (Brandstetter et al., ICLR 2022) and MM-PDE (Hu et al., ICLR 2024) — to Geographic Atrophy (GA) progression prediction from longitudinal OCT imaging.** The contribution is applied, not methodological: irregular visit intervals, multi-channel state (mask + 10 retinal layers), patient covariates (Age, Sex), and a learned surrogate encoder for PDE coefficients. Code lives in a separate repository and is treated as read-only reference — DO NOT modify it.
+Master thesis at the Johannes Kepler University in collaboration with the Medical University of Vienna: **what does a model need in order to predict Geographic Atrophy (GA) progression from longitudinal OCT imaging, and what framework does it need to sit in?**
+
+The work began as an adaptation of two neural PDE solver frameworks — MP-PDE (Brandstetter et al., ICLR 2022) and MM-PDE (Hu et al., ICLR 2024) — and that adaptation is still the largest single block of engineering. What it produced, however, is a **fixed experimental framework with one swappable operator slot**, and what the thesis reports is a controlled survey through that slot (GNN on a k-NN graph, GNN on a dilated physical-scale stencil, U-Net, FNO, FNO + local bypass, graph U-Net, Finite Element Network, Runge–Kutta wrapper, per-pixel floor — nine settings, six architecture classes, all 5-fold, all parameter-matched to within 1.25x except two deliberate controls). The headline is that **the framework transfers and the architecture class does not decide the outcome**; what separates arms is which *ingredients* they carry (spatial context, physical reach at lesion scale, global+local context, an explicit transport term), each measured one at a time.
+
+The contribution is applied, not methodological: irregular visit intervals ($\Delta t$-conditioned residual operator), multi-channel state (mask + 10 retinal layers), extreme grid anisotropy (~21:1), and the controlled-comparison framework itself. Note that several originally-claimed contributions are now **measured nulls** (patient covariates, the learned surrogate encoder, mesh adaptation / the dual branch, integration order, every GNN-internal knob) — these are reportable negative results, not contributions. Code lives in a separate repository and is treated as read-only reference — DO NOT modify it.
 
 ## Context Files
 
-- See @THESIS_STRUCTURE.md for the fixed chapter outline. Confirm where requested content belongs before writing.
-- See @PROJECT_CONTEXT.md for architectural differences (e.g., Frobenius norm, \Delta t-conditioning), dataset spacing, and supervisor constraints. Consult this before writing technical sections.
+- See @THESIS_STRUCTURE.md for the chapter outline. Confirm where requested content belongs before writing.
+- See @PROJECT_CONTEXT.md (mirror of the code repo, re-mirrored 2026-09-17) for the *what and why* of each architectural decision, the dataset/spacing facts, the backbone family, and the measured-effect table. Consult this before writing technical sections.
+- See `THESIS_FRAMEWORK.md` (mirror, ~280 KB, deliberately NOT auto-loaded) for the *complete technical content* end to end — data, preprocessing, DMM, every backbone, dual-branch composition, training, evaluation, the thesis-bound results table with instruments and caveats (§7.5), the chronology of load-bearing fixes (§9), refuted ideas (§9.3), open items (§9.4) and the reference list (§10). **Read the relevant `§` on demand whenever drafting Chapters 3-5.** It is the closest thing to a source of truth for numbers; never quote a figure that is not in it or in NOTES.md.
 - See @NOTES.md for the single source of truth for open TODOs, supervisor feedback, pending numbers, and unresolved citations.
+- Both mirrors are hand-copied from `masterthesis-docker`. If a fact in them looks stale, the code repo wins — say so rather than writing around it.
 
 ## Chapter Files
 
