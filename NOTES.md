@@ -164,8 +164,8 @@ Measured nulls (reportable negative results, **not** contributions):
   diagnostics / 5.7 qualitative + Mai comparison / 5.8 cost. A Framing block was added at the
   top of the document, and §1.4, §2.3, §3.1, §3.7, Ch 6, Ch 7 and the appendices were updated
   to match. The chapter .tex files have **not** been touched.
-- [ ] TODO: `02-background.tex` §2.1–§2.2 are drafted but **uncommitted** in the working
-  tree (804 added lines). Commit or review before any further editing.
+- [x] 2026-09-17: `02-background.tex` §2.1–§2.2 (drafted 2026-05-02, uncommitted since)
+  committed together with the new §2.1.6 corrections and the §2.3–§2.6 drafts.
 
 ### Assets that now exist and should be reused
 
@@ -282,13 +282,64 @@ Pulled from the code repository (`masterthesis-docker/NOTES.md` + `PROJECT_CONTE
 - [x] 2026-05-02: added new §2.1.1 "A short anatomy primer" at the start of §2.1, before "Geographic Atrophy on OCT". Subsections renumber: anatomy primer = §2.1.1; GA on OCT = §2.1.2; OCT principle = §2.1.3; en-face projections = §2.1.4 (the one the user said was fine, content unchanged); state representation = §2.1.5; MUW cohort = §2.1.6. Subsection labels are topic-named (e.g. `sec:background:ga-oct:disease`), so cross-references continue to resolve.
 - [x] 2026-05-02: §2.1.3 OCT-acquisition explanation softened. Replaced the dense "low-coherence interferometry / sample arm / reference arm / spectral interference pattern" sentence with a slower account that uses an ultrasound analogy, motivates why interferometry is needed, and walks through A-scan -> B-scan -> volume step by step with cross-references to the new figure placeholder. The SD-OCT vs SS-OCT paragraph and the FAF comparison remain unchanged.
 - [x] 2026-05-02: 2.2 PDEs and numerical solvers drafted using SWE as running example (subsections: temporal PDEs and conservation form, method of lines, FDM/FVM stencils, time integration, uniform vs adaptive meshes; cites Brandstetter2022, Hu2024, Yehoshua2011, Singh2025; no historical detours).
-- [ ] TODO: 2.3 Neural PDE solvers (neural operators vs autoregressive).
-- [ ] TODO: 2.4 MP-PDE summary.
-- [ ] TODO: 2.5 MM-PDE summary.
-- [ ] TODO: 2.6 Related work.
+- [x] 2026-09-17: §2.1.6 corrected against the refreshed code-side facts. Removed the false
+  native volume shape (`49 x 1024 x 496`) here and at the two other places it appeared
+  (the §2.1.3 body and the `fig:bg:oct-acquisition` figure TODO); the cohort is now
+  described as 553 Heidelberg SD-OCT scans over 75 eyes with 38--66 B-scans x 961--1719
+  A-scans and 67 distinct native shapes, with `49 x 1024` named as the *modelling* grid
+  reached by symmetric centre-crop or zero-pad. The constant-spacing assumption is stated
+  as an assumption (~2 % tolerance) with an inline `% TODO` pointing at the DICOM fields.
+  The `\citet{Pilotto2015}` ninety-nine-per-cent statement is retained as literature
+  precedent but no longer carries the justification: the measured censoring census
+  (27.3 % of visits lose real lesion area, worst case 25.7 %, 31.1 % of cropped lesions
+  touch the border) now follows it directly. The clause that shifted "within-window
+  heterogeneity onto the moving-mesh inductive bias" was deleted — the moving mesh is a
+  tested hypothesis, not an assumption.
+- [x] 2026-09-17: §2.1.1 fixed a pre-existing miscount ("three concentric anatomical
+  zones" followed by four items: foveola, fovea, parafovea, perifovea).
+- [x] 2026-09-17: 2.3 drafted and retitled "Neural PDE Solvers and Surrogate
+  Architectures" (label `sec:background:neural-pde` unchanged). Widened past the original
+  operators-vs-autoregressive stub so that every architecture class later surveyed in
+  Chapter 4 has its background here: neural operators (FNO, DeepONet) and their
+  equation-family limitation; why the autoregressive framing fits irregular clinical
+  visits; the distribution-shift cost of autoregression; then the U-Net, global-spectral
+  vs local operators and the local-kernel hybrid, graph U-Nets, Finite Element Networks
+  with a transport term, and the Neural-ODE reading *with* the solver-invariance caveat
+  stated as something that must be tested. Closes by naming the "inductive-bias
+  ingredient" vocabulary that Chapter 5 measures, without previewing any outcome.
+- [x] 2026-09-17: 2.4 MP-PDE drafted (graph-as-stencil analogy, encode--process--decode,
+  encoder/message/update functions, the $\theta_{PDE}$ equation feature vector and why it
+  is injected at every layer, the 1-D CNN decoder and residual Euler update, temporal
+  bundling, the pushforward trick and its zero-stability reading, model scale, the
+  paper's own three limitations). Ends with two sentences of forward reference: the
+  residual update and pushforward are kept, $\Delta t$-conditioning is added, temporal
+  bundling is removed entirely.
+- [x] 2026-09-17: 2.5 MM-PDE drafted (uniform-mesh inefficiency, $h$- vs $r$-adaptation,
+  the monitor function, the equidistribution principle, optimal transport and Brenier to
+  the Monge--Ampère equation, why a scalar potential is learned, the residual
+  reformulation, the DMM's DeepONet architecture and its three-term data-free physics
+  loss, freezing, the dual-branch composition, ItpNet and its pretraining, the paper's
+  ablations). **Closing paragraph checked against the constraint**: mesh adaptation is
+  framed as an open question this thesis tests, not as the thesis's architecture, and the
+  multi-channel monitor question is deferred to Chapter 4 without naming any formulation.
+- [x] 2026-09-17: 2.6 Related work drafted (cohort-level AI-on-OCT precedents; **Mai et
+  al. 2024 named as the closest prior work on the same MUW cohort, with the
+  pre-segmented-masks vs raw-OCT input-regime difference stated in the same paragraph**;
+  Salvi et al. 2025 as the dense-CNN precedent on FAF; the positioning contrast between
+  categorical time-to-conversion prediction and per-eye per-time-step spatial
+  prediction). Left an inline `% TODO` asking for a literature check on neural PDE
+  solvers applied to other biomedical problems rather than inventing examples.
+- [x] 2026-09-17: chapter compiles (`latexmk -xelatex`), zero unresolved `\ref`s. Chapter 2
+  now spans pages 6--23 (~18 pages) against the ~12--15 in `THESIS_STRUCTURE.md`; §2.1 is
+  ~8 pages of that. Decide whether to trim §2.1 or raise the chapter's budget.
+- [ ] TODO: §2.3--§2.6 came in shorter than planned (§2.3 ~1.5 pages against a ~2.5-page
+  target, §2.4 ~1.5 against ~2). The prose is correct but terse in places; consider a
+  depth pass on §2.3 (operator-vs-autoregressive contrast) and §2.4 (message passing as a
+  learned stencil) once Chapters 4--5 are drafted and it is clear how much background
+  they actually lean on.
 - [ ] TODO: produce Figure `fig:bg:eye-anatomy` placed in `02-background.tex` §2.1.1 -- two-panel anatomy reference for ML readers without clinical background: (left) sagittal cross-section of the human eye labelling cornea, lens, vitreous body, retina, fovea, optic-nerve head (ONH) / optic disc, optic nerve, choroid, sclera, with the macular region highlighted on the retina near the posterior pole; (right) en-face fundus view of the posterior pole labelling macula (~6 mm-wide central region), fovea (central pit), foveola (innermost ~0.35 mm of the fovea), parafovea (~0.5--1.5 mm eccentric ring), perifovea (~1.5--3 mm eccentric ring), and ONH / optic disc (~4 mm nasal to the fovea). Overlay the 6 x 6 mm OCT scanning window used by the thesis cohort as a dashed square centred on the fovea. Currently rendered as an `\fbox` placeholder pending a real graphic.
 - [ ] TODO: produce Figure `fig:bg:retinal-anatomy` placed in `02-background.tex` §2.1.2 (formerly §2.1.1) -- two-panel schematic for readers without a clinical background: (left) labelled cross-section through a healthy macula showing the principal retinal layers from ILM through RNFL, GCL+IPL, INL+OPL, ONL, photoreceptor IS/OS bands (including the ellipsoid zone), RPE, and Bruch's membrane, with the choriocapillaris immediately beneath; (right) a representative OCT B-scan through a GA-affected macula highlighting the dropout of the outer-retinal layers within the lesion and the corresponding choroidal hypertransmission signature beneath. Mirror the channel ordering of the eleven-channel state tensor used in the thesis. Currently rendered as an `\fbox` placeholder pending a real graphic.
-- [ ] TODO: produce Figure `fig:bg:oct-acquisition` placed in `02-background.tex` §2.1.3 -- four-panel schematic of OCT acquisition geometry intended to anchor the geometric vocabulary (A-scan, B-scan, volume, en-face) for ML readers without imaging background: (a) eye + single probe beam + inset depth-vs-reflectivity profile of one A-scan; (b) the same with the beam scanned laterally along one axis to form a B-scan; (c) the beam scanned in both lateral directions to form a 3D volume of shape 49 x 1024 x 496 with the 6 x 6 mm physical footprint annotated; (d) the volume projected axially onto the fundus plane to yield the 49 x 1024 en-face image used by the model, with a representative GA lesion visible as a region of altered signal. Currently rendered as an `\fbox` placeholder pending a real graphic.
+- [ ] TODO: produce Figure `fig:bg:oct-acquisition` placed in `02-background.tex` §2.1.3 -- four-panel schematic of OCT acquisition geometry intended to anchor the geometric vocabulary (A-scan, B-scan, volume, en-face) for ML readers without imaging background: (a) eye + single probe beam + inset depth-vs-reflectivity profile of one A-scan; (b) the same with the beam scanned laterally along one axis to form a B-scan; (c) the beam scanned in both lateral directions to form a 3D volume with the 6 x 6 mm physical footprint annotated (do NOT annotate a fixed voxel count -- native shapes vary per eye: 38-66 B-scans x 961-1719 A-scans, 67 distinct shapes); (d) the volume projected axially onto the fundus plane to yield the 49 x 1024 en-face image used by the model, with a representative GA lesion visible as a region of altered signal. Currently rendered as an `\fbox` placeholder pending a real graphic.
 - [ ] TODO: confirm with supervisor the exact provenance of the eleven state-tensor channels in the MUW cohort (mask: manual grading vs trained network vs combination; layer boundaries: which segmentation algorithm, which boundary list, which post-processing) before drafting `03-data.tex` §3.1. The §2.1.4 text is currently agnostic of those details so it does not need to be revisited once the answer is in hand.
 
 ### Chapter 3 - Data and Preprocessing (`03-data.tex`)
@@ -345,6 +396,54 @@ Pulled from the code repository (`masterthesis-docker/NOTES.md` + `PROJECT_CONTE
 - [ ] TODO: F. Code structure + GitHub pointer + reproducibility.
 
 ### Pending external citations
+
+Introduced by the 2026-09-17 Chapter 2 draft (`02-background.tex` §2.3--§2.6). Each has a
+matching `% TODO: cite ...` marker in the .tex, with the full bibliographic detail in the
+marker itself; `THESIS_FRAMEWORK.md` §10.1 carries verified entries for all of them.
+
+- [ ] TODO: cite **Gupta2023** -- Gupta & Brandstetter, *TMLR* 2023, "Towards
+  Multi-spatiotemporal-scale Generalized PDE Modeling" (PDEArena). Used in §2.3 as the
+  evidence that a U-Net is a standard strong surrogate baseline in the neural-PDE
+  literature.
+- [ ] TODO: cite **LiuSchiaffini2024** -- Liu-Schiaffini, Berner, Bonev, Kurth,
+  Azizzadenesheli & Anandkumar, *ICML* 2024, "Neural Operators with Localized Integral and
+  Differential Kernels". Used in §2.3 for the local-kernel bypass over a global operator.
+- [ ] TODO: cite **Gao2019** -- Gao & Ji, *ICML* 2019, "Graph U-Nets". Used in §2.3 as the
+  multi-scale counterpart on graphs. Note for §4.4: the repository's own `GAGraphUNet` is
+  an image pyramid with a graph operator per block, **not** this work's learned node-score
+  pooling — cite it as a disambiguation there, not as the method used.
+- [ ] TODO: cite **Lienen2022** -- Lienen & Günnemann, *ICLR* 2022, "Learning the Dynamics
+  of Physical Systems from Sparse Observations with Finite Element Networks". Used in §2.3
+  and needed again in §4.4 for the FEN / T-FEN arm.
+- [ ] TODO: cite **Chen2018** -- Chen, Rubanova, Bettencourt & Duvenaud, *NeurIPS* 2018,
+  "Neural Ordinary Differential Equations". Used in §2.3 for the Neural-ODE reading of a
+  residual update; needed again in §4.4 for the Runge--Kutta wrapper.
+- [ ] TODO: cite **Ott2021** -- Ott, Katiyar, Hennig & Tiemann, *ICLR* 2021, "ResNet After
+  All: Neural ODEs and Their Numerical Solution". Used in §2.3 for the solver-invariance
+  requirement; needed again in §5.6 for the solver-swap diagnostic.
+- [ ] TODO: cite **Krishnapriyan2023** -- Krishnapriyan, Queiruga, Erichson & Mahoney,
+  *Communications Physics* 6:319, 2023, "Learning continuous models for continuous
+  physics". Used with Ott2021 in §2.3 and §5.6. Cite the 2023 journal year, not the 2022
+  preprint.
+- [ ] TODO: cite **HuangRussell2011** -- Huang & Russell, *Adaptive Moving Mesh Methods*,
+  Springer, Applied Mathematical Sciences vol. 174, 2011. Used in §2.5 as the classical
+  background for moving meshes; also the source of the equidistribution-CoV mesh-quality
+  measure needed in §5.5.
+- [ ] TODO: cite **Mai2024** -- Mai, Lachinov, Reiter, Riedl, Grechenig, Bogunović &
+  Schmidt-Erfurth, *Ophthalmology Science* 4(4):100466, 2024, "Deep Learning-Based
+  Prediction of Individual Geographic Atrophy Progression from a Single Baseline OCT".
+  Used in §2.6 as the closest prior work (same MUW cohort, same task); needed again in
+  §5.7. **The pre-segmented-masks vs raw-OCT caveat must travel with every comparison.**
+- [ ] TODO: cite **Salvi2025** -- Salvi et al., *Ophthalmology Science* 5(2):100635, 2025,
+  "Deep Learning to Predict the Future Growth of Geographic Atrophy from Fundus
+  Autofluorescence". Used in §2.6 as the dense-CNN precedent on this task (different
+  modality, so not a comparable number); also the GA-domain motivation for the U-Net arm
+  in §4.4.
+- [ ] TODO: literature check -- is there any prior application of neural PDE solvers to
+  biomedical disease progression or organ modelling? §2.6 currently states only that the
+  application "remains sparse", with an inline `% TODO`. Either find and cite one or two
+  examples, or make the absence an explicit, defensible claim.
+
 
 External references introduced inline in the LaTeX drafts that still need to be added to `references.bib` (one entry per reference; each has a corresponding `% TODO: cite ...` marker in the .tex file). Once an entry is added to the bibliography, replace the placeholder author-year mention with the proper `\citet{}` / `\citep{}` and remove the matching `% TODO:` line.
 

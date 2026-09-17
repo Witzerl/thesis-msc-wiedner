@@ -8,53 +8,1217 @@
 \section{Geographic Atrophy and OCT Imaging}
 \label{sec:background:ga-oct}
 
-% TODO: clinical background on GA; OCT volumes and en-face projections;
-% meaning of the 10 retinal layer boundaries; how masks are annotated;
-% reference to the MUW dataset structure.
+This section provides the imaging-side background needed to motivate
+the state representation used throughout the remainder of the thesis.
+The clinical framing established in Chapter~\ref{ch:introduction} is
+taken as read; the focus here is on \emph{which part of the eye} GA
+affects, on \emph{how} that part is imaged, on \emph{what is visible}
+in an OCT volume of a GA eye, and on \emph{which derived quantities}
+feed into the eleven-channel state tensor introduced
+in~\S\ref{sec:data:state}. Because the rest of this thesis is written
+for a primarily machine-learning audience, the present section is
+deliberately self-contained and aims to remain accessible to readers
+without prior clinical training:~\S\ref{sec:background:ga-oct:anatomy}
+introduces the small set of anatomical terms that recur throughout the
+work, and the subsequent subsections build the imaging substrate on
+top of that vocabulary.
+
+\subsection{A short anatomy primer}
+\label{sec:background:ga-oct:anatomy}
+
+% TODO: produce Figure fig:bg:eye-anatomy --- a two-panel anatomy
+% reference for ML readers without clinical background:
+% (left) sagittal cross-section of the human eye labelling the
+% principal structures from front to back: cornea, lens, vitreous
+% body, retina, fovea, optic nerve head (ONH) / optic disc, optic
+% nerve, choroid, sclera; with an explicit annotation of the macular
+% region as a small disc-shaped area on the retina centred near the
+% posterior pole. (right) en-face fundus view of the posterior pole
+% looking at the inside of the back of the eye, labelling: macula
+% (~6 mm-wide central region), fovea (central pit), foveola (the
+% innermost ~0.35 mm of the fovea), parafovea (~0.5--1.5 mm
+% eccentric ring), perifovea (~1.5--3 mm eccentric ring), and ONH /
+% optic disc (~4 mm nasal to the fovea). The 6 x 6 mm OCT scanning
+% window used by the thesis cohort can be overlaid on the fundus
+% panel as a dashed square centred on the fovea, to make the link
+% between the anatomical reference frame and the modelling grid
+% explicit.
+\begin{figure}[t]
+  \centering
+  \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering\itshape Placeholder
+    for Figure~\ref{fig:bg:eye-anatomy}: sagittal cross-section of the
+    eye (left) and en-face view of the fundus (right) labelling the
+    anatomical terms used throughout this thesis. See accompanying
+    \texttt{\% TODO} for the intended content.}}
+  \caption[Anatomy of the eye and the macular region.]{%
+    Anatomy reference for the terms used throughout this thesis.
+    \emph{Left:} sagittal (side-view) cross-section of the eye. Light
+    enters through the cornea and lens at the front, traverses the
+    vitreous body, and falls on the retina at the back; the
+    \emph{macula} is a small disc-shaped specialised region of the
+    retina near the posterior pole, and the \emph{fovea} is its
+    centre, where photoreceptor density and visual acuity peak. The
+    optic-nerve head (ONH, also called the optic disc) is the point
+    at which the optic nerve exits the eye.
+    \emph{Right:} en-face view of the fundus, i.e.\ the inside of the
+    back of the eye seen along the optical axis. The fovea sits
+    roughly at the centre of the macula; the macula itself is
+    sub-divided into the foveola (innermost), parafovea, and
+    perifovea, in concentric rings of increasing radius. The dashed
+    square indicates the
+    $6 \times 6$\,mm fovea-centred OCT scanning window used in this
+    thesis (\S\ref{sec:background:ga-oct:muw}).}
+  \label{fig:bg:eye-anatomy}
+\end{figure}
+
+The eye, sketched in Figure~\ref{fig:bg:eye-anatomy} (left), can be
+thought of as a biological camera. Light enters at the front through
+the \emph{cornea} and \emph{lens}, traverses the gel-filled vitreous
+body, and is focused onto the \emph{retina} --- a thin
+neural-tissue lining at the back of the eye that converts the
+incoming light pattern into electrical signals. Those signals leave
+the eye via the \emph{optic nerve}, which exits the retina at a
+specific anatomical landmark called the \emph{optic-nerve head} (ONH,
+also called the \emph{optic disc}). Behind the retina, two further
+layers --- the \emph{choroid} (a richly vascularised tissue, of which
+the \emph{choriocapillaris} is the innermost capillary bed) and the
+\emph{sclera} (the white, mechanically rigid outer shell) --- support
+and supply the retina from beneath.
+
+The retina is not uniform across its surface. A small disc-shaped
+region near the posterior pole, the \emph{macula}, is specialised for
+high-acuity central vision, while the rest of the retina handles
+peripheral vision at lower resolution. The macula has a diameter of
+roughly five to six millimetres and is the only part of the retina
+that GA ever affects clinically; for that reason, the OCT scanning
+window used throughout the thesis is centred on the macula and
+covers a $6 \times 6$\,mm field
+(\S\ref{sec:background:ga-oct:muw}). Within the macula, four
+concentric anatomical zones are conventionally distinguished, in
+order of increasing radius from the centre: the \emph{foveola}, the
+\emph{fovea}, the \emph{parafovea}, and the \emph{perifovea}
+(Figure~\ref{fig:bg:eye-anatomy}, right). The fovea is the small
+central pit at which photoreceptor density and visual acuity reach
+their peak, and the term ``foveal'' refers to anything in or close to
+that pit; ``parafoveal'' and ``perifoveal'' describe progressively
+more eccentric annular regions. Two qualifiers used in the GA
+literature follow directly from this geography: a lesion is called
+\emph{subfoveal} if it overlaps the fovea (i.e.\ it directly threatens
+high-acuity vision) and \emph{extrafoveal} otherwise. As discussed
+in~\S\ref{sec:introduction:problem}, whether a lesion is subfoveal or
+extrafoveal materially changes its clinical significance even if its
+total area is the same.
+
+A second piece of anatomy is internal rather than positional: the
+retina is itself a \emph{layered} tissue, with several distinct
+strata stacked vertically from the front (closest to the vitreous
+body) to the back (closest to the choroid). The principal layers, in
+order from inner to outer, are the inner limiting membrane, the
+retinal nerve fibre layer, the ganglion-cell and inner-plexiform
+layers, the inner nuclear and outer plexiform layers, the outer
+nuclear layer, the photoreceptor inner- and outer-segment bands, the
+retinal pigment epithelium (RPE), and Bruch's membrane;
+Figure~\ref{fig:bg:retinal-anatomy} (left) gives a labelled schematic.
+The terminology in this list takes some getting used to, but for the
+purposes of this thesis it is sufficient to remember the structural
+fact that the retina is layered, that GA destroys a specific
+\emph{outer}-retinal stack of three of those layers
+(\S\ref{sec:background:ga-oct:disease}), and that the surrounding
+layer geometry --- ten boundary depth maps in total --- is what feeds
+the model alongside the lesion mask
+(\S\ref{sec:background:ga-oct:state-rep}).
+
+The remaining subsections build on this vocabulary. \S\ref{sec:background:ga-oct:disease}
+describes how GA appears on OCT; \S\ref{sec:background:ga-oct:oct}
+explains what an OCT volume actually is and how it is acquired;
+\S\ref{sec:background:ga-oct:enface} describes the projection from
+3D OCT volume to the 2D en-face grid that the model operates on;
+\S\ref{sec:background:ga-oct:state-rep} defines the eleven channels of
+the state tensor; and \S\ref{sec:background:ga-oct:muw} describes the
+MUW longitudinal cohort.
+
+\subsection{Geographic Atrophy on OCT}
+\label{sec:background:ga-oct:disease}
+
+% TODO: produce Figure fig:bg:retinal-anatomy --- a two-panel
+% schematic for readers without a clinical background:
+% (left) labelled cross-section through a healthy macula showing the
+% principal retinal layers from ILM at the top through RNFL, GCL+IPL,
+% INL+OPL, ONL, photoreceptor IS/OS bands (including the ellipsoid
+% zone), RPE, and Bruch's membrane, with the choriocapillaris
+% immediately beneath; (right) a representative OCT B-scan through a
+% GA-affected macula highlighting the dropout of the outer-retinal
+% layers within the lesion and the corresponding choroidal
+% hypertransmission signature beneath. Mirror the channel ordering of
+% the eleven-channel state tensor used in the thesis.
+\begin{figure}[t]
+  \centering
+  \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering\itshape Placeholder for
+    Figure~\ref{fig:bg:retinal-anatomy}: schematic cross-section of a
+    healthy macula (left) versus a GA-affected macula on OCT (right).
+    See accompanying \texttt{\% TODO} for the intended content.}}
+  \caption[Retinal anatomy and the OCT signature of geographic atrophy.]{%
+    Anatomy of the macular retina and the OCT signature of geographic
+    atrophy. \emph{Left}: schematic cross-section through a healthy
+    macula, labelling the principal retinal layers from the inner
+    limiting membrane (ILM) at the top --- through the retinal nerve
+    fibre layer, the ganglion-cell and inner-plexiform layers, the inner
+    nuclear and outer plexiform layers, the outer nuclear layer, and the
+    photoreceptor inner- and outer-segment bands including the ellipsoid
+    zone --- down to the retinal pigment epithelium (RPE) and Bruch's
+    membrane (BM), with the choriocapillaris immediately beneath. The
+    same set of anatomical strata corresponds to the ten layer-boundary
+    channels of the eleven-channel state tensor introduced in
+    \S\ref{sec:background:ga-oct:state-rep}. \emph{Right}: a
+    representative OCT B-scan through a GA-affected macula. Inside the
+    lesion the outer-retinal complex is missing and a brighter signal
+    appears in the choroid beneath the lesion (the
+    \emph{choroidal hypertransmission} signature, item~(ii) in the
+    text below).}
+  \label{fig:bg:retinal-anatomy}
+\end{figure}
+
+The retina is a thin, layered tissue at the back of the eye that
+converts incoming light into neural signals;
+Figure~\ref{fig:bg:retinal-anatomy} (left) sketches its principal
+anatomical strata in the macula. Geographic atrophy is the disease in
+which a stack of three tightly coupled \emph{outer}-retinal layers ---
+the retinal pigment epithelium (RPE), the photoreceptor outer segments
+that sit just above the RPE, and the choriocapillaris (a dense capillary
+bed) immediately below the RPE --- die together in a localised patch of
+the macula \citep{Boopathiraj2024,Boyer2017}. These three layers are
+anatomically interdependent: the RPE supports the photoreceptors, and
+the choriocapillaris supplies both. In other words, atrophy of one
+layer entrains the degeneration of the others, so the resulting lesion
+appears on imaging as a sharply delineated patch in which the entire
+outer-retinal complex is missing rather than as the loss of a single
+isolated layer.
+
+What this end-stage lesion looks like on OCT has been formalised by an
+international consensus group, the Classification of Atrophy Meetings
+(CAM), under the term \emph{complete RPE and outer retinal atrophy}
+(cRORA) \citep{Vallino2024}. cRORA is identified by three concurrent
+OCT features: \emph{(a)} a region of choroidal hypertransmission of at
+least 250\,\textmu{}m in diameter; \emph{(b)} co-located attenuation or
+disruption of the RPE band of at least 250\,\textmu{}m; and \emph{(c)}
+overlying photoreceptor degeneration --- with the additional condition
+that no abnormal blood-vessel growth (\emph{macular neovascularisation},
+which is the wet form of AMD) is present in the same region.
+% TODO: cite Sadda2018 (CAM Report 3, "Consensus Definition for Atrophy
+% Associated with Age-Related Macular Degeneration on OCT", Ophthalmology
+% 125:537-548) once added to references.bib -- this is the primary
+% source for the cRORA criteria attributed to Vallino2024 here.
+Put differently, cRORA is the OCT-readable definition of an established
+dry-AMD lesion, and \emph{GA is precisely the subset of cRORA that
+arises in eyes without macular neovascularisation}. The CAM framework
+also recognises a precursor stage, \emph{iRORA} (incomplete RPE and
+outer retinal atrophy), which is essentially the same lesion at a
+smaller spatial scale, i.e.\ the same OCT pattern below the
+250\,\textmu{}m size threshold; iRORA progresses to cRORA in
+approximately 93\,\% of cases within twenty-four months, with a median
+conversion time of fourteen months \citep{Vallino2024}. The thesis
+state tensor encodes only the cRORA endpoint, as channel~0; iRORA is
+implicit in the surrounding layer channels but is not represented as a
+separate disease label, a scoping decision discussed
+in~\S\ref{sec:discussion:limitations}.
+
+The principal direct OCT signatures of an established GA lesion ---
+the visual fingerprints by which the disease is identified on a B-scan
+--- are the following \citep{Boopathiraj2024,Yehoshua2011,Vallino2024}.
+\emph{(i)} The outer-retinal layers are missing: the photoreceptor
+inner-segment / outer-segment junction (the \emph{ellipsoid zone}) and
+the RPE band drop out of the B-scan, leaving a structurally collapsed
+column where intact retina used to be.
+\emph{(ii)} \emph{Choroidal hypertransmission} appears beneath the
+lesion: because pigmented RPE no longer absorbs the probe beam, light
+penetrates deeper into the choroid, and the column-summed signal is
+higher than in the surrounding intact tissue. This is the same optical
+effect that makes GA appear bright on summed-voxel en-face projections,
+discussed in~\S\ref{sec:background:ga-oct:enface}.
+\emph{(iii)} \emph{RPE--Bruch's-membrane (BM) thickening} is
+concentrated immediately around the lesion margin --- essentially, the
+narrow ring of tissue just outside the lesion is measurably thicker
+than healthy tissue elsewhere on the retina --- and is attributed to
+basal-laminar deposits accumulated in the diseased tissue; the
+thickness of this rim correlates strongly with the eye's subsequent
+annual square-root lesion enlargement rate \citep{Chu2022}.
+The first two signatures define the lesion mask used as channel~0 of
+the state tensor; the third is a boundary-localised predictive
+biomarker that motivates encoding the surrounding layer geometry
+rather than the mask alone.
+
+\subsection{Optical Coherence Tomography of the Macula}
+\label{sec:background:ga-oct:oct}
+
+% TODO: cite Huang1991 (Huang et al., Science 254:1178-1181, "Optical
+% Coherence Tomography") once added to references.bib -- the seminal
+% paper introducing OCT, conventionally cited as the methodological
+% origin of the modality.
+% TODO: cite Wojtkowski2002 / Drexler2008 (or an equivalent SD-OCT
+% review) once added to references.bib -- the principle behind
+% spectral-domain OCT (the modality used to acquire the MUW cohort)
+% conventionally rests on these works.
+
+% TODO: produce Figure fig:bg:oct-acquisition --- a four-panel
+% schematic showing how an OCT volume is built up from one-dimensional
+% depth profiles, intended to anchor the geometric vocabulary
+% (A-scan, B-scan, volume, en-face) for ML readers without imaging
+% background:
+% (a) a sketch of the eye with a single near-infrared probe beam
+%     entering the cornea and reaching the retina; an inset graph
+%     shows the resulting depth-versus-reflectivity profile (= one
+%     A-scan), with characteristic peaks at the principal retinal
+%     layer interfaces.
+% (b) the same sketch with the beam scanned laterally along one
+%     axis, producing a stack of adjacent A-scans which when
+%     displayed side-by-side form a 2D cross-sectional image
+%     (= one B-scan).
+% (c) the beam now scanned in both lateral directions, producing
+%     a 3D rectangular cuboid of voxels (= one OCT volume) with the
+%     physical footprint explicitly annotated.
+% (d) the volume projected (e.g. by summing along the axial
+%     direction) onto its top face, yielding the 49 x 1024 en-face
+%     image used by the thesis (= the en-face projection of
+%     Section~2.1.4). A representative en-face image with a GA
+%     lesion visible as a brighter region can be shown next to the
+%     volume to make the projection step concrete.
+\begin{figure}[t]
+  \centering
+  \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering\itshape Placeholder
+    for Figure~\ref{fig:bg:oct-acquisition}: four-panel schematic of
+    OCT acquisition geometry, going A-scan $\to$ B-scan $\to$ volume
+    $\to$ en-face projection. See accompanying \texttt{\% TODO} for
+    the intended content.}}
+  \caption[OCT acquisition geometry: A-scan, B-scan, volume,
+  en-face projection.]{%
+    OCT acquisition geometry, showing how a three-dimensional OCT
+    volume is built up from one-dimensional depth profiles and how
+    the two-dimensional en-face image used by the model relates to
+    that volume.
+    \emph{(a)} A single near-infrared probe beam enters the eye and
+    is reflected back from the various retinal and choroidal layers
+    along its path; the resulting depth-versus-reflectivity profile
+    is one \emph{A-scan}, and the bright bands in that profile
+    correspond to the principal layer interfaces.
+    \emph{(b)} Scanning the beam laterally along one direction
+    produces a sequence of A-scans whose side-by-side display forms
+    a two-dimensional cross-sectional image of the retina, called a
+    \emph{B-scan}.
+    \emph{(c)} Scanning in both lateral directions yields a
+    three-dimensional \emph{OCT volume} (the physical scan window of
+    the MUW cohort spans approximately $6 \times 6$\,mm laterally).
+    \emph{(d)} Projecting the volume along its axial direction onto
+    the fundus plane yields the two-dimensional en-face image on
+    which the modelling pipeline operates
+    (\S\ref{sec:background:ga-oct:enface}); a GA lesion appears
+    inside the en-face image as a region with a different signal
+    intensity than the surrounding healthy retina.}
+  \label{fig:bg:oct-acquisition}
+\end{figure}
+
+Optical Coherence Tomography (OCT) produces micrometre-resolution
+cross-sectional images of the retina, in much the same way that
+ultrasound produces them for soft tissue --- except that low-coherence
+near-infrared light replaces sound. Concretely, the system shines a
+weak probe beam into the eye and measures how strongly each
+\emph{depth} along the path of the beam reflects light back. That
+depth-versus-reflectivity profile is then displayed as a single column
+of pixels in the output image, with intensity encoding reflectivity
+and the vertical position of each pixel encoding depth. Resolving the
+depth dimension requires a small piece of optical engineering, because
+near-infrared light from a single short pulse cannot be timed
+precisely enough on a per-layer basis with conventional electronics.
+The standard solution is interferometric: the source light is split
+into two beams (Figure~\ref{fig:bg:oct-acquisition}(a)), one of which
+--- the \emph{sample arm} --- is sent into the eye and reflected back
+from the various retinal layers, while the other --- the
+\emph{reference arm} --- is sent to a known mirror and reflected back
+unchanged. The two returning beams are then recombined and produce an
+interference pattern, and the spectrum of that pattern (in
+spectral-domain OCT) encodes the depth at which each reflection in
+the eye occurred. Standard signal processing then recovers the
+A-scan as a one-dimensional function of depth.
+
+A single A-scan is one column of one image. Scanning the probe beam
+laterally along one direction produces many adjacent A-scans, and
+displaying them side by side yields a two-dimensional cross-section
+through the retina, called a \emph{B-scan}
+(Figure~\ref{fig:bg:oct-acquisition}(b)). Scanning in both lateral
+directions yields a three-dimensional \emph{OCT volume}
+(Figure~\ref{fig:bg:oct-acquisition}(c)), in which each voxel records
+the reflectivity of one small block of tissue. The MUW cohort uses an
+acquisition protocol that produces volumes with a physical footprint of
+approximately $6 \times 6$\,mm laterally; how the varying native voxel
+grids are reduced to the standard two-dimensional modelling grid used in
+the rest of the thesis is the subject of~\S\ref{sec:background:ga-oct:enface}.
+
+Two acquisition platforms dominate the GA literature.
+Spectral-domain OCT (SD-OCT) operates around an 870\,nm wavelength and
+reaches an axial resolution of roughly 3--6\,\textmu{}m
+\citep{Boopathiraj2024,Pilotto2015}, sufficient to resolve the
+principal retinal layer boundaries from inner limiting membrane to
+Bruch's membrane. Swept-source OCT (SS-OCT), operating at approximately
+1050\,nm and at A-scan rates above 100\,kHz, reaches deeper into the
+choroid with a 5.5\,\textmu{}m axial resolution at the cost of slightly
+coarser lateral sampling \citep{Chu2022}. \citet{Vallino2024} argue
+that OCT is the modality of choice for GA over fundus
+autofluorescence (FAF) for three reasons: it provides
+cross-sectional images amenable to detailed quantitative analysis of
+each retinal layer, it detects atrophic processes earlier in their
+natural history, and it is reliable in the foveal region where blue-FAF
+struggles. The thesis modelling substrate is therefore OCT-derived,
+not FAF-derived, with \citet{Pilotto2015} providing the empirical
+guarantee that en-face OCT GA-area measurements reach inter-operator
+intraclass correlation coefficients of 0.97--0.99 and are statistically
+equivalent to B-FAF and near-infrared FAF on small cohorts.
+
+The single OCT acquisition simultaneously yields all the disease
+information that the state tensor needs to encode. The lesion itself is
+visible on the B-scan as a region of outer-retinal layer dropout with
+choroidal hypertransmission; the surrounding retinal layer geometry is
+recoverable from the same volume by automatic segmentation; and the
+choroidal slab beneath Bruch's membrane provides an additional view of
+the GA extent through the hypertransmission signature
+\citep{Vallino2024,Yehoshua2011}. No cross-modality fusion is required.
+
+\subsection{From OCT volumes to en-face projections}
+\label{sec:background:ga-oct:enface}
+
+The full SD-OCT volume of a GA eye is too large and too redundant to be
+modelled at native voxel resolution. The clinical literature has
+converged on a two-dimensional \emph{en-face projection} of the volume
+onto the fundus plane as the canonical analysis substrate
+\citep{Pilotto2015,Chu2022,Yehoshua2011,Vallino2024}, and the present
+work adopts the same convention.
+
+Two construction strategies appear in the literature. The
+\emph{summed-voxel projection} of \citet{Yehoshua2011} integrates the
+A-scan intensity along the full axial extent of the volume; in this
+projection GA appears as a \emph{bright} region because the absence of
+the pigmented RPE column lets choroidal signal contribute to the column
+sum that would otherwise be absorbed. The \emph{slab segmentation}
+strategy of \citet{Pilotto2015} instead extracts a thin axial slab of
+the volume and projects only that slab onto the fundus plane; an outer
+retinal slab placed just above Bruch's membrane visualises RPE and
+photoreceptor-complex atrophy directly, whereas a sub-RPE slab placed
+between 64 and 400\,\textmu{}m below Bruch's membrane visualises the
+same lesion through its choroidal hypertransmission signature
+\citep{Chu2022,Vallino2024}. The two strategies converge on the same
+underlying lesion geometry.
+
+The choice of en-face rather than B-scan as the modelling substrate is
+motivated by a methodologically important caveat documented by
+\citet{Vallino2024}: a lesion classified as iRORA on a single horizontal
+B-scan can in fact be part of a larger cRORA lesion that is only fully
+visible in the en-face slab. The en-face representation is therefore
+the more complete view of the GA extent and is the substrate on which
+quantitative growth-rate metrics, drug-response readouts, and
+deep-learning progression predictors are reported in the recent
+literature \citep{Chu2022,Vogl2021,Vallino2024}. By construction, the
+2D en-face grid also reduces a per-step three-dimensional forward
+problem to a per-step two-dimensional one, which matters for the
+tractability of the graph-neural-network architectures introduced in
+the subsequent chapters.
+
+\subsection{The eleven-channel state representation}
+\label{sec:background:ga-oct:state-rep}
+
+This subsection describes \emph{what} the eleven channels of the state
+tensor are, in structural terms, and \emph{why} retaining all of them
+is clinically motivated. The operational details of how the channels
+are produced from the raw OCT volumes in the MUW cohort ---
+segmentation pipeline, grading protocol, software stack --- are
+deferred to~\S\ref{sec:data:dataset} and are not relied upon
+in the rest of this chapter.
+% TODO: confirm with supervisor the exact provenance of channel 0
+% (manual clinical grading vs trained segmentation network vs
+% combination) and of channels 1-10 (which layer-segmentation
+% algorithm, which boundary list, which post-processing) before
+% drafting Chapter 3.1; the present subsection is written to be
+% agnostic of those details.
+
+The first channel of the state tensor is a binary \emph{GA mask} on the
+en-face grid: an indicator function that takes value one inside the
+cRORA region defined by the CAM criteria
+of~\S\ref{sec:background:ga-oct:disease} and zero outside it. The only
+properties of channel~0 that this chapter relies upon are that it is
+binary, that it is aligned to the same en-face grid as the layer
+channels, and that the supported region of the mask coincides with the
+GA lesion as it would be identified by a trained reader applying the
+cRORA criteria.
+
+The remaining ten channels are \emph{retinal layer boundary depth
+maps}: at every pixel of the en-face grid, the value of channel
+$c \in \{1, \dots, 10\}$ is the axial position of one anatomical layer
+boundary in the underlying OCT B-scan. Concretely, fixing a pixel of
+the en-face grid selects a single A-scan in the OCT volume, and channel
+$c$ at that pixel records how deep along that A-scan the $c$-th
+anatomical layer-boundary surface lies. Stacking all ten channels
+therefore reconstructs the full vertical retinal architecture of the
+eye on the same horizontal grid as the lesion mask. The specific list
+of boundaries used for the MUW cohort is given
+in~\S\ref{sec:data:state}; collectively the boundaries delimit the
+principal anatomical strata of the retina, from the inner limiting
+membrane at the top, through the retinal nerve fibre layer, the
+ganglion-cell and inner-plexiform layers, the inner nuclear and outer
+plexiform layers, the outer nuclear layer, the photoreceptor inner-
+and outer-segment bands (including the ellipsoid zone), the retinal
+pigment epithelium, and Bruch's membrane at the bottom (cf.\
+Figure~\ref{fig:bg:retinal-anatomy}).
+
+Two technical caveats are inherent to standard SD-OCT-derived layer
+segmentation, regardless of the specific algorithm used to produce the
+boundary maps, and are explicitly acknowledged here and again
+in~\S\ref{sec:discussion:limitations}. First, standard SD-OCT cannot
+separate the outer nuclear layer from the Henle fibre layer
+\citep{Vogl2021}, so what is referred to as the ``ONL'' boundary in any
+SD-OCT-derived state tensor is effectively a combined
+ONL\,+\,HFL boundary. Second, the hyperreflective complex that
+aggregates the RPE, the ellipsoid zone, the interdigitation zone, and
+the outer photoreceptor segments sits at or below the axial resolution
+limit of SD-OCT and is conventionally treated as a single composite
+band rather than resolved into its sub-bands. Both caveats apply to the
+state tensor used throughout the thesis.
+
+The clinical motivation for retaining all ten layer-boundary channels
+alongside the binary mask is that documented prognostic biomarkers for
+GA progression live throughout the full vertical retinal column, not
+only inside the lesion itself. RPE--Bruch's-membrane thickening at the
+0--300\,\textmu{}m rim around the GA boundary correlates with annual
+square-root enlargement rate at $r = 0.595$ \citep{Chu2022}; outer
+retinal layer thinning, in particular of the outer nuclear layer and
+of the RPE-photoreceptor complex, accelerates in the months preceding
+macular-atrophy conversion \citep{Vogl2021}; and the inner nuclear
+layer in the retina immediately adjacent to a GA lesion correlates
+with subsequent yearly progression rate at Spearman $r = 0.48$
+\citep{Ebneter2016}. \citet{Vallino2024} further report that
+RPE-to-Bruch's-membrane distance combined with outer-retinal-layer
+thickness jointly predicts approximately 62\,\% of the annual GA
+progression variance, while either feature alone explains less than
+ten per cent. The layer channels are therefore not auxiliary context;
+they carry rate-of-change information that the mask alone cannot
+provide. \S\ref{sec:method:multichannel} returns to how this
+multi-channel state propagates through the network.
+
+\subsection{The MUW longitudinal GA cohort}
+\label{sec:background:ga-oct:muw}
+
+The dataset used throughout the thesis is the GA cohort of the Medical
+University of Vienna (MUW), a longitudinal collection of macula-centred
+SD-OCT volumes acquired in routine clinical practice. The cohort comprises
+553 Heidelberg SD-OCT volume scans over 75 eyes. Lateral pixel counts
+vary per eye across the 553 visits, ranging from 38 to 66 B-scans by 961
+to 1719 A-scans, giving 67 distinct native shapes in total. No visit has
+a native dimension of $49 \times 1024$. Instead, $49 \times 1024$ is the
+modelling grid, reached by a symmetric centre-crop or zero-pad operation,
+and never by resampling (\S\ref{sec:data:spatial}). Pixel spacing is
+treated as constant across the cohort at approximately
+$[0.12118,\, 0.003867,\, 0.00568]$\,mm in the $(x, z, y)$ directions,
+because the scans were resampled upstream to one gold-standard spacing.
+The resulting fixed physical window is approximately
+$5.94 \times 5.82$\,mm.
+% TODO: check the DICOM spacing fields to confirm the constant-spacing assumption.
+This constant-spacing assumption has only been checked against the
+cohort's own recorded transform files, where it holds to a tolerance of
+about two per cent. The ratio between the two in-plane spacings is
+roughly 21:1. This extreme anisotropy is a direct consequence of the
+clinical acquisition protocol and is reflected in several architectural
+choices in Chapter~\ref{ch:method}.
+
+The 6\,mm window is a standard in the literature. \citet{Pilotto2015}
+explicitly exclude eyes whose GA extends beyond a $6 \times 6$\,mm
+fovea-centred square, observing that approximately ninety-nine per cent
+of GA pathology occurs within a central three-millimetre radius from
+the macula. The same window is used by \citet{Yehoshua2011}
+($200 \times 200$ raster at 30\,\textmu{}m / pixel lateral) and by
+\citet{Chu2022} (Zeiss PLEX Elite 9000 SS-OCT, $6 \times 6$\,mm scan
+window with 1536 axial pixels and 500 A-lines per B-scan), and it
+serves as the de-facto analysis area for GA OCT studies. However,
+measured on the present cohort, this window is not lossless. It cuts
+real lesion area in 27.3 per cent of visits. The cut removes more than
+5 per cent of the lesion in 6.0 per cent of visits, reaching a
+worst-case loss of 25.7 per cent. Furthermore, 31.1 per cent of the
+cropped lesions touch the crop border, meaning that growth across that
+border is censored without a missingness flag. A detailed treatment of
+the spatial grid is deferred to~\S\ref{sec:data:spatial}.
+
+For each eye in the cohort, the dataset comprises a sequence of
+follow-up visits at irregular calendar intervals, each visit
+contributing one eleven-channel en-face state. Patient-level
+covariates --- in particular age and biological sex --- accompany the
+imaging sequence; the operational details of how they are extracted
+and encoded are described in~\S\ref{sec:data:covariates}. Because GA
+is bilateral in approximately 39--50\,\% of patients at the time of
+initial diagnosis with strong inter-eye correlation
+\citep{Yehoshua2011,Boyer2017}, the dataset is split at the patient
+level rather than the eye level, as motivated
+in~\S\ref{sec:data:splits}.
 
 
 \section{Partial Differential Equations and Numerical Solvers}
 \label{sec:background:pde-solvers}
 
-% TODO: short primer on temporal PDEs, the method of lines, finite
-% differences/volumes, and mesh-based discretization - only the subset
-% that motivates what neural solvers replace.
-% Constraint: focus strictly on spatial grids and time-stepping as they
-% relate to discrete, autoregressive state updates. Use the Shallow Water
-% Equation (SWE) as the running example whenever one is needed.
+This section reviews the subset of classical PDE-solver theory that is
+load-bearing for the remainder of the thesis. The exposition is
+deliberately narrow: it covers temporal PDEs in conservation form, the
+method-of-lines reduction to a system of ordinary differential
+equations, finite-difference and finite-volume spatial stencils, the
+elementary time integrators that close the loop on a discrete update
+rule, and the distinction between uniform and adaptive meshes. The aim
+is to provide the language in which the neural solvers
+of~\S\ref{sec:background:neural-pde}--\S\ref{sec:background:mm-pde}
+are defined; nothing further is required. In line with the project
+convention, the two-dimensional shallow-water equation (SWE) serves as
+the running concrete example throughout, both because the SWE features
+prominently as a benchmark in the moving-mesh literature
+\citep{Hu2024} and because its sharp wave fronts on a quadratic spatial
+domain are visually similar to the active GA boundary on the
+$49 \times 1024$ en-face grid.
+
+\subsection{Temporal PDEs and conservation form}
+\label{sec:background:pde-solvers:problem}
+
+Following \citet{Brandstetter2022}, a temporal partial differential
+equation in one time dimension and $D$ spatial dimensions is written as
+\begin{equation}
+  \partial_t u \;=\; F\!\left(t, x, u, \partial_x u, \partial_{xx} u, \dots\right),
+  \qquad (t, x) \in [0, T] \times \mathcal{X},
+  \label{eq:bg:temporal-pde}
+\end{equation}
+where $\mathcal{X} \subset \mathbb{R}^D$ is the spatial domain and the
+solution $u: [0, T] \times \mathcal{X} \to \mathbb{R}^n$ takes values in
+an $n$-dimensional state space. The problem is closed by an initial
+condition $u(0, x) = u^{0}(x)$ and boundary conditions
+$B[u](t, x) = 0$ on $[0, T] \times \partial \mathcal{X}$, where the
+boundary operator $B$ may be of Dirichlet, Neumann, or periodic type.
+
+A subclass of \eqref{eq:bg:temporal-pde} of particular interest in
+this thesis is the family of equations expressible in
+\emph{conservation form},
+\begin{equation}
+  \partial_t u \;+\; \nabla \cdot J(u) \;=\; 0,
+  \label{eq:bg:conservation-form}
+\end{equation}
+where $J(u)$ is the flux of the conserved quantity $u$. The
+conservation-form framing is the structural property that makes finite
+volume methods \emph{exact} on the cell-integrated state and that
+underpins the message-passing-as-stencil interpretation of neural
+solvers in~\S\ref{sec:background:mp-pde}.
+
+The SWE describe the depth-averaged motion of a thin layer of
+incompressible fluid under gravity over a flat bottom and provide the
+running example for this section.
+% TODO: cite a canonical SWE reference (e.g. LeVeque 2002, "Finite
+% Volume Methods for Hyperbolic Problems", Cambridge University Press,
+% Chapter 13; or Vreugdenhil 1994, "Numerical Methods for Shallow-Water
+% Flow", Springer) once added to references.bib -- the SWE are the
+% running example for Section 2.2 and require a textbook citation.
+With water column height $h(t, x, y)$ and depth-averaged horizontal
+velocities $u(t, x, y)$ and $v(t, x, y)$, mass and momentum
+conservation read
+\begin{align}
+  \partial_t h \;+\; \partial_x (h u) \;+\; \partial_y (h v) &= 0, \label{eq:bg:swe-mass}\\
+  \partial_t (h u) \;+\; \partial_x \!\left( h u^{2} + \tfrac{1}{2} g h^{2} \right) \;+\; \partial_y \!\left( h u v \right) &= 0, \label{eq:bg:swe-momx}\\
+  \partial_t (h v) \;+\; \partial_x \!\left( h u v \right) \;+\; \partial_y \!\left( h v^{2} + \tfrac{1}{2} g h^{2} \right) &= 0,
+  \label{eq:bg:swe-momy}
+\end{align}
+where $g$ is gravitational acceleration. Equations
+\eqref{eq:bg:swe-mass}--\eqref{eq:bg:swe-momy} are a coupled system of
+hyperbolic conservation laws on the three-component state
+$\mathbf{u} = (h, h u, h v)^{\top}$, and they fit
+\eqref{eq:bg:conservation-form} with vector-valued flux
+\[
+  J(\mathbf{u}) \;=\;
+  \begin{pmatrix}
+    h u & h v \\
+    h u^{2} + \tfrac{1}{2} g h^{2} & h u v \\
+    h u v & h v^{2} + \tfrac{1}{2} g h^{2}
+  \end{pmatrix}.
+\]
+The relevant features of this system for the present thesis are that the
+solution is multi-component (foreshadowing the multi-channel state
+tensor of~\S\ref{sec:method:multichannel}), that wave fronts can
+develop sharp gradients in regions of small support
+(foreshadowing the active GA boundary on a quasi-static interior and
+exterior), and that a uniform discretisation of the spatial domain
+wastes resolution in regions where the solution is smooth.
+
+\subsection{The method of lines}
+\label{sec:background:pde-solvers:mol}
+
+The classical strategy for solving \eqref{eq:bg:temporal-pde}
+numerically is the \emph{method of lines}, in which the spatial
+variables are discretised first while the time variable is left
+continuous \citep{Brandstetter2022}. The continuous spatial domain
+$\mathcal{X}$ is replaced by a finite grid
+$X = \{c_i\}_{i=1}^{N}$ of $N$ collocation points or cell centres, and
+the value of the state at grid point $i$ and continuous time $t$ is
+written $u_i(t)$. Spatial derivatives in $F(\cdot)$ are then
+approximated by stencil-based operators evaluated on $X$, yielding the
+semi-discrete system
+\begin{equation}
+  \frac{\mathrm{d} u_i}{\mathrm{d} t}
+  \;=\; f_i\!\left(t, u_1(t), \dots, u_N(t)\right),
+  \qquad i = 1, \dots, N,
+  \label{eq:bg:mol-ode}
+\end{equation}
+in which only the time variable remains continuous. Equation
+\eqref{eq:bg:mol-ode} is an ordinary differential equation in the
+state vector $\mathbf{u}(t) = (u_1(t), \dots, u_N(t))^{\top}$ and can
+be integrated with any standard ODE integrator. The full numerical
+PDE solver is then a composition of two ingredients: a \emph{spatial
+discretisation} that assembles the right-hand side of
+\eqref{eq:bg:mol-ode}, and a \emph{time integrator} that advances
+$\mathbf{u}(t)$ over a finite step $\Delta t$. The decomposition
+matters because, as shown in~\S\ref{sec:background:mp-pde}, the
+encode--process--decode neural solver of \citet{Brandstetter2022} can
+be read directly as a learned non-linear instantiation of the same
+two ingredients, with the GNN replacing the stencil and a residual
+update replacing the ODE integrator.
+
+\subsection{Spatial discretisation: stencils on a uniform grid}
+\label{sec:background:pde-solvers:stencils}
+
+For a uniform one-dimensional grid with spacing $\Delta x$, the
+elementary stencil for the first spatial derivative is the
+finite-difference approximation
+\begin{equation}
+  \left.\frac{\partial u}{\partial x}\right|_{x = x_i}
+  \;\approx\; \frac{u_{i+1} - u_{i-1}}{2 \Delta x},
+  \label{eq:bg:fdm-central}
+\end{equation}
+and analogous stencils exist for higher derivatives and higher
+orders. More systematically, a polynomial of suitable degree is fitted
+locally to a window of grid values, and the stencil coefficients are
+read off as the corresponding derivative of the fitted polynomial
+evaluated at the target grid point \citep{Brandstetter2022}. A
+finite-difference method (FDM) is therefore a fixed linear operator
+acting on the local neighbourhood of each grid point.
+
+The finite-volume method (FVM) takes a different route, motivated by
+the conservation form \eqref{eq:bg:conservation-form}. The spatial
+domain is partitioned into control volumes (cells) $K_i$, and the
+state value at cell $i$ is interpreted as the cell-averaged quantity
+$\bar{u}_i = |K_i|^{-1} \int_{K_i} u \, \mathrm{d}x$. Integrating
+\eqref{eq:bg:conservation-form} over $K_i$ and applying the
+divergence theorem yields, in one spatial dimension,
+\begin{equation}
+  \frac{\mathrm{d} \bar{u}_i}{\mathrm{d} t}
+  \;=\; \frac{1}{\Delta x_i}
+  \!\left( J^{}_{i - 1/2} - J^{}_{i + 1/2} \right),
+  \label{eq:bg:fvm-update}
+\end{equation}
+where $J^{}_{i \pm 1/2}$ are numerical flux estimates at the left and
+right cell boundaries \citep{Brandstetter2022}. The cell average
+$\bar{u}_i$ is exactly conserved up to boundary fluxes, which is the
+discrete analogue of the local-conservation property of the underlying
+PDE. Higher-order conservative reconstructions such as WENO5 add a
+non-linear convex combination of sub-stencils that adapts to local
+solution smoothness, allowing the scheme to capture sharp gradients
+without introducing spurious oscillations \citep{Brandstetter2022}.
+
+For the SWE in two dimensions, both FDM and FVM stencils generalise
+in the natural way: the partial derivatives in
+\eqref{eq:bg:swe-mass}--\eqref{eq:bg:swe-momy} are replaced by
+finite-difference stencils on a tensor-product grid in the FDM case,
+or by surface-flux estimates on the boundaries of two-dimensional
+control volumes in the FVM case. In both cases the spatial
+discretisation is local: the right-hand side of
+\eqref{eq:bg:mol-ode} at grid point $i$ depends only on a small
+neighbourhood of $i$. Locality is the structural property that
+message-passing graph neural networks exploit explicitly when they
+replace classical stencils, and it is the property that the dynamics
+of GA --- atrophy concentrated at the lesion boundary, with the
+lesion interior and the surrounding healthy retina both quasi-static
+\citep{Yehoshua2011} --- already satisfies on the en-face grid.
+
+\subsection{Time integration}
+\label{sec:background:pde-solvers:time}
+
+Once the spatial discretisation has reduced \eqref{eq:bg:temporal-pde}
+to the system of ordinary differential equations
+\eqref{eq:bg:mol-ode}, any standard ODE integrator closes the loop. The
+simplest choice is the explicit Euler step
+\begin{equation}
+  u_i^{k + 1} \;=\; u_i^{k}
+  \;+\; \Delta t \, f_i\!\left(t_k, u_1^{k}, \dots, u_N^{k}\right),
+  \label{eq:bg:euler}
+\end{equation}
+with $u_i^{k} \approx u_i(t_k)$ and $\Delta t = t_{k+1} - t_k$. Higher
+order is reached by replacing the single-stage Euler update with a
+Runge--Kutta scheme; the fourth-order Runge--Kutta integrator (RK4) is
+the standard choice for benchmark generation in the neural-PDE-solver
+literature, used for instance in combination with WENO5 spatial
+reconstruction by \citet{Brandstetter2022} to produce ground-truth
+trajectories.
+
+For the running SWE example, an explicit time-stepping scheme advances
+the discretised state $\mathbf{u}^{k} = (h^{k}, (hu)^{k}, (hv)^{k})$ by
+evaluating the discretised flux divergence on $\mathbf{u}^{k}$ and
+applying \eqref{eq:bg:euler} or its Runge--Kutta extension. Stability
+of the scheme is governed by a Courant--Friedrichs--Lewy (CFL)
+condition that constrains $\Delta t$ in proportion to the spatial
+spacing $\Delta x$ and the maximum wave speed
+$\sqrt{g h} + \max(|u|, |v|)$; on a finer mesh, a smaller $\Delta t$
+is required.
+
+The form of \eqref{eq:bg:euler} is the structural template for the
+\emph{residual} decoder of MP-PDE \citep{Brandstetter2022}, in which
+the right-hand side $f_i$ is replaced by the output of a graph neural
+network. The thesis adapts that template to the irregular
+$\Delta t$ of clinical visits, replacing the fixed step size by the
+per-window observation interval; the formal definition is given
+in~\S\ref{sec:method:dt-residual}.
+
+\subsection{Uniform and adaptive meshes}
+\label{sec:background:pde-solvers:mesh}
+
+The spatial discretisations described above all rest on a fixed
+\emph{mesh} that partitions $\mathcal{X}$ into grid points or cells.
+The simplest choice is a \emph{uniform mesh}, in which all cells have
+the same size and the same shape; for a rectangular domain in two
+spatial dimensions, this is a tensor-product grid with constant
+spacings $\Delta x$ and $\Delta y$. A uniform mesh is the natural
+discretisation when the solution is approximately equally hard to
+resolve everywhere on the domain, which is rarely the case for
+problems with localised structure.
+
+When the solution exhibits sharp gradients in some regions and is
+smooth in others --- as the SWE does in the vicinity of a wave front,
+and as the GA state does in the vicinity of the active lesion boundary
+--- a uniform mesh either over-resolves the smooth regions or
+under-resolves the sharp ones. Two families of mesh-adaptation
+strategies have been developed in classical numerical analysis to
+address this trade-off \citep{Hu2024}. \emph{$h$-adaptation}
+adds and removes vertices to refine or coarsen the mesh locally; the
+total number of degrees of freedom changes over time and the mesh
+topology is dynamic. \emph{$r$-adaptation}, sometimes called the
+\emph{moving-mesh} approach, keeps the number of vertices and the
+graph topology fixed and only \emph{moves} existing vertices toward
+regions where the solution is hardest to approximate. The latter
+strategy preserves the dimensionality and connectivity of the discrete
+state across time steps, which is the property that makes it
+compatible with graph-neural-network solvers; \S\ref{sec:background:mm-pde}
+develops this point in detail.
+
+The classical $r$-adaptation problem is well-posed only after a
+\emph{monitor function} $M(x)$ has been specified, encoding where on
+$\mathcal{X}$ the mesh should refine; the moving-mesh map then
+redistributes vertex positions so that each cell carries the same
+amount of monitor-weighted volume \citep{Hu2024}. \S\ref{sec:background:mm-pde}
+shows how \citet{Hu2024} reformulate this redistribution as a
+single-scalar Monge--Amp\`ere equation that can be solved without
+ground-truth meshes, and how the resulting mesh mover plugs into a
+neural PDE solver. The point for the present section is structural:
+classical numerical analysis already recognises that fixed uniform
+meshes are wasteful for problems with localised dynamics, and the
+moving-mesh inductive bias of MM-PDE is a learned analogue of an
+established classical idea --- one that on the GA imaging substrate is
+motivated by the empirical fact that lesion progression is
+concentrated at a thin boundary and is direction-dependent
+\citep{Yehoshua2011,Singh2025}, while the lesion interior and the
+surrounding healthy retina are quasi-static.
+
+The remainder of Chapter~\ref{ch:background} traces the same chain of
+ingredients --- discrete state on a mesh, local stencil, residual
+update, optionally adapted mesh --- through their neural counterparts.
 
 
-\section{Neural PDE Solvers}
+\section{Neural PDE Solvers and Surrogate Architectures}
 \label{sec:background:neural-pde}
 
-% TODO: neural operators (FNO, DeepONet - briefly, as context) versus
-% autoregressive solvers (MP-PDE). Explain why autoregressive is the right
-% framing for clinical longitudinal data.
+Neural PDE solvers broadly separate into two paradigms. Neural
+operators learn a continuous map
+$M: [0, T] \times \mathcal{F} \to \mathcal{F}$ such that
+$M(t, u_0) = u(t)$, thereby predicting the solution at any arbitrary
+time directly from the initial condition. By contrast, autoregressive
+solvers learn a local update operator
+$u(t + \Delta t) = A(\Delta t, u(t))$ and are applied iteratively to
+unroll a trajectory. Note that when the step size $\Delta t$ is fixed
+by the dataset, the explicit dependence on it is usually suppressed in
+the notation. This thesis cannot suppress it because clinical
+observation intervals are fundamentally irregular.
+
+Neural operators take several structural forms. Finite-dimensional
+variants are bound to the specific grid geometry they were trained on.
+Infinite-dimensional variants decouple the learned operator from the
+spatial discretisation altogether.
+% TODO: cite Li2021 (Li, Kovachki, Azizzadenesheli, Liu, Bhattacharya,
+% Stuart & Anandkumar, "Fourier Neural Operator for Parametric Partial
+% Differential Equations", ICLR 2021)
+The Fourier Neural Operator (Li et al., 2021) parameterises a kernel
+integral operator in the Fourier domain. This formulation gives the
+network global spatial support in a single layer.
+% TODO: cite Lu2021 (Lu, Jin, Pang, Zhang & Karniadakis, "Learning
+% nonlinear operators via DeepONet based on the universal approximation
+% theorem of operators", Nature Machine Intelligence 3(3):218-229, 2021)
+Alternatively, DeepONet (Lu et al., 2021) factorises the operator into
+a branch network that encodes the input function and a trunk network
+that encodes the continuous query coordinate. A standard limitation
+applies to both variants: the trained operator is inherently tied to
+the equation family it was trained on, and extrapolation beyond the
+temporal horizon seen during training is reliably poor.
+
+The autoregressive framing is the natural fit for clinical
+longitudinal data. Each visit-to-visit transition fundamentally
+constitutes one step. Furthermore, there is no shared temporal origin
+($t = 0$) across patients, making a direct time-dependent mapping
+ill-posed. Finally, the required prediction horizon is set by the
+clinic rather than by the model, which necessitates a system that can
+be stepped forward as many times as a given patient's schedule
+dictates.
+
+The principal cost of the autoregressive framing is error
+accumulation. After the first step, the solver consumes its own output
+rather than numerical ground truth. The input distribution at test
+time therefore differs systematically from the distribution seen
+during training. This distribution shift is the central training
+difficulty for autoregressive rollouts.
+\S\ref{sec:background:mp-pde} describes the two primary mechanisms
+proposed to mitigate it in the graph-network literature.
+
+Beyond graph networks, several distinct architecture families are used
+as PDE surrogates.
+% TODO: cite Ronneberger2015 (Ronneberger, Fischer & Brox, "U-Net:
+% Convolutional Networks for Biomedical Image Segmentation",
+% MICCAI 2015, pp. 234-241)
+% TODO: cite Gupta2023 (Gupta & Brandstetter, "Towards
+% Multi-spatiotemporal-scale Generalized PDE Modeling", TMLR 2023)
+The U-Net (Ronneberger et al., 2015) is an encoder-decoder
+architecture with skip connections and a multi-scale receptive field.
+Although originally introduced for biomedical image segmentation, it
+serves as a standard strong surrogate baseline in the neural-PDE
+literature (Gupta \& Brandstetter, 2023).
+% TODO: cite LiuSchiaffini2024 (Liu-Schiaffini, Berner, Bonev, Kurth,
+% Azizzadenesheli & Anandkumar, "Neural Operators with Localized
+% Integral and Differential Kernels", ICML 2024)
+Surrogate architectures also vary fundamentally in their spatial
+context. Global spectral operators, such as the Fourier Neural
+Operator, contrast directly with local convolutional or
+message-passing operators. Hybrid architectures combine these
+properties by adding a small local kernel bypass to a global operator
+to capture high-frequency details more effectively
+(Liu-Schiaffini et al., 2024).
+% TODO: cite Gao2019 (Gao & Ji, "Graph U-Nets", ICML 2019)
+Graph U-Nets (Gao \& Ji, 2019) provide the corresponding multi-scale
+counterpart for data structured as graphs.
+% TODO: cite Lienen2022 (Lienen & Gunnemann, "Learning the Dynamics of
+% Physical Systems from Sparse Observations with Finite Element
+% Networks", ICLR 2022)
+Finite Element Networks (Lienen \& G\"unnemann, 2022) adopt a different
+numerical perspective, building the neural update directly from a
+learned finite-element discretisation and carrying an explicit
+transport (advection) term.
+% TODO: cite Chen2018 (Chen, Rubanova, Bettencourt & Duvenaud, "Neural
+% Ordinary Differential Equations", NeurIPS 2018)
+% TODO: cite Ott2021 (Ott, Katiyar, Hennig & Tiemann, "ResNet After
+% All: Neural ODEs and Their Numerical Solution", ICLR 2021)
+% TODO: cite Krishnapriyan2023 (Krishnapriyan, Queiruga, Erichson &
+% Mahoney, "Learning continuous models for continuous physics",
+% Communications Physics 6:319, 2023)
+Finally, because a residual step resembles one explicit Euler step, a
+Neural-ODE reading is sometimes applied (Chen et al., 2018). Under
+this interpretation, a higher-order integrator such as a Runge--Kutta
+scheme can in principle replace the residual step. It must be stated
+plainly that this reading is only legitimate if the trained model is
+nearly invariant to the solver used at inference. This property must
+be tested empirically rather than assumed, as classical solver
+guarantees do not automatically transfer to neural parameterisations
+(Ott et al., 2021; Krishnapriyan et al., 2023).
+
+These architecture families differ in a small number of structural
+properties. The primary distinctions lie in whether the operator has
+spatial context at all, how far that context physically reaches,
+whether it combines global and local information, and whether it
+carries an explicit transport term. This thesis refers to these
+structural differences as inductive-bias ingredients.
+Chapter~\ref{ch:experiments} isolates and measures them.
 
 
 \section{MP-PDE: Message-Passing Neural PDE Solvers}
 \label{sec:background:mp-pde}
 
-% TODO: Brandstetter et al. (2022) - encode-process-decode architecture,
-% temporal bundling, the pushforward trick and its zero-stability
-% interpretation.
+\citet{Brandstetter2022} introduced an autoregressive neural solver for
+time-dependent PDEs in conservation form. The solver operates on a
+spatial graph, leveraging a direct analogy where grid points or
+finite-volume cells become nodes, and numerical stencils become edges.
+The spatial graph is constructed dynamically via a cutoff radius on
+regular grids, or by connecting $k$-nearest-neighbours on irregular
+meshes.
+
+% TODO: cite Battaglia2018 (Battaglia et al., "Relational inductive
+% biases, deep learning, and graph networks", arXiv 2018)
+% TODO: cite SanchezGonzalez2020 (Sanchez-Gonzalez et al., "Learning to
+% simulate complex physics with graph networks", ICML 2020)
+The architecture follows a standard encode--process--decode pattern
+(Battaglia et al., 2018; Sanchez-Gonzalez et al., 2020). An encoder,
+implemented as a per-node two-layer multilayer perceptron (MLP), lifts
+the initial node features into a latent space. The encoder input takes
+the form
+$f_i^0 = \epsilon([u_i^{k-K:k}, x_i, t_k, \theta_{\text{PDE}}])$.
+
+The processor applies multiple rounds of message passing to update the
+latent node state; the original paper sets the number of rounds to six.
+The message function is defined as
+$m_{ij}^m = \phi(f_i^m, f_j^m, u_i^{k-K:k} - u_j^{k-K:k}, x_i - x_j,
+\theta_{\text{PDE}})$, and the subsequent node update is
+$f_i^{m+1} = \psi(f_i^m, \sum_j m_{ij}^m, \theta_{\text{PDE}})$. Both
+$\phi$ and $\psi$ are parameterised as two-layer MLPs with skip
+connections and normalisation layers. The inclusion of relative
+positions $x_i - x_j$ directly encodes translational symmetry into the
+network. The solution differences $u_i - u_j$ act as a learned local
+difference operator, establishing a flexible learned stencil.
+
+A core representational claim of the MP-PDE framework is that message
+passing can approximate classical numerical schemes. The original
+authors mapped roughly one message-passing layer to a finite-difference
+scheme, two layers to finite volumes, and three layers to a WENO5
+reconstruction.
+
+The equation feature vector, denoted $\theta_{\text{PDE}}$, holds the
+PDE coefficients and the boundary-condition identifiers. Crucially,
+this vector is injected both at the encoder and at every single
+message-passing layer. This persistent injection is what enables a
+single trained solver to generalise across a family of equations.
+Ablating the $\theta_{\text{PDE}}$ injection degrades performance most
+severely when the equation parameters vary across the dataset.
+
+The decoder is a shallow one-dimensional convolutional neural network
+with weights shared across the spatial dimensions. It is applied along
+the temporal-bundle axis to decode the final latent state into a
+sequence of updates $d_i = (d_i^1, \dots, d_i^K)$. A residual update
+$u_i^{k+l} = u_i^k + (t_{k+l} - t_k) d_i^l$ produces the final
+prediction for each substep $1 \leq l \leq K$. This formulation is
+motivated by numerical consistency: the update must necessarily
+converge to the true solution as the temporal step size approaches
+zero.
+
+Two distinct mechanisms mitigate the accumulation of rollout errors.
+The first is temporal bundling. The model predicts $K$ future steps per
+forward pass (with $K \in \{20, 25, 50\}$ in the original evaluation).
+This reduces the total number of solver calls required along a given
+rollout by a factor of $K$, which in turn reduces the number of
+accumulated distribution shifts the model is exposed to.
+
+The second mechanism is the pushforward trick, an adversarial stability
+loss. During training, the input state is perturbed by the model's own
+one-step prediction from the preceding state. This ensures that the
+perturbation applied to the training input is drawn from the exact
+distribution the solver will subsequently face at inference time. The
+trick is implemented by unrolling two steps and backpropagating only
+through the last; gradients on the earlier step are deliberately cut.
+Cutting the gradients is both faster and more stable, because
+backpropagating through the perturbation itself would teach the model
+to make the perturbation small rather than learning to correct it. This
+technique empirically outperforms training with Gaussian noise, which
+improves stability but consistently incurs a cost to predictive
+accuracy.
+
+The pushforward trick is theoretically grounded in the concept of zero
+stability. An update operator is considered zero-stable if
+$\lVert A(u^0 + \epsilon) - u^1 \rVert \leq \kappa \lVert \epsilon
+\rVert$ for a small constant $\kappa$. The pushforward loss directly
+minimises this constant $\kappa$. Zero stability, together with
+consistency, provides the fundamental convergence argument that the
+MP-PDE architecture relies upon.
+
+At scale, the original MP-PDE models comprise roughly one million
+parameters. The hidden representation size is of the order of 128, and
+the networks are trained using the AdamW optimiser.
+
+The original paper states three clear limitations. High-quality
+numerical ground truth is strictly required for training. There are no
+formal accuracy guarantees. Finally, a uniform mesh is wasteful in
+smooth regions and under-resolved at sharp gradients. This last
+limitation directly motivates the moving-mesh extension detailed in the
+next section.
+
+This thesis keeps the residual update formulation and the pushforward
+trick. It modifies the architecture by conditioning the update on a
+variable $\Delta t$ and removes temporal bundling entirely. The
+specifics of this adaptation are deferred to
+Chapter~\ref{ch:method}.
 
 
 \section{MM-PDE: Moving Mesh PDE Solvers}
 \label{sec:background:mm-pde}
 
-% TODO: Hu et al. (2024) - DMM (data-free mesh mover, trained on the
-% Monge--Amp\`ere equation), monitor function and equidistribution principle,
-% dual-branch architecture with ItpNet, interpolation between uniform and
-% moved meshes.
+\citet{Hu2024} extend message-passing neural solvers by integrating an
+adaptive moving mesh. A uniform mesh is fundamentally inefficient for
+problems that exhibit localised dynamics. It wastes computational
+resolution in smooth regions while simultaneously under-resolving sharp
+gradients, such as wave fronts.
+
+Mesh adaptation strategies separate into two families. The
+$h$-adaptation approach adds and removes vertices to dynamically refine
+or coarsen the mesh. This changes both the topology and the total
+degrees of freedom between steps, a property that is hostile to
+standard graph-network training. Conversely, $r$-adaptation, or
+moving-mesh adaptation, moves a fixed set of nodes while maintaining
+both the node count and the original graph topology. Prior neural
+$r$-adaptation methods were entirely supervised and required
+ground-truth optimal meshes generated by an expensive classical solver.
+
+The moving-mesh framework is governed by a monitor function. The
+monitor is defined as $M = (1 + \lVert \nabla u \rVert_2 / \alpha) I$,
+a matrix-valued function that takes large values precisely where the
+state solution varies sharply. The identity factor $I$ ensures that the
+refinement is isotropic. The addition of a constant $+1$ keeps $M$
+bounded away from zero, which prevents nodes from collapsing entirely
+in smooth regions. The global scaling constant $\alpha$ dictates the
+trade-off between mesh adaptivity and numerical stability. The
+corresponding mesh density is given by $\rho(x) = \sqrt{\det M(x)}$.
+This specific functional form is derived from an established upper
+bound on finite-element interpolation error.
+
+The equidistribution principle formalises the objective of the mesh
+adaptation. A coordinate map $f$ produces an $M$-uniform mesh if the
+integral of the density $\rho$ over the image of every single cell is
+equal. Specifically, this integral must equal $\sigma / N$, where
+$\sigma$ is the total integral of $\rho$ over the domain and $N$ is the
+total number of cells. Intuitively, every cell must carry the identical
+amount of monitor-weighted information, which forces cells to shrink in
+regions where $M$ is large.
+
+Because infinitely many maps satisfy the equidistribution principle,
+choosing the optimal map is framed as an optimal transport problem. The
+objective is to select the mapping closest to the identity. By
+Brenier's theorem, the unique solution to this problem is the gradient
+of a convex scalar potential, such that $f = \nabla \phi$. Substituting
+this gradient into the equidistribution constraint yields the
+Monge--Amp\`ere equation,
+\[
+  \det H(\phi) \;=\; \frac{\sigma}{|\Omega| \, \rho(\nabla \phi)},
+\]
+which is a fully non-linear second-order PDE for the scalar potential
+$\phi$. The problem is constrained by the boundary condition that the
+domain boundary maps exactly to itself. A scalar potential is learned
+rather than the full vector map because the convexity of $\phi$ is
+mathematically equivalent to a non-singular Jacobian of $f$. A
+non-singular Jacobian guarantees that the resulting mesh does not
+tangle. Crucially, enforcing convexity on a scalar potential is far
+easier to regularise than imposing a global non-tangling constraint on
+a vector field.
+
+The network architecture reformulates the scalar potential residually
+as $\phi(x) = 0.5 \|x\|^2 + \psi(x)$. The gradient therefore becomes
+$\nabla \phi = x + \nabla \psi$. The network is tasked with predicting
+only the displacement field $\psi$. This formulation removes the
+trivial identity component from the network's objective and ensures
+that the coordinate map is approximately the identity mapping at
+initialisation.
+
+The Data-free Mesh Mover (DMM) follows a DeepONet-style architecture. A
+branch network encodes the full spatial state $u$, and a trunk network
+processes a continuous query coordinate. Together, they output the
+scalar potential. The DMM is trained entirely without mesh supervision
+via a dedicated physics loss
+$L = L_{\text{eq}} + \beta L_{\text{bound}} + \gamma L_{\text{convex}}$.
+In this formulation, $L_{\text{eq}}$ is the squared residual of the
+Monge--Amp\`ere equation evaluated at sampled interior points,
+$L_{\text{bound}}$ enforces the boundary condition, and
+$L_{\text{convex}}$ penalises violations of convexity. The convexity
+term is critical; a non-convex potential inevitably yields a tangled
+and useless mesh, regardless of how small the equation residual
+becomes. Training uses the Adam optimiser followed by L-BFGS
+fine-tuning applied exclusively to the last layer. The DMM is
+pretrained and subsequently frozen during solver training. This
+decouples a well-posed geometric problem from the main solver objective
+and allows the identical mesh mover to be reused across different
+experiments.
+
+The full moving-mesh update operator is constructed as a dual-branch
+composition, defined as $M(u_t) = G_1(u_t) + I(G_2, \tilde{f}, u_t)$.
+Here, $G_1$ represents a graph neural network operating on the uniform
+mesh, $G_2$ is a graph neural network operating on the moved mesh,
+$\tilde{f}$ is the coordinate map predicted by the DMM, and $I$ is a
+learned interpolation operator mapping features back to uniform
+coordinates. The uniform branch supplies a stable global view of the
+domain, while the moved branch supplies a locally refined correction
+where gradients are steep.
+
+The interpolation network, ItpNet, learns adaptive interpolation
+weights directly from the moved-mesh geometry rather than relying on
+fixed finite-element basis functions. It is pretrained with its own
+optimiser before joint dual-branch training begins, because an
+untrained interpolation would feed unstructured noise into the uniform
+branch, destabilising the system.
+
+% TODO: cite HuangRussell2011 (Huang & Russell, "Adaptive Moving Mesh
+% Methods", Springer, Applied Mathematical Sciences vol. 174, 2011)
+The classical background for adaptive moving meshes on which this
+framework builds is covered extensively by Huang \& Russell (2011).
+\citet{Hu2024} reported several architectural ablations that confirm
+the dual-branch necessity. Removing the moved branch degrades
+performance entirely to the uniform-mesh baseline. Removing the uniform
+branch degrades performance even further, because the moved mesh
+inherently under-covers smooth regions. Replacing the DMM-generated
+mesh with a random mesh isolates and degrades the performance of the
+moved branch specifically. Finally, removing the interpolation
+pretraining severely harms overall training stability, even if it does
+not permanently cap the final accuracy.
+
+Whether mesh adaptation provides a measurable benefit for slowly
+evolving clinical data remains an open question, and one that this
+thesis tests. How a monitor function should be defined over a
+multi-channel state tensor is similarly treated as an open question
+deferred to Chapter~\ref{ch:method}.
 
 
 \section{Related Work}
 \label{sec:background:related-work}
 
-% TODO: deep learning for retinal imaging; GA progression models in the
-% clinical literature; other neural solvers applied to biomedical problems
-% (if any).
+Deep learning models for OCT-based age-related macular degeneration and
+geographic atrophy progression divide broadly into cohort-level risk
+models and spatial-progression models.
+% TODO: cite SchmidtErfurth2018 (Schmidt-Erfurth et al., "Prediction of
+% individual disease conversion in early AMD using artificial
+% intelligence", IOVS 59:3199-3208, 2018)
+Schmidt-Erfurth et al. (2018) reported on the prediction of individual
+disease conversion in early AMD using artificial intelligence.
+% TODO: cite Bogunovic2017 (Bogunovic et al., "Machine learning of the
+% progression of intermediate AMD based on OCT imaging",
+% IOVS 58:BIO141-BIO150, 2017)
+Bogunovic et al. (2017) demonstrated the machine learning of
+intermediate-AMD progression directly from OCT imaging. For established
+geographic atrophy, \citet{Vogl2021} provided a topographic progression
+analysis. The broader landscape of deep-learning progression models in
+this domain is reviewed extensively by \citet{Lad2023} and
+\citet{Singh2025}. \citet{Vallino2024} explicitly argued that
+artificial intelligence applied to OCT can provide predictive
+probabilities of GA development over time, cementing OCT as a
+predictive substrate for structural endpoints.
+
+% TODO: cite Mai2024 (Mai, Lachinov, Reiter, Riedl, Grechenig,
+% Bogunovic & Schmidt-Erfurth, "Deep Learning-Based Prediction of
+% Individual Geographic Atrophy Progression from a Single Baseline
+% OCT", Ophthalmology Science 4(4):100466, 2024)
+The closest prior work on the specific prediction task addressed here
+is by Mai et al. (2024), who predicted individual GA progression from a
+single baseline OCT on the exact MUW cohort used in this thesis. The
+input regime, however, is fundamentally different. While that prior
+work operates directly on raw OCT volumes, the present thesis consumes
+pre-segmented lesion masks and layer surfaces. This difference must be
+kept in mind whenever the approaches are compared.
+% TODO: cite Salvi2025 (Salvi et al., "Deep Learning to Predict the
+% Future Growth of Geographic Atrophy from Fundus Autofluorescence",
+% Ophthalmology Science 5(2):100635, 2025)
+As a precedent for dense convolutional architectures on this task,
+Salvi et al. (2025) predicted future GA growth using a two-dimensional
+U-Net on fundus autofluorescence images, establishing a relevant
+multi-scale spatial benchmark on an alternative modality.
+
+The prevailing formulation in the clinical literature rests on
+cohort-level, categorical, time-to-conversion prediction. By contrast,
+the formulation used here dictates a per-eye, per-time-step prediction
+of the full spatial next state. Consequently, this thesis sits at the
+intersection of applied medical-imaging deep learning and PDE-solver
+inductive biases.
+% TODO: check the literature for any prior application of neural PDE
+% solvers to biomedical disease progression or organ modelling. Add a
+% citation if one exists; otherwise note the absence explicitly.
+The application of neural PDE solvers to biomedical problems remains
+sparse.
 
 
 %%
