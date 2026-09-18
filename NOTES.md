@@ -467,7 +467,52 @@ Pulled from the code repository (`masterthesis-docker/NOTES.md` + `PROJECT_CONTE
   That contradicts the locked-off monotonic penalty and the observed local shrinkage.
   Fix it in `masterthesis-docker` and re-mirror; the thesis text rests the prior on slow
   change only.
-- [ ] TODO: 4.4 Backbone II (countermodel family, contract, parameter matching).
+- [x] 2026-09-18: §4.4 Backbone II drafted (pages 38-46, ~9 pages, level with §4.3) from an
+  external-LLM draft built on (a) an implementation fact sheet from `THESIS_FRAMEWORK.md`
+  §4b and (b) a **paper fact sheet written from the papers themselves** -- U-Net, FNO,
+  localized kernels, Graph U-Nets, FEN, Ott et al., MM-PDE -- read from their PDFs, with
+  section/equation locations. Audited line by line. The draft's self-report said "no
+  unverified claims were introduced"; that was not true. Corrections:
+  - **My fact sheet was ambiguous, the draft picked wrong:** the locality floors are
+    truncations of the *index-space k-NN* arm (the ladder's two-round rung, 0.4515, is the
+    k-NN model), not of the canonical dilated stencil.
+  - **Invented or wrong:** "batch sizes vary" as the reason to avoid batch statistics (the
+    reason is the no-gradient training-mode rollout); "the solver restricts the Courant
+    number to 2.83" (the limit is *checked*, not enforced -- 9/10 final T-FEN checkpoints
+    exceed it); "the FEN formulates the update as a physical transport process" (only the
+    transport term does); "the autonomous formulation prevents reach beyond one triangle"
+    (reach is limited because one derivative evaluation only couples nodes sharing a
+    triangle); the graph U-Net's message function called a "multi-layer perceptron" (one
+    shared linear layer + ReLU); a 0.5 mm wavelength described as "the size of small
+    lesions" (unsupported); Hu et al. said to have "established" parameter matching (they
+    ran a bigger-GNN control); "temporal covariates"; FNO discretisation invariance stated
+    as fact rather than as the paper's claim.
+  - **Missing from the draft, added:** the FEN free-form MLP's tanh/depth-4/width-96/zero-init
+    details and inputs; RK4 with a fixed 45-day step; the 97,632-triangle transport mesh
+    as the FE analogue of the dilated stencil; "no-flux boundary is a statement about the
+    crop"; the U-Net's nine blocks / 18 normalised sites (the graph U-Net paragraph
+    referenced them); "the mode count was not ablated"; the 1.97x gap stated in §4.4.4 as
+    well as §4.4.6; the hybrid explicitly "not the resolution-consistent operator".
+  - **Table caption claimed all non-control arms lie within 1.25x**; the one-hop floor
+    (0.67x) and the free-form FEN (0.52x) do not. Caption and text now say why.
+  - Two tables (this one and §4.3.3's) were ~5 pt wider than the text block; narrowed.
+    The one remaining overfull-box warning predates this session (template, \output).
+- [ ] TODO: the RK4 stability limit for the T-FEN transport stencil is recorded two ways
+  (2.8 as implemented vs ~2.4 derived from a spectral radius of 1.1-1.2). §4.4.4 carries an
+  inline TODO. Also confirm "monitored, not enforced during training" against the code;
+  it is inferred from the out-of-bound final checkpoints and the parked bounded-velocity
+  head.
+- [ ] TODO: a parameter-matched free-form FEN control (width ~139, ~5 GPU-h at 5 folds) has
+  never been run; §4.4.4 and §4.4.6 state the 1.97x gap. Inline TODO in §4.4.4.
+- [ ] TODO (code repo, not editable from here) -- three statements in
+  `THESIS_FRAMEWORK.md` §4b found wrong or misleading while checking the papers:
+  (1) the 3x3 FNO hybrid is called "the localized-kernel neural operator
+  (Liu-Schiaffini et al.)"; it is a simplified relative -- no mean subtraction, no 1/h
+  rescaling, no DISCO, one fixed resolution; (2) the FEN transport term is said to depart
+  from Lienen & Günnemann by imposing "no divergence constraint", but the paper's velocity
+  is also only per-cell constant (Appendix B assumes div v = 0 to reach the same advective
+  form); both implementations are the same in this respect; (3) the "44x" U-Net ratio is
+  against the k-NN arm (75,339); against the canonical 67,147 it is 50x.
 - [ ] TODO: 4.5 Moving-mesh extension as a tested hypothesis (DMM, dual branch, alpha gate).
 - [ ] TODO: 4.6 Conditioning (covariates, LayerEncoder).
 - [ ] TODO: 4.7 Training.
@@ -538,6 +583,21 @@ marker itself; `THESIS_FRAMEWORK.md` §10.1 carries verified entries for all of 
   Springer, Applied Mathematical Sciences vol. 174, 2011. Used in §2.5 as the classical
   background for moving meshes; also the source of the equidistribution-CoV mesh-quality
   measure needed in §5.5.
+- [ ] TODO: cite **Liu2018** -- Liu, Lehman, Molino, Petroski Such, Frank, Sergeev & Yosinski,
+  *NeurIPS* 2018, "An Intriguing Failing of Convolutional Neural Networks and the CoordConv
+  Solution", arXiv:1807.03247. Used in §4.4.1 for the coordinate input channels.
+- [ ] TODO: cite **Wu2018** -- Wu & He, *ECCV* 2018, "Group Normalization", arXiv:1803.08494.
+  Used in §4.4.2 for the U-Net / graph U-Net normalisation.
+- [ ] TODO: cite **Gilmer2017** -- Gilmer, Schoenholz, Riley, Vinyals & Dahl, *ICML* 2017,
+  "Neural Message Passing for Quantum Chemistry", arXiv:1704.01212. Used in §4.4.3.
+- [ ] TODO: cite **Courant1928** -- Courant, Friedrichs & Lewy, "Über die partiellen
+  Differenzengleichungen der mathematischen Physik", *Mathematische Annalen* 100(1):32-74,
+  1928, doi:10.1007/BF01448839. Used in §4.4.4 for the stability condition.
+- [ ] TODO: cite **Butcher1987** -- Butcher, *The Numerical Analysis of Ordinary Differential
+  Equations: Runge-Kutta and General Linear Methods*, Wiley 1987. Used in §4.4.5.
+- [ ] TODO: cite **Hairer1993** -- Hairer, Nørsett & Wanner, *Solving Ordinary Differential
+  Equations I: Nonstiff Problems*, Springer, 2nd rev. ed. 1993,
+  doi:10.1007/978-3-540-78862-1. Used in §4.4.5.
 - [ ] TODO: cite **Ba2016** -- Ba, Kiros & Hinton, "Layer Normalization", arXiv:1607.06450,
   2016 (preprint, no peer-reviewed venue). Used in §4.3.1 for the per-node normalisation.
 - [ ] TODO: cite **Ioffe2015** -- Ioffe & Szegedy, *ICML* 2015, "Batch Normalization:

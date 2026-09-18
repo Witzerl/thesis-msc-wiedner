@@ -126,7 +126,7 @@ Everything else that occupies the same slot, described on identical terms and at
 - **Graph countermodels and the floors:** the graph U-Net, and the per-pixel model with no spatial context as the lower floor.
 - **The Finite Element Network**, free-form and with the learned transport (advection) term.
 - **Time integration:** the fixed-step Runge-Kutta wrapper over any backbone, and what a continuous-time reading would require.
-- **Parameter matching:** what is matched to what, the 1.25x band, and the two deliberate out-of-band controls (44x U-Net, 0.22x per-pixel floor) and why each exists.
+- **Parameter matching:** what is matched to what, the 1.25x band, and the two deliberate out-of-band controls (the width-32 U-Net at ~50x the canonical model -- 44.5x the k-NN arm -- and the 0.22x per-pixel floor) and why each exists.
 
 ### 4.5 The moving-mesh extension as a tested hypothesis
 DMM + dual branch, framed from the outset as a hypothesis the design was built to measure rather than a component assumed to help.
@@ -172,7 +172,7 @@ Reported as findings, not as failures, each with its instrument and its scope.
 - **Mesh adaptation / the dual branch.** The tightest null in the project, parameter-matched, at ~10x the cost. **Constraint on scope: α stays shut in the parameter-matched bypass control as well as in the mesh arm, so what the gate measured is the correction branch's failure to optimise — not "mesh adaptation does not transfer to GA". Weight decay is refuted as the cause.**
 - **Patient covariates** — both instruments agree, neither graduates, and the residual points against them.
 - **The learned coefficient surrogate** — null at every width over an 8x range, at 30-55 % more compute.
-- **Capacity** — the 44x U-Net erases its own smaller twin's win.
+- **Capacity** — the width-32 U-Net (~50x the canonical model) erases its own smaller twin's win.
 - **Time-integration order** — RK4 vs Euler null over both a local graph operator and a global spectral one, at ~4.8x the cost.
 - **Every GNN-internal knob** — normalisation, aggregation, edge-direction features. The geometry mattered; the message function did not.
 - **The intermediate-time-point regulariser** — evaluated and removed.

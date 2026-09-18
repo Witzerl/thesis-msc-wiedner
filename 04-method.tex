@@ -439,7 +439,7 @@ used different settings for the two.
     aggregation of its reference implementation.}
   \label{tab:method:mppde-diff}
   \small
-  \begin{tabular}{p{0.2\textwidth} p{0.36\textwidth} p{0.36\textwidth}}
+  \begin{tabular}{p{0.18\textwidth} p{0.35\textwidth} p{0.35\textwidth}}
     \toprule
     Aspect & Original MP-PDE & This thesis \\
     \midrule
@@ -483,11 +483,443 @@ represents all eleven channels independently (\S\ref{sec:method:mppde:arch}).
 \section{Backbone II: The Countermodel Family}
 \label{sec:method:family}
 
-% TODO: the shared backbone contract; U-Net at two capacities, FNO, FNO +
-% 3x3 local kernel; graph U-Net; per-pixel floor; Finite Element Network,
-% free-form and with the transport term; the Runge--Kutta wrapper;
-% parameter matching (1.25x band, and the two deliberate out-of-band
-% controls). Same depth as Backbone I.
+The framework of~\S\ref{sec:method:framework} provides one slot for the
+update operator $f_\theta$. This section describes every architecture other
+than the graph solver of~\S\ref{sec:method:mppde} that occupies that slot.
+Each of them is a comparison model --- a countermodel --- chosen to isolate
+one property. A U-Net tests multiscale local detail. A Fourier Neural
+Operator tests global spectral support without a local path, and a hybrid
+adds a minimal local path to it. A graph U-Net separates the operator class
+from the multiscale pyramid. Two truncated graph solvers test how much
+spatial context is needed at all. A Finite Element Network adds an explicit
+transport term. Finally, a Runge--Kutta wrapper changes the time integration
+of any of these operators. Because all of them run in the same training
+environment, differences between them can be attributed to the architecture
+rather than to the training protocol.
+
+\S\ref{sec:method:family:contract} states the interface every member
+satisfies. \S\ref{sec:method:family:dense} describes the three dense grid
+operators, \S\ref{sec:method:family:floors} the graph U-Net and the locality
+floors, and \S\ref{sec:method:family:fen} the Finite Element Network.
+\S\ref{sec:method:family:rk} describes the integration wrapper, and
+\S\ref{sec:method:family:params} the parameter matching.
+
+\subsection{The Backbone Contract}
+\label{sec:method:family:contract}
+
+Every member of the family satisfies the same interface. It is built from
+the same metadata --- one time step, eleven state channels and two
+covariates --- and it consumes the same batch. It returns the full next
+state in the residual form of Equation~\eqref{eq:method:residual-update}:
+the predicted residual is scaled by $\Delta t$ and added to the input
+state. The final layer of every architecture is initialised to zero, so
+every member starts training at exact persistence. Each module computes the
+residual and the next state from one shared internal computation, so the
+two cannot diverge. The integration wrapper of~\S\ref{sec:method:family:rk}
+integrates exactly this residual.
+
+No member uses a normalisation that keeps batch statistics. The reason is
+the one given in~\S\ref{sec:method:mppde:arch}: the training curriculum
+rolls the model forward on its own predictions in training mode, and batch
+statistics would make training and evaluation behave as two different
+operators. The loss, the curriculum, the optimiser, the computational
+budget, the model selection and the random seeds are identical for every
+member. The members differ in their architecture only.
+
+The three operators that work on the image grid --- the U-Net, the Fourier
+Neural Operator and the graph U-Net --- receive identical inputs. Each takes
+sixteen input channels: the eleven state channels, $\Delta t$ broadcast as a
+constant plane, the two covariates broadcast as constant planes, and two
+coordinate ramps running from zero to one along each axis.
+% TODO: cite Liu2018 (Liu, Lehman, Molino, Petroski Such, Frank, Sergeev &
+% Yosinski, "An Intriguing Failing of Convolutional Neural Networks and the
+% CoordConv Solution", NeurIPS 2018, arXiv:1807.03247)
+The coordinate ramps follow the CoordConv construction of Liu et al.
+(2018). Because the inputs are identical, a difference between these three
+arms reflects the operator, not the information it receives.
+
+The three grid operators and the Finite Element Network run as single-branch
+models and without the layer encoder of~\S\ref{sec:method:encoder}. The
+U-Net is therefore a like-for-like comparison with the single-branch graph
+solver, not with the moving-mesh variant of~\S\ref{sec:method:mmpde}. One
+technical difference remains: the convolutional arms run their convolutions
+at the default TF32 precision of the GPU, whereas the linear layers of the
+graph solver run in standard 32-bit precision. The arms are therefore not
+precision-matched (\S\ref{sec:method:implementation}).
+
+\subsection{Dense Operators: U-Net, FNO and a Local-Kernel Hybrid}
+\label{sec:method:family:dense}
+
+% TODO: cite Ronneberger2015 (Ronneberger, Fischer & Brox, "U-Net:
+% Convolutional Networks for Biomedical Image Segmentation", MICCAI 2015,
+% arXiv:1505.04597)
+The first dense operator is a U-Net (Ronneberger et al., 2015). The
+original was designed for biomedical image segmentation. It consists of a
+contracting and an expansive path. Each contracting step applies two
+unpadded $3 \times 3$ convolutions, each followed by a ReLU, and then a
+$2 \times 2$ max pooling with stride two; the number of feature channels
+doubles at each downsampling step. Each expansive step upsamples, halves the
+channels with an up-convolution, concatenates the correspondingly cropped
+feature map from the contracting path, and applies two further $3 \times 3$
+convolutions. A final $1 \times 1$ convolution maps to the output classes.
+% TODO: cite Gupta2023 (Gupta & Brandstetter, "Towards
+% Multi-spatiotemporal-scale Generalized PDE Modeling", TMLR 2023,
+% arXiv:2209.15616)
+Gupta and Brandstetter (2023) study modernised U-Nets as PDE surrogates and
+attribute their strength to handling local and global information through
+the down- and up-sampling paths.
+% TODO: cite Salvi2025 (Salvi et al., "Deep Learning to Predict the Future
+% Growth of Geographic Atrophy from Fundus Autofluorescence", Ophthalmology
+% Science 5(2):100635, 2025)
+In the GA domain, Salvi et al. (2025) predict future lesion growth with a
+two-dimensional U-Net on fundus autofluorescence images.
+
+The U-Net used here departs from the original in four ways. First, each
+convolution is followed by group normalisation with a single group before
+the ReLU; the original uses no normalisation.
+% TODO: cite Wu2018 (Wu & He, "Group Normalization", ECCV 2018,
+% arXiv:1803.08494)
+With one group, group normalisation normalises each sample over all its
+channels and positions and keeps no batch statistics (Wu \& He, 2018). With
+nine such blocks --- an input stage, four downsampling and four upsampling
+stages --- the network has 18 normalised convolution sites. Second, pooling
+is anisotropic. The factors (rows, columns) are $(1, 2)$, $(1, 2)$,
+$(2, 2)$ and $(2, 2)$, so the grid shrinks from $49 \times 1024$ through
+$49 \times 512$, $49 \times 256$ and $24 \times 128$ to $12 \times 64$. Rows
+are pooled four times and columns sixteen times, which reduces the 21:1
+aspect of the grid to about 5:1 without removing it. The schedule was
+deliberately not tuned further, because a comparison model whose geometry
+has been optimised against this dataset would be a weaker control, not a
+stronger one. Third, upsampling is nearest-neighbour instead of an
+up-convolution, and the output has the grid size of the input. Fourth, the
+final $1 \times 1$ layer is zero-initialised and returns a residual rather
+than class scores. Two widths are used: a base width of five gives
+83\,081 parameters (the parameter-matched arm), and a base width of 32 gives
+3\,354\,347 (the capacity control).
+
+% TODO: cite Li2021 (Li, Kovachki, Azizzadenesheli, Liu, Bhattacharya,
+% Stuart & Anandkumar, "Fourier Neural Operator for Parametric Partial
+% Differential Equations", ICLR 2021, arXiv:2010.08895)
+The second dense operator is the Fourier Neural Operator (FNO) of Li et al.
+(2021). The input is first lifted to a wider representation by a local
+map. Each layer then combines a local linear transform with a non-local
+integral operator and applies a nonlinearity. The integral operator
+transforms its input to Fourier space, multiplies the retained low modes by
+learned complex weights, and transforms back. Modes above a threshold are
+truncated; both the low positive and the low negative frequencies are kept.
+A local projection maps the result to the output. The paper shows that the
+Fourier layers are invariant to the discretisation, and that truncation does
+not limit the output to the retained modes, because the nonlinearities and
+the projection recover higher frequencies. For its two-dimensional problems,
+the original uses four Fourier layers, ReLU activations with batch
+normalisation, 12 modes per dimension and a width of 32. It notes that the
+local linear term helps the model handle non-periodic boundaries.
+
+The FNO used here keeps four blocks, each a spectral convolution plus a
+pointwise $1 \times 1$ path, and departs from the original in the
+following respects. It uses GELU activations between blocks instead of ReLU,
+and no normalisation. It retains 14 modes per axis instead of 12, and its
+width is 5 instead of 32, which gives 79\,160 parameters. The output passes
+through a $1 \times 1$ convolution to 32 channels, a GELU and a
+zero-initialised $1 \times 1$ projection. The domain here is a crop, not a
+periodic physical domain (\S\ref{sec:data:spatial}). This thesis therefore
+zero-pads the field by about one eighth per axis before the transform, from
+$49 \times 1024$ to $56 \times 1152$, and crops it back after the spectral
+blocks; the original relies on the local linear term instead and does not
+pad. The mode count follows from the geometry. The physical domain is nearly
+square ($5.94 \times 5.82$\,mm), so equal mode counts give nearly equal
+physical bandwidth on both axes --- the property the index-space graph
+of~\S\ref{sec:method:graph} lacks. Dividing the padded extent by the highest
+retained mode index, 13, gives a finest retained wavelength of about
+0.52\,mm across rows and 0.50\,mm along columns. The mode count was not
+ablated.
+
+The third dense operator is a local-kernel hybrid.
+% TODO: cite LiuSchiaffini2024 (Liu-Schiaffini, Berner, Bonev, Kurth,
+% Azizzadenesheli & Anandkumar, "Neural Operators with Localized Integral
+% and Differential Kernels", ICML 2024, arXiv:2402.16845)
+Liu-Schiaffini et al. (2024) observe that global operations in Fourier
+space are prone to over-smoothing and may miss local details. They add
+localised operators in parallel to the Fourier layers and the pointwise
+path. Their differential kernels subtract the kernel mean and rescale by the
+reciprocal grid width, so that the convolution converges to a differential
+operator as the grid is refined; their localised integral kernels use
+discrete-continuous convolutions. The hybrid used here is the simplest
+instance of this idea. It widens the pointwise $1 \times 1$ path of each FNO
+block to an unconstrained $3 \times 3$ convolution, so a local path runs in
+parallel with the spectral one. Unlike the original, it operates at a single
+training resolution, without mean subtraction, without rescaling and without
+discrete-continuous convolutions; it is therefore not the
+resolution-consistent operator of that paper. The spectral path keeps
+global support and the local path gains one ring of neighbours, at a cost
+of 800 parameters (79\,960 in total). With a kernel size of one, the model
+reduces exactly to the plain FNO.
+
+\subsection{The Graph U-Net and the Locality Floors}
+\label{sec:method:family:floors}
+
+The graph U-Net sits between the U-Net and the graph solver. It is the
+U-Net of~\S\ref{sec:method:family:dense} with every $3 \times 3$ convolution
+replaced by one message-passing layer on the 8-connected grid graph, which
+links each pixel to its horizontal, vertical and diagonal neighbours. The
+pyramid, the pooling schedule, the channel schedule, the 18 normalised
+sites, the nearest-neighbour upsampling, the skip connections, the
+zero-initialised head and the input channels are all unchanged. Each
+message is computed by one shared layer --- a linear map followed by a ReLU
+--- applied to the two hidden states and the row and column offsets between
+them, at each of the eight offsets. Neighbours outside the grid are left out
+of the mean. This is mean-aggregation message passing on the 8-neighbour
+graph. The model has 72\,713 parameters.
+
+Against the U-Net, this architecture isolates the operator class at a fixed
+multiscale pyramid. Against the graph solver of~\S\ref{sec:method:mppde}, it
+isolates the pyramid at a fixed operator class.
+% TODO: cite Gilmer2017 (Gilmer, Schoenholz, Riley, Vinyals & Dahl,
+% "Neural Message Passing for Quantum Chemistry", ICML 2017,
+% arXiv:1704.01212)
+One caveat applies. A message function that is shared across offsets and
+receives the offset as an input is the standard message-passing
+construction (Gilmer et al., 2017), but it is not a strict superset of a
+$3 \times 3$ convolution, which has a separate weight matrix for every
+offset. The comparison therefore probes the question whether a convolution
+is a one-hop graph layer in one direction only.
+% TODO: cite Gao2019 (Gao & Ji, "Graph U-Nets", ICML 2019,
+% arXiv:1905.05178)
+The name is reused: Gao and Ji (2019) introduced Graph U-Nets that pool a
+general graph by selecting nodes with a learned projection score. That
+pooling is not used here; the pyramid is an ordinary image pyramid.
+
+Two further arms test how much spatial context is needed at all. Both are
+the graph solver on the index-space $k$-nearest-neighbour graph
+of~\S\ref{sec:method:graph} with fewer message-passing rounds, so neither
+needs a separate module. The one-hop floor uses a single round at width 64,
+so each node sees exactly one ring of neighbours; it has 45\,067 parameters.
+The per-pixel floor uses no message passing at all. Each node's next state
+then depends only on its own state and its conditioning inputs, and the
+model has no spatial context; it has 14\,795 parameters. Together with the
+two-round index-space arm, they form a locality ladder of zero, one and two
+rounds.
+
+\subsection{The Finite Element Network}
+\label{sec:method:family:fen}
+
+% TODO: cite Lienen2022 (Lienen & Günnemann, "Learning the Dynamics of
+% Physical Systems from Sparse Observations with Finite Element Networks",
+% ICLR 2022, arXiv:2203.08852)
+The Finite Element Network (FEN) of Lienen and G\"unnemann (2022) builds the
+update from a finite-element discretisation of an unknown PDE. It is the only
+member of the family whose output is defined as a time derivative by
+construction rather than as a next state. This is a property of the
+architecture. It is not a claim that the trained model behaves as a valid
+continuous-time system, which is tested in Chapter~\ref{ch:experiments}.
+
+The original uses a Galerkin method with the P1 basis of piecewise-linear
+hat functions, by default on a Delaunay triangulation of the observation
+points. The resulting system involves the mass matrix of inner products
+between basis functions, which is lumped by row-wise summation --- a
+standard approximation for time-dependent problems that makes its inversion
+trivial. The inner products are factored so that a network, the free-form
+term, predicts one coefficient per cell, vertex and feature from the time,
+the cell centre, the local vertex coordinates and the vertex features. The
+transport variant, T-FEN, adds a convection term. It starts from the
+conservative form $-\nabla \cdot (v u)$, applies the product rule and
+assumes a divergence-free velocity, which leaves the advective form
+$-v \cdot \nabla u$. A second network predicts one velocity per cell and
+feature; since the velocity is constant within each cell, it is
+divergence-free there, but not across cells. Both networks are tanh MLPs,
+and the resulting ODE is solved with the adaptive dopri5 solver.
+
+The FEN used here triangulates the regular grid by splitting every grid
+cell into two right triangles, which gives 98\,208 triangles over the
+50\,176 nodes; each node belongs to one, two, three or six triangles. The
+mass matrix is lumped as in the original. On this equal-area lattice the
+lumped assembly is exactly a mean over the triangles adjacent to a node.
+On a uniform mesh, the FEN is therefore a message-passing network over
+triangle hyperedges with mean aggregation, and the finite-element machinery
+only makes a difference at the boundary. The free-form term is a tanh MLP
+of depth four and width 96, without normalisation and with a
+zero-initialised head. It receives the three vertex states of a triangle, a
+triangle-type indicator for the two triangle orientations, the covariates
+and optionally the normalised triangle centre, and it outputs one
+coefficient per vertex and channel.
+
+The transport term is a second MLP that predicts one velocity per triangle
+and channel, in millimetres per year. The assembled operator is the
+advective form $-v \cdot \nabla u$ with a velocity that is constant within
+each triangle, as in the original. Neither the original nor this
+implementation makes the velocity divergence-free across triangles, so
+reading it as a physical advection speed rests on an assumption the model
+does not enforce globally. The gradient coefficients are assembled in grid
+units, so the 21:1 axis imbalance never reaches the MLPs; only the velocity
+conversion uses millimetres. No flux term is assembled at the edge of the
+domain, so the crop border carries a natural, no-flux boundary condition by
+construction --- a statement about the crop, not about the anatomy
+(\S\ref{sec:data:spatial}). The transport term runs on its own coarser mesh,
+built on every seventh column (97\,632 triangles), while the free-form term
+uses the full-resolution mesh. This coarser mesh is the finite-element
+counterpart of the dilated stencil of~\S\ref{sec:method:graph}.
+
+The implementation departs from the original in the following points. A
+regular lattice replaces the Delaunay triangulation. A triangle-type
+indicator replaces the local vertex coordinates, which on this lattice take
+only two forms. The covariates are added as inputs. The time is not an
+input, so the learned dynamics are autonomous, a variant the original paper
+explicitly allows. Integration uses a fixed-step scheme instead of the
+adaptive dopri5 solver. The advective form and the per-cell velocity are the
+same as in the original.
+
+One evaluation of the time derivative only couples nodes that share a
+triangle, so spatial reach has to come from sub-steps. The FEN is therefore
+always run inside the Runge--Kutta wrapper of~\S\ref{sec:method:family:rk},
+with classical RK4 and a fixed physical step of 45 days; $\Delta t$ sets
+only the integration horizon. The step is constrained by stability. On the
+lattice, the assembled transport operator is a skew-symmetric
+central-difference stencil whose interior spectrum is purely imaginary. An
+explicit Euler step therefore amplifies every mode for any non-zero velocity,
+and the second-order midpoint and Heun schemes have no stability interval on
+the imaginary axis. Classical RK4 has one, $|\lambda| h \leq 2\sqrt{2}
+\approx 2.83$.
+% TODO: cite Courant1928 (Courant, Friedrichs & Lewy, "Über die partiellen
+% Differenzengleichungen der mathematischen Physik", Mathematische Annalen
+% 100(1):32-74, 1928)
+The implementation checks the Courant number $C = |v| h$ per sub-step
+against this limit, in the spirit of the classical stability condition of
+Courant et al. (1928). The limit is monitored, not enforced during training.
+% TODO: resolve the RK4 Courant bound for the assembled transport stencil
+% (2.8 as implemented vs ~2.4 derived from the stencil's spectral radius of
+% about 1.1-1.2).
+Its exact value also depends on the spectral radius of the assembled
+stencil, which was estimated at about 1.1 to 1.2 per unit velocity and step
+and would place the bound nearer $C \approx 2.4$.
+
+The T-FEN has 68\,503 parameters, of which 34\,785 belong to the free-form
+term and 33\,718 to the transport head. The free-form-only control removes
+the transport head at the same width and has 34\,785 parameters. This
+control is therefore not parameter-matched to the T-FEN: the two differ by a
+factor of 1.97.
+% TODO: a parameter-matched free-form FEN control (width ~139) has not been
+% run.
+A matched free-form control, at a width of about 139, was not run.
+
+\subsection{Fixed-Step Runge--Kutta Integration}
+\label{sec:method:family:rk}
+
+The Runge--Kutta wrapper is not a backbone. It takes the residual $f_\theta$
+of any backbone and integrates it over each graph's own interval with an
+explicit Runge--Kutta scheme, stored as a Butcher tableau. It adds no
+parameters. All reported runs use classical fourth-order Runge--Kutta
+(RK4).
+% TODO: cite Butcher1987 (Butcher, "The Numerical Analysis of Ordinary
+% Differential Equations: Runge-Kutta and General Linear Methods", Wiley
+% 1987)
+% TODO: cite Hairer1993 (Hairer, Nørsett & Wanner, "Solving Ordinary
+% Differential Equations I: Nonstiff Problems", Springer, 2nd revised ed.
+% 1993)
+The schemes follow the standard definitions (Butcher, 1987; Hairer et al.,
+1993).
+
+The step is set per graph. It is either the interval divided by a number of
+sub-steps, $h = \Delta t / n$, or it follows from a physical step length in
+days, with the number of sub-steps rounded up from the ratio of the interval
+to that length. An eye is therefore integrated with the same step whether it
+is batched with others or evaluated alone. Graphs with shorter intervals
+finish early and then take zero-length steps until the longest interval in
+the batch is complete.
+
+By default the wrapper integrates an autonomous field. The $\Delta t$ entry
+of the conditioning vector is set to zero inside the wrapper, so $f_\theta$
+becomes a right-hand side that does not depend on the interval, and
+$\Delta t$ only sets the integration horizon. The positions, the graph edges
+and the covariates of a graph stay fixed across the stages of one step.
+% TODO: cite Chen2018 (Chen, Rubanova, Bettencourt & Duvenaud, "Neural
+% Ordinary Differential Equations", NeurIPS 2018, arXiv:1806.07366)
+This is the reading under which the wrapped model is a Neural ODE in the
+sense of Chen et al. (2018). If the sub-step length is fed in place of zero,
+the wrapper instead acts as a learned Runge--Kutta integrator, which reduces
+to the canonical operator for a single Euler step. The wrapper applies to
+single-branch models only and requires the $\Delta t$-multiplied residual
+form of Equation~\eqref{eq:method:residual-update}. As a unit check, the
+observed convergence orders on the test problem $\mathrm{d}u / \mathrm{d}t =
+-\lambda u$ are 0.99, 2.04, 2.04 and 4.35 for the Euler, midpoint, Heun and
+RK4 schemes, close to their nominal orders of one, two, two and four.
+
+% TODO: cite Ott2021 (Ott, Katiyar, Hennig & Tiemann, "ResNet After All:
+% Neural ODEs and Their Numerical Solution", ICLR 2021, arXiv:2007.15386)
+% TODO: cite Krishnapriyan2023 (Krishnapriyan, Queiruga, Erichson &
+% Mahoney, "Learning continuous models for continuous physics",
+% Communications Physics 6:319, 2023, arXiv:2202.08494)
+Because any trained backbone can be integrated with different schemes and
+step counts after training, the wrapper also enables a solver-invariance
+test. Ott et al. (2021) show that a model trained with an overly coarse step
+can reach high accuracy and still lose its interpretation as an ODE; they
+test this by evaluating the trained model with solvers of equal or smaller
+discretisation error and checking whether its predictions stay the same.
+Krishnapriyan et al. (2023) make the same point for learned models of
+physical systems. The test and its outcome are reported in
+Chapter~\ref{ch:experiments}.
+
+\subsection{Parameter Matching}
+\label{sec:method:family:params}
+
+Every member of the family is matched in size to the canonical graph solver
+of~\S\ref{sec:method:graph}, which has 67\,147 parameters. The widths are
+chosen so that each arm comes as close to this count as its width
+granularity allows. The principle follows \citet{Hu2024}, who compare MM-PDE
+with a deepened and widened GNN of similar parameter count, so that gains
+cannot be attributed to extra parameters. Table~\ref{tab:method:params}
+lists every configuration. All architecture arms lie within a factor of
+1.25 of the reference. The one-hop floor lies below this band because it is
+a rung of the locality ladder of~\S
+ef{sec:method:family:floors}, not an
+architecture arm.
+
+Two deliberate controls lie outside this band and bound the parameter
+question from both sides. The width-32 U-Net has about 50 times the
+parameters of the canonical configuration and tests whether capacity alone
+changes the picture. The per-pixel floor has about a fifth of them and
+marks what a model without spatial context can do.
+
+One comparison is not matched. The free-form FEN control has 34\,785
+parameters, half the reference and a factor of 1.97 below the T-FEN it
+controls, because it is the T-FEN with the transport head removed
+(\S\ref{sec:method:family:fen}). A matched free-form control was not run.
+The Runge--Kutta wrapper adds no parameters to any backbone.
+
+\begin{table}[t]
+  \centering
+  \caption[Parameter counts of all arms.]{%
+    Parameter counts of all arms, with their ratio to the canonical
+    configuration (67\,147 parameters) and the property each arm isolates.
+    The architecture arms lie within a factor of 1.25 of the canonical
+    configuration. Four arms lie outside this band by design: the width-32
+    U-Net and the per-pixel floor bound the parameter question from above
+    and below; the one-hop floor is a rung of the locality ladder, a
+    truncation of the index-space arm; and the free-form FEN is the one
+    control that is not matched to the arm it is compared with (factor
+    1.97 against the T-FEN).}
+  \label{tab:method:params}
+  \small
+  \begin{tabular}{p{0.34\textwidth} r r p{0.30\textwidth}}
+    \toprule
+    Arm & Parameters & Ratio & Isolates \\
+    \midrule
+    Graph solver, dilated stencil (canonical) & 67\,147 & 1.00 & reference \\
+    Graph solver, index-space $k$-NN & 75\,339 & 1.12 & graph geometry and
+      aggregation \\
+    T-FEN & 68\,503 & 1.02 & finite-element operator with transport \\
+    FEN, free-form only & 34\,785 & 0.52 & transport term (not matched) \\
+    Graph U-Net & 72\,713 & 1.08 & pyramid with a graph operator \\
+    FNO & 79\,160 & 1.18 & global support, no local path \\
+    FNO with $3 \times 3$ local path & 79\,960 & 1.19 & global support plus
+      local detail \\
+    U-Net, width 5 & 83\,081 & 1.24 & multiscale local detail \\
+    U-Net, width 32 & 3\,354\,347 & 49.95 & capacity (control) \\
+    One-hop floor & 45\,067 & 0.67 & one ring of spatial context \\
+    Per-pixel floor & 14\,795 & 0.22 & no spatial context (control) \\
+    Any backbone with RK4 wrapper & unchanged & --- & integration order \\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
 
 \section{The Moving-Mesh Extension as a Tested Hypothesis}
