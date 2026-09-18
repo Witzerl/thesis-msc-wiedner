@@ -5,101 +5,125 @@
 \label{ch:method}
 
 
-\section{Overview}
+\section{Overview: One Framework, One Swappable Slot}
 \label{sec:method:overview}
 
-% TODO: one pipeline figure: input state -> uniform-mesh GNN branch +
-% DMM-moved-mesh GNN branch with interpolation -> combined prediction.
-% Reference every component to its detailed subsection below.
+% TODO: one pipeline figure with the operator slot drawn as the only part
+% that varies: state in -> (fixed) conditioning -> f_theta -> (fixed)
+% Delta-t-scaled residual update -> next state. State the design contract:
+% loss, curriculum, evaluation, model selection and bookkeeping live in one
+% shared pipeline that a backbone may not duplicate. Point to every
+% subsection below.
 
 
-\section{\texorpdfstring{$\Delta t$}{Delta t}-Conditioned Residual Formulation}
+\section{The Fixed Framework}
+\label{sec:method:framework}
+
+% TODO: what every arm shares. One visit in, no history (and why).
+
+\subsection{\texorpdfstring{$\Delta t$}{Delta t}-Conditioned Residual Formulation}
 \label{sec:method:dt-residual}
 
-% TODO: core adaptation from SWE-style fixed-$\Delta t$ to clinical
-% variable-$\Delta t$. The model learns
-%   $u_{t+\Delta t} = u_t + \Delta t \cdot f_\theta(u_t, \Delta t)$.
-% Explain why this replaces absolute time and preserves consistency in the
-% MP-PDE sense.
+% TODO: u_{t+Delta t} = u_t + Delta t * f_theta(u_t, Delta t); why this
+% replaces absolute time; the Delta t -> 0 persistence limit; the
+% zero-initialised head, so every model starts at exact persistence.
 
-
-\section{Multi-Channel Pipeline}
+\subsection{Multi-Channel State Propagation}
 \label{sec:method:multichannel}
 
-% TODO: walk through how $C=11$ channels propagate through each component:
-%   - dataset layout $(N, C\cdot K)$,
-%   - GNN features,
-%   - DMM with Frobenius-norm monitor function for vector-valued state,
-%   - per-channel interpolation in ItpNet,
-%   - multi-channel res_cut Conv2d.
-% NOTE (2026-07-26, see NOTES.md "Code-side sync"): TWO of the bullets above are
-% STALE. The final DMM trains on a single-channel SLO mask -> plain scalar monitor
-% (NOT a multi-channel Frobenius monitor); and res_cut was removed from the
-% framework entirely. The moved-branch correction is now alpha * Itilde[dt*g],
-% with a learnable scalar gate alpha (init 0) and partition-of-unity interpolation.
-% Constraint: assume clinical meaning of the 11 channels was already
-% established in Section~\ref{sec:data:state}; focus entirely on
-% mathematical/tensor propagation here.
+% TODO: how the C = 11 channels move through the pipeline at the tensor
+% level. Mathematics and tensors only -- the clinical meaning of the
+% channels is established in Section~\ref{sec:data:state}.
 
 
-\section{Data-Free Mesh Mover for GA}
-\label{sec:method:dmm}
-
-% TODO: how DMM is trained on GA states: physics loss
-% (Monge--Amp\`ere + boundary + convexity), sampling strategy,
-% monitor function choice. Note that DMM is pre-trained separately and
-% frozen during MM-PDE training.
-
-
-\section{Single-Branch MP-PDE Architecture}
+\section{Backbone I: The GA-Adapted Graph Solver}
 \label{sec:method:mppde}
 
-% TODO: describe the baseline adaptation as a single-branch uniform-mesh
-% GNN. Explicitly note that temporal bundling from the original MP-PDE is
-% removed entirely due to the short, irregular clinical sequences.
+% TODO: the arm the project built rather than imported: encoder, message
+% passing, decoder, Delta-t-conditioned output. Temporal bundling removed
+% entirely (strict K = 1).
+
+\subsection{Architecture}
+\label{sec:method:mppde:arch}
+
+% TODO: encoder, message and update functions, conditioning vector,
+% normalisation, decoder.
+
+\subsection{Graph Construction on an Anisotropic Grid}
+\label{sec:method:graph}
+
+% TODO: the load-bearing part of the section. Index-space k-NN (v1) versus
+% the dilated physical-scale stencil (v2 lock); offsets derived from the
+% lesion scale.
+
+\subsection{Differences from the Original MP-PDE}
+\label{sec:method:mppde:diff}
+
+% TODO: summary table of every departure from Brandstetter et al. (2022).
 
 
-\section{Dual-Branch MM-PDE Architecture}
+\section{Backbone II: The Countermodel Family}
+\label{sec:method:family}
+
+% TODO: the shared backbone contract; U-Net at two capacities, FNO, FNO +
+% 3x3 local kernel; graph U-Net; per-pixel floor; Finite Element Network,
+% free-form and with the transport term; the Runge--Kutta wrapper;
+% parameter matching (1.25x band, and the two deliberate out-of-band
+% controls). Same depth as Backbone I.
+
+
+\section{The Moving-Mesh Extension as a Tested Hypothesis}
 \label{sec:method:mmpde}
 
-% TODO: main GNN branch on the uniform mesh produces the full next state;
-% correction GNN branch on the moved mesh produces a pure $\Delta t$-delta;
-% interpolation back via ItpNet; summation.
-% Explain why the correction-branch formulation is the natural
-% $\Delta t$-conditioned analogue of the original dual-branch sum.
+% TODO: DMM + dual branch, framed as a hypothesis the design was built to
+% measure. The alpha gate (zero-initialised) is the instrument; alpha -> 0
+% was a pre-registered reportable outcome. res_cut is NOT part of the
+% framework and must not be described as a component.
+
+\subsection{Data-Free Mesh Mover for GA}
+\label{sec:method:dmm}
+
+% TODO: physics loss (Monge--Amp\`ere + boundary + convexity), sampling,
+% monitor function. The monitor is a plain scalar monitor on the Gaussian-
+% blurred mask; the DMM trains and is applied on the native (49, 1024) grid.
+% The Frobenius-norm multi-channel monitor and the 256^2 SLO path are
+% superseded -- historical steps only, never the design. Pretrained, frozen.
+
+\subsection{Dual-Branch Composition}
+\label{sec:method:dual}
+
+% TODO: uniform branch returns the full next state; moved branch returns a
+% pure Delta-t delta; ItpNet interpolation renormalised to sum to one; the
+% learnable scalar gate alpha.
 
 
-\section{Patient Covariate Conditioning}
+\section{Conditioning: Covariates and the Coefficient Surrogate}
 \label{sec:method:covariates}
 
-% TODO: Age and Sex as graph-level attributes broadcast per-node into the
-% GNN's \texttt{variables} vector, entering both the embedding MLP and every
-% message-passing layer.
+% TODO: age and sex broadcast per node into the conditioning vector. Their
+% value is an open question at this point; Chapter 5 reports it.
 
-
-\section{Surrogate Equation Encoder}
+\subsection{Surrogate Equation Encoder}
 \label{sec:method:encoder}
 
-% TODO: the learnable layer encoder - CNN compressing $(10, 49, 1024)$ to
-% $\mathbb{R}^{d_{\text{embed}}}$, concatenated to \texttt{variables} alongside
-% $\Delta t$ and covariates. Framed as a learned stand-in for the PDE
-% coefficients $\theta_{\text{PDE}}$ used in MP-PDE.
+% TODO: the LayerEncoder CNN, framed as a learned stand-in for theta_PDE.
+% Its stride schedule corrects only ~2x of the ~21:1 anisotropy.
 
 
 \section{Training}
 \label{sec:method:training}
 
-% TODO: pushforward trick with depth-aware sampling; ItpNet pre-training at
-% epoch 0; loss weighting across channels (mask gets higher weight);
-% optimizer setup; learning rate schedule.
+% TODO: channel-weighted MSE + soft-Dice objective; time-budgeted
+% pushforward curriculum (unroll depth in elapsed days); ItpNet pretraining
+% at epoch 0 for the dual branch; per-module gradient clipping; optimiser
+% and schedule. Monotonic penalty is 0.0 and the residual is signed.
 
 
 \section{Implementation Details}
 \label{sec:method:implementation}
 
-% TODO: hardware, framework versions, notable engineering choices
-% (GPU-native $k$-NN replacing sklearn, graph precomputation,
-% mixed-precision or not, etc.).
+% TODO: hardware, framework versions, run identity / checkpointing,
+% graph precomputation, notable engineering choices.
 
 
 %%
