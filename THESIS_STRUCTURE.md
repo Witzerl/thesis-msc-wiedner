@@ -94,7 +94,7 @@ Center-crop/pad to the canonical (49, 1024) grid. **Constraint: Explicitly state
 Per-channel z-score normalization from training-split statistics. Table with the computed mean/std per channel.
 
 ### 3.5 Patient-level covariates
-Age and sex extraction from the patient index. Training-split z-score for age, binary encoding for sex, mean imputation for missing values. Note the per-visit vs baseline age encoding and that both are later measured (§5.5).
+Age and sex extraction from the patient index. Training-split z-score for age, binary encoding for sex, mean imputation for missing values. Note the per-visit vs baseline age encoding and that both are later measured (§5.4, negative results).
 
 ### 3.6 Temporal structure
 Visits ordered per eye, $\Delta t$ computed between consecutive visits in years. Consecutive (state_i, state_{i+1}, $\Delta t$) triples form the training windows.

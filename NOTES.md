@@ -344,13 +344,69 @@ Pulled from the code repository (`masterthesis-docker/NOTES.md` + `PROJECT_CONTE
 
 ### Chapter 3 - Data and Preprocessing (`03-data.tex`)
 
-- [ ] TODO: 3.1 MUW dataset description + example figure.
-- [ ] TODO: 3.2 11-channel state tensor (clinical/data level only).
-- [ ] TODO: 3.3 Spatial standardization (crop/pad justification, 6x6 mm window justification).
-- [ ] TODO: 3.4 Per-channel normalization + mean/std table.
-- [ ] TODO: 3.5 Age/Sex covariate extraction and encoding.
-- [ ] TODO: 3.6 Temporal structure and $\Delta t$ computation.
-- [ ] TODO: 3.7 Patient-level train/val/test splits.
+- [x] 2026-09-18: Chapter 3 drafted in full (§3.1--§3.7, pages 24--31, ~8 pages against the
+  8--10 budget) from an external-LLM draft built on a fact sheet taken from
+  `THESIS_FRAMEWORK.md` §1--§2, then audited line by line against that source. Every
+  number in the draft matched the source, including the mask normalisation statistics it
+  derived (mean 0.266, std 0.442, which reproduce the +0.529 threshold). The prose around
+  the numbers needed these corrections:
+  - **Factually wrong, fixed:** the schedule-reach figures (0/75 at 90 d, 74/75 at 360 d,
+    68/75 and 73/75 at two or more steps) were attributed to *evaluation/inference*; they
+    are the **training pushforward budget**, and "73/75 reach an evaluation point" was
+    invented (it is "at least two steps"). "About 19 % of the border-touching lesions" had
+    the wrong denominator (it is about 19 % of lesions whose border contact cannot be
+    avoided by any window). "Two affine transformation matrices" became two transform
+    *files*. 0.003867 mm was called the axial *resolution*; it is the axial pixel spacing.
+    "The standard deviation is floored to a small constant" became "a vanishing standard
+    deviation is replaced by one". "Mapping the prediction back into a bounded probability
+    space" became "back to the original scale" (the output is a regression, not a
+    probability). "Demographic information is integrated into the state" was wrong — the
+    covariates accompany each window, they are not state channels.
+  - **Would have broken the build:** `\citet{Mai2024}` used a key that is not in
+    `references.bib`; replaced by plain "Mai et al. (2024)" plus the `% TODO: cite` marker.
+  - **Unsupported claims, removed or neutralised:** "the lesions exhibit continuous
+    anatomical progression" (unsupported, and in tension with the observed local
+    shrinkage); a §3.2 closing sentence naming "superficial layers, photoreceptors and RPE"
+    as what the channels capture and asserting a "richer, more precise" context (names the
+    unrecorded layers and asserts a benefit); mask value 0 described as "healthy" (it means
+    non-atrophic); "due to segmentation artefacts"; "clinically vital" (bilaterality makes
+    eye-level splitting a leakage issue); the claim that uneven patient counts *cause* the
+    fold-4 lesion-area imbalance; "the literature precedent for a 6 x 6 mm window via
+    cropping" (the literature did not crop); "this geometry dictates the receptive field
+    requirements for any spatial operator" (previews a Chapter 5 result); "continuous
+    longitudinal observation", "hardware and software setting", "estimated progression
+    rate", "strict comparability". Filler intensifiers stripped throughout.
+  - **Fixed in my own prompt:** the figure spec asked for "layer boundaries overlaid on an
+    en-face image", which is physically incoherent (boundaries are surfaces, visible as
+    lines only in B-scans), and the raw B-scans are not in the repository at all. The
+    figure (`fig:data:example-state`) is re-specified as SLO fundus + OCT field of view,
+    the channel-0 mask at physical aspect ratio, and a layer depth map as a heatmap — all
+    producible from repository files.
+  - §3.3 retitled "Spatial Standardisation and its Measured Cost", §3.4 "Normalisation",
+    §3.7 "Splits and Cross-Validation"; all labels unchanged. The false "99 % / periphery
+    irrelevant" placeholder TODO was replaced, not preserved; the string appears nowhere in
+    the chapter.
+- [ ] TODO: confirm the device model (Heidelberg Spectralis) with the MUW data provider.
+  §3.1 currently reports it as an inference from Mai et al. (2024); the data records only
+  vendor, scan mode and study identifier.
+- [ ] TODO: settle the constant-spacing assumption (~2 % deviation against the visits' own
+  transform files) from the DICOM spacing fields. Marked inline in §3.1; also mirrored in
+  §2.1.6.
+- [ ] TODO: produce Figure `fig:data:example-state` in §3.1 -- (a) SLO fundus image with
+  the OCT field of view as a rectangle and the SLO-frame GA mask overlaid; (b) channel 0 on
+  the 49 x 1024 grid at the physical aspect ratio (~5.94 x 5.82 mm), so the ~21:1 pixel
+  anisotropy is visible; (c) one or two layer depth maps as heatmaps with the mask outline
+  overlaid. Mark padded regions. A B-scan panel would need raw data from MUW.
+- [ ] TODO: fill Table `tab:data:norm-stats` (§3.4) -- per-channel mean/std of the ten layer
+  channels from `meta["norm_params"]` of the canonical fold (split 2) precompute. Means
+  should rise monotonically from ~137 to ~204 axial px.
+- [ ] TODO: record the training/validation window counts for folds 0, 1, 3 and 4 (§3.7);
+  only fold 2 (378 / 100) is known.
+- [ ] TODO: keep every later chapter free of "test set" wording -- §3.7 states that the test
+  split is structurally empty and every result is a validation result.
+- [ ] TODO: the anatomical names of the ten layer boundaries (§3.2 inline TODO) and the
+  cohort-level baseline lesion-area table (§3.1 inline TODO) remain open; both are also
+  tracked in the 2026-09-17 sync section above.
 
 ### Chapter 4 - Method (`04-method.tex`)
 
@@ -429,11 +485,17 @@ marker itself; `THESIS_FRAMEWORK.md` §10.1 carries verified entries for all of 
   Springer, Applied Mathematical Sciences vol. 174, 2011. Used in §2.5 as the classical
   background for moving meshes; also the source of the equidistribution-CoV mesh-quality
   measure needed in §5.5.
+- [ ] TODO: cite **Feuer2013** -- Feuer, Yehoshua, Gregori, Penha, Chew, Ferris, Clemons,
+  Lindblad & Rosenfeld, *JAMA Ophthalmology* 131(1):110-111, 2013, "Square Root
+  Transformation of Geographic Atrophy Area Measurements to Eliminate Dependence of Growth
+  Rates on Baseline Lesion Measurements". Used in §3.1 for the square-root area scale of
+  the cohort growth statistics; needed again in §5.1 for √area MAE and growth rates.
 - [ ] TODO: cite **Mai2024** -- Mai, Lachinov, Reiter, Riedl, Grechenig, Bogunović &
   Schmidt-Erfurth, *Ophthalmology Science* 4(4):100466, 2024, "Deep Learning-Based
   Prediction of Individual Geographic Atrophy Progression from a Single Baseline OCT".
-  Used in §2.6 as the closest prior work (same MUW cohort, same task); needed again in
-  §5.7. **The pre-segmented-masks vs raw-OCT caveat must travel with every comparison.**
+  Used in §2.6 as the closest prior work (same MUW cohort, same task), in §3.1 as the
+  source of the device-model inference, and in §3.6 for the one-year-anchor
+  comparability choice; needed again in §5.7. **The pre-segmented-masks vs raw-OCT caveat must travel with every comparison.**
 - [ ] TODO: cite **Salvi2025** -- Salvi et al., *Ophthalmology Science* 5(2):100635, 2025,
   "Deep Learning to Predict the Future Growth of Geographic Atrophy from Fundus
   Autofluorescence". Used in §2.6 as the dense-CNN precedent on this task (different
@@ -468,5 +530,13 @@ External references introduced inline in the LaTeX drafts that still need to be 
 
 ### Template / build system
 
+- [ ] TODO (build environment, 2026-09-18): VS Code's LaTeX Workshop auto-builds
+  `main-thesis.tex` on every save, and it races any `latexmk` run in the same directory --
+  both write `main-thesis.aux`, which twice ended up truncated mid-line ("File ended while
+  scanning use of \@writefile", "Undefined control sequence \abx@aux@defaglobal"). Such
+  errors are .aux corruption, not source errors. Verification builds therefore use an
+  isolated output directory: `latexmk -xelatex -interaction=nonstopmode -outdir=<tmp>
+  main-thesis.tex`. Consider disabling `latex-workshop.latex.autoBuild.run` while an agent
+  is editing, or pointing LaTeX Workshop at its own `outDir`.
 - [x] 2026-05-02: switched the biblatex configuration in `main-thesis.tex` from `style=ACM-Reference-Format,citestyle=numeric` to `style=authoryear,natbib=true` so that the natbib-style commands `\citet` / `\citep` mandated by `CLAUDE.md` produce author-year output. Other biblatex options (`backend=biber`, `sortcites=true`, `maxcitenames=2`) preserved.
 - [ ] TODO: confirm with supervisor that the JKU technical-report template tolerates the author-year deviation from the bundled ACM numeric default; if not, a one-line revert restores the original style.

@@ -8,62 +8,463 @@
 \section{Dataset}
 \label{sec:data:dataset}
 
-% TODO: MUW GA cohort - number of patients, eyes, visits per eye, visit
-% interval distribution, demographic breakdown. Include a figure showing an
-% example OCT en-face with GA mask and retinal layer overlays.
+The data used in this thesis is a longitudinal cohort of eyes with
+Geographic Atrophy, provided by the Medical University of Vienna (MUW).
+It was acquired in routine clinical practice at a single clinical site
+in Vienna. The sample unit throughout is the individual eye. The cohort
+contains 75 eyes, which together contribute 553 visits, where a visit is
+one OCT acquisition. Ordering the visits of each eye in time yields 478
+visit-to-next-visit intervals ($553 - 75$). The number of visits per eye
+ranges from five to thirteen, with a median of seven. The follow-up
+span, from the baseline visit to the last recorded visit of an eye,
+ranges from 720 to 2160 days, with a median of 1080 days, or roughly
+three years.
+
+The acquisition setting recorded in the data is the same for all 553
+visits. The vendor is logged as Heidelberg Engineering, the protocol as
+a volume scan in ART mode, and the study identifier as ``HRF SPEC''. The
+device model is not a recorded field.
+% TODO: cite Mai2024 (Mai, Lachinov, Reiter, Riedl, Grechenig, Bogunovic
+% & Schmidt-Erfurth, "Deep Learning-Based Prediction of Individual
+% Geographic Atrophy Progression from a Single Baseline OCT",
+% Ophthalmology Science 4(4):100466, 2024)
+Mai et al. (2024), who describe the same MUW cohort, report that it was
+acquired on a Spectralis device. The scanner is therefore taken to be a
+Heidelberg Spectralis, but this is an inference from that source rather
+than a property of the data.
+% TODO: confirm the device model (Heidelberg Spectralis) with the MUW
+% data provider; it is currently an inference from Mai et al. (2024).
+
+The splits (\S\ref{sec:data:splits}) are defined over a universe of 100
+patient identifiers. Of these, 49 have no imaging data. The remaining 51
+patients contribute the 75 eyes: 24 patients contribute both eyes and 27
+contribute a single eye. Of the 75 eyes, 47 belong to female and 28 to
+male patients. Age at baseline ranges from 60.7 to 88.0 years, with a
+mean of 76.4 years over the eyes. Ages are decimal values computed from
+the date of birth to the baseline visit, not hand-entered integers.
+
+The data does not contain the raw three-dimensional OCT volumes.
+Instead, each visit provides a set of registered two-dimensional en-face
+derivatives. The first is a binary GA mask on the native OCT en-face
+grid, stored as an image with the values 0 and 255. The second is an
+array of layer-boundary depth maps of shape (rows, columns, 10), stored
+as 16-bit integers in units of axial pixels. Each visit further provides
+a GA mask, a scanning laser ophthalmoscopy (SLO) fundus image and a
+fundus-autofluorescence image, all in the SLO reference frame, together
+with two files of coordinate transforms between the OCT and the SLO
+frame. Only the OCT-grid mask and the layer array are required. An eye
+is included if at least two of its visits carry both, which guarantees
+at least one transition. All 75 eyes meet this condition.
+
+The native en-face grids are not uniform. The 553 visits have 67
+distinct grid shapes, with 38 to 66 rows and 961 to 1719 columns. The
+shape is constant across the visits of one eye but differs between eyes.
+The variation stems from the raw acquisitions, whose B-scan spacing
+ranged from 115 to 258\,\textmu{}m. Upstream of this work, the stored
+en-face arrays were resampled onto one gold-standard pixel spacing:
+0.12118\,mm between B-scans, 0.00568\,mm between A-scans, and
+0.003867\,mm per axial pixel. Pixel spacing is therefore treated as
+constant across the cohort, while pixel counts, and with them the
+physical extent of each native grid, differ between eyes.
+
+% TODO: settle the constant-spacing assumption by obtaining the original
+% DICOM spacing fields from the data provider.
+This constant spacing is an assumption rather than a measurement.
+Checked against the visits' own transform files, it holds to within
+about 2\,\%. Settling it requires the original DICOM spacing fields,
+which are not part of the data used here. Every area reported in square
+millimetres in this thesis inherits this assumption.
+
+Lesion growth is summarised on the square-root area scale.
+% TODO: cite Feuer2013 (Feuer, Yehoshua, Gregori, Penha, Chew, Ferris,
+% Clemons, Lindblad & Rosenfeld, "Square Root Transformation of
+% Geographic Atrophy Area Measurements to Eliminate Dependence of Growth
+% Rates on Baseline Lesion Measurements", JAMA Ophthalmology
+% 131(1):110-111, 2013)
+This transform is standard for GA, because it removes the dependence of
+growth rates on baseline lesion size (Feuer et al., 2013). Over the 75
+eyes, the median square-root-area growth rate is 0.234\,mm per year. The
+interquartile range spans 0.153 to 0.340\,mm per year, and the 90th
+percentile is 0.473\,mm per year.
+% TODO: add a cohort-level baseline lesion-area distribution table
+% comparable to the one reported by Mai et al. (2024).
+
+Figure~\ref{fig:data:example-state} shows one visit of the cohort in the
+views used throughout this chapter.
+
+% TODO: produce Figure fig:data:example-state --- three panels for one
+% representative visit, all generated from files that exist in the
+% repository (the raw B-scans are NOT part of the repository data; a
+% B-scan panel would have to be sourced from MUW separately):
+% (a) the SLO fundus image with the OCT field of view drawn as a
+%     rectangle and the SLO-frame GA mask overlaid;
+% (b) channel 0, the binary GA mask on the 49 x 1024 modelling grid,
+%     drawn at the physical aspect ratio (about 5.94 x 5.82 mm), so
+%     that the ~21:1 pixel anisotropy is visible as tall, thin pixels;
+% (c) one or two layer-boundary depth maps (channels 1--10) on the same
+%     grid as heatmaps coloured by axial depth, with the GA mask
+%     outline from (b) overlaid.
+% Any padded region should be marked, since it is visible in about one
+% visit in four.
+\begin{figure}[t]
+  \centering
+  \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering\itshape Placeholder
+    for Figure~\ref{fig:data:example-state}: one visit shown as the SLO
+    fundus image with the OCT field of view, the GA mask on the modelling
+    grid, and a layer-boundary depth map. See accompanying
+    \texttt{\% TODO} for the intended content.}}
+  \caption[One visit of the MUW cohort.]{%
+    One visit of the MUW cohort.
+    \emph{(a)}~SLO fundus image with the OCT field of view marked and the
+    GA lesion overlaid.
+    \emph{(b)}~The binary GA mask (channel~0) on the $49 \times 1024$
+    modelling grid, drawn at its physical aspect ratio of about
+    $5.94 \times 5.82$\,mm; each pixel is about 21 times taller than it
+    is wide.
+    \emph{(c)}~A layer-boundary depth map (one of channels~1--10) on the
+    same grid, coloured by axial depth, with the lesion outline from (b)
+    overlaid. Panels (b) and (c) show the state tensor as the models
+    receive it.}
+  \label{fig:data:example-state}
+\end{figure}
 
 
 \section{State Representation}
 \label{sec:data:state}
 
-% TODO: define the 11-channel state tensor:
-%   channel 0    = binary GA mask,
-%   channels 1-10 = retinal layer depths.
-% Justify this choice as capturing both the pathology and its structural
-% context.
-% Constraint: keep this strictly at the clinical/data definition level. Do
-% NOT discuss how these channels propagate through the network
-% (that is reserved for Section~\ref{sec:method:multichannel}).
+The state of an eye at each visit is an eleven-channel tensor, so
+$C = 11$. Channel~0 holds the binary GA mask. Channels~1--10 hold the
+ten layer-boundary depth maps, ordered from the most superficial
+boundary to the deepest. Channel~0 is both the prediction target and the
+clinical deliverable. The layer channels supply structural context and
+serve as auxiliary prediction targets.
+
+The tensor is assembled per visit from the two required files. The
+stored mask, which has the values 0 and 255, is thresholded above 127.
+This yields a binary field with the value 1 inside the lesion and 0
+outside it. The 16-bit layer array is cast to floating point. Mask and
+layers are then concatenated along the channel axis into a tensor of
+shape $11 \times \text{rows} \times \text{columns}$.
+
+The channel order --- the mask first, followed by the ten layers --- is a
+fixed invariant of the pipeline. The loss weighting and the layer
+encoder both rely on channel~0 being the mask, and the order is checked
+by an explicit assertion at load time.
+
+Each layer channel is a depth map. Fixing a pixel of the en-face grid
+selects a single A-scan of the underlying volume. The channel value at
+that pixel is the axial pixel index at which the boundary surface lies
+along that A-scan. Together, the ten channels describe the vertical
+layer structure of the retina at every en-face position. Across the
+cohort, the raw depth values range from $-14$ to $499$. This slightly
+exceeds the nominal 496-pixel depth of the volume, because the upstream
+segmentation occasionally returns values just above the top of the
+volume or just below its bottom.
+
+On the training split of the canonical fold, the mean depth of the ten
+layer channels increases monotonically from 137 to 204 axial pixels. At
+0.003867\,mm per axial pixel, this corresponds to a mean depth of about
+0.53 to 0.79\,mm below the top of the scan volume. The anatomical names
+of the ten boundary surfaces are not recorded in the data as delivered;
+the channels carry generic identifiers only.
+% TODO: obtain the anatomical names of the ten layer-boundary surfaces
+% from the MUW segmentation-pipeline documentation.
+
+Retinal thickness, the distance between the deepest and the shallowest
+boundary, is not computed anywhere in this pipeline. It could be
+recovered from the layer channels, but it is neither stored nor used as
+an input. The reason for keeping all ten layer channels next to the mask
+was given in~\S\ref{sec:background:ga-oct:state-rep}: documented
+predictors of GA progression are found throughout the vertical retinal
+column, not only inside the lesion. The layer geometry is therefore kept
+in full rather than reduced to the lesion mask alone. How the channels
+are processed by the models is described
+in~\S\ref{sec:method:multichannel}.
 
 
-\section{Spatial Standardization}
+\section{Spatial Standardisation and its Measured Cost}
 \label{sec:data:spatial}
 
-% TODO: center-crop/pad to the canonical $49 \times 1024$ grid corresponding
-% to the $6\times 6$\,mm macula-centered window. Explicitly state that
-% crop/pad (not resampling) is used so the en-face pixel spacing stays
-% invariant at $[0.12118, 0.00568]$\,mm across all patients. Justify the
-% $6\times 6$\,mm window: $\sim$99\% of GA pathology lies within a central
-% 3\,mm radius of the macula, so the periphery is clinically irrelevant here.
+Because the native en-face grids differ in size, every state tensor is
+brought to one common grid of 49 rows by 1024 columns. Per axis, a
+symmetric centre crop is applied when the native size is at least the
+target size, and a symmetric zero-pad is applied when it is smaller.
+Both cases are common: 149 of the 553 visits are padded along the rows,
+because they have fewer than 49 rows, and 115 are padded along the
+columns. Cropping and padding are used instead of resampling for two
+reasons. They introduce no interpolation artefacts, and they keep the
+stored pixel spacing identical across the cohort by construction. The
+use of a $6 \times 6$\,mm analysis window in the literature was reviewed
+in~\S\ref{sec:background:ga-oct:muw}.
+
+The resulting window spans $49 \times 0.12118$\,mm by
+$1024 \times 0.00568$\,mm, or about $5.938 \times 5.816$\,mm, and holds
+50\,176 grid positions. The spacing between B-scans is 21.335 times
+larger than the spacing along them. The grid is therefore strongly
+anisotropic: moving by one row covers about the same physical distance
+as moving by 21 columns. This property matters for every
+spatial operator applied to the grid and is taken up again in
+Chapter~\ref{ch:method}.
+
+Zero-padding raises a less obvious problem. Physically, a zero means
+``no signal'': a mask value of 0 means not atrophic, and a layer depth
+of 0 is the top of the volume, above the retina. The models, however, do
+not see raw values. Cropping and padding run before the normalisation
+statistics are computed (\S\ref{sec:data:normalization}), so the padded
+zeros enter the per-channel mean and standard deviation. After
+normalisation, the zero fill of the layer channels sits between $-2.35$
+and $-2.94$ standard deviations, which is an extreme value. Unless the
+pad positions are excluded from the loss, the models are trained to
+reproduce this value at full weight. Zero also cannot serve as a
+sentinel that marks padding, because real layer values range from $-14$
+to $499$ and so include zero.
+
+The crop also has a measured cost for the pathology itself. A census
+over all 553 visits shows that the $49 \times 1024$ window cuts off real
+lesion area in 27.3\,\% of visits. It removes more than 5\,\% of the
+lesion in 6.0\,\% of visits, and 25.7\,\% of the lesion in the worst
+case. In addition, 31.1\,\% of the cropped lesions touch the crop
+border. Growth across that border is censored, and no missingness flag
+records it. The models are therefore trained on censored targets, and
+the change-region metrics at the one-year anchor under-measure
+progression for roughly one visit in five. The censoring also limits
+comparability with literature results computed over the whole field of
+view.
+
+The window was nevertheless kept on purpose. Larger windows reduce the
+truncation, but they require up to 35\,\% zero-padding and about 1.9
+times as many grid positions. They also cannot remove the problem: for
+about 19\,\% of lesions, border contact is unavoidable with any window,
+because those lesions reach the edge of the scan itself. The
+consequences are therefore handled in the evaluation instead
+(\S\ref{sec:experiments:protocol}). There, the change-region metric is
+split into border-touching and interior lesions, a pad-masked variant of
+the metric is reported, and layer errors are computed over non-padded
+positions only. In addition, the training loss can optionally exclude
+pad positions.
 
 
-\section{Normalization}
+\section{Normalisation}
 \label{sec:data:normalization}
 
-% TODO: per-channel z-score normalization computed from training-split
-% statistics. Include a table of mean/std per channel.
+After spatial standardisation, each channel is normalised. The
+statistics are computed per channel over the training visits of the
+current fold only, and are then applied to every visit, including the
+validation visits. No validation data enters the statistics. Because
+they are computed on the cropped and padded states, the padded zeros
+contribute to each channel's mean and standard deviation
+(\S\ref{sec:data:spatial}).
+
+The canonical scheme is a z-score,
+\[
+  x' \;=\; \frac{x - \mu_c}{\sigma_c},
+\]
+where $\mu_c$ and $\sigma_c$ are the training mean and standard
+deviation of channel~$c$. A vanishing standard deviation is replaced by
+one to avoid division by zero. A min-max scaling to $[-1, 1]$,
+\[
+  x' \;=\; 2\,\frac{x - \min_c}{\max_c - \min_c} \;-\; 1,
+\]
+is kept as an ablation variant.
+
+The binary mask is z-scored in the same way as the layer channels. On
+the canonical fold, the background value 0 maps to $-0.602$ and the
+foreground value 1 maps to $+1.660$. The binarisation threshold of 0.5
+maps to $+0.529$. Two consequences follow. First, the normalised mask
+has a hard step at the lesion edge. Second, evaluation maps every
+threshold into normalised space rather than mapping the prediction back
+to the original scale, and this mapping must be applied consistently.
+Table~\ref{tab:data:norm-stats} lists the statistics for the canonical
+fold.
+
+\begin{table}[t]
+  \centering
+  \caption[Per-channel normalisation statistics.]{%
+    Per-channel normalisation statistics (mean and standard deviation),
+    computed over the training split of the canonical fold after
+    cropping and padding. The mask statistics are derived from the two
+    mapped values given in the text and rounded to three decimals; the
+    layer statistics are still to be extracted.}
+  \label{tab:data:norm-stats}
+  \begin{tabular}{lrr}
+    \toprule
+    Channel & Mean & Standard deviation \\
+    \midrule
+    0 (GA mask)  & 0.266 & 0.442 \\
+    1 (layer 0)  & -- & -- \\
+    2 (layer 1)  & -- & -- \\
+    3 (layer 2)  & -- & -- \\
+    4 (layer 3)  & -- & -- \\
+    5 (layer 4)  & -- & -- \\
+    6 (layer 5)  & -- & -- \\
+    7 (layer 6)  & -- & -- \\
+    8 (layer 7)  & -- & -- \\
+    9 (layer 8)  & -- & -- \\
+    10 (layer 9) & -- & -- \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+% TODO: extract the per-channel mean and standard deviation of the ten
+% layer channels from the precompute metadata (norm_params) of the
+% canonical fold and fill Table tab:data:norm-stats. Layer means should
+% increase monotonically from about 137 to 204 axial pixels.
 
 
 \section{Patient-Level Covariates}
 \label{sec:data:covariates}
 
-% TODO: extract Age and Sex from the patient index. Training-split z-score
-% for age, binary encoding for sex, mean imputation for missing values.
+Each window is accompanied by two patient-level covariates, age and sex.
+They come from a clinical covariates table with 187 rows, which covers
+the wider study cohort and all 75 eyes used here. The table is keyed per
+eye, so a patient who contributes two eyes appears in two rows with the
+same age and sex. Sex is encoded as 0 for female and 1 for male. A
+missing value is imputed with the male fraction of the training split.
+
+Age is z-scored with training statistics. Two encodings are implemented.
+In the baseline mode, each eye keeps its baseline age for all of its
+windows. In the per-visit mode, which is the canonical setting, each
+window carries the age at its own start visit, that is, the baseline age
+plus the elapsed years. The z-score statistics for this mode are
+computed over all training window-start ages. Since there is one start
+age per window, the final visit of each training eye does not enter
+them. On the canonical fold this gives 378 ages, with a mean of 77.653
+years and a standard deviation of 7.220 years.
+
+In the per-visit mode, the age covariate advances along a rollout. This
+leaks no information about the future, because the age at the next step
+follows from the current age and the input $\Delta t$
+alone.\footnote{The conversion of elapsed days into years uses 365.25
+days per year for the age covariate but 365 days per year for $\Delta
+t$. The resulting difference is at most 0.07\,\%. It is deliberately
+left unchanged, because aligning the two would invalidate every
+precomputed dataset.}
+
+The source clinical table also records, per eye, the progression rate,
+the pseudodrusen status, the predominant fundus-autofluorescence pattern
+and the concentration of hyperreflective foci. None of these variables
+is used in this thesis; their possible use is discussed
+in~\S\ref{sec:discussion:future}. Whether age and sex contribute to the
+predictions is measured in~\S\ref{sec:experiments:ablations}.
 
 
 \section{Temporal Structure}
 \label{sec:data:temporal}
 
-% TODO: visits ordered per eye; $\Delta t$ computed between consecutive
-% visits in years. Consecutive $(\text{state}_i, \text{state}_{i+1}, \Delta t)$
-% triples form the training windows.
+The longitudinal sequences are split into transition windows. For each
+eye, the visits are sorted by day in study, and every pair of
+consecutive visits forms one window. Window~$i$ consists of the state at
+visit~$i$, the state at visit~$i+1$, and the interval $\Delta t$ between
+them. Each window holds exactly one transition; this is a fixed
+commitment of the framework, not a configuration option. $\Delta t$ is
+stored in years, computed as the gap in days divided by 365, so a gap of
+180 days gives $\Delta t = 0.4932$. Each window also stores the raw gap
+in days, the two covariates and the position of the window within its
+eye. Over the cohort this gives 478 windows.
+
+The distribution of the intervals between consecutive visits is given in
+Table~\ref{tab:data:intervals}.
+
+\begin{table}[t]
+  \centering
+  \caption[Distribution of visit intervals.]{%
+    Distribution of the intervals between consecutive visits over the
+    478 windows of the cohort, with the number of eyes that contain at
+    least one interval of each length.}
+  \label{tab:data:intervals}
+  \begin{tabular}{lrrr}
+    \toprule
+    Interval & Windows & Share & Eyes \\
+    \midrule
+    90 days  & 67  & 14.0\,\% & 10 \\
+    180 days & 364 & 76.2\,\% & 72 \\
+    270 days & 2   & 0.4\,\%  & 2  \\
+    360 days & 38  & 7.9\,\%  & 28 \\
+    540 days & 6   & 1.3\,\%  & 5  \\
+    720 days & 1   & 0.2\,\%  & 1  \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Three properties of this schedule shape the rest of the pipeline. First,
+every interval is a multiple of the 90-day acquisition grid, and the
+most common interval is 180 days. Second, the short 90-day intervals are
+concentrated in a small subgroup: all 67 of them belong to 10 eyes from
+7 patients. A training scheme restricted to intervals shorter than the
+modal 180 days would therefore learn from this densely imaged subgroup
+alone.
+
+Third, the schedule limits how far an eye can be rolled forward during
+training, where several visits are chained within a fixed time budget
+(\S\ref{sec:method:training}). With a budget of 90 days, none of the 75
+eyes can chain two visits. With 360 days, 74 of the 75 eyes reach at
+least one autoregressive step. With 540 days, 68 eyes reach at least two
+steps, and with 720 days, 73 eyes do.
+
+The same schedule also shapes the evaluation. The one-year anchor has no
+upper bound: the metric is taken at the first rollout step whose
+cumulative time reaches about 347 days. For 68 of the 75 eyes, this is
+exactly 360 days. The remaining 7 eyes (9.3\,\%) are scored at 450 to
+720 days, where the true change region is 1.3 to 1.7 times larger.
+% TODO: cite Mai2024 (see the marker in Section 3.1).
+This is accepted on purpose, for comparability with Mai et al. (2024).
+The evaluation protocol is defined in~\S\ref{sec:experiments:protocol}.
 
 
-\section{Train / Validation / Test Splits}
+\section{Splits and Cross-Validation}
 \label{sec:data:splits}
 
-% TODO: patient-level splitting (not eye-level) to prevent leakage across an
-% individual's two eyes. Split indices provided with the dataset.
+The data is partitioned by five split files that define a patient-level
+5-fold cross-validation over the universe of 100 patient identifiers. In
+each fold, 80 patients are assigned to training and 20 to validation.
+The five validation sets do not overlap, and together they cover the
+whole universe. The split identifiers carry no eye suffix, so both eyes
+of a patient always fall into the same partition. This prevents leakage
+between the eyes of one patient, which matters because GA is frequently
+bilateral with strongly correlated eyes
+(\S\ref{sec:background:ga-oct:muw}).
+
+Only 51 of the 100 patients have scans. The per-fold eye counts are
+therefore uneven, although the patient split is balanced.
+Table~\ref{tab:data:splits} lists them. On fold~2, the split yields 378
+training windows and 100 validation windows.
+% TODO: record the training and validation window counts for folds 0,
+% 1, 3 and 4.
+
+\begin{table}[t]
+  \centering
+  \caption[Eyes per cross-validation fold.]{%
+    Number of training and validation eyes in each of the five
+    cross-validation folds. Each fold assigns 80 of the 100 patient
+    identifiers to training and 20 to validation; the eye counts are
+    uneven because 49 of the identifiers have no scans.}
+  \label{tab:data:splits}
+  \begin{tabular}{lrr}
+    \toprule
+    Fold & Training eyes & Validation eyes \\
+    \midrule
+    0 & 55 & 20 \\
+    1 & 63 & 12 \\
+    2 & 59 & 16 \\
+    3 & 60 & 15 \\
+    4 & 63 & 12 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The test split is structurally empty. An eye whose patient appeared in
+neither the training nor the validation list would be assigned to a test
+partition. However, every patient with scans lies inside the
+100-identifier universe, and every identifier is assigned to training or
+validation in every fold. No test partition is therefore ever produced.
+The protocol is 5-fold train/validation cross-validation, and every
+result reported in this thesis is a validation result.
+% TODO: ensure that no chapter describes the cross-validation results as
+% test-set performance; the test split is structurally empty.
+
+The folds also differ in baseline lesion size. The median baseline
+lesion area is about 4.1\,mm$^2$ on fold~4, against 6.0 to 7.9\,mm$^2$
+on the other four folds. This heterogeneity between folds is revisited
+in the evaluation protocol (\S\ref{sec:experiments:protocol}).
 
 
 %%
