@@ -410,16 +410,68 @@ Pulled from the code repository (`masterthesis-docker/NOTES.md` + `PROJECT_CONTE
 
 ### Chapter 4 - Method (`04-method.tex`)
 
-- [ ] TODO: 4.1 Overview figure and component map.
-- [ ] TODO: 4.2 $\Delta t$-conditioned residual formulation.
-- [ ] TODO: 4.3 Multi-channel pipeline (tensor propagation only).
-- [ ] TODO: 4.4 DMM for GA (physics loss, sampling, monitor function).
-- [ ] TODO: 4.5 Single-branch MP-PDE architecture (no temporal bundling).
-- [ ] TODO: 4.6 Dual-branch MM-PDE architecture (correction branch).
-- [ ] TODO: 4.7 Patient covariate conditioning.
-- [ ] TODO: 4.8 Surrogate equation encoder (LayerEncoder).
-- [ ] TODO: 4.9 Training (pushforward, ItpNet pre-training, loss weighting).
-- [ ] TODO: 4.10 Implementation details.
+- [x] 2026-09-18: `04-method.tex` skeleton rebuilt to the framework-and-survey outline
+  (commit a4c2a15). All labels referenced by Chapters 2-3 kept (`dt-residual`,
+  `multichannel`, `training`); new labels `framework`, `mppde:arch`, `graph`,
+  `mppde:diff`, `family`, `dual`.
+- [x] 2026-09-18: Chapter 4 part 1 drafted (§4.1-§4.3, pages 32-39, ~8 pages) from an
+  external-LLM draft with a fact sheet from `THESIS_FRAMEWORK.md` §0.2, §2.5, §4-§4.7,
+  §4b.1-§4b.2, then audited line by line **and checked against the MP-PDE paper itself**
+  (`pdfs/2202.03376v3_MPPDE.pdf`). Findings:
+  - **The external model fabricated paper facts.** It claimed the original's 2-D
+    experiments were shallow-water runs using GroupNorm "in Appendix E" and denied that
+    the paper pairs ReLU with batch normalisation. The paper's appendix says: Swish +
+    instance normalisation for the 1-D experiments (E1-E3, WE1-WE3), ReLU + batch
+    normalisation for the 2-D **smoke-inflow** experiments. It also cited the sum
+    aggregation as "Eq. 7"; it is Eq. (9). The table now states what the paper says.
+  - **Conflict 3 (decoder axis) resolved:** the paper feeds each node's final hidden
+    vector into a 1-D CNN, "treat[ing] this vector as a temporally contiguous signal".
+    Both earlier descriptions were half right. Chapter 2 §2.4 reworded accordingly.
+  - **Residual connection is not a departure:** the paper's appendix states skip
+    connections are used in its message-passing layers; the draft (and my own first
+    fix) listed it as a change. Removed from the difference table.
+  - **Build-breaking, fixed:** `\cleardoddpage` typo, `\ref{experiments:protocol}`
+    missing its `sec:` prefix, `\tablefootnote` (package not loaded).
+  - **Factually wrong, fixed:** layer channels called "thickness" channels (they are
+    boundary depths; thickness is never computed); backbones said to return "the
+    predicted change" (they return the full next state); the moved branch said to build
+    a *physical* k-NN graph (it cannot -- a physical graph is 100 % in-row); batch norm
+    said to use "historical" statistics (training mode uses the current batch);
+    "the framework implements strict guardrails enforcing the permuted view" (invented);
+    "the moving mesh leaves the layer channels undisturbed" (only the mesh mover reads
+    the mask; the moved branch processes all 11 channels); splits called "random".
+  - **Framing, fixed:** MP-PDE called a "continuous-time method" three times; Backbone I
+    called "the primary structural subject" (contradicts the equal-weight framing); the
+    "two halves of equal weight" misread as framework vs operators (it is Backbone I vs
+    II); the six architecture classes enumerated in an order the source never gives;
+    "the model is effectively blind to the movement of the lesion" and "verified against
+    alternative scales" (both preview results).
+  - Message/update equations rewritten in the §2.4 notation ($f_i^m$, $\phi$, $\psi$) so
+    they compare line by line with the original; the update equation now includes the
+    layer normalisation the draft had dropped.
+  - The draft came in at roughly 60 % of the word budget again; it now fills ~8 pages,
+    which is proportionate for the first three of eight sections.
+- [ ] TODO: confirm which persistence-baseline quantities are bit-identical across arms,
+  and cite the runs (§4.1 inline TODO). `THESIS_FRAMEWORK.md` §0.2 asserts the
+  "bit-identical persistence fingerprints across arms" without defining them.
+- [ ] TODO: verify the temporal-bundle sizes of the original MP-PDE. The set {20, 25, 50}
+  (from code-side notes) could not be found in the paper text; §2.4 carries an inline
+  TODO, and the §4.3.3 table states only "K steps".
+- [ ] TODO: produce Figure `fig:method:pipeline` (§4.1) -- the shared pipeline with the
+  operator slot as the one varying box and the moving-mesh branch dashed.
+- [ ] TODO: produce Figure `fig:method:stencils` (§4.3.2) -- index-space diamond vs dilated
+  stencil at physical aspect ratio, 0.1 mm scale bar, median (12 col) and p90 (23 col)
+  per-visit front advance marked.
+- [ ] TODO (code repo, not editable from here): `THESIS_FRAMEWORK.md` §4.5 still justifies
+  the persistence prior with "GA evolves ... monotonically (dead tissue does not heal)".
+  That contradicts the locked-off monotonic penalty and the observed local shrinkage.
+  Fix it in `masterthesis-docker` and re-mirror; the thesis text rests the prior on slow
+  change only.
+- [ ] TODO: 4.4 Backbone II (countermodel family, contract, parameter matching).
+- [ ] TODO: 4.5 Moving-mesh extension as a tested hypothesis (DMM, dual branch, alpha gate).
+- [ ] TODO: 4.6 Conditioning (covariates, LayerEncoder).
+- [ ] TODO: 4.7 Training.
+- [ ] TODO: 4.8 Implementation details.
 
 ### Chapter 5 - Experiments (`05-experiments.tex`)
 
@@ -473,7 +525,8 @@ marker itself; `THESIS_FRAMEWORK.md` §10.1 carries verified entries for all of 
   and needed again in §4.4 for the FEN / T-FEN arm.
 - [ ] TODO: cite **Chen2018** -- Chen, Rubanova, Bettencourt & Duvenaud, *NeurIPS* 2018,
   "Neural Ordinary Differential Equations". Used in §2.3 for the Neural-ODE reading of a
-  residual update; needed again in §4.4 for the Runge--Kutta wrapper.
+  residual update, and in §4.2.1 for the caution that the Euler form does not make
+  f_theta a rate; needed again in §4.4 for the Runge--Kutta wrapper.
 - [ ] TODO: cite **Ott2021** -- Ott, Katiyar, Hennig & Tiemann, *ICLR* 2021, "ResNet After
   All: Neural ODEs and Their Numerical Solution". Used in §2.3 for the solver-invariance
   requirement; needed again in §5.6 for the solver-swap diagnostic.
@@ -485,6 +538,12 @@ marker itself; `THESIS_FRAMEWORK.md` §10.1 carries verified entries for all of 
   Springer, Applied Mathematical Sciences vol. 174, 2011. Used in §2.5 as the classical
   background for moving meshes; also the source of the equidistribution-CoV mesh-quality
   measure needed in §5.5.
+- [ ] TODO: cite **Ba2016** -- Ba, Kiros & Hinton, "Layer Normalization", arXiv:1607.06450,
+  2016 (preprint, no peer-reviewed venue). Used in §4.3.1 for the per-node normalisation.
+- [ ] TODO: cite **Ioffe2015** -- Ioffe & Szegedy, *ICML* 2015, "Batch Normalization:
+  Accelerating Deep Network Training by Reducing Internal Covariate Shift",
+  arXiv:1502.03167. Used in §4.3.1 for the normalisation that is avoided. (Also cited by
+  the MP-PDE paper itself for its 2-D experiments.)
 - [ ] TODO: cite **Feuer2013** -- Feuer, Yehoshua, Gregori, Penha, Chew, Ferris, Clemons,
   Lindblad & Rosenfeld, *JAMA Ophthalmology* 131(1):110-111, 2013, "Square Root
   Transformation of Geographic Atrophy Area Measurements to Eliminate Dependence of Growth

@@ -8,58 +8,476 @@
 \section{Overview: One Framework, One Swappable Slot}
 \label{sec:method:overview}
 
-% TODO: one pipeline figure with the operator slot drawn as the only part
-% that varies: state in -> (fixed) conditioning -> f_theta -> (fixed)
-% Delta-t-scaled residual update -> next state. State the design contract:
-% loss, curriculum, evaluation, model selection and bookkeeping live in one
-% shared pipeline that a backbone may not duplicate. Point to every
-% subsection below.
+The method of this thesis separates the experimental framework from the
+spatial operators evaluated inside it. The aim is to find out which
+properties a model needs in order to predict GA progression. Answering
+that question requires a controlled comparison. If every candidate
+architecture came with its own training pipeline, differences in data
+handling, time representation or optimisation would be confounded with
+the architectural differences under test. A single pipeline is therefore
+fixed, and it provides one swappable slot for the update operator
+$f_\theta$. The operator placed in this slot is the only component that
+changes between experiments.
+
+Everything outside the slot is held fixed. The input is the eleven-channel
+state on the $49 \times 1024$ grid of Chapter~\ref{ch:data}. Time is
+handled by a single-step residual update conditioned on the interval
+between visits (\S\ref{sec:method:dt-residual}). The loss, the training
+curriculum, the optimiser, the epoch budget, the cross-validation folds,
+the random seeds, the evaluation and the model selection rule are shared
+by every run. A backbone placed in the slot contains architecture only. It
+receives the current state and its conditioning inputs in a common batch
+format, and it returns the full predicted next state. It may not change the
+optimisation loop or carry training settings of its own. A separate
+pipeline per architecture would reintroduce exactly the confounds the
+design is meant to remove.
+
+Nine settings of the slot, spanning six architecture classes, are run
+through this pipeline. They are a message-passing graph neural network on
+two different graphs --- an index-space nearest-neighbour graph and a
+dilated stencil at the physical scale of the lesion, the latter being the
+canonical configuration of this thesis; a U-Net at a matched parameter
+count and at a much larger capacity; a Fourier Neural Operator, alone and
+with a small local convolutional bypass; a graph U-Net; and a Finite
+Element Network, in a free-form version and with an explicitly learned
+transport term. A fixed-step Runge--Kutta wrapper can be placed around any
+of these operators, and a per-pixel model with no spatial context marks the
+lower floor. All arms are parameter-matched to the canonical
+configuration's 67\,147 parameters within a narrow band, except for two
+deliberate controls. The matching is described in~\S\ref{sec:method:family}.
+
+% TODO: confirm exactly which persistence-baseline quantities are
+% bit-identical across arms, and cite the runs.
+The persistence baseline, which predicts no change, is computed inside
+every run by the same evaluation code. Its values come out identical
+across all arms. This indicates that every arm was trained and evaluated on
+the same data through the same evaluation routine.
+
+The two backbone sections carry equal weight.
+\S\ref{sec:method:mppde} describes the graph solver in more detail only
+because it is the arm this project built rather than imported;
+\S\ref{sec:method:family} describes the remaining architectures on the same
+terms. Before them, \S\ref{sec:method:framework} defines the parts every arm
+shares. After them, \S\ref{sec:method:mmpde} describes the moving-mesh
+extension, \S\ref{sec:method:covariates} the conditioning inputs,
+\S\ref{sec:method:training} the shared training setup, and
+\S\ref{sec:method:implementation} the implementation.
+Figure~\ref{fig:method:pipeline} summarises the pipeline.
+
+% TODO: produce Figure fig:method:pipeline. Raw visits -> precomputation
+% (crop/pad, normalisation, windows with Delta t and covariates, graph
+% edges) -> the shared training loop. In the loop, the current state and
+% its conditioning (Delta t, covariates) enter the operator slot ->
+% residual update u + Delta t * f -> next state, fed back for multi-step
+% rollout during training and evaluation -> evaluation. The operator slot
+% is drawn as the one box that changes, listing the architecture classes.
+% A separate, optional path shows the pretrained, frozen mesh mover
+% feeding a second branch (Section 4.5), drawn dashed.
+\begin{figure}[t]
+  \centering
+  \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering\itshape Placeholder
+    for Figure~\ref{fig:method:pipeline}: the shared pipeline with the
+    operator slot as the only varying component. See accompanying
+    \texttt{\% TODO} for the intended content.}}
+  \caption[The fixed framework and its swappable operator slot.]{%
+    The fixed framework and its swappable operator slot. Precomputation,
+    conditioning, the residual update, the training curriculum and the
+    evaluation are shared by every experiment. Only the operator
+    $f_\theta$ in the highlighted box changes between arms. The dashed
+    path shows the optional moving-mesh extension of
+    \S\ref{sec:method:mmpde}, in which a pretrained and frozen mesh mover
+    feeds a second branch.}
+  \label{fig:method:pipeline}
+\end{figure}
 
 
 \section{The Fixed Framework}
 \label{sec:method:framework}
 
-% TODO: what every arm shares. One visit in, no history (and why).
+This section defines what every arm shares: the time handling and the
+tensor layout of the state. A further shared choice concerns the input
+itself. Every operator receives exactly one visit and predicts the state at
+the next visit. It sees the current state, the interval to the next visit
+and the patient covariates, but no earlier visits. It has no memory of the
+trajectory so far.
+
+Two reasons support this design. First, the clinical sequences are short,
+with five to thirteen visits per eye (\S\ref{sec:data:dataset}). Using
+several past visits as input would leave fewer visits available as
+prediction targets. Second, the framework predicts strictly one step at a
+time. The original MP-PDE predicts several future steps in one forward pass
+(temporal bundling, \S\ref{sec:background:mp-pde}). Here, this is removed.
+The optional moving mesh of \S\ref{sec:method:mmpde} is computed from a
+single state, so a mesh built at the start of a multi-step window would no
+longer reflect the lesion at the later steps. The shared loss and
+curriculum are defined in~\S\ref{sec:method:training}, and the shared
+evaluation in~\S\ref{sec:experiments:protocol}.
 
 \subsection{\texorpdfstring{$\Delta t$}{Delta t}-Conditioned Residual Formulation}
 \label{sec:method:dt-residual}
 
-% TODO: u_{t+Delta t} = u_t + Delta t * f_theta(u_t, Delta t); why this
-% replaces absolute time; the Delta t -> 0 persistence limit; the
-% zero-initialised head, so every model starts at exact persistence.
+The original neural PDE solvers use a fixed time step and receive the
+absolute time as an input feature. The clinical data offers neither. Visits
+occur at irregular intervals, and patients share no common time origin. The
+absolute time is therefore replaced by the interval between two
+consecutive visits, $\Delta t$, measured in years (\S\ref{sec:data:temporal}).
+
+The transition from the current state $u_t$ to the next state
+$u_{t+\Delta t}$ is written as a residual update scaled by the interval:
+\begin{equation}
+  u_{t+\Delta t} \;=\; u_t \;+\; \Delta t \cdot
+  f_\theta\!\left(u_t,\, \Delta t,\, \mathbf{z}\right),
+  \label{eq:method:residual-update}
+\end{equation}
+where $f_\theta$ is the operator in the swappable slot and $\mathbf{z}$
+denotes the patient covariates. $\Delta t$ therefore enters twice. It is an
+input feature of the network, so the operator can adapt its output to the
+length of the interval. It is also the multiplier of the network output.
+
+This form has a useful limit. As $\Delta t$ approaches zero, the predicted
+change vanishes and the prediction collapses to $u_{t+\Delta t} = u_t$.
+For two visits very close in time, the model thus predicts no change. The
+leading $u_t$ term is also a deliberate prior. Consecutive visits are
+almost identical, because GA changes slowly relative to the rest of the
+retinal state. Passing the current state through unchanged relieves the
+network of reproducing the whole state. It only has to model the change
+over the interval. The output of $f_\theta$ is signed and unbounded, so the
+model can also predict a shrinking lesion. No monotonic-growth constraint is
+imposed; the prior rests on slow change alone.
+
+The final layer of every operator's output head is initialised to zero,
+weights and bias alike. Before training, $f_\theta$ therefore outputs zero
+for every input, and Equation~\eqref{eq:method:residual-update} reduces to
+exact persistence. Every arm starts from the same function.
+
+Equation~\eqref{eq:method:residual-update} has the form of an explicit Euler
+step (\S\ref{sec:background:pde-solvers:time}) and generalises the residual
+update of MP-PDE (\S\ref{sec:background:mp-pde}) to a variable step. This
+resemblance needs a caution.
+% TODO: cite Chen2018 (Chen, Rubanova, Bettencourt & Duvenaud, "Neural
+% Ordinary Differential Equations", NeurIPS 2018, arXiv:1806.07366)
+% TODO: cite Ott2021 (Ott, Katiyar, Hennig & Tiemann, "ResNet After All:
+% Neural ODEs and Their Numerical Solution", ICLR 2021, arXiv:2007.15386)
+The Euler form does not by itself make $f_\theta$ a time derivative or a
+rate of change. A network trained with this update need not be a consistent
+discretisation of any continuous-time system (Chen et al., 2018; Ott et
+al., 2021). This thesis therefore does not assume such a reading. Whether
+any of the models behaves as a continuous-time system is tested separately
+in Chapter~\ref{ch:experiments}.
 
 \subsection{Multi-Channel State Propagation}
 \label{sec:method:multichannel}
 
-% TODO: how the C = 11 channels move through the pipeline at the tensor
-% level. Mathematics and tensors only -- the clinical meaning of the
-% channels is established in Section~\ref{sec:data:state}.
+The framework carries the full eleven-channel state through every
+component. As defined in~\S\ref{sec:data:state}, the state consists of one
+binary mask channel and ten layer-boundary depth channels. This subsection
+covers only how these channels are laid out and moved as tensors.
+
+Each window stores its input and target state with the layout
+$(C, N, K) = (11, 50\,176, 1)$, where $C$ is the number of channels, $N$
+the number of grid nodes and $K$ the number of time steps. At run time, a
+batch of $B$ graphs is flattened into a node-feature matrix of shape
+$(B \cdot N,\; C \cdot K) = (B \cdot 50\,176,\; 11)$. The feature axis is
+ordered channel-major and time-minor. The node axis is ordered row-major
+over the $49 \times 1024$ grid.
+
+Operators that work on images, such as the convolutional arms
+of~\S\ref{sec:method:family}, need the state in the image layout
+$(B, C, 49, 1024)$. There is only one valid way to obtain it: the matrix is
+first viewed as $(B, N, C, K)$, and the axes are then permuted. A direct
+reshape to the image shape produces a tensor of the right size, but it
+scrambles the channels across the grid and raises no error. The inverse
+mapping follows the same rule in reverse.
+
+All eleven channels are both input and output of the operator. The mask
+channel is the clinical target, and the ten layer channels are auxiliary
+targets. Each output channel receives its own independent prediction; for
+the graph solver, this is guaranteed by the full-rank decoder
+of~\S\ref{sec:method:mppde:arch}. The loss weights the mask channel more
+heavily than the layer channels, with the weights set
+in~\S\ref{sec:method:training}. The mesh mover of~\S\ref{sec:method:mmpde}
+reads only the mask channel to compute the moved mesh. The network branch
+that operates on the moved mesh still processes all eleven channels.
 
 
 \section{Backbone I: The GA-Adapted Graph Solver}
 \label{sec:method:mppde}
 
-% TODO: the arm the project built rather than imported: encoder, message
-% passing, decoder, Delta-t-conditioned output. Temporal bundling removed
-% entirely (strict K = 1).
+The first backbone is the encode--process--decode message-passing network
+of MP-PDE (\S\ref{sec:background:mp-pde}), adapted to the clinical setting.
+It is not a privileged arm. It is described in more depth than the others
+because this project built it rather than imported it, and because several
+of its design decisions --- the time handling, the output layer and the
+strict one-step prediction --- became part of the shared framework. The
+same network class is used for both branches of the moving-mesh extension
+of~\S\ref{sec:method:mmpde}. Temporal bundling is removed entirely, for the
+reasons given in~\S\ref{sec:method:framework}. \S\ref{sec:method:mppde:arch}
+describes the architecture, \S\ref{sec:method:graph} the graph it operates
+on, and \S\ref{sec:method:mppde:diff} summarises the departures from the
+original.
 
 \subsection{Architecture}
 \label{sec:method:mppde:arch}
 
-% TODO: encoder, message and update functions, conditioning vector,
-% normalisation, decoder.
+The forward pass consists of an encoder, a number of message-passing
+rounds and a decoder. The notation follows~\S\ref{sec:background:mp-pde}.
+Each node $i$ carries the normalised eleven-channel state $u_i$ and its
+physical position $(x_i, y_i)$ in millimetres. The positions enter the
+network divided by the domain size, as $(x_i / L_x,\, y_i / L_y)$.
+
+Each node also receives a conditioning vector $\mathbf{c}_i$. In the
+canonical configuration it has three entries: the interval $\Delta t$ in
+years, the z-scored age and the sex of the patient. All three are
+graph-level quantities, broadcast to every node of the graph. An optional
+learned layer embedding can be appended (\S\ref{sec:method:encoder}); it is
+switched off in the canonical configuration. The conditioning vector fills
+the slot that the equation feature vector $\theta_{\text{PDE}}$ occupies in
+the original. No governing equation or coefficients are known for GA, so
+the interval and the covariates take this place. As in the original, the
+vector is injected at three points: the encoder input, every message and
+every node update.
+
+The encoder maps the concatenated node input to a hidden vector,
+\begin{equation}
+  f_i^{0} \;=\; \epsilon\!\left(\left[u_i,\; x_i / L_x,\; y_i / L_y,\;
+  \mathbf{c}_i\right]\right),
+  \label{eq:method:encoder}
+\end{equation}
+where $\epsilon$ consists of a linear layer, layer normalisation, a ReLU
+activation, a second linear layer and a final layer normalisation, with no
+activation after it.
+
+Each message-passing round $m$ computes a message along every edge from
+node $j$ to node $i$ and then updates node $i$:
+\begin{align}
+  m_{ij}^{m} &\;=\; \phi\!\left(f_i^{m},\; f_j^{m},\; u_i - u_j,\;
+    \Delta\mathbf{p}_{ij},\; \mathbf{c}_i\right),
+  \label{eq:method:message}\\
+  f_i^{m+1} &\;=\; \mathrm{LN}\!\left(f_i^{m} + \psi\!\left(f_i^{m},\;
+    \frac{1}{|\mathcal{N}(i)|}\sum_{j \in \mathcal{N}(i)} m_{ij}^{m},\;
+    \mathbf{c}_i\right)\right).
+  \label{eq:method:update}
+\end{align}
+Here $\Delta\mathbf{p}_{ij}$ is the offset between the normalised positions
+of the two nodes, $\mathcal{N}(i)$ is the set of neighbours of node $i$, and
+$\mathrm{LN}$ denotes layer normalisation. The message function $\phi$ and
+the update function $\psi$ each consist of two linear layers, each followed
+by a ReLU activation. As in the original, the state difference $u_i - u_j$
+lets the message act as a learned local difference operator. Every round
+receives the raw state, the positions and the conditioning vector again, so
+this information is available at every depth. As in the original, which
+uses skip connections in its message-passing layers, each update ends in a
+residual connection followed by a normalisation layer; only the type of
+normalisation differs. The canonical configuration aggregates messages by their
+mean, as written in Equation~\eqref{eq:method:update}. The arm on the
+index-space graph instead concatenates the mean and the maximum of the
+messages. The canonical configuration uses two message-passing rounds and
+a hidden width of 64. This capacity is a configuration choice based on
+experiments reported in Chapter~\ref{ch:experiments}.
+
+% TODO: cite Ba2016 (Ba, Kiros & Hinton, "Layer Normalization",
+% arXiv:1607.06450, 2016)
+% TODO: cite Ioffe2015 (Ioffe & Szegedy, "Batch Normalization:
+% Accelerating Deep Network Training by Reducing Internal Covariate
+% Shift", ICML 2015, arXiv:1502.03167)
+All normalisation layers are per-node layer normalisations (Ba et al.,
+2016). Each node is normalised over its own feature vector. No running
+statistics are kept, and no nodes or graphs are coupled, so the operator is
+identical in training and in evaluation. This matters because of the
+training curriculum of~\S\ref{sec:method:training}, which rolls the model
+forward on its own predictions without gradients but in training mode.
+Batch normalisation (Ioffe \& Szegedy, 2015) would normalise these drifted
+states with the statistics of the current batch. This would erase the very
+perturbation the curriculum is meant to expose the model to. It would also
+write the drifted statistics into the running estimates that evaluation
+later uses. Before this change, training and evaluation measurably behaved
+as two different operators. A graph-level variant that normalises a whole
+batch as one graph was avoided for the same reason, because it would couple
+the samples of a batch.
+
+The decoder maps the final hidden vector $f_i^{M}$ to one output per
+channel. It consists of a linear layer, layer normalisation and a ReLU,
+applied twice, followed by a final linear layer to $C \cdot K = 11$
+outputs. The final layer is bare, without normalisation or activation,
+because the output is a signed and unbounded residual. On the uniform
+branch, the node update is then
+$u_i + \Delta t \cdot \delta(f_i^{M})$, where $\delta$ denotes the decoder;
+this is Equation~\eqref{eq:method:residual-update} at node level.
+
+This decoder replaces the convolutional output head of the original. That
+head treats the final hidden vector of a node as a temporal signal and
+convolves along it to emit the $K$ bundled future steps
+\citep{Brandstetter2022}. With $K = 1$ and eleven channels, the head reduced
+the hidden vector to a single scalar per node and then expanded that scalar
+linearly to all eleven channels. The eleven outputs were therefore perfectly
+collinear, a rank-1 bottleneck. The head also required a hidden width of at
+least 113. The replacement gives every channel an independent output and
+restores full rank. Its final layer is initialised to zero on the uniform
+branch, which yields the persistence start
+of~\S\ref{sec:method:dt-residual}. On the correction branch of the moving
+mesh it must not be, for reasons given in~\S\ref{sec:method:dual}.
 
 \subsection{Graph Construction on an Anisotropic Grid}
 \label{sec:method:graph}
 
-% TODO: the load-bearing part of the section. Index-space k-NN (v1) versus
-% the dilated physical-scale stencil (v2 lock); offsets derived from the
-% lesion scale.
+The graph on which messages travel turns out to be the most consequential
+design decision of the graph solver. The modelling grid has 49 rows and
+1024 columns, or 50\,176 nodes. Rows are 0.12118\,mm apart, while columns
+are only 0.00568\,mm apart (\S\ref{sec:data:spatial}). Along a row, the
+nodes are therefore about 21 times denser than across rows. The node
+positions are stored in physical millimetres.
+
+A $k$-nearest-neighbour graph built on these physical positions fails. The
+twelve physically nearest neighbours of every node all lie in its own row:
+measured over the grid, 100\,\% of the edges connect nodes in the same row
+and none cross rows. Message passing on such a graph runs along rows only.
+No information can cross from one row to the next at any network depth, and
+the two-dimensional retina falls apart into 49 independent one-dimensional
+strands.
+
+Building the graph on integer grid indices instead of physical coordinates
+restores two-dimensional connectivity. With $k = 12$, and without
+self-loops, the neighbourhood of an interior node is exactly the
+index-space disc of squared radius four, a diamond of radius two. It
+contains the four direct neighbours, the four diagonal neighbours and the
+four neighbours two steps away along either axis. The resulting graph has
+602\,112 directed edges; about 33\,\% connect nodes in the same row,
+50\,\% nodes one row apart and 17\,\% nodes two rows apart. About 8.5\,\%
+of the nodes (4\,276), on and next to the border of the grid, do not have
+the full interior neighbourhood.
+
+This index-space graph solves the connectivity problem, but its physical
+reach is lopsided. A neighbourhood that is symmetric in grid steps inherits
+the 21:1 anisotropy of the grid. One hop reaches about $\pm 0.25$\,mm
+across rows but only about $\pm 0.011$\,mm along a row. After the two
+message-passing rounds of the canonical configuration, a node has received
+information from at most four columns away, about $\pm 0.023$\,mm along the
+row.
+
+This reach can be compared with the scale on which the lesion changes.
+Between two visits 180 days apart, the GA front advances a median of about
+12 columns, or roughly 0.07\,mm. The upper quartile is 17 columns and the
+90th percentile 23 columns. A single hop along a row therefore covers only
+a small fraction of the distance the front typically moves between two
+visits.
+
+The dilated stencil is designed to close this gap
+(Figure~\ref{fig:method:stencils}). Each interior node is connected to the
+nodes at row offsets $\{-1, 0, +1\}$ and column offsets
+$\{0, \pm 7, \pm 14, \pm 21\}$, excluding the node itself: 20 neighbours in
+total. One hop then reaches $\pm 0.121$\,mm across rows and
+$\pm 0.119$\,mm along a row. The physical reach is nearly equal on both
+axes, at about 0.12\,mm per hop. Along a row, one hop now spans 21 columns,
+close to the 90th percentile of the per-visit front advance. The design
+thus sets the reach from the physical scale of the lesion rather than
+treating it as a free hyperparameter. Chapter~\ref{ch:experiments} tests
+this choice against smaller and larger reaches.
+
+The dilated stencil replaces only the edge set. The network, its weights
+and every other component stay unchanged, and the stencil adds no
+parameters. It is used on the uniform grid only. The nodes of the moved
+mesh in~\S\ref{sec:method:mmpde} lie off the lattice, where a lattice
+stencil is undefined, so that branch builds its own $k$-nearest-neighbour
+graph on the moved positions (\S\ref{sec:method:dual}).
+
+The two canonical configurations differ slightly in size, and the
+difference comes from the aggregation, not from the graph. With the
+dilated stencil and mean aggregation, the network has 67\,147 parameters;
+the arm on the index-space graph, with concatenated mean and maximum, has
+75\,339. The concatenation doubles the width of the aggregated message that
+enters the update function. The same network on the dilated stencil with
+mean-and-maximum aggregation also has 75\,339 parameters, and on the
+index-space graph with mean aggregation also 67\,147.
+
+% TODO: produce Figure fig:method:stencils. The two neighbourhoods side
+% by side, drawn at the physical aspect ratio (a row step ~21x a column
+% step): left the index-space k-NN diamond (12 neighbours, +/-2 rows and
+% +/-2 columns), right the dilated stencil (rows -1..+1 x columns
+% 0,+/-7,+/-14,+/-21, 20 neighbours). Add a 0.1 mm scale bar and mark the
+% median (12 columns, ~0.07 mm) and 90th-percentile (23 columns) per-visit
+% front advance along the row axis for comparison.
+\begin{figure}[t]
+  \centering
+  \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering\itshape Placeholder
+    for Figure~\ref{fig:method:stencils}: the index-space neighbourhood and
+    the dilated stencil at physical aspect ratio. See accompanying
+    \texttt{\% TODO} for the intended content.}}
+  \caption[The two graph neighbourhoods on the anisotropic grid.]{%
+    The two graph neighbourhoods of the graph solver, drawn at the
+    physical aspect ratio of the grid, where one row step is about 21
+    times longer than one column step.
+    \emph{Left:} the index-space $k$-nearest-neighbour graph ($k = 12$),
+    a diamond reaching two rows and two columns.
+    \emph{Right:} the dilated stencil, reaching one row and 21 columns,
+    with 20 neighbours and about 0.12\,mm of reach on both axes.
+    The markers show the median and the 90th-percentile advance of the
+    GA front between two visits 180 days apart.}
+  \label{fig:method:stencils}
+\end{figure}
 
 \subsection{Differences from the Original MP-PDE}
 \label{sec:method:mppde:diff}
 
-% TODO: summary table of every departure from Brandstetter et al. (2022).
+Table~\ref{tab:method:mppde-diff} lists every departure from the original
+MP-PDE \citep{Brandstetter2022}. The original entries refer to the
+published paper; the original was evaluated mainly on one-dimensional
+equations, with additional two-dimensional smoke-inflow experiments, and
+used different settings for the two.
+
+% TODO: verify the bundle sizes K used in Brandstetter et al. (2022). The
+% set {20, 25, 50} quoted in Section 2.4 could not be located in the
+% paper's text; the table therefore states only "K steps".
+\begin{table}[t]
+  \centering
+  \caption[Differences between the original MP-PDE and the graph solver of
+  this thesis.]{%
+    Differences between the original MP-PDE \citep{Brandstetter2022} and
+    the graph solver of this thesis. \emph{1-D} and \emph{2-D} refer to the
+    one-dimensional experiments and the two-dimensional smoke-inflow
+    experiments of the original. The original's aggregation is the sum
+    written in its node-update equation; the paper does not describe the
+    aggregation of its reference implementation.}
+  \label{tab:method:mppde-diff}
+  \small
+  \begin{tabular}{p{0.2\textwidth} p{0.36\textwidth} p{0.36\textwidth}}
+    \toprule
+    Aspect & Original MP-PDE & This thesis \\
+    \midrule
+    State & Scalar field of a PDE & Eleven-channel clinical state on a
+      2-D grid \\
+    Temporal bundling & $K$ future steps per forward pass & Removed;
+      one step per pass ($K = 1$) \\
+    Time & Fixed time step; current time as an input & Irregular
+      per-window $\Delta t$ as input and as multiplier; no shared time
+      origin \\
+    Equation identity & Known coefficients and boundary conditions
+      ($\theta_{\text{PDE}}$) & None known; $\Delta t$ and covariates in
+      that slot (\S\ref{sec:method:covariates}) \\
+    Graph & Cut-off radius (1-D, 2-D) or $k$-nearest neighbours (wave
+      equations), on positions & Index-space $k$-nearest neighbours, then
+      the dilated stencil (\S\ref{sec:method:graph}) \\
+    Aggregation & Sum over neighbours & Mean (canonical); mean and maximum
+      for the index-space arm \\
+    Activation & Swish (1-D); ReLU (2-D) & ReLU \\
+    Normalisation & Instance normalisation (1-D); batch normalisation
+      (2-D) & Per-node layer normalisation \\
+    Decoder & 1-D convolution along the node's hidden vector, read as a
+      temporal signal, emitting $K$ steps & Full-rank three-layer MLP;
+      last layer zero-initialised \\
+    Branches & One network & One class for the uniform and the correction
+      branch (\S\ref{sec:method:mmpde}) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Each change is motivated where it is introduced. The irregular time
+handling and the removal of bundling follow from the clinical visit
+schedule (\S\ref{sec:method:framework}, \S\ref{sec:method:dt-residual}).
+The conditioning vector replaces the unknown equation identity. The graph
+constructions follow from the anisotropy of the grid
+(\S\ref{sec:method:graph}). The normalisation and the decoder were changed
+so that the operator behaves identically under the training curriculum and
+represents all eleven channels independently (\S\ref{sec:method:mppde:arch}).
 
 
 \section{Backbone II: The Countermodel Family}

@@ -984,9 +984,9 @@ Ablating the $\theta_{\text{PDE}}$ injection degrades performance most
 severely when the equation parameters vary across the dataset.
 
 The decoder is a shallow one-dimensional convolutional neural network
-with weights shared across the spatial dimensions. It is applied along
-the temporal-bundle axis to decode the final latent state into a
-sequence of updates $d_i = (d_i^1, \dots, d_i^K)$. A residual update
+with weights shared across the spatial dimensions. It treats the final
+hidden vector of each node as a temporal signal and convolves along it,
+producing a sequence of updates $d_i = (d_i^1, \dots, d_i^K)$. A residual update
 $u_i^{k+l} = u_i^k + (t_{k+l} - t_k) d_i^l$ produces the final
 prediction for each substep $1 \leq l \leq K$. This formulation is
 motivated by numerical consistency: the update must necessarily
@@ -994,6 +994,9 @@ converge to the true solution as the temporal step size approaches
 zero.
 
 Two distinct mechanisms mitigate the accumulation of rollout errors.
+% TODO: verify the bundle sizes against Brandstetter et al. (2022); the
+% set {20, 25, 50} comes from the code-side notes and could not be located
+% in the paper's text. Remove the parenthesis if it cannot be confirmed.
 The first is temporal bundling. The model predicts $K$ future steps per
 forward pass (with $K \in \{20, 25, 50\}$ in the original evaluation).
 This reduces the total number of solver calls required along a given
