@@ -169,7 +169,7 @@ wrong / to change". The author asked for no shortening yet; cuts wait for a late
   the Flaxman PDF: cataract, refractive error, trachoma, glaucoma, diabetic retinopathy,
   corneal opacity).
 - [x] §1.1: "The combination of an aging population…" — too long, too complicated. Rewritten 2026-09-25 as two sentences.
-- [ ] §1.2: "This per-eye, spatially resolved framing…" — simplify.
+- [x] §1.2: "This per-eye, spatially resolved framing…" — simplify. Rewritten 2026-09-25.
 - [ ] §1.2: "A standard U-Net or similar dense predictor…" — marked, no comment; it
   conflicts with the result that a U-Net inside the framework matches the locked GNN.
 - [x] §1.3: "Two recent neural PDE solver families…" — too much focus on MP-PDE/MM-PDE.

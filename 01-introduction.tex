@@ -74,11 +74,10 @@ coherence tomography (OCT) volumes. For each eye, longitudinal imaging yields
 a sequence of macula-centred grids on which the lesion outline and the
 underlying retinal layer geometry are traced; given the most recent observed
 state and a target horizon $\Delta t$, the goal is to predict the full
-spatial configuration of the lesion at the future visit. This per-eye,
-spatially resolved framing is distinct from the cohort-level conversion-time
-prediction common in prior AMD deep-learning work \citep{Vogl2021}: the
-deliverable is not a single risk score but the entire next image of the
-disease.
+spatial configuration of the lesion at the future visit. This differs from
+earlier deep-learning work on AMD, which predicts when an eye will convert to
+a later disease stage \citep{Vogl2021}. The output here is not a single risk
+score but a complete map of the lesion at the next visit.
 % TODO: cite SchmidtErfurth2018 (IOVS, "Prediction of individual disease
 % conversion in early AMD using artificial intelligence") and
 % Bogunovic2017 (IOVS, "Machine learning of the progression of intermediate
