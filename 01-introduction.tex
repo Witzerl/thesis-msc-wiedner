@@ -252,30 +252,19 @@ The work presented in this thesis makes the following contributions:
 \section{Thesis Outline}
 \label{sec:introduction:outline}
 
-The remainder of this thesis is organised as follows. Chapter~\ref{ch:background}
-provides the necessary background, surveying GA pathology and OCT imaging,
-the relevant subset of numerical and neural PDE solver theory, and the two
-specific architectures (MP-PDE, MM-PDE) on which the present work builds.
-Chapter~\ref{ch:data} describes the Medical University of Vienna GA cohort,
-the eleven-channel state representation, and the spatial, temporal, and
-demographic preprocessing pipeline.
-Chapter~\ref{ch:method} details the proposed adaptation: the
-$\Delta t$-conditioned residual operator, the multi-channel pipeline, the
-data-free mesh mover for vector-valued GA states, the dual-branch
-correction-style architecture, the patient covariate conditioning, the
-surrogate equation encoder, and the training protocol.
-Chapter~\ref{ch:experiments} reports the empirical evaluation, comprising
-baseline comparisons, ablations of each contribution, moving-mesh quality
-diagnostics, qualitative rollout analyses, and computational-cost
-measurements.
-Chapter~\ref{ch:discussion} interprets the results in clinical and
-methodological terms and articulates the principal limitations.
-Chapter~\ref{ch:conclusion} summarises the contributions and outlines
-directions for future work.
-
-% TODO: confirm chapter labels (\ref{ch:background} etc.) match the
-% \label commands defined in the chapter source files once they are written;
-% currently these are placeholders consistent with the planned structure.
+The remainder of this thesis is organised as follows.
+Chapter~ef{ch:background} introduces GA and OCT imaging, the numerical
+ideas that learned PDE solvers build on, and the families of learned models
+considered in this work. Chapter~ef{ch:data} describes the Medical
+University of Vienna GA cohort and how each visit is turned into an
+eleven-channel state. Chapter~ef{ch:method} addresses the first part of
+the research question by developing the framework, and describes the models
+that fill its one free component. Chapter~ef{ch:experiments} addresses the
+second part by comparing these models on equal terms.
+Chapter~ef{ch:discussion} discusses what the results mean clinically and
+methodologically, together with their limitations, and
+Chapter~ef{ch:conclusion} concludes. The appendix reports an additional
+experiment with an adaptive moving mesh.
 
 
 %%
