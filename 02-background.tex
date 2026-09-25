@@ -521,270 +521,400 @@ in~\S\ref{sec:data:splits}.
 \section{Partial Differential Equations and Numerical Solvers}
 \label{sec:background:pde-solvers}
 
-This section reviews the subset of classical PDE-solver theory that is
-load-bearing for the remainder of the thesis. The exposition is
-deliberately narrow: it covers temporal PDEs in conservation form, the
-method-of-lines reduction to a system of ordinary differential
-equations, finite-difference and finite-volume spatial stencils, the
-elementary time integrators that close the loop on a discrete update
-rule, and the distinction between uniform and adaptive meshes. The aim
-is to provide the language in which the neural solvers
-of~\S\ref{sec:background:neural-pde}--\S\ref{sec:background:mm-pde}
-are defined; nothing further is required. In line with the project
-convention, the two-dimensional shallow-water equation (SWE) serves as
-the running concrete example throughout, both because the SWE features
-prominently as a benchmark in the moving-mesh literature
-\citep{Hu2024} and because its sharp wave fronts on a quadratic spatial
-domain are visually similar to the active GA boundary on the
-$49 \times 1024$ en-face grid.
+The models studied in this thesis borrow their structure from numerical
+methods for partial differential equations (PDEs): a state stored on a
+spatial grid, an update computed from the values around each grid point,
+and a step forward in time that is repeated to produce a trajectory.
+This section introduces that structure and the notation used for it in
+the remainder of the thesis. It first defines temporal PDEs and the
+conservation form (\S\ref{sec:background:pde-solvers:problem}), then
+follows the computational path of a classical solver from the
+discretisation of space (\S\ref{sec:background:pde-solvers:mol}
+and~\S\ref{sec:background:pde-solvers:stencils}) to the step in time
+(\S\ref{sec:background:pde-solvers:time}). It closes with the strengths
+and limits of this path (\S\ref{sec:background:pde-solvers:limits}) and
+with the step from hand-designed to learned solvers
+(\S\ref{sec:background:pde-solvers:neural}). The presentation follows
+the background section of \citet{Brandstetter2022}.
 
-\subsection{Temporal PDEs and conservation form}
+No claim is made that GA progression obeys a known PDE. What is borrowed
+is the vocabulary and the shape of the computation, not an equation.
+
+\subsection{Temporal PDEs and the conservation form}
 \label{sec:background:pde-solvers:problem}
 
-Following \citet{Brandstetter2022}, a temporal partial differential
-equation in one time dimension and $D$ spatial dimensions is written as
+Many physical processes are described by a field $u(t, x)$ that changes
+over time $t$ at every point $x$ of a spatial domain. A \emph{temporal}
+PDE states how fast the field changes at each point, given the current
+state of the field around that point. Following \citet{Brandstetter2022},
+such an equation is written as
 \begin{equation}
   \partial_t u \;=\; F\!\left(t, x, u, \partial_x u, \partial_{xx} u, \dots\right),
   \qquad (t, x) \in [0, T] \times \mathcal{X},
   \label{eq:bg:temporal-pde}
 \end{equation}
-where $\mathcal{X} \subset \mathbb{R}^D$ is the spatial domain and the
-solution $u: [0, T] \times \mathcal{X} \to \mathbb{R}^n$ takes values in
-an $n$-dimensional state space. The problem is closed by an initial
-condition $u(0, x) = u^{0}(x)$ and boundary conditions
-$B[u](t, x) = 0$ on $[0, T] \times \partial \mathcal{X}$, where the
-boundary operator $B$ may be of Dirichlet, Neumann, or periodic type.
+where $\mathcal{X} \subset \mathbb{R}^D$ is the spatial domain and
+$u: [0, T] \times \mathcal{X} \to \mathbb{R}^n$ is the solution with $n$
+components. The right-hand side $F$ is the law of the process. Because
+it depends only on $u$ and its spatial derivatives at $x$, the rate of
+change at a point is determined by the field in an arbitrarily small
+neighbourhood of that point; PDEs of this form are \emph{local}. The
+problem is closed by an initial condition $u(0, x) = u^{0}(x)$ and by a
+boundary condition $B[u](t, x) = 0$ on the domain boundary
+$\partial \mathcal{X}$, which fixes the value of $u$ there (Dirichlet
+type) or its normal derivative (Neumann type). Solving the PDE means
+computing $u(t, \cdot)$ for $t > 0$ from $u^{0}$. Closed-form solutions
+exist only for special cases, so in practice the solution is
+approximated numerically.
 
-A subclass of \eqref{eq:bg:temporal-pde} of particular interest in
-this thesis is the family of equations expressible in
-\emph{conservation form},
+An important subclass of~\eqref{eq:bg:temporal-pde} describes quantities
+that are neither created nor destroyed, such as mass or momentum in a
+fluid. Let $u$ be the density of such a quantity and $V \subset
+\mathcal{X}$ any fixed region. The total amount in $V$ can change only
+by flowing in or out across the boundary $\partial V$:
 \begin{equation}
-  \partial_t u \;+\; \nabla \cdot J(u) \;=\; 0,
+  \frac{\mathrm{d}}{\mathrm{d}t} \int_{V} u \,\mathrm{d}x
+  \;=\; - \oint_{\partial V} J(u) \cdot \mathbf{n} \,\mathrm{d}S ,
+  \label{eq:bg:conservation-integral}
+\end{equation}
+where $J(u)$ is the \emph{flux}, the rate at which the quantity flows
+per unit area, and $\mathbf{n}$ is the outward normal. The divergence
+theorem turns the boundary integral into an integral of $\nabla \cdot
+J(u)$ over $V$. Since~\eqref{eq:bg:conservation-integral} holds for
+every region $V$, the integrands must agree pointwise, which gives the
+\emph{conservation form}
+\begin{equation}
+  \partial_t u \;+\; \nabla \cdot J(u) \;=\; 0 .
   \label{eq:bg:conservation-form}
 \end{equation}
-where $J(u)$ is the flux of the conserved quantity $u$. The
-conservation-form framing is the structural property that makes finite
-volume methods \emph{exact} on the cell-integrated state and that
-underpins the message-passing-as-stencil interpretation of neural
-solvers in~\S\ref{sec:background:mp-pde}.
+% TODO: cite LeVeque2002 (LeVeque, "Finite Volume Methods for Hyperbolic
+% Problems", Cambridge University Press, 2002) once added to
+% references.bib -- textbook reference for conservation laws and the
+% finite-volume method.
+The shallow-water equations of oceanography and the Euler equations of
+gas dynamics are standard examples (LeVeque, 2002).
+\citet{Brandstetter2022} restrict their solver to this class because the
+classical finite-volume method (\S\ref{sec:background:pde-solvers:stencils})
+is built directly on the integral form~\eqref{eq:bg:conservation-integral}.
+The conservation form is introduced here for that reason. The GA lesion
+is not a conserved quantity --- its area grows --- and the thesis does
+not assume that GA progression has this form.
 
-The SWE describe the depth-averaged motion of a thin layer of
-incompressible fluid under gravity over a flat bottom and provide the
-running example for this section.
-% TODO: cite a canonical SWE reference (e.g. LeVeque 2002, "Finite
-% Volume Methods for Hyperbolic Problems", Cambridge University Press,
-% Chapter 13; or Vreugdenhil 1994, "Numerical Methods for Shallow-Water
-% Flow", Springer) once added to references.bib -- the SWE are the
-% running example for Section 2.2 and require a textbook citation.
-With water column height $h(t, x, y)$ and depth-averaged horizontal
-velocities $u(t, x, y)$ and $v(t, x, y)$, mass and momentum
-conservation read
-\begin{align}
-  \partial_t h \;+\; \partial_x (h u) \;+\; \partial_y (h v) &= 0, \label{eq:bg:swe-mass}\\
-  \partial_t (h u) \;+\; \partial_x \!\left( h u^{2} + \tfrac{1}{2} g h^{2} \right) \;+\; \partial_y \!\left( h u v \right) &= 0, \label{eq:bg:swe-momx}\\
-  \partial_t (h v) \;+\; \partial_x \!\left( h u v \right) \;+\; \partial_y \!\left( h v^{2} + \tfrac{1}{2} g h^{2} \right) &= 0,
-  \label{eq:bg:swe-momy}
-\end{align}
-where $g$ is gravitational acceleration. Equations
-\eqref{eq:bg:swe-mass}--\eqref{eq:bg:swe-momy} are a coupled system of
-hyperbolic conservation laws on the three-component state
-$\mathbf{u} = (h, h u, h v)^{\top}$, and they fit
-\eqref{eq:bg:conservation-form} with vector-valued flux
-\[
-  J(\mathbf{u}) \;=\;
-  \begin{pmatrix}
-    h u & h v \\
-    h u^{2} + \tfrac{1}{2} g h^{2} & h u v \\
-    h u v & h v^{2} + \tfrac{1}{2} g h^{2}
-  \end{pmatrix}.
-\]
-The relevant features of this system for the present thesis are that the
-solution is multi-component (foreshadowing the multi-channel state
-tensor of~\S\ref{sec:method:multichannel}), that wave fronts can
-develop sharp gradients in regions of small support
-(foreshadowing the active GA boundary on a quasi-static interior and
-exterior), and that a uniform discretisation of the spatial domain
-wastes resolution in regions where the solution is smooth.
-
-\subsection{The method of lines}
+\subsection{The computational path: discretise space, then step in time}
 \label{sec:background:pde-solvers:mol}
 
-The classical strategy for solving \eqref{eq:bg:temporal-pde}
-numerically is the \emph{method of lines}, in which the spatial
-variables are discretised first while the time variable is left
-continuous \citep{Brandstetter2022}. The continuous spatial domain
-$\mathcal{X}$ is replaced by a finite grid
-$X = \{c_i\}_{i=1}^{N}$ of $N$ collocation points or cell centres, and
-the value of the state at grid point $i$ and continuous time $t$ is
-written $u_i(t)$. Spatial derivatives in $F(\cdot)$ are then
-approximated by stencil-based operators evaluated on $X$, yielding the
-semi-discrete system
+A computer cannot store a function $u(t, \cdot)$ on a continuous domain.
+Numerical solvers therefore partition $\mathcal{X}$ into a finite grid
+$X = \{c_i\}_{i=1}^{N}$ of $N$ small, non-overlapping cells with centres
+$x_i$ \citep{Brandstetter2022}. The solution in cell $c_i$ at time $t_k$
+is written $u_i^{k}$; it is either a point sample,
+$u_i^{k} = u(t_k, x_i)$, or a cell average,
+$u_i^{k} = |c_i|^{-1} \int_{c_i} u(t_k, x) \,\mathrm{d}x$. Omitting the
+cell index denotes the whole grid, $u^{k} = (u_1^{k}, \dots, u_N^{k})$.
+The simplest grid is a \emph{uniform} one, a regular array of equal
+rectangular cells with constant spacings $\Delta x$ and $\Delta y$. The
+en-face grid of this thesis is of that type, with the particularity
+that the two spacings differ by a factor of about twenty
+(\S\ref{sec:data:spatial}).
+
+The standard way from~\eqref{eq:bg:temporal-pde} to a computable scheme
+is the \emph{method of lines}
+% TODO: cite Schiesser2012 (Schiesser, "The Numerical Method of Lines:
+% Integration of Partial Differential Equations", Academic Press /
+% Elsevier; cited as Schiesser 2012 by Brandstetter2022) once added to
+% references.bib.
+(Schiesser, 2012), which discretises space first and leaves time
+continuous. Once the spatial derivatives in $F$ are replaced by
+approximations computed from the grid values
+(\S\ref{sec:background:pde-solvers:stencils}), the unknowns are the $N$
+functions $u_i(t)$, one per cell. Drawn in the $(x, t)$ plane, each of
+them runs along a line parallel to the time axis, which gives the method
+its name. The PDE becomes a system of $N$ coupled ordinary differential
+equations (ODEs),
 \begin{equation}
   \frac{\mathrm{d} u_i}{\mathrm{d} t}
   \;=\; f_i\!\left(t, u_1(t), \dots, u_N(t)\right),
   \qquad i = 1, \dots, N,
   \label{eq:bg:mol-ode}
 \end{equation}
-in which only the time variable remains continuous. Equation
-\eqref{eq:bg:mol-ode} is an ordinary differential equation in the
-state vector $\mathbf{u}(t) = (u_1(t), \dots, u_N(t))^{\top}$ and can
-be integrated with any standard ODE integrator. The full numerical
-PDE solver is then a composition of two ingredients: a \emph{spatial
-discretisation} that assembles the right-hand side of
-\eqref{eq:bg:mol-ode}, and a \emph{time integrator} that advances
-$\mathbf{u}(t)$ over a finite step $\Delta t$. The decomposition
-matters because, as shown in~\S\ref{sec:background:mp-pde}, the
-encode--process--decode neural solver of \citet{Brandstetter2022} can
-be read directly as a learned non-linear instantiation of the same
-two ingredients, with the GNN replacing the stencil and a residual
-update replacing the ODE integrator.
+in which the only remaining derivative is in time. The function $f$ is
+the discrete counterpart of $F$: it maps the current grid values to the
+rate of change in every cell.
 
-\subsection{Spatial discretisation: stencils on a uniform grid}
+A classical solver is thereby split into two independent choices: a
+\emph{spatial discretisation}, which defines how $f$ is computed from
+$u^{k}$, and a \emph{time integrator}, which uses $f$ to advance the
+state by a step $\Delta t$ \citep{Brandstetter2022}. Together they
+define an update operator
+\begin{equation}
+  u^{k+1} \;=\; \mathcal{A}\!\left(\Delta t, u^{k}\right),
+  \label{eq:bg:update-operator}
+\end{equation}
+and a trajectory is produced by applying $\mathcal{A}$ repeatedly from
+$u^{0}$, each step consuming the output of the previous one. This
+repeated application is called a \emph{rollout}.
+Figure~\ref{fig:bg:solver-path} summarises the path. The same
+decomposition --- state on a grid, a spatial operator that yields a rate,
+a time step that applies it --- is the template that the neural solvers
+of~\S\ref{sec:background:neural-pde} and the framework of
+Chapter~\ref{ch:method} are built on.
+
+% TODO: produce Figure fig:bg:solver-path -- the classical computational
+% path as a left-to-right pipeline: continuous field u(t,x) on the domain
+% -> grid of cells with values u_i^k -> spatial discretisation (a
+% highlighted cell with its stencil neighbours, producing f_i) -> time
+% integrator (u^{k+1} = u^k + dt f for Euler) -> u^{k+1}, with a loop arrow
+% back to the grid labelled "rollout". Mark the two boxes "spatial
+% discretisation" and "time integrator" as the two independent choices.
+\begin{figure}[t]
+  \centering
+  \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering\itshape Placeholder
+    for Figure~\ref{fig:bg:solver-path}: the computational path of a
+    classical PDE solver. See accompanying \texttt{\% TODO} for the
+    intended content.}}
+  \caption[The computational path of a classical PDE solver.]{%
+    The computational path of a classical PDE solver under the method of
+    lines. The continuous field is stored as one value per grid cell. A
+    \emph{spatial discretisation} computes the rate of change of every
+    cell from the values of its neighbours (its stencil); a \emph{time
+    integrator} uses that rate to advance the grid by one step
+    $\Delta t$. Repeating the step from the initial condition produces a
+    rollout. The two components are chosen independently.}
+  \label{fig:bg:solver-path}
+\end{figure}
+
+\subsection{Spatial discretisation}
 \label{sec:background:pde-solvers:stencils}
 
-For a uniform one-dimensional grid with spacing $\Delta x$, the
-elementary stencil for the first spatial derivative is the
-finite-difference approximation
+The spatial discretisation determines which grid values enter the rate
+of change of a cell and with which weights. Three classical families are
+relevant here \citep{Brandstetter2022}.
+
+\paragraph{Finite differences.}
+The finite difference method (FDM) replaces each derivative by a
+difference of neighbouring grid values. On a uniform one-dimensional
+grid, the central approximation of the first derivative is
 \begin{equation}
-  \left.\frac{\partial u}{\partial x}\right|_{x = x_i}
-  \;\approx\; \frac{u_{i+1} - u_{i-1}}{2 \Delta x},
+  \left.\frac{\partial u}{\partial x}\right|_{x_i}
+  \;\approx\; \frac{u_{i+1} - u_{i-1}}{2 \Delta x}.
   \label{eq:bg:fdm-central}
 \end{equation}
-and analogous stencils exist for higher derivatives and higher
-orders. More systematically, a polynomial of suitable degree is fitted
-locally to a window of grid values, and the stencil coefficients are
-read off as the corresponding derivative of the fitted polynomial
-evaluated at the target grid point \citep{Brandstetter2022}. A
-finite-difference method (FDM) is therefore a fixed linear operator
-acting on the local neighbourhood of each grid point.
-
-The finite-volume method (FVM) takes a different route, motivated by
-the conservation form \eqref{eq:bg:conservation-form}. The spatial
-domain is partitioned into control volumes (cells) $K_i$, and the
-state value at cell $i$ is interpreted as the cell-averaged quantity
-$\bar{u}_i = |K_i|^{-1} \int_{K_i} u \, \mathrm{d}x$. Integrating
-\eqref{eq:bg:conservation-form} over $K_i$ and applying the
-divergence theorem yields, in one spatial dimension,
+More generally, the $n$-th derivative at cell $i$ is estimated as a
+weighted sum over a small neighbourhood $\mathcal{N}(i)$,
 \begin{equation}
-  \frac{\mathrm{d} \bar{u}_i}{\mathrm{d} t}
+  \left[\partial_x^{(n)} u\right]_i
+  \;\approx\; \sum_{j \in \mathcal{N}(i)} \alpha_j^{(n)} u_j ,
+  \label{eq:bg:stencil}
+\end{equation}
+where the fixed coefficients $\alpha_j^{(n)}$ are obtained by fitting a
+local polynomial to the neighbourhood and differentiating it. The set of
+neighbours together with its coefficients is called a \emph{stencil}.
+FDM is simple and cheap, but it is stable only when the spatial and
+temporal resolutions are carefully matched \citep{Brandstetter2022}.
+
+\paragraph{Finite volumes.}
+The finite volume method (FVM) starts from the integral
+form~\eqref{eq:bg:conservation-integral} and applies it to each cell,
+with $u_i$ read as a cell average. The average in cell $i$ then changes
+only through the fluxes across the cell's faces; in one dimension,
+\begin{equation}
+  f_i\!\left(t, u^{k}\right)
   \;=\; \frac{1}{\Delta x_i}
-  \!\left( J^{}_{i - 1/2} - J^{}_{i + 1/2} \right),
+  \left( J^{k}_{i - 1/2} - J^{k}_{i + 1/2} \right),
   \label{eq:bg:fvm-update}
 \end{equation}
-where $J^{}_{i \pm 1/2}$ are numerical flux estimates at the left and
-right cell boundaries \citep{Brandstetter2022}. The cell average
-$\bar{u}_i$ is exactly conserved up to boundary fluxes, which is the
-discrete analogue of the local-conservation property of the underlying
-PDE. Higher-order conservative reconstructions such as WENO5 add a
-non-linear convex combination of sub-stencils that adapts to local
-solution smoothness, allowing the scheme to capture sharp gradients
-without introducing spurious oscillations \citep{Brandstetter2022}.
+where $\Delta x_i$ is the cell width and $J^{k}_{i \pm 1/2}$ are the
+fluxes at the left and right faces \citep{Brandstetter2022}. The problem
+reduces to estimating these face fluxes from the neighbouring cell
+averages, which is again a local stencil. Because the flux that leaves
+one cell enters its neighbour, the total amount of $u$ on the grid is
+conserved exactly. FVM is generally more stable and accurate than FDM,
+but it applies only to equations in conservation form.
 
-For the SWE in two dimensions, both FDM and FVM stencils generalise
-in the natural way: the partial derivatives in
-\eqref{eq:bg:swe-mass}--\eqref{eq:bg:swe-momy} are replaced by
-finite-difference stencils on a tensor-product grid in the FDM case,
-or by surface-flux estimates on the boundaries of two-dimensional
-control volumes in the FVM case. In both cases the spatial
-discretisation is local: the right-hand side of
-\eqref{eq:bg:mol-ode} at grid point $i$ depends only on a small
-neighbourhood of $i$. Locality is the structural property that
-message-passing graph neural networks exploit explicitly when they
-replace classical stencils, and it is the property that the dynamics
-of GA --- atrophy concentrated at the lesion boundary, with the
-lesion interior and the surrounding healthy retina both quasi-static
-\citep{Yehoshua2011} --- already satisfies on the en-face grid.
+Sharp fronts pose a particular difficulty. A fixed high-order stencil
+that straddles a discontinuity produces spurious oscillations next to
+it. Weighted essentially non-oscillatory (WENO) schemes avoid this by
+computing several candidate reconstructions on shifted sub-stencils and
+combining them with weights that depend on the local smoothness of the
+data, so that sub-stencils crossing the front receive almost no weight
+\citep{Brandstetter2022}. The resulting stencil is non-linear and
+adapts to its input. \citet{Brandstetter2022} generate their reference
+solutions with a fifth-order WENO scheme.
+
+\paragraph{Pseudospectral methods.}
+Pseudospectral methods (PSM) compute derivatives in Fourier space: the
+field is transformed, each Fourier mode is multiplied by $(i\omega)^n$
+for the $n$-th derivative, and the result is transformed back. The
+derivative at every point then depends on all grid values, not on a
+neighbourhood. For smooth solutions on periodic domains the accuracy is
+exponential in the resolution, but the method breaks down for
+non-smooth solutions and needs different transforms on non-periodic
+domains \citep{Brandstetter2022}.
+
+\paragraph{Locality and reach.}
+FDM, FVM and WENO are \emph{local}: the rate of change of a cell is
+computed from a small neighbourhood, so information travels at most one
+stencil radius per evaluation of $f$. How far that is in physical units
+depends on the stencil width and on the grid spacing. Pseudospectral
+methods are \emph{global}. The distinction between local and global
+spatial support reappears in the neural architectures
+of~\S\ref{sec:background:neural-pde}.
 
 \subsection{Time integration}
 \label{sec:background:pde-solvers:time}
 
-Once the spatial discretisation has reduced \eqref{eq:bg:temporal-pde}
-to the system of ordinary differential equations
-\eqref{eq:bg:mol-ode}, any standard ODE integrator closes the loop. The
-simplest choice is the explicit Euler step
+Once the spatial discretisation is fixed,~\eqref{eq:bg:mol-ode} can be
+advanced with any standard ODE integrator
+% TODO: cite Butcher1987 (Butcher, "The Numerical Analysis of Ordinary
+% Differential Equations: Runge-Kutta and General Linear Methods",
+% Wiley 1987) and Hairer1993 (Hairer, Norsett & Wanner, "Solving
+% Ordinary Differential Equations I: Nonstiff Problems", Springer,
+% 2nd rev. ed. 1993) once added to references.bib.
+(Butcher, 1987; Hairer et al., 1993). The simplest is the explicit Euler
+step,
 \begin{equation}
   u_i^{k + 1} \;=\; u_i^{k}
-  \;+\; \Delta t \, f_i\!\left(t_k, u_1^{k}, \dots, u_N^{k}\right),
+  \;+\; \Delta t \, f_i\!\left(t_k, u^{k}\right),
+  \qquad \Delta t = t_{k+1} - t_k ,
   \label{eq:bg:euler}
 \end{equation}
-with $u_i^{k} \approx u_i(t_k)$ and $\Delta t = t_{k+1} - t_k$. Higher
-order is reached by replacing the single-stage Euler update with a
-Runge--Kutta scheme; the fourth-order Runge--Kutta integrator (RK4) is
-the standard choice for benchmark generation in the neural-PDE-solver
-literature, used for instance in combination with WENO5 spatial
-reconstruction by \citet{Brandstetter2022} to produce ground-truth
-trajectories.
+which assumes that the rate stays constant over the step. Its error per
+unit time shrinks only linearly with $\Delta t$. Runge--Kutta methods
+reach higher order by evaluating $f$ several times within a step and
+combining the results; the classical fourth-order scheme (RK4) uses four
+evaluations. \citet{Brandstetter2022} generate their reference
+trajectories with RK4 and adaptive step sizes.
 
-For the running SWE example, an explicit time-stepping scheme advances
-the discretised state $\mathbf{u}^{k} = (h^{k}, (hu)^{k}, (hv)^{k})$ by
-evaluating the discretised flux divergence on $\mathbf{u}^{k}$ and
-applying \eqref{eq:bg:euler} or its Runge--Kutta extension. Stability
-of the scheme is governed by a Courant--Friedrichs--Lewy (CFL)
-condition that constrains $\Delta t$ in proportion to the spatial
-spacing $\Delta x$ and the maximum wave speed
-$\sqrt{g h} + \max(|u|, |v|)$; on a finer mesh, a smaller $\Delta t$
-is required.
+Two properties decide whether a time integrator is usable. The first is
+\emph{consistency}: in the limit of a vanishing step, the update must
+reproduce the exact solution,
+$\lim_{\Delta t \to 0} \lVert \mathcal{A}(\Delta t, u^{0}) - u(\Delta t) \rVert = 0$
+\citep{Brandstetter2022}. An update written as the current state plus
+$\Delta t$ times a rate, as in~\eqref{eq:bg:euler}, returns the current
+state at $\Delta t = 0$ by construction. This \emph{residual} form
+carries over to the neural solvers of~\S\ref{sec:background:mp-pde} and
+to the framework of~\S\ref{sec:method:dt-residual}.
 
-The form of \eqref{eq:bg:euler} is the structural template for the
-\emph{residual} decoder of MP-PDE \citep{Brandstetter2022}, in which
-the right-hand side $f_i$ is replaced by the output of a graph neural
-network. The thesis adapts that template to the irregular
-$\Delta t$ of clinical visits, replacing the fixed step size by the
-per-window observation interval; the formal definition is given
-in~\S\ref{sec:method:dt-residual}.
+The second is \emph{stability}: errors committed in one step must not
+grow from step to step. For explicit schemes this bounds the step size.
+% TODO: cite Courant1928 (Courant, Friedrichs & Lewy, "Ueber die
+% partiellen Differenzengleichungen der mathematischen Physik",
+% Mathematische Annalen 100(1):32-74, 1928, doi:10.1007/BF01448839)
+% once added to references.bib.
+The Courant--Friedrichs--Lewy (CFL) condition (Courant et al., 1928)
+states, for a process that transports information at speed $c$, that
+one step may not carry information further than the stencil reaches,
+\begin{equation}
+  \frac{c \, \Delta t}{\Delta x} \;\leq\; C_{\max},
+  \label{eq:bg:cfl}
+\end{equation}
+with a constant $C_{\max}$ of order one that depends on the scheme. A
+finer grid therefore forces a smaller time step. Halving the spacing in
+two dimensions quadruples the number of cells and at least doubles the
+number of steps; for diffusive terms the admissible step even shrinks
+with $\Delta x^2$. Implicit integrators relax the bound, at the price of
+solving a system of equations in every step.
 
-\subsection{Uniform and adaptive meshes}
-\label{sec:background:pde-solvers:mesh}
+\subsection{Strengths and limits of classical solvers}
+\label{sec:background:pde-solvers:limits}
 
-The spatial discretisations described above all rest on a fixed
-\emph{mesh} that partitions $\mathcal{X}$ into grid points or cells.
-The simplest choice is a \emph{uniform mesh}, in which all cells have
-the same size and the same shape; for a rectangular domain in two
-spatial dimensions, this is a tensor-product grid with constant
-spacings $\Delta x$ and $\Delta y$. A uniform mesh is the natural
-discretisation when the solution is approximately equally hard to
-resolve everywhere on the domain, which is rarely the case for
-problems with localised structure.
+The classical path has clear strengths. Each component has a defined
+meaning and a known error behaviour, and for linear problems
+consistency and stability together guarantee that the numerical
+solution converges to the true one as the grid is refined
+(LeVeque, 2002). No training data are needed: the equation itself is the
+model. Conservative schemes preserve physical invariants exactly, and a
+scheme designed for one equation applies to every initial condition of
+that equation.
 
-When the solution exhibits sharp gradients in some regions and is
-smooth in others --- as the SWE does in the vicinity of a wave front,
-and as the GA state does in the vicinity of the active lesion boundary
---- a uniform mesh either over-resolves the smooth regions or
-under-resolves the sharp ones. Two families of mesh-adaptation
-strategies have been developed in classical numerical analysis to
-address this trade-off \citep{Hu2024}. \emph{$h$-adaptation}
-adds and removes vertices to refine or coarsen the mesh locally; the
-total number of degrees of freedom changes over time and the mesh
-topology is dynamic. \emph{$r$-adaptation}, sometimes called the
-\emph{moving-mesh} approach, keeps the number of vertices and the
-graph topology fixed and only \emph{moves} existing vertices toward
-regions where the solution is hardest to approximate. The latter
-strategy preserves the dimensionality and connectivity of the discrete
-state across time steps, which is the property that makes it
-compatible with graph-neural-network solvers; \S\ref{sec:background:mm-pde}
-develops this point in detail.
+Its limits follow from the same design. First, the equation $F$ must be
+known, including its coefficients; the solver computes what $F$
+prescribes and nothing else. Second, good schemes are hand-crafted for
+each equation class. \citet{Brandstetter2022} describe numerical
+analysis as a ``splitter'' field for this reason: requirements such as
+resolution, geometry, boundary conditions and solution smoothness each
+call for their own specialised method. Third, accuracy is expensive.
+Fine features require fine grids, the CFL condition then requires small
+time steps, and the cost grows faster than the resolution. Sharp fronts
+need non-linear schemes such as WENO to avoid oscillations. Fourth, a
+uniform grid spends the same resolution everywhere, although the error
+usually concentrates where the solution changes quickly. Adaptive meshes
+address this last point by refining or moving the grid towards such
+regions \citep{Hu2024}; that line of work and its learned variant are
+treated together with the moving-mesh experiment in the appendix.
+% TODO: \ref the moving-mesh appendix (Appendix G) once its label exists.
 
-The classical $r$-adaptation problem is well-posed only after a
-\emph{monitor function} $M(x)$ has been specified, encoding where on
-$\mathcal{X}$ the mesh should refine; the moving-mesh map then
-redistributes vertex positions so that each cell carries the same
-amount of monitor-weighted volume \citep{Hu2024}. \S\ref{sec:background:mm-pde}
-shows how \citet{Hu2024} reformulate this redistribution as a
-single-scalar Monge--Amp\`ere equation that can be solved without
-ground-truth meshes, and how the resulting mesh mover plugs into a
-neural PDE solver. The point for the present section is structural:
-classical numerical analysis already recognises that fixed uniform
-meshes are wasteful for problems with localised dynamics, and the
-moving-mesh inductive bias of MM-PDE is a learned analogue of an
-established classical idea --- one that on the GA imaging substrate is
-motivated by the empirical fact that lesion progression is
-concentrated at a thin boundary and is direction-dependent
-\citep{Yehoshua2011,Singh2025}, while the lesion interior and the
-surrounding healthy retina are quasi-static.
+\subsection{From classical to learned solvers}
+\label{sec:background:pde-solvers:neural}
 
-The remainder of Chapter~\ref{ch:background} traces the same chain of
-ingredients --- discrete state on a mesh, local stencil, residual
-update, optionally adapted mesh --- through their neural counterparts.
+Every component of the path above is a function that maps a
+neighbourhood of grid values to a number: the stencil coefficients
+in~\eqref{eq:bg:stencil}, the face fluxes in~\eqref{eq:bg:fvm-update},
+the smoothness weights of WENO, and the rate that the time integrator
+applies. Any of them can be replaced by a function learned from data.
+Two routes have been taken \citep{Brandstetter2022}. \emph{Hybrid}
+solvers keep the classical computation and learn only selected parts
+of it.
+% TODO: cite BarSinai2019 (Bar-Sinai, Hoyer, Hickey & Brenner, "Learning
+% data-driven discretizations for partial differential equations",
+% PNAS 116(31):15344-15349, 2019) once added to references.bib.
+% TODO: cite Kochkov2021 (Kochkov, Smith, Alieva, Wang, Brenner & Hoyer,
+% "Machine learning-accelerated computational fluid dynamics", PNAS
+% 118(21):e2101784118, 2021) once added to references.bib.
+Bar-Sinai et al.\ (2019) learn the stencil coefficients of a
+finite-volume scheme and obtain accurate solutions on considerably
+coarser grids than the hand-designed stencils allow, and Kochkov et al.\
+(2021) apply the same idea inside a solver for turbulent flow.
+\emph{End-to-end} solvers learn the whole update $\mathcal{A}$.
+% TODO: cite SanchezGonzalez2020 (Sanchez-Gonzalez, Godwin, Pfaff, Ying,
+% Leskovec & Battaglia, "Learning to Simulate Complex Physics with Graph
+% Networks", ICML 2020) once added to references.bib.
+% TODO: cite Pfaff2021 (Pfaff, Fortunato, Sanchez-Gonzalez & Battaglia,
+% "Learning Mesh-Based Simulation with Graph Networks", ICLR 2021) once
+% added to references.bib.
+Graph neural networks have been trained this way to simulate fluids,
+deformable materials and cloth (Sanchez-Gonzalez et al., 2020; Pfaff et
+al., 2021), and \citet{Brandstetter2022} show that such a network can
+represent finite differences, finite volumes and WENO as special cases
+(\S\ref{sec:background:mp-pde}).
+
+Three properties explain why learned solvers work. First, a learned
+update can absorb effects that a coarse grid does not resolve, so it can
+run on coarser grids and with larger steps than a classical scheme of
+the same accuracy; once trained, it is cheap to evaluate. Second, it is
+fitted to data rather than derived from an equation, so it can be used
+where the equation is expensive to solve, known only approximately, or
+not known at all. Third, the same architecture can be trained on many
+problems, which removes part of the hand-crafting that classical schemes
+require.
+% TODO: cite Lam2023 (Lam, Sanchez-Gonzalez, Willson, Wirnsberger,
+% Fortunato, Alet, Ravuri, Ewalds, Eaton-Rosen, Hu, Merose, Hoyer,
+% Holland, Vinyals, Stott, Pritzel, Mohamed & Battaglia, "Learning
+% skillful medium-range global weather forecasting", Science
+% 382(6677):1416-1421, 2023) once added to references.bib.
+Weather forecasting is the most prominent example: a graph-network
+forecaster trained on decades of reanalysis data outperforms a leading
+operational numerical weather model on most of its verification
+targets at a fraction of the cost (Lam et al., 2023).
+
+The price is paid in guarantees. A learned solver needs training data,
+it carries no convergence guarantee, and it may behave arbitrarily on
+inputs unlike those seen in training. In a rollout it consumes its own
+predictions, so its errors can accumulate from step to step; this
+problem and its remedies are the subject
+of~\S\ref{sec:background:neural-pde}
+and~\S\ref{sec:background:mp-pde}.
+
+GA progression lies at the far end of the ``equation not known'' case.
+No governing equation is available, and the data are not a densely
+simulated trajectory but a few observed snapshots per eye at irregular
+intervals (\S\ref{sec:background:ga-oct:muw}). The classical path is
+therefore not available, and only its structure can be kept: a state on
+a grid, a spatial operator that computes an update from the state, and
+a residual step scaled by the elapsed time. Which kind of spatial
+operator suits this problem --- local or global, and with what reach ---
+is not assumed here; it is the question that Chapter~\ref{ch:experiments}
+answers by measurement.
 
 
 \section{Neural PDE Solvers and Surrogate Architectures}

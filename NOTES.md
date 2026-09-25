@@ -421,6 +421,32 @@ Pulled from the code repository (`masterthesis-docker/NOTES.md` + `PROJECT_CONTE
 - [x] 2026-09-17: chapter compiles (`latexmk -xelatex`), zero unresolved `\ref`s. Chapter 2
   now spans pages 6--23 (~18 pages) against the ~12--15 in `THESIS_STRUCTURE.md`; §2.1 is
   ~8 pages of that. Decide whether to trim §2.1 or raise the chapter's budget.
+- [x] 2026-09-25: §2.2 reworked in full at the author's request (pages 13--19, ~6 pages).
+  Structure now follows the MP-PDE paper's own background (§2.1--§2.3 of Brandstetter
+  2022): temporal PDEs + conservation form, now *derived* from the integral balance and
+  the divergence theorem so it is clear where it comes from; the computational path
+  (grids and cells, the method of lines with the origin of the name, the update operator
+  $\mathcal{A}$ and the rollout, new pipeline figure); spatial discretisation (FDM with
+  the general stencil equation, FVM, WENO, pseudospectral, locality vs global support);
+  time integration (Euler, RK, consistency, CFL); a new strengths-and-limits subsection;
+  and a new subsection on the step to learned solvers (hybrid vs end-to-end, why they
+  work, weather/fluids as examples, what they cost), closing on GA as the "no known
+  equation, sparse irregular snapshots" case. The SWE system and its flux matrix were
+  removed (one mention remains as an example of a conservation law); the uniform vs
+  adaptive mesh subsection was cut to one sentence pointing to the moving-mesh appendix.
+  New labels: `eq:bg:conservation-integral`, `eq:bg:update-operator`, `eq:bg:stencil`,
+  `eq:bg:cfl`, `fig:bg:solver-path`, `sec:background:pde-solvers:limits`,
+  `sec:background:pde-solvers:neural`. Removed labels (none referenced elsewhere):
+  `eq:bg:swe-*`, `sec:background:pde-solvers:mesh`. The label
+  `sec:background:pde-solvers:time` (used by §4.2) is kept.
+  Note: §2.3 opens by re-defining the autoregressive update $\mathcal{A}(\Delta t, u)$,
+  which §2.2.2 now introduces; trim that overlap when §2.3 is revised.
+- [ ] TODO: produce Figure `fig:bg:solver-path` (§2.2.2) -- the classical computational
+  path as a pipeline: continuous field -> grid of cell values -> spatial discretisation
+  (one cell and its stencil, yielding f_i) -> time integrator (Euler step) -> next state,
+  with a loop arrow labelled "rollout"; the two boxes marked as independent choices.
+- [ ] TODO: §2.2.5 points to "the appendix" for adaptive meshes / MM-PDE; replace with
+  `\ref` to Appendix G once its label exists (inline TODO in the .tex).
 - [ ] TODO: §2.3--§2.6 came in shorter than planned (§2.3 ~1.5 pages against a ~2.5-page
   target, §2.4 ~1.5 against ~2). The prose is correct but terse in places; consider a
   depth pass on §2.3 (operator-vs-autoregressive contrast) and §2.4 (message passing as a
@@ -709,6 +735,24 @@ marker itself; `THESIS_FRAMEWORK.md` §10.1 carries verified entries for all of 
   Autofluorescence". Used in §2.6 as the dense-CNN precedent on this task (different
   modality, so not a comparable number); also the GA-domain motivation for the U-Net arm
   in §4.4.
+- [ ] TODO: cite **Schiesser2012** -- Schiesser, *The Numerical Method of Lines:
+  Integration of Partial Differential Equations*, Academic Press / Elsevier (cited as
+  Schiesser 2012 by Brandstetter2022; check the edition year). Used in §2.2.2.
+- [ ] TODO: cite **BarSinai2019** -- Bar-Sinai, Hoyer, Hickey & Brenner, "Learning
+  data-driven discretizations for partial differential equations", *PNAS*
+  116(31):15344-15349, 2019. Used in §2.2.6 as the hybrid (learned-stencil) example.
+- [ ] TODO: cite **Kochkov2021** -- Kochkov, Smith, Alieva, Wang, Brenner & Hoyer,
+  "Machine learning-accelerated computational fluid dynamics", *PNAS* 118(21):e2101784118,
+  2021. Used in §2.2.6.
+- [ ] TODO: cite **Pfaff2021** -- Pfaff, Fortunato, Sanchez-Gonzalez & Battaglia,
+  "Learning Mesh-Based Simulation with Graph Networks", *ICLR* 2021. Used in §2.2.6.
+- [ ] TODO: cite **Lam2023** -- Lam et al., "Learning skillful medium-range global weather
+  forecasting", *Science* 382(6677):1416-1421, 2023 (GraphCast). Used in §2.2.6 as the
+  weather-forecasting example.
+- [ ] Note (2026-09-25): the §2.2 rework also uses the already-listed markers
+  **LeVeque2002** (now for conservation laws / FVM / convergence, no longer as the SWE
+  textbook), **SanchezGonzalez2020** (§2.2.6), **Butcher1987** and **Hairer1993**
+  (§2.2.4), and **Courant1928** (§2.2.4, CFL).
 - [ ] TODO: literature check -- is there any prior application of neural PDE solvers to
   biomedical disease progression or organ modelling? §2.6 currently states only that the
   application "remains sparse", with an inline `% TODO`. Either find and cite one or two
