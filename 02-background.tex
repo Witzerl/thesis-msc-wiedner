@@ -423,14 +423,10 @@ in the rest of this chapter.
 % agnostic of those details.
 
 The first channel of the state tensor is a binary \emph{GA mask} on the
-en-face grid: an indicator function that takes value one inside the
-cRORA region defined by the CAM criteria
-of~\S\ref{sec:background:ga-oct:disease} and zero outside it. The only
-properties of channel~0 that this chapter relies upon are that it is
-binary, that it is aligned to the same en-face grid as the layer
-channels, and that the supported region of the mask coincides with the
-GA lesion as it would be identified by a trained reader applying the
-cRORA criteria.
+en-face grid: an indicator function that takes value one inside the GA
+lesion and zero outside it. The only properties of channel~0 that this
+chapter relies upon are that it is binary and that it is aligned to the
+same en-face grid as the layer channels.
 
 The remaining ten channels are \emph{retinal layer boundary depth
 maps}: at every pixel of the en-face grid, the value of channel
@@ -440,30 +436,8 @@ the en-face grid selects a single A-scan in the OCT volume, and channel
 $c$ at that pixel records how deep along that A-scan the $c$-th
 anatomical layer-boundary surface lies. Stacking all ten channels
 therefore reconstructs the full vertical retinal architecture of the
-eye on the same horizontal grid as the lesion mask. The specific list
-of boundaries used for the MUW cohort is given
-in~\S\ref{sec:data:state}; collectively the boundaries delimit the
-principal anatomical strata of the retina, from the inner limiting
-membrane at the top, through the retinal nerve fibre layer, the
-ganglion-cell and inner-plexiform layers, the inner nuclear and outer
-plexiform layers, the outer nuclear layer, the photoreceptor inner-
-and outer-segment bands (including the ellipsoid zone), the retinal
-pigment epithelium, and Bruch's membrane at the bottom (cf.\
-Figure~\ref{fig:bg:retinal-anatomy}).
-
-Two technical caveats are inherent to standard SD-OCT-derived layer
-segmentation, regardless of the specific algorithm used to produce the
-boundary maps, and are explicitly acknowledged here and again
-in~\S\ref{sec:discussion:limitations}. First, standard SD-OCT cannot
-separate the outer nuclear layer from the Henle fibre layer
-\citep{Vogl2021}, so what is referred to as the ``ONL'' boundary in any
-SD-OCT-derived state tensor is effectively a combined
-ONL\,+\,HFL boundary. Second, the hyperreflective complex that
-aggregates the RPE, the ellipsoid zone, the interdigitation zone, and
-the outer photoreceptor segments sits at or below the axial resolution
-limit of SD-OCT and is conventionally treated as a single composite
-band rather than resolved into its sub-bands. Both caveats apply to the
-state tensor used throughout the thesis.
+eye on the same horizontal grid as the lesion mask. The ten boundaries are ordered from the most superficial
+to the deepest (\S\ref{sec:data:state}).
 
 The clinical motivation for retaining all ten layer-boundary channels
 alongside the binary mask is that documented prognostic biomarkers for

@@ -215,10 +215,16 @@ wrong / to change". The author asked for no shortening yet; cuts wait for a late
   "The thesis therefore works on the OCT en-face grid." and "A single OCT volume shows both the
   lesion and the retinal layers around it." Still to fix: §1.2 cRORA claim, §2.1.5 CAM/cRORA
   mask definition; add the provenance as a plain dataset fact in §3.1.
-- [ ] §2.1.5 "Two technical caveats…" — not needed (cut, later pass); also removes an
+- [x] §2.1.5 "Two technical caveats…" — not needed (cut, later pass); also removes an
   SD-OCT claim. The preceding sentence naming the layer strata claims more than is known.
+  Done 2026-09-25 (author approved the cut): caveats paragraph deleted; mask defined neutrally
+  (binary, one inside the GA lesion, aligned with the layer grid — no CAM/cRORA claim); the
+  layer-strata list replaced by "ordered from the most superficial to the deepest (§3.2)",
+  since the boundary names are not recorded. The "again in §6.3" promise went with it.
 - [ ] §2.1.6 "SD-OCT" (twice) — only the vendor is recorded; state the device once with
   the Mai et al. (2024) caveat.
+  Update: Mai et al. (2024) state "Spectral-domain (SD)-OCT … (Spectralis, Heidelberg
+  Engineering)" for the MUW cohort, so SD-OCT is supported by a citable source.
 - [x] (done 2026-09-25) TODO (⚠️): `01-introduction.tex` §1.5 outline — describes a Method chapter built
   around MP-PDE vs MM-PDE; will need to follow whatever restructure is agreed.
 - [x] 2026-09-17: `THESIS_STRUCTURE.md` §3.3 corrected. The old constraint told the writer to
