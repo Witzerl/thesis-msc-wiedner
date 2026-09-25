@@ -152,34 +152,27 @@ finite-difference and finite-volume PDE solvers exploit explicitly through
 local stencils and adaptive meshes, and that generic dense convolutional
 predictors must learn implicitly from data.
 
-% TODO: in the autoregressive-vs-operator contrast below, the operator
-% family (FNO, DeepONet) is intentionally deferred to Chapter 2.3
-% per THESIS_STRUCTURE.md; once Li2021 (FNO) and Lu2021 (DeepONet) are
-% added to references.bib, decide whether a one-sentence acknowledgement
-% of the operator alternative belongs here as well.
-Two recent neural PDE solver families directly encode these biases.
-\citet{Brandstetter2022} introduced \emph{message-passing neural PDE
-solvers} (MP-PDE), in which a graph neural network performs an
-% TODO: cite Battaglia2018 (relational inductive biases) and
-% SanchezGonzalez2020 (Learning to Simulate) once added to references.bib --
-% the encode--process--decode pattern predates Brandstetter2022 and is
-% conventionally attributed to those works.
-encode--process--decode rollout that produces a residual Euler update of the
-form $u_{t+\Delta t} = u_t + \Delta t \cdot f_{\theta}(u_t, \Delta t)$. The
-message-passing layers act as learned, non-linear analogues of classical
-local stencils, and the temporally conditioned residual form provides a
-natural place to inject elapsed time into the dynamics.
-\citet{Hu2024} extended this idea with the \emph{moving-mesh PDE solver}
-(MM-PDE), which couples a uniform-mesh GNN with a second GNN operating on a
-dynamically moved mesh produced by a data-free mesh mover; the moving mesh
-concentrates discretisation density in regions of large solution gradient,
-which on GA imagery is precisely the active lesion boundary. Adapting these
-two frameworks to longitudinal OCT bridges the methodological PDE-solver
-literature with the applied medical-imaging deep-learning literature
-\citep{Vogl2021,Vallino2024}, where prior work has remained anchored in
-cohort-level statistical atlases and time-to-conversion survival models
-rather than in per-eye autoregressive forward operators on the imaging
-state itself.
+Neural PDE solvers turn these classical ideas into learned models.
+Instead of discretising a known equation, they learn from data an operator
+that maps the current state of a system, and the time that elapses, to its
+next state. The literature offers many such operators, and they differ
+mainly in their built-in assumptions: how far a single prediction can look
+across the domain, whether it works on a regular grid or on a graph, and
+whether physical terms such as transport are represented explicitly. For
+GA, where the governing equation is unknown and only a few dozen patients
+are available for training, these assumptions are likely to matter more
+than model size.
+
+Which of them GA progression actually requires cannot be decided by
+testing a single architecture: if one model succeeds, the reason may be
+its operator, its size, or the setup around it. This thesis therefore
+separates the two. The setup --- how elapsed time enters the prediction,
+how models are trained and how they are evaluated --- is fixed once, and
+the operator is the only part that changes. Architectures from different
+families can then be compared on equal terms. Unlike prior work, which has
+remained anchored in cohort-level statistical atlases and time-to-conversion
+survival models \citep{Vogl2021,Vallino2024}, every model in this comparison
+forecasts the lesion of an individual eye directly on the imaging state.
 
 \paragraph{Research question.}
 \label{par:introduction:research-question}
