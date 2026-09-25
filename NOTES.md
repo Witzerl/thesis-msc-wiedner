@@ -180,7 +180,8 @@ wrong / to change". The author asked for no shortening yet; cuts wait for a late
   rollout must come from a framework around the model (which borrows techniques from
   neural PDE solvers); the model choice is left as a separate question. The Ronneberger2015
   cite marker went with the removed U-Net sentence.
-- [ ] §1.2 "three properties" paragraph (not marked by the author): the covariate
+- [x] (2026-09-25: covariates reframed as an open question tested in the thesis; opening now
+  "properties … that a model has to deal with"; mask says "GA lesion", not cRORA) §1.2 "three properties" paragraph (not marked by the author): the covariate
   requirement ("should enter the dynamics on equal footing") contradicts the measured
   covariate null, and the claim that both mask and layers are *required* is not shown
   by the results. Revisit.

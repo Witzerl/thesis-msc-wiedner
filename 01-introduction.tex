@@ -86,7 +86,7 @@ score but a complete map of the lesion at the next visit.
 % Bogunovic is the supervisor's own institutional precedent.
 
 The clinical reality of OCT follow-up imposes three properties on the data
-that the model must respect. First, follow-up visits are
+that a model has to deal with. First, follow-up visits are
 \emph{irregularly spaced} in time and the spacing varies substantially
 between patients and between consecutive visits of the same patient. There
 is no shared temporal origin across eyes, which rules out methods that
@@ -97,10 +97,11 @@ boundaries encode the structural cascade in which the atrophy is embedded
 \citep{Chu2022,Vallino2024}. Both information sources are required because
 prognostic biomarkers documented in the clinical literature, such as
 RPE--Bruch's-membrane thickening and outer nuclear layer thinning, are not
-contained in the lesion mask alone. Third, every patient carries
-\emph{covariates} --- in particular age and sex --- that modulate baseline
-risk and progression speed and that should enter the dynamics on equal
-footing with the imaging signal.
+contained in the lesion mask alone. Third, every patient carries \emph{covariates}, in particular age and
+sex. Age is strongly associated with the risk of developing the disease
+(\S\ref{sec:introduction:motivation}), and the evidence on sex is mixed;
+whether either also helps to forecast where and how fast a lesion grows is
+not established, and is tested in this thesis.
 
 Meeting these requirements is not only a question of the model itself but
 also of how the model is used. A typical image-to-image model maps one image
