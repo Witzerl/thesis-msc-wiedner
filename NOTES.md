@@ -441,11 +441,26 @@ Pulled from the code repository (`masterthesis-docker/NOTES.md` + `PROJECT_CONTE
   `sec:background:pde-solvers:time` (used by §4.2) is kept.
   Note: §2.3 opens by re-defining the autoregressive update $\mathcal{A}(\Delta t, u)$,
   which §2.2.2 now introduces; trim that overlap when §2.3 is revised.
+- [x] 2026-09-25 (second pass, author feedback): the conservation form was **removed
+  entirely** -- it only served to motivate FVM, which the thesis never uses, and the text
+  then had to say it does not apply to GA. §2.2 is now: short PDE notation intro ->
+  2.2.1 stencils (FDM, general stencil eq., FVM in one sentence, WENO as adaptive stencil,
+  pseudospectral as global, locality and reach) -> 2.2.2 stepping in time (method of lines,
+  Euler/RK, update operator + rollout, consistency/residual form, CFL) -> 2.2.3 strengths
+  and limits -> 2.2.4 neural solvers that keep the mechanisms (hybrid, end-to-end, MP-PDE
+  as the explicit case) -> 2.2.5 why this structure suits GA (fixed grid, neighbourhood-
+  driven change, slow change, irregular steps; framed as expectations, not evidence; the
+  CFL argument motivates the reach question without previewing results). Pages 13--17.
+  Labels removed: `eq:bg:conservation-integral`, `eq:bg:conservation-form`,
+  `sec:background:pde-solvers:problem`, `sec:background:pde-solvers:mol`; new:
+  `sec:background:pde-solvers:ga`. The LeVeque2002 marker now only backs the convergence
+  sentence in §2.2.3; the "moving-mesh appendix" pointer TODO below is obsolete (the
+  sentence was cut).
 - [ ] TODO: produce Figure `fig:bg:solver-path` (§2.2.2) -- the classical computational
   path as a pipeline: continuous field -> grid of cell values -> spatial discretisation
   (one cell and its stencil, yielding f_i) -> time integrator (Euler step) -> next state,
   with a loop arrow labelled "rollout"; the two boxes marked as independent choices.
-- [ ] TODO: §2.2.5 points to "the appendix" for adaptive meshes / MM-PDE; replace with
+- [x] (obsolete 2026-09-25, sentence cut) §2.2.5 points to "the appendix" for adaptive meshes / MM-PDE; replace with
   `\ref` to Appendix G once its label exists (inline TODO in the .tex).
 - [ ] TODO: §2.3--§2.6 came in shorter than planned (§2.3 ~1.5 pages against a ~2.5-page
   target, §2.4 ~1.5 against ~2). The prose is correct but terse in places; consider a
