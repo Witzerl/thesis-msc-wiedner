@@ -620,28 +620,19 @@ neural architectures of~\S\ref{sec:background:neural-pde}.
 \subsection{Stepping in time}
 \label{sec:background:pde-solvers:time}
 
-Once every spatial derivative is replaced by a stencil, the only
-derivative left is in time, and the PDE has become a system of ordinary
-differential equations (ODEs), one per cell:
-\begin{equation}
-  \frac{\mathrm{d} u_i}{\mathrm{d} t}
-  \;=\; f_i\!\left(t, u_1(t), \dots, u_N(t)\right),
-  \qquad i = 1, \dots, N.
-  \label{eq:bg:mol-ode}
-\end{equation}
-% TODO: cite Schiesser2012 (Schiesser, "The Numerical Method of Lines:
-% Integration of Partial Differential Equations", Academic Press /
-% Elsevier; cited as Schiesser 2012 by Brandstetter2022) once added to
-% references.bib.
-This reduction is known as the \emph{method of lines} (Schiesser, 2012):
-each $u_i(t)$ runs along a line parallel to the time axis at a fixed
-grid position. Any standard ODE integrator can now advance the grid.
+Once every spatial derivative is replaced by a stencil, the solver is
+left with a function $f$ that maps the current grid values to a rate of
+change for every cell. The spatial part of the problem is then settled,
+and the remaining task is to advance the grid in time using this rate.
+The two parts are independent: the same $f$ can be combined with any
+time-stepping scheme, and the choice of scheme does not change how $f$
+is computed.
 % TODO: cite Butcher1987 (Butcher, "The Numerical Analysis of Ordinary
 % Differential Equations: Runge-Kutta and General Linear Methods",
 % Wiley 1987) and Hairer1993 (Hairer, Norsett & Wanner, "Solving
 % Ordinary Differential Equations I: Nonstiff Problems", Springer,
 % 2nd rev. ed. 1993) once added to references.bib.
-The simplest is the explicit Euler step (Butcher, 1987; Hairer et al.,
+The simplest time-stepping scheme is the explicit Euler step (Butcher, 1987; Hairer et al.,
 1993),
 \begin{equation}
   u_i^{k + 1} \;=\; u_i^{k}

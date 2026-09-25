@@ -456,6 +456,12 @@ Pulled from the code repository (`masterthesis-docker/NOTES.md` + `PROJECT_CONTE
   `sec:background:pde-solvers:ga`. The LeVeque2002 marker now only backs the convergence
   sentence in §2.2.3; the "moving-mesh appendix" pointer TODO below is obsolete (the
   sentence was cut).
+- [x] 2026-09-25 (third pass): "method of lines" name, the Schiesser citation and the ODE
+  equation `eq:bg:mol-ode` removed from §2.2.2 (nothing referenced them). Kept the idea in
+  plain words: stencils yield a rate function f, and any time-stepping scheme can advance
+  it -- the split that the swappable slot, the RK4 arm (§4.4.5) and the solver-swap
+  diagnostic (§5.6) rely on. The Schiesser2012 pending citation is therefore obsolete.
+  **Author to review §2.2 on 2026-09-26.**
 - [ ] TODO: produce Figure `fig:bg:solver-path` (§2.2.2) -- the classical computational
   path as a pipeline: continuous field -> grid of cell values -> spatial discretisation
   (one cell and its stencil, yielding f_i) -> time integrator (Euler step) -> next state,
@@ -750,7 +756,7 @@ marker itself; `THESIS_FRAMEWORK.md` §10.1 carries verified entries for all of 
   Autofluorescence". Used in §2.6 as the dense-CNN precedent on this task (different
   modality, so not a comparable number); also the GA-domain motivation for the U-Net arm
   in §4.4.
-- [ ] TODO: cite **Schiesser2012** -- Schiesser, *The Numerical Method of Lines:
+- [x] (obsolete 2026-09-25, method-of-lines sentence removed) cite **Schiesser2012** -- Schiesser, *The Numerical Method of Lines:
   Integration of Partial Differential Equations*, Academic Press / Elsevier (cited as
   Schiesser 2012 by Brandstetter2022; check the edition year). Used in §2.2.2.
 - [ ] TODO: cite **BarSinai2019** -- Bar-Sinai, Hoyer, Hickey & Brenner, "Learning
