@@ -186,16 +186,21 @@ state itself.
 This thesis is organised around a single question:
 
 \begin{quote}
-  \itshape Given the lack of regenerative therapies for Geographic
-  Atrophy and the recent approval of complement inhibitors that only
-  slow lesion expansion, can the adaptation of neural PDE solvers to the
-  irregular intervals of longitudinal OCT yield per-eye spatial
-  forecasts accurate enough to inform patient stratification and
-  treatment timing?
+  \itshape What is needed to forecast the progression of Geographic
+  Atrophy from longitudinal OCT?
+  \begin{enumerate}
+    \item What kind of framework does the forecast need?
+    \item What kind of operator does that framework need?
+  \end{enumerate}
 \end{quote}
 
-The remaining chapters decompose this question into a sequence of
-methodological adaptations and empirical evaluations.
+The first part concerns everything that surrounds the model: how
+irregular visit intervals enter the prediction, and how models are
+trained and evaluated. The second concerns the model itself, the
+operator that maps one visit to the next. Chapter~\ref{ch:method}
+develops a framework that answers the first part and leaves the operator
+as its only free component. Chapter~\ref{ch:experiments} then answers the
+second by comparing different operators within that framework.
 
 
 \section{Contributions}

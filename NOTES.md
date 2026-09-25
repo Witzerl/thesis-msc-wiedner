@@ -142,6 +142,39 @@ Measured nulls (reportable negative results, **not** contributions):
 - [ ] TODO (⚠️): `01-introduction.tex` §1.3 "Why neural PDE solvers" and the locked-in
   research-question blockquote at its end — the question has changed (see above). Re-read
   and re-frame.
+  - [x] 2026-09-25: research question rewritten (user-approved wording): "What is needed
+    to forecast the progression of GA from longitudinal OCT?" with two sub-questions —
+    (1) what kind of framework, (2) what kind of operator — plus a short follow-up that
+    maps them to Chapters 4 and 5.
+  - [ ] The paragraph leading into it ("Two recent neural PDE solver families…") still
+    centres MP-PDE/MM-PDE; rewrite drafted in the 2026-09-25 session, not yet applied.
+
+### Author's tablet review of Chapters 1–2 (2026-09-25)
+
+Handwritten review of thesis pp. 1–14 (build of 2026-09-22), decoded from the Samsung
+Notes export. Legend: blue highlight = "do not like the sentence", red pen = "something
+wrong / to change". The author asked for no shortening yet; cuts wait for a later pass.
+
+- [ ] Author decision pending: the MM-PDE branch (DMM + dual branch) moves to an
+  appendix. Confirm the scope (§2.5, §4.5, §5.4, §5.5) and then update
+  `THESIS_STRUCTURE.md`.
+- [ ] §1.1: split the first sentence after "industrialised countries".
+- [ ] §1.1: "Crucially, AMD is not classified as avoidable…" — "could go?" (cut, later pass).
+- [ ] §1.1: "The combination of an aging population…" — too long, too complicated.
+- [ ] §1.2: "This per-eye, spatially resolved framing…" — simplify.
+- [ ] §1.2: "A standard U-Net or similar dense predictor…" — marked, no comment; it
+  conflicts with the result that a U-Net inside the framework matches the locked GNN.
+- [ ] §1.3: "Two recent neural PDE solver families…" — too much focus on MP-PDE/MM-PDE.
+- [ ] §1.4 Contributions — "might remove"; decide between rewriting and removing.
+- [ ] §1.5 Outline — "the two specific architectures (MP-PDE, MM-PDE)" marked; rewrite.
+- [ ] §2.1.3 "Two acquisition platforms…" — drop the SD/SS-OCT description; reword the
+  OCT-vs-FAF argument.
+- [ ] §2.1.4 "Two construction strategies…" — not needed (data come as en-face derivatives).
+- [ ] End of §2.1.4 — add a short summary of what OCT is, what en-face is, what is used.
+- [ ] §2.1.5 "Two technical caveats…" — not needed (cut, later pass); also removes an
+  SD-OCT claim. The preceding sentence naming the layer strata claims more than is known.
+- [ ] §2.1.6 "SD-OCT" (twice) — only the vendor is recorded; state the device once with
+  the Mai et al. (2024) caveat.
 - [ ] TODO (⚠️): `01-introduction.tex` §1.5 outline — describes a Method chapter built
   around MP-PDE vs MM-PDE; will need to follow whatever restructure is agreed.
 - [x] 2026-09-17: `THESIS_STRUCTURE.md` §3.3 corrected. The old constraint told the writer to
