@@ -221,8 +221,9 @@ wrong / to change". The author asked for no shortening yet; cuts wait for a late
   (binary, one inside the GA lesion, aligned with the layer grid — no CAM/cRORA claim); the
   layer-strata list replaced by "ordered from the most superficial to the deepest (§3.2)",
   since the boundary names are not recorded. The "again in §6.3" promise went with it.
-- [ ] §2.1.6 "SD-OCT" (twice) — only the vendor is recorded; state the device once with
-  the Mai et al. (2024) caveat.
+- [x] §2.1.6 "SD-OCT" (twice) — only the vendor is recorded; state the device once with
+  the Mai et al. (2024) caveat. Done 2026-09-25: device stated once, sourced to Mai et al. (2024)
+  (plain-text citation + `% TODO: cite Mai2024` marker).
   Update: Mai et al. (2024) state "Spectral-domain (SD)-OCT … (Spectralis, Heidelberg
   Engineering)" for the MUW cohort, so SD-OCT is supported by a citable source.
 - [x] (done 2026-09-25) TODO (⚠️): `01-introduction.tex` §1.5 outline — describes a Method chapter built
@@ -695,8 +696,8 @@ marker itself; `THESIS_FRAMEWORK.md` §10.1 carries verified entries for all of 
 - [ ] TODO: cite **Mai2024** -- Mai, Lachinov, Reiter, Riedl, Grechenig, Bogunović &
   Schmidt-Erfurth, *Ophthalmology Science* 4(4):100466, 2024, "Deep Learning-Based
   Prediction of Individual Geographic Atrophy Progression from a Single Baseline OCT".
-  Used in §2.6 as the closest prior work (same MUW cohort, same task), in §3.1 as the
-  source of the device-model inference, and in §3.6 for the one-year-anchor
+  Used in §2.6 as the closest prior work (same MUW cohort, same task), in §2.1.6 and §3.1 as the
+  source of the device model, and in §3.6 for the one-year-anchor
   comparability choice; needed again in §5.7. **The pre-segmented-masks vs raw-OCT caveat must travel with every comparison.**
 - [ ] TODO: cite **Salvi2025** -- Salvi et al., *Ophthalmology Science* 5(2):100635, 2025,
   "Deep Learning to Predict the Future Growth of Geographic Atrophy from Fundus
