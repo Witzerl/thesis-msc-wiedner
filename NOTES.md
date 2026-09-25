@@ -211,6 +211,10 @@ wrong / to change". The author asked for no shortening yet; cuts wait for a late
   … are therefore OCT-derived", §2.1.5 mask defined via CAM cRORA criteria. Mai confirms
   Spectralis SD-OCT; Mai says nothing about layer segmentation (provenance still open).
   Caveat: that the repo data are exactly Mai's annotations is an inference, not a record.
+  2026-09-25: §2.1.3 fixed neutrally (author: keep the FAF provenance out of the Background):
+  "The thesis therefore works on the OCT en-face grid." and "A single OCT volume shows both the
+  lesion and the retinal layers around it." Still to fix: §1.2 cRORA claim, §2.1.5 CAM/cRORA
+  mask definition; add the provenance as a plain dataset fact in §3.1.
 - [ ] §2.1.5 "Two technical caveats…" — not needed (cut, later pass); also removes an
   SD-OCT claim. The preceding sentence naming the layer strata claims more than is known.
 - [ ] §2.1.6 "SD-OCT" (twice) — only the vendor is recorded; state the device once with
