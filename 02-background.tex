@@ -363,8 +363,9 @@ of 0.97--0.99 for en-face OCT and find the resulting GA areas statistically
 equivalent to blue-light and near-infrared FAF measurements in a small
 cohort. The data used in this thesis are therefore OCT-derived.
 
-The single OCT acquisition simultaneously yields all the disease
-information that the state tensor needs to encode. The lesion itself is
+Both pieces of information this thesis relies on can be read from a single
+OCT acquisition: where the lesion is, and where the retinal layers lie. The
+lesion itself is
 visible on the B-scan as a region of outer-retinal layer dropout with
 choroidal hypertransmission; the surrounding retinal layer geometry is
 recoverable from the same volume by automatic segmentation; and the
@@ -376,18 +377,21 @@ the GA extent through the hypertransmission signature
 \label{sec:background:ga-oct:enface}
 
 The full OCT volume of a GA eye is too large and too redundant to be
-modelled at native voxel resolution. The clinical literature has
-converged on a two-dimensional \emph{en-face projection} of the volume
-onto the fundus plane as the canonical analysis substrate
-\citep{Pilotto2015,Chu2022,Yehoshua2011,Vallino2024}, and the present
-work adopts the same convention.
+modelled at native voxel resolution. The clinical literature therefore
+works with an \emph{en-face} image instead: a two-dimensional map of the
+retina seen from the front, as in a fundus photograph, in which every pixel
+corresponds to one A-scan of the volume and summarises what lies along it
+\citep{Pilotto2015,Chu2022,Yehoshua2011,Vallino2024}. The present work
+adopts the same convention.
 
 Several ways of forming the en-face image from the volume are used in the
 literature, for example summing the full depth of each A-scan
 \citep{Yehoshua2011} or projecting only a thin slab around the RPE
-\citep{Pilotto2015}. No projection is computed in this thesis: the MUW data
-already provide the lesion mask and the layer depth maps on the en-face grid
-(\S\ref{sec:data:dataset}).
+\citep{Pilotto2015}. No projection is computed in this thesis. Instead, the MUW
+data provide two kinds of en-face maps for every visit, on the same grid:
+the GA lesion as a binary mask, and, for each of ten retinal layer
+boundaries, its depth along every A-scan (\S\ref{sec:data:dataset}). These
+maps are the imaging input the models in this thesis receive.
 
 The choice of en-face rather than B-scan as the modelling substrate is
 motivated by a methodologically important caveat documented by
@@ -400,8 +404,7 @@ deep-learning progression predictors are reported in the recent
 literature \citep{Chu2022,Vogl2021,Vallino2024}. By construction, the
 2D en-face grid also reduces a per-step three-dimensional forward
 problem to a per-step two-dimensional one, which matters for the
-tractability of the graph-neural-network architectures introduced in
-the subsequent chapters.
+tractability of the models introduced in the subsequent chapters.
 
 \subsection{The eleven-channel state representation}
 \label{sec:background:ga-oct:state-rep}

@@ -194,7 +194,23 @@ wrong / to change". The author asked for no shortening yet; cuts wait for a late
   Done 2026-09-25. With the SD-OCT/SS-OCT definitions gone, "SD-OCT volume" in §2.1.4
   became "OCT volume" and "SS-OCT" in §2.1.6 was spelled out.
 - [x] §2.1.4 "Two construction strategies…" — not needed (data come as en-face derivatives). Replaced 2026-09-25 by a two-sentence version.
-- [ ] End of §2.1.4 — add a short summary of what OCT is, what en-face is, what is used.
+- [x] End of §2.1.4 — add a short summary of what OCT is, what en-face is, what is used.
+  Done 2026-09-25 in place, not as a separate paragraph: en-face defined where introduced
+  (§2.1.4 opening), "what the thesis receives" stated after the projection sentence, and the
+  last paragraph of §2.1.3 opens with the two pieces of information used. "graph-neural-network
+  architectures" -> "models".
+- [ ] ⚠️ FACT CHECK (2026-09-25, Mai et al. 2024, PMC11000109): in the Mai study of the MUW
+  cohort the GA reference was annotated **on FAF** by certified Vienna Reading Center readers
+  ("well-demarcated areas with a significantly decreased or extinguished degree of
+  autofluorescence"), then registered automatically to the near-infrared image aligned with
+  the OCT, giving 2-D en-face OCT annotations. The repo is consistent with this: `mask_oct`
+  equals the SLO/FAF-frame `mask_global` sampled through `T_mask` (IoU ~1.0 on all 553 visits).
+  So channel 0 is most likely a FAF-based annotation transferred to the OCT grid, NOT an
+  OCT/cRORA segmentation. Wrong as written: §1.2 "binary lesion mask captures the cRORA region",
+  §2.1.3 "Both pieces of information … can be read from a single OCT acquisition" and "The data
+  … are therefore OCT-derived", §2.1.5 mask defined via CAM cRORA criteria. Mai confirms
+  Spectralis SD-OCT; Mai says nothing about layer segmentation (provenance still open).
+  Caveat: that the repo data are exactly Mai's annotations is an inference, not a record.
 - [ ] §2.1.5 "Two technical caveats…" — not needed (cut, later pass); also removes an
   SD-OCT claim. The preceding sentence naming the layer strata claims more than is known.
 - [ ] §2.1.6 "SD-OCT" (twice) — only the vendor is recorded; state the device once with
