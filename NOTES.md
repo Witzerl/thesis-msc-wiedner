@@ -163,8 +163,11 @@ wrong / to change". The author asked for no shortening yet; cuts wait for a late
 - [ ] Author decision pending: the MM-PDE branch (DMM + dual branch) moves to an
   appendix. Confirm the scope (§2.5, §4.5, §5.4, §5.5) and then update
   `THESIS_STRUCTURE.md`.
-- [ ] §1.1: split the first sentence after "industrialised countries".
-- [ ] §1.1: "Crucially, AMD is not classified as avoidable…" — "could go?" (cut, later pass).
+- [x] §1.1: split the first sentence after "industrialised countries". Done 2026-09-25.
+- [x] §1.1: "Crucially, AMD is not classified as avoidable…" — author clarified: keep the
+  content, fix the construction. Rewritten 2026-09-25 (avoidable-cause list checked against
+  the Flaxman PDF: cataract, refractive error, trachoma, glaucoma, diabetic retinopathy,
+  corneal opacity).
 - [ ] §1.1: "The combination of an aging population…" — too long, too complicated.
 - [ ] §1.2: "This per-eye, spatially resolved framing…" — simplify.
 - [ ] §1.2: "A standard U-Net or similar dense predictor…" — marked, no comment; it
@@ -172,6 +175,8 @@ wrong / to change". The author asked for no shortening yet; cuts wait for a late
 - [x] §1.3: "Two recent neural PDE solver families…" — too much focus on MP-PDE/MM-PDE.
   Rewritten 2026-09-25.
 - [ ] §1.4 Contributions — "might remove"; decide between rewriting and removing.
+  2026-09-25: headline now reads "Contributions (TODO: maybe remove)" as a visible marker;
+  the bullets themselves are still the stale pre-survey list.
 - [ ] §1.5 Outline — "the two specific architectures (MP-PDE, MM-PDE)" marked; rewrite.
 - [ ] §2.1.3 "Two acquisition platforms…" — drop the SD/SS-OCT description; reword the
   OCT-vs-FAF argument.
