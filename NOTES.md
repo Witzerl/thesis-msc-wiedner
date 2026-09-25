@@ -160,9 +160,10 @@ Handwritten review of thesis pp. 1–14 (build of 2026-09-22), decoded from the 
 Notes export. Legend: blue highlight = "do not like the sentence", red pen = "something
 wrong / to change". The author asked for no shortening yet; cuts wait for a later pass.
 
-- [ ] Author decision pending: the MM-PDE branch (DMM + dual branch) moves to an
-  appendix. Confirm the scope (§2.5, §4.5, §5.4, §5.5) and then update
-  `THESIS_STRUCTURE.md`.
+- [ ] Author decision (2026-09-25): **everything MM-PDE moves to the appendix** as an
+  additional experiment — the mesh mover (DMM), the dual branch, the α-gate result and the
+  mesh-quality study. Affects §2.5, §4.5, §5.4 (mesh null) and §5.5. `THESIS_STRUCTURE.md`
+  not yet updated and no chapter text moved; do both when the author says so.
 - [x] §1.1: split the first sentence after "industrialised countries". Done 2026-09-25.
 - [x] §1.1: "Crucially, AMD is not classified as avoidable…" — author clarified: keep the
   content, fix the construction. Rewritten 2026-09-25 (avoidable-cause list checked against
@@ -185,7 +186,9 @@ wrong / to change". The author asked for no shortening yet; cuts wait for a late
 - [ ] §1.4 Contributions — "might remove"; decide between rewriting and removing.
   2026-09-25: headline now reads "Contributions (TODO: maybe remove)" as a visible marker;
   the bullets themselves are still the stale pre-survey list.
-- [ ] §1.5 Outline — "the two specific architectures (MP-PDE, MM-PDE)" marked; rewrite.
+- [x] §1.5 Outline — "the two specific architectures (MP-PDE, MM-PDE)" marked; rewrite.
+  Rewritten 2026-09-25: no framework names, no mesh content; Chapters 4 and 5 are tied to
+  the two parts of the research question; the moving mesh is pointed to the appendix.
 - [ ] §2.1.3 "Two acquisition platforms…" — drop the SD/SS-OCT description; reword the
   OCT-vs-FAF argument.
 - [ ] §2.1.4 "Two construction strategies…" — not needed (data come as en-face derivatives).
@@ -194,7 +197,7 @@ wrong / to change". The author asked for no shortening yet; cuts wait for a late
   SD-OCT claim. The preceding sentence naming the layer strata claims more than is known.
 - [ ] §2.1.6 "SD-OCT" (twice) — only the vendor is recorded; state the device once with
   the Mai et al. (2024) caveat.
-- [ ] TODO (⚠️): `01-introduction.tex` §1.5 outline — describes a Method chapter built
+- [x] (done 2026-09-25) TODO (⚠️): `01-introduction.tex` §1.5 outline — describes a Method chapter built
   around MP-PDE vs MM-PDE; will need to follow whatever restructure is agreed.
 - [x] 2026-09-17: `THESIS_STRUCTURE.md` §3.3 corrected. The old constraint told the writer to
   "justify the 6×6 mm window by citing that 99 % of GA pathology occurs within a central 3 mm
@@ -322,7 +325,7 @@ Pulled from the code repository (`masterthesis-docker/NOTES.md` + `PROJECT_CONTE
 - [x] 2026-05-02: 1.3 Why neural PDE solvers drafted (boundary growth model, anisotropy, MP-PDE/MM-PDE; cites Yehoshua2011, Chu2022, Singh2025, Brandstetter2022, Hu2024, Vogl2021, Vallino2024). Locked-in research question included as a blockquote at the end of 1.3.
 - [x] 2026-05-02: 1.4 Contributions bullets drafted (six contributions covering MM-PDE transfer, $\Delta t$-residual, multi-channel monitor, covariates, surrogate encoder, empirical validation).
 - [x] 2026-05-02: 1.5 Thesis outline paragraph drafted; uses `\ref{ch:...}` cross-references to chapters 2-7.
-- [ ] TODO: confirm `\ref{ch:background}`, `\ref{ch:data}`, `\ref{ch:method}`, `\ref{ch:experiments}`, `\ref{ch:discussion}`, `\ref{ch:conclusion}` resolve once the corresponding `\label{}` commands exist in the chapter source files (currently those chapters are placeholders).
+- [x] 2026-09-25 (all resolve; stale TODO comment removed from the .tex): confirm `\ref{ch:background}`, `\ref{ch:data}`, `\ref{ch:method}`, `\ref{ch:experiments}`, `\ref{ch:discussion}`, `\ref{ch:conclusion}` resolve once the corresponding `\label{}` commands exist in the chapter source files (currently those chapters are placeholders).
 - [ ] TODO: re-read 1.1 prevalence numbers against the latest cohort statistics extracted from MUW data once available; the figures cited (1M US / 5M global, 160k new dx/yr, 14-27% growth-rate reduction) follow Singh2025 / Vallino2024 / Lad2023 verbatim.
 
 ### Chapter 2 - Background (`02-background.tex`)
