@@ -382,20 +382,12 @@ onto the fundus plane as the canonical analysis substrate
 \citep{Pilotto2015,Chu2022,Yehoshua2011,Vallino2024}, and the present
 work adopts the same convention.
 
-Two construction strategies appear in the literature. The
-\emph{summed-voxel projection} of \citet{Yehoshua2011} integrates the
-A-scan intensity along the full axial extent of the volume; in this
-projection GA appears as a \emph{bright} region because the absence of
-the pigmented RPE column lets choroidal signal contribute to the column
-sum that would otherwise be absorbed. The \emph{slab segmentation}
-strategy of \citet{Pilotto2015} instead extracts a thin axial slab of
-the volume and projects only that slab onto the fundus plane; an outer
-retinal slab placed just above Bruch's membrane visualises RPE and
-photoreceptor-complex atrophy directly, whereas a sub-RPE slab placed
-between 64 and 400\,\textmu{}m below Bruch's membrane visualises the
-same lesion through its choroidal hypertransmission signature
-\citep{Chu2022,Vallino2024}. The two strategies converge on the same
-underlying lesion geometry.
+Several ways of forming the en-face image from the volume are used in the
+literature, for example summing the full depth of each A-scan
+\citep{Yehoshua2011} or projecting only a thin slab around the RPE
+\citep{Pilotto2015}. No projection is computed in this thesis: the MUW data
+already provide the lesion mask and the layer depth maps on the en-face grid
+(\S\ref{sec:data:dataset}).
 
 The choice of en-face rather than B-scan as the modelling substrate is
 motivated by a methodologically important caveat documented by
