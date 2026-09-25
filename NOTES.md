@@ -189,8 +189,10 @@ wrong / to change". The author asked for no shortening yet; cuts wait for a late
 - [x] §1.5 Outline — "the two specific architectures (MP-PDE, MM-PDE)" marked; rewrite.
   Rewritten 2026-09-25: no framework names, no mesh content; Chapters 4 and 5 are tied to
   the two parts of the research question; the moving mesh is pointed to the appendix.
-- [ ] §2.1.3 "Two acquisition platforms…" — drop the SD/SS-OCT description; reword the
+- [x] §2.1.3 "Two acquisition platforms…" — drop the SD/SS-OCT description; reword the
   OCT-vs-FAF argument.
+  Done 2026-09-25. With the SD-OCT/SS-OCT definitions gone, "SD-OCT volume" in §2.1.4
+  became "OCT volume" and "SS-OCT" in §2.1.6 was spelled out.
 - [ ] §2.1.4 "Two construction strategies…" — not needed (data come as en-face derivatives).
 - [ ] End of §2.1.4 — add a short summary of what OCT is, what en-face is, what is used.
 - [ ] §2.1.5 "Two technical caveats…" — not needed (cut, later pass); also removes an

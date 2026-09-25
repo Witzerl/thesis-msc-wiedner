@@ -352,25 +352,16 @@ approximately $6 \times 6$\,mm laterally; how the varying native voxel
 grids are reduced to the standard two-dimensional modelling grid used in
 the rest of the thesis is the subject of~\S\ref{sec:background:ga-oct:enface}.
 
-Two acquisition platforms dominate the GA literature.
-Spectral-domain OCT (SD-OCT) operates around an 870\,nm wavelength and
-reaches an axial resolution of roughly 3--6\,\textmu{}m
-\citep{Boopathiraj2024,Pilotto2015}, sufficient to resolve the
-principal retinal layer boundaries from inner limiting membrane to
-Bruch's membrane. Swept-source OCT (SS-OCT), operating at approximately
-1050\,nm and at A-scan rates above 100\,kHz, reaches deeper into the
-choroid with a 5.5\,\textmu{}m axial resolution at the cost of slightly
-coarser lateral sampling \citep{Chu2022}. \citet{Vallino2024} argue
-that OCT is the modality of choice for GA over fundus
-autofluorescence (FAF) for three reasons: it provides
-cross-sectional images amenable to detailed quantitative analysis of
-each retinal layer, it detects atrophic processes earlier in their
-natural history, and it is reliable in the foveal region where blue-FAF
-struggles. The thesis modelling substrate is therefore OCT-derived,
-not FAF-derived, with \citet{Pilotto2015} providing the empirical
-guarantee that en-face OCT GA-area measurements reach inter-operator
-intraclass correlation coefficients of 0.97--0.99 and are statistically
-equivalent to B-FAF and near-infrared FAF on small cohorts.
+OCT is preferred over fundus autofluorescence (FAF), the other common
+imaging modality for GA, for three reasons given by \citet{Vallino2024}: it
+shows each retinal layer in cross-section and so permits layer-wise
+quantitative analysis, it detects atrophy earlier in its natural history,
+and it remains reliable near the fovea, where blue-light FAF struggles.
+OCT-based area measurements are also reproducible and consistent with FAF:
+\citet{Pilotto2015} report inter-reader intraclass correlation coefficients
+of 0.97--0.99 for en-face OCT and find the resulting GA areas statistically
+equivalent to blue-light and near-infrared FAF measurements in a small
+cohort. The data used in this thesis are therefore OCT-derived.
 
 The single OCT acquisition simultaneously yields all the disease
 information that the state tensor needs to encode. The lesion itself is
@@ -384,7 +375,7 @@ the GA extent through the hypertransmission signature
 \subsection{From OCT volumes to en-face projections}
 \label{sec:background:ga-oct:enface}
 
-The full SD-OCT volume of a GA eye is too large and too redundant to be
+The full OCT volume of a GA eye is too large and too redundant to be
 modelled at native voxel resolution. The clinical literature has
 converged on a two-dimensional \emph{en-face projection} of the volume
 onto the fundus plane as the canonical analysis substrate
@@ -531,7 +522,7 @@ fovea-centred square, observing that approximately ninety-nine per cent
 of GA pathology occurs within a central three-millimetre radius from
 the macula. The same window is used by \citet{Yehoshua2011}
 ($200 \times 200$ raster at 30\,\textmu{}m / pixel lateral) and by
-\citet{Chu2022} (Zeiss PLEX Elite 9000 SS-OCT, $6 \times 6$\,mm scan
+\citet{Chu2022} (Zeiss PLEX Elite 9000 swept-source OCT, $6 \times 6$\,mm scan
 window with 1536 axial pixels and 500 A-lines per B-scan), and it
 serves as the de-facto analysis area for GA OCT studies. However,
 measured on the present cohort, this window is not lossless. It cuts
