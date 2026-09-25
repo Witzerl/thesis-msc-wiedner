@@ -103,20 +103,15 @@ contained in the lesion mask alone. Third, every patient carries
 risk and progression speed and that should enter the dynamics on equal
 footing with the imaging signal.
 
-The combination of these requirements --- a per-eye spatial state forecast,
-under arbitrary $\Delta t$, on a vector-valued field, conditioned on patient
-context --- is exactly the kind of task for which conventional segmentation
-networks are ill-suited.
-% TODO: cite Ronneberger2015 (MICCAI, "U-Net: Convolutional Networks for
-% Biomedical Image Segmentation") once added to references.bib -- the
-% U-Net mention below should carry an inline citation.
-A standard U-Net or similar dense predictor
-provides no principled mechanism for ingesting an elapsed-time scalar, no
-notion of the local-dynamics structure that drives lesion-boundary growth,
-and no separation between the static disease identity of the patient and
-the time-evolving state. The next section argues that the problem instead
-fits naturally into the framework of neural partial differential equation
-(PDE) solvers.
+Meeting these requirements is not only a question of the model itself but
+also of how the model is used. A typical image-to-image model maps one image
+to another; on its own, it has no notion of elapsed time and no built-in way
+to advance a state from one visit to the next. These properties have to come
+from a framework around the model, one that conditions the prediction on
+$\Delta t$ and rolls the state forward visit by visit. The next section
+motivates such a framework, which borrows several of its techniques from
+neural partial differential equation (PDE) solvers. Which model should sit
+inside it is a separate question.
 
 
 \section{Why Neural PDE Solvers?}

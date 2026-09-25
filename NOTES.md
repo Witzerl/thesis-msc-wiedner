@@ -170,8 +170,16 @@ wrong / to change". The author asked for no shortening yet; cuts wait for a late
   corneal opacity).
 - [x] §1.1: "The combination of an aging population…" — too long, too complicated. Rewritten 2026-09-25 as two sentences.
 - [x] §1.2: "This per-eye, spatially resolved framing…" — simplify. Rewritten 2026-09-25.
-- [ ] §1.2: "A standard U-Net or similar dense predictor…" — marked, no comment; it
+- [x] §1.2: "A standard U-Net or similar dense predictor…" — marked, no comment; it
   conflicts with the result that a U-Net inside the framework matches the locked GNN.
+  Rewritten 2026-09-25: the paragraph now argues that elapsed time and visit-to-visit
+  rollout must come from a framework around the model (which borrows techniques from
+  neural PDE solvers); the model choice is left as a separate question. The Ronneberger2015
+  cite marker went with the removed U-Net sentence.
+- [ ] §1.2 "three properties" paragraph (not marked by the author): the covariate
+  requirement ("should enter the dynamics on equal footing") contradicts the measured
+  covariate null, and the claim that both mask and layers are *required* is not shown
+  by the results. Revisit.
 - [x] §1.3: "Two recent neural PDE solver families…" — too much focus on MP-PDE/MM-PDE.
   Rewritten 2026-09-25.
 - [ ] §1.4 Contributions — "might remove"; decide between rewriting and removing.
@@ -675,7 +683,7 @@ External references introduced inline in the LaTeX drafts that still need to be 
 - [ ] TODO: cite **Wong2014** -- Wong et al., *Lancet Glob Health* 2014, "Global prevalence of age-related macular degeneration and disease burden projection for 2020 and 2040." Used in `01-introduction.tex` §1.1 opening to support "leading cause of irreversible central vision loss in industrialised countries."
 - [ ] TODO: cite **SchmidtErfurth2018** -- Schmidt-Erfurth et al., *IOVS* 2018, "Prediction of individual disease conversion in early AMD using artificial intelligence." Used in `01-introduction.tex` §1.2 as an AI-on-OCT precedent for cohort-level conversion prediction.
 - [ ] TODO: cite **Bogunovic2017** -- Bogunović et al., *IOVS* 2017, "Machine learning of the progression of intermediate AMD based on OCT imaging." Used in `01-introduction.tex` §1.2 alongside SchmidtErfurth2018 as the supervisor's institutional AI-on-OCT precedent. (Earlier draft of `02-background.tex` §2.1.4 also cited it for the MUW segmentation pipeline; that usage was removed on 2026-05-02 because the MUW pipeline provenance is not actually established by this reference --- if confirmed, restore that usage in `03-data.tex` §3.1 instead.)
-- [ ] TODO: cite **Ronneberger2015** -- Ronneberger et al., *MICCAI* 2015, "U-Net: Convolutional Networks for Biomedical Image Segmentation." Used in `01-introduction.tex` §1.2 to anchor the "standard U-Net" baseline mention.
+- [ ] TODO: cite **Ronneberger2015** -- Ronneberger et al., *MICCAI* 2015, "U-Net: Convolutional Networks for Biomedical Image Segmentation." Used in `01-introduction.tex` §1.2 to anchor the "standard U-Net" baseline mention. (2026-09-25: that §1.2 sentence was removed; still needed for §2.3 and §4.4.)
 - [ ] TODO: cite **Battaglia2018** -- Battaglia et al., 2018, "Relational inductive biases, deep learning, and graph networks." Used in `01-introduction.tex` §1.3 to attribute the encode--process--decode GNN pattern. (2026-09-25: that §1.3 sentence was removed; the marker went with it. Still relevant for §2.4.)
 - [ ] TODO: cite **SanchezGonzalez2020** -- Sanchez-Gonzalez et al., *ICML* 2020, "Learning to simulate complex physics with graph networks." Used in `01-introduction.tex` §1.3 alongside Battaglia2018 for the encode--process--decode pattern. (2026-09-25: that §1.3 sentence was removed; still relevant for §2.4.)
 - [ ] TODO: cite **Li2021** (FNO) and **Lu2021** (DeepONet) -- needed for `02-background.tex` §2.3 (autoregressive vs operator-style neural solvers). (2026-09-25: the conditional §1.3 acknowledgement is moot; §1.3 names no architecture.)
