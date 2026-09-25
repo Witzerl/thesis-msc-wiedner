@@ -2,7 +2,7 @@
 
 LaTeX source for a Master's thesis at the [Johannes Kepler University Linz](https://www.jku.at/) in collaboration with the [Medical University of Vienna](https://www.meduniwien.ac.at/).
 
-**Topic:** Adapting two neural PDE solver frameworks — MP-PDE (Brandstetter et al., ICLR 2022) and MM-PDE (Hu et al., ICLR 2024) — to Geographic Atrophy (GA) progression prediction from longitudinal OCT imaging.
+**Topic:** What is needed to forecast Geographic Atrophy (GA) progression from longitudinal OCT imaging — which framework the forecast needs, and which operator that framework needs. The work began as an adaptation of the MP-PDE (Brandstetter et al., ICLR 2022) and MM-PDE (Hu et al., ICLR 2024) solvers and grew into a controlled comparison of model families inside one fixed framework; the moving-mesh (MM-PDE) extension is reported in an appendix.
 
 **Supervisor:** Hrvoje Bogunović (Medical University of Vienna)
 **Co-supervisor:** Dmitrii Lachinov (Medical University of Vienna)

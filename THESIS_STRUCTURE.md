@@ -19,6 +19,8 @@
 
 **The thesis question is "what does a model need in order to predict GA progression, and what framework does it need to sit in?" — not "can MP-PDE/MM-PDE be adapted to GA?".** The adaptation of the two solver frameworks is still the largest single block of engineering and keeps its full technical chapter, but what it produced is a **fixed experimental framework with one swappable operator slot**, and what the thesis reports is a controlled survey through that slot. Chapters 4 and 5 are structured accordingly: §4.3 (the graph solver the project built) and §4.4 (everything else, on identical terms) are two halves of one chapter, not a subject and its appendix.
 
+**Revision 2026-09-25 (author's review of Chapters 1–2).** (i) The research question is worded as a main question with two sub-questions: *"What is needed to forecast the progression of Geographic Atrophy from longitudinal OCT? (1) What kind of framework does the forecast need? (2) What kind of operator does that framework need?"* Chapter 4 answers (1), Chapter 5 answers (2). (ii) **Everything MM-PDE moves to a dedicated appendix** (Appendix G) as an additional experiment: the MM-PDE background, the data-free mesh mover, the dual branch and α-gate, the mesh-quality study and their costs. The main text keeps at most one pointer sentence per chapter. (iii) The introduction no longer centres the two graph frameworks; it speaks of models and the framework around them.
+
 Several originally-planned contributions are **measured nulls** and must be written up as negative results rather than contributions: mesh adaptation / the dual branch, patient covariates, the learned surrogate encoder, parameter count, time-integration order, and every GNN-internal knob. See `NOTES.md` → "Code-side sync (2026-09-17)" for the binding vocabulary rules, and `THESIS_FRAMEWORK.md` §7.5 for every number with its instrument and caveat.
 
 **Narrative Constraint:** This thesis must strictly follow the "Hour-Glass" model:
@@ -41,10 +43,10 @@ Brief explanation of Geographic Atrophy as an advanced form of age-related macul
 ### 1.2 Problem statement
 Frame GA progression as a spatiotemporal prediction task on OCT en-face grids: given a baseline state and elapsed time, predict the future lesion configuration. State the irregular-visit-interval challenge clinical data imposes.
 
-### 1.3 Why a PDE-solver framing, and why a survey
-Argue that GA progression has the structural properties of a locally driven growth process (spatial state evolving over time with local dynamics) and that neural PDE solvers offer a principled inductive bias in a low-data clinical regime. **Then make the turn that defines the thesis:** a single architecture cannot answer whether that prior is the right one, so the work fixes everything except the update operator and surveys the slot. State the research question in its current form — what a model needs, and what framework it needs to sit in. Be honest about provenance: the two frameworks were initially suggested by the clinical partner; the locality/inductive-bias justification was built and tested empirically afterwards.
+### 1.3 Why a PDE-solver framing, and why a survey (section title in the .tex: "Why Neural PDE Solvers?", kept)
+Argue that GA progression has the structural properties of a locally driven growth process (spatial state evolving over time with local dynamics) and that neural PDE solvers offer a principled inductive bias in a low-data clinical regime. **Then make the turn that defines the thesis:** a single architecture cannot answer whether that prior is the right one, so the work fixes everything except the update operator and surveys the slot. State the research question in its current form (see Framing, revision 2026-09-25): the main question plus the framework and operator sub-questions, followed by a short paragraph mapping them to Chapters 4 and 5. **Do not centre MP-PDE/MM-PDE here** — neural PDE solvers are introduced generally, as learned operators that differ in their built-in assumptions. The provenance note (the two graph frameworks were suggested by the clinical partner; the locality justification was built and tested afterwards) belongs in §1.4 or at the start of Chapter 4, not in §1.3.
 
-### 1.4 Contributions
+### 1.4 Contributions (TODO: maybe remove — headline in the .tex carries this marker)
 Bulleted list, rewritten against the measured results:
 - A Δt-conditioned autoregressive framework for irregular clinical visit schedules, with a persistence-exact initialisation, that makes architecture classes comparable under one loss, curriculum, evaluation and parameter budget.
 - The first controlled comparison of six architecture classes on longitudinal OCT GA progression, parameter-matched, 5-fold, with two agreeing statistical instruments and a replicate noise floor.
@@ -52,15 +54,15 @@ Bulleted list, rewritten against the measured results:
 - The finding that **global context and local detail are separable and both required**, demonstrated by two architecturally unrelated constructions landing at the same place.
 - An explicit **transport term** as a second, independent route to the same deficit (with its parameter-matching caveat stated in the same breath).
 - A set of **reportable negative results**: mesh adaptation, patient covariates, the learned coefficient surrogate, capacity, integration order, and every GNN-internal knob.
-- The transfer of the MM-PDE/MP-PDE machinery to a multi-channel clinical state on an extremely anisotropic grid, as the engineering that made the above measurable.
+- The transfer of the MP-PDE machinery to a multi-channel clinical state on an extremely anisotropic grid, as the engineering that made the above measurable (the MM-PDE extension is reported in Appendix G).
 
 ### 1.5 Thesis outline
-One-paragraph roadmap of the remaining chapters.
+One-paragraph roadmap of the remaining chapters: no framework names, no mesh content; Chapters 4 and 5 are tied to the two sub-questions; the moving mesh is pointed to the appendix.
 
 ## 2. Background (~12-15 pages)
 
 ### 2.1 Geographic Atrophy and OCT imaging
-Clinical background: what GA is, how it's imaged (OCT volumes, en-face projections), what the 10 retinal layer boundaries represent, how masks are annotated. Reference the MUW dataset structure.
+Clinical background: what GA is, how it's imaged (OCT volumes, en-face projections), what the 10 retinal layer boundaries represent. Reference the MUW dataset structure. **Constraints (2026-09-25):** keep acquisition physics and projection techniques brief (the MUW data arrive as en-face maps; no projection is computed); make clear in the running text what OCT is, what en-face means and what the models receive. Do **not** define the mask via CAM/cRORA criteria and do not name the layer boundaries — per Mai et al. (2024) the GA reference was annotated on FAF and registered onto the OCT grid, and the boundary names are not recorded. The mask provenance is stated as a dataset fact in §3.1, not in the Background.
 
 ### 2.2 Partial differential equations and numerical solvers
 Short primer on temporal PDEs, the method of lines, finite differences/volumes, and mesh-based discretization. Just enough to motivate what neural solvers replace. **Constraint: Do not detail historical PDE origins or generic equations (e.g., heat/wave equation). Focus strictly on spatial grids and time-stepping as they relate to discrete, autoregressive state updates. When an example is needed for explanations, always use the Shallow Water Equation (SWE) as we have relevant examples and potential visualizations.**
@@ -71,10 +73,10 @@ Widened from the original "operators vs autoregressive" framing so that every cl
 ### 2.4 MP-PDE: Message-Passing Neural PDE Solvers
 Focused summary of Brandstetter et al. (2022): encode-process-decode architecture, temporal bundling, the pushforward trick and its zero-stability interpretation.
 
-### 2.5 MM-PDE: Moving Mesh PDE Solvers
-Focused summary of Hu et al. (2024): DMM (data-free mesh mover trained on the Monge-Ampère equation), the monitor function and equidistribution principle, the dual-branch architecture with ItpNet, interpolation between uniform and moved meshes.
+### 2.5 ~~MM-PDE: Moving Mesh PDE Solvers~~ → moved to Appendix G (2026-09-25)
+The focused summary of Hu et al. (2024) (DMM, monitor function, equidistribution, dual branch, ItpNet) becomes the background part of Appendix G. The draft currently in `02-background.tex` §2.5 is to be moved there; Chapter 2 keeps at most one sentence in §2.3 pointing to it. Related work then becomes §2.5.
 
-### 2.6 Related work
+### 2.6 Related work (becomes §2.5 once the MM-PDE section is moved)
 Short section on: deep learning for retinal imaging, GA progression models in the clinical literature (including Mai et al. 2024 as the direct comparison on the same cohort), other neural solvers applied to biomedical problems (if any).
 
 ## 3. Data and Preprocessing (~8-10 pages)
@@ -128,7 +130,9 @@ Everything else that occupies the same slot, described on identical terms and at
 - **Time integration:** the fixed-step Runge-Kutta wrapper over any backbone, and what a continuous-time reading would require.
 - **Parameter matching:** what is matched to what, the 1.25x band, and the two deliberate out-of-band controls (the width-32 U-Net at ~50x the canonical model -- 44.5x the k-NN arm -- and the 0.22x per-pixel floor) and why each exists.
 
-### 4.5 The moving-mesh extension as a tested hypothesis
+### 4.5 ~~The moving-mesh extension as a tested hypothesis~~ → moved to Appendix G (2026-09-25)
+Content below is retained as the specification for Appendix G. Once moved, §4.6–§4.8 renumber to §4.5–§4.7.
+
 DMM + dual branch, framed from the outset as a hypothesis the design was built to measure rather than a component assumed to help.
 - **DMM for GA:** the physics loss (Monge-Ampère + boundary + convexity), sampling strategy, and the monitor function. **Constraint: the monitor is a plain scalar monitor on the Gaussian-blurred mask, and the DMM trains and is applied on the native anisotropic (49, 1024) grid (since 2026-08-04). The multi-channel Frobenius-norm monitor and the square 256² SLO-mask path are superseded — mention them, if at all, only as documented intermediate steps, and never as the design.** DMM is pretrained separately and frozen.
 - **Dual-branch composition:** main branch on the uniform mesh returning the full next state; correction branch on the moved mesh returning a pure Δt-delta; ItpNet interpolation renormalised to a partition of unity; the learnable scalar gate α, zero-initialised, which is the instrument that makes the question measurable. **Constraint: `res_cut` is gone from the framework entirely — do not describe it as a component.**
@@ -138,7 +142,7 @@ DMM + dual branch, framed from the outset as a hypothesis the design was built t
 Age and sex as graph-level attributes broadcast per node into the `variables` vector; the LayerEncoder CNN compressing the 10 layer maps into a global embedding concatenated the same way, framed as a learned stand-in for the PDE coefficients $\theta_{PDE}$ of MP-PDE. Describe both as implementation deltas whose value is an open question at this point in the text; §5.4 reports both as nulls. Note the encoder's stride schedule corrects only ~2x of the image's ~21:1 anisotropy, which bounds what the null covers.
 
 ### 4.7 Training
-The channel-weighted MSE + soft-Dice objective, the time-budgeted pushforward curriculum (unroll depth measured in elapsed days, not visit count), ItpNet pretraining at epoch 0 for the dual branch, per-module gradient clipping, optimizer and schedule. Note that the explicit monotonic-growth penalty is set to 0.0 and the residual form is signed — what the zero-init biases toward is *persistence*, not monotonicity.
+The channel-weighted MSE + soft-Dice objective, the time-budgeted pushforward curriculum (unroll depth measured in elapsed days, not visit count), per-module gradient clipping (ItpNet pretraining for the dual branch goes to Appendix G), optimizer and schedule. Note that the explicit monotonic-growth penalty is set to 0.0 and the residual form is signed — what the zero-init biases toward is *persistence*, not monotonicity.
 
 ### 4.8 Implementation details
 Hardware, framework versions, the run-identity/checkpoint/resume infrastructure, and notable engineering choices (GPU-native k-NN, graph precomputation, anisotropy-corrected edge construction, etc.).
@@ -169,7 +173,7 @@ The core of the chapter: what actually separates arms, measured one at a time.
 
 ### 5.4 Negative results
 Reported as findings, not as failures, each with its instrument and its scope.
-- **Mesh adaptation / the dual branch.** The tightest null in the project, parameter-matched, at ~10x the cost. **Constraint on scope: α stays shut in the parameter-matched bypass control as well as in the mesh arm, so what the gate measured is the correction branch's failure to optimise — not "mesh adaptation does not transfer to GA". Weight decay is refuted as the cause.**
+- **Mesh adaptation / the dual branch — one-line pointer only; full treatment in Appendix G (2026-09-25).** The tightest null in the project, parameter-matched, at ~10x the cost. **Constraint on scope: α stays shut in the parameter-matched bypass control as well as in the mesh arm, so what the gate measured is the correction branch's failure to optimise — not "mesh adaptation does not transfer to GA". Weight decay is refuted as the cause.**
 - **Patient covariates** — both instruments agree, neither graduates, and the residual points against them.
 - **The learned coefficient surrogate** — null at every width over an 8x range, at 30-55 % more compute.
 - **Capacity** — the width-32 U-Net (~50x the canonical model) erases its own smaller twin's win.
@@ -177,7 +181,7 @@ Reported as findings, not as failures, each with its instrument and its scope.
 - **Every GNN-internal knob** — normalisation, aggregation, edge-direction features. The geometry mattered; the message function did not.
 - **The intermediate-time-point regulariser** — evaluated and removed.
 
-### 5.5 Moving mesh quality
+### 5.5 ~~Moving mesh quality~~ → moved to Appendix G (2026-09-25); §5.6–§5.8 renumber accordingly
 The DMM judged on its own terms, independent of whether the dual branch helped: equidistribution CoV, tangled-cell counts, geometric quality, capacity/overfitting behaviour across branch architectures and seeds. Visualise example moved meshes overlaid on sample states. This is what licenses the §5.4 null being read as "the correction branch did not engage" rather than "the mesh was bad".
 
 ### 5.6 Validity diagnostics
@@ -189,7 +193,7 @@ Results that are not accuracy numbers but that determine what may be said.
 Per-eye rollout visualizations. Success cases and failure modes (atypical progression, sparse schedules, very short vs long $\Delta t$, border-censored lesions). Comparison against Mai et al. 2024 on the same cohort and task, **with the mandatory caveat that this model consumes pre-segmented masks whereas Mai works from raw OCT** — which is part of why a local model suffices here.
 
 ### 5.8 Computational cost
-Training time, inference time per rollout step, memory footprint, per arm, under the stated cost convention. The three estimator-independent ratios (dual/single ≈ 10x, RK4/Euler ≈ 4.8x, T-FEN/stencil ≈ 4x) and the cheapest-arm comparison.
+Training time, inference time per rollout step, memory footprint, per arm, under the stated cost convention. The estimator-independent ratios (RK4/Euler ≈ 4.8x, T-FEN/stencil ≈ 4x; dual/single ≈ 10x is reported in Appendix G) and the cheapest-arm comparison.
 
 ## 6. Discussion (~6-9 pages)
 
@@ -214,8 +218,9 @@ BibTeX file. Expect 40-80 references: clinical GA literature, OCT imaging, PDE n
 ## Appendices
 
 - **A. Dataset details** — Full demographic tables, visit-interval histograms, per-channel statistics, the crop-censoring census, lesion-area and growth-rate distributions.
-- **B. Extended derivations** — Monge-Ampère equation, the monitor function, pushforward stability argument, the Courant/CFL bound used to read the transport velocity.
+- **B. Extended derivations** — pushforward stability argument, the Courant/CFL bound used to read the transport velocity (Monge–Ampère and the monitor function move to Appendix G).
 - **C. Full hyperparameters** — Everything not in the main text: all architecture widths per arm, all training schedules, random seeds, the parameter-matching table.
 - **D. Additional rollout figures** — Extra qualitative examples, including failure cases.
 - **E. Full result tables** — Per-fold and per-eye readouts for every arm and every ablation, not just the headline numbers; both instruments side by side.
 - **F. Code structure** — Brief map of the repository, pointer to GitHub, reproducibility instructions, and the run-identity scheme that maps each reported number to its run.
+- **G. The moving-mesh extension (MM-PDE) — added 2026-09-25.** Reported as an additional experiment: background on Hu et al. (2024) (former §2.5), the DMM for GA and the dual-branch composition with the α gate (former §4.5), the result — the gate never opens, dual − parameter-matched bypass = −0.0001 ± 0.0060, scoped as the correction branch's failure to optimise, not "mesh adaptation does not transfer" (former §5.4 bullet) — the mesh-quality study (former §5.5) and the ~10x cost. The Monge–Ampère and monitor-function derivations from Appendix B move here as well.

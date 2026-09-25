@@ -8,6 +8,8 @@ The work began as an adaptation of two neural PDE solver frameworks — MP-PDE (
 
 The contribution is applied, not methodological: irregular visit intervals ($\Delta t$-conditioned residual operator), multi-channel state (mask + 10 retinal layers), extreme grid anisotropy (~21:1), and the controlled-comparison framework itself. Note that several originally-claimed contributions are now **measured nulls** (patient covariates, the learned surrogate encoder, mesh adaptation / the dual branch, integration order, every GNN-internal knob) — these are reportable negative results, not contributions. Code lives in a separate repository and is treated as read-only reference — DO NOT modify it.
 
+**Decided 2026-09-25:** the research question reads "What is needed to forecast the progression of GA from longitudinal OCT? (1) What kind of framework does the forecast need? (2) What kind of operator does that framework need?", and **everything MM-PDE (mesh mover, dual branch, α gate, mesh quality) is reported in an appendix** as an additional experiment, not in the main chapters. See THESIS_STRUCTURE.md → Framing.
+
 ## Context Files
 
 - See @THESIS_STRUCTURE.md for the chapter outline. Confirm where requested content belongs before writing.

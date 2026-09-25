@@ -162,8 +162,11 @@ wrong / to change". The author asked for no shortening yet; cuts wait for a late
 
 - [ ] Author decision (2026-09-25): **everything MM-PDE moves to the appendix** as an
   additional experiment — the mesh mover (DMM), the dual branch, the α-gate result and the
-  mesh-quality study. Affects §2.5, §4.5, §5.4 (mesh null) and §5.5. `THESIS_STRUCTURE.md`
-  not yet updated and no chapter text moved; do both when the author says so.
+  mesh-quality study. Affects §2.5, §4.5, §5.4 (mesh null) and §5.5.
+  2026-09-25: `THESIS_STRUCTURE.md` updated (Framing revision, §2.5/§4.5/§5.5 marked as moved,
+  new Appendix G), plus short notes in `CLAUDE.md` and `README.md`. The mirrors
+  (`PROJECT_CONTEXT.md`, `THESIS_FRAMEWORK.md`) are code-side and untouched. **Still open:**
+  moving the drafted `02-background.tex` §2.5 text into `91-appendix.tex`.
 - [x] §1.1: split the first sentence after "industrialised countries". Done 2026-09-25.
 - [x] §1.1: "Crucially, AMD is not classified as avoidable…" — author clarified: keep the
   content, fix the construction. Rewritten 2026-09-25 (avoidable-cause list checked against
