@@ -298,7 +298,7 @@ Being worked through one item at a time.
 - [x] #16 §2.3 remove the Graph U-Nets (Gao & Ji) sentence — "not used, no?" Done 2026-09-26
   (sentence and its Gao2019 marker removed from §2.3). Author: the graph U-Net arm "was more
   of a test than serious" and showed nothing significant.
-- [ ] TODO (follow-up to #16, decision needed): the graph U-Net arm is still a full arm in
+- [x] (2026-09-26: author decided the arm stays in Chapter 4 for now) TODO (follow-up to #16, decision needed): the graph U-Net arm is still a full arm in
   `04-method.tex` (overview list l.41, l.492/502/530, own subsection §4.4.3 "The Graph U-Net
   and the Locality Floors" with the Gao & Ji disambiguation, parameter table l.911) and in the
   project framing ("nine settings, six architecture classes"). Decide whether to keep it as
@@ -323,14 +323,17 @@ Being worked through one item at a time.
   for GA, dual branch + α gate, the null result with its scope, mesh-quality study, ~10×
   cost. Chapters 4 and 5 still contain the MM-PDE sections to be moved ("The Moving-Mesh
   Extension as a Tested Hypothesis" §4.5, "Moving Mesh Quality" §5.5).
-- [ ] #23 §2.5 related work: add related work for all other surveyed methods. Postponed
+- [x] #23 §2.5 related work: add related work for all other surveyed methods. Done 2026-09-26
+  (after first being postponed): one paragraph naming the original source of every method in
+  the operator slot, pointing to §4.4. Previously postponed
   2026-09-26; inline `% TODO` placed at the end of Related Work (U-Net, FNO + hybrid, FENs,
   RK / Neural-ODE). Needs a literature search first.
 - [x] #24–#26 §3.1 remove "HRF SPEC"/device-model sentences, the Spectralis-inference sentence
   ("useless information"), and the 100-identifier / 49-without-data sentences. Done
   2026-09-26: the Mai et al. (2024) Spectralis sentence and the device-model TODO are kept;
   the patient paragraph now opens "The 75 eyes come from 51 patients: …".
-- [ ] TODO (follow-up to #26): §3.7 still explains the split over "the universe of 100 patient
+- [x] (2026-09-26: author wants no more than "75 eyes from 51 patients"; §3.7 text, Table 3.3
+  caption and the test-split paragraph no longer mention the 100-identifier universe) TODO (follow-up to #26): §3.7 still explains the split over "the universe of 100 patient
   identifiers", 80/20 per fold, and "Only 51 of the 100 patients have scans". That is where
   the uneven per-fold eye counts come from, so it may be needed there; author to decide
   whether it stays in §3.7.
@@ -892,6 +895,17 @@ marker itself; `THESIS_FRAMEWORK.md` §10.1 carries verified entries for all of 
   Equations*, Springer, Texts in Applied Mathematics vol. 64, 2016,
   doi:10.1007/978-3-319-32354-1. §2.2.3, origin of the "splitter field" remark quoted via
   MP-PDE.
+- [ ] TODO: cite **Scarselli2009** -- Scarselli, Gori, Tsoi, Hagenbuchner & Monfardini, "The
+  Graph Neural Network Model", *IEEE Trans. Neural Networks* 20(1):61-80, 2009,
+  doi:10.1109/TNN.2008.2005605. §2.5 related work (origin of GNNs).
+- [ ] TODO: cite **Runge1895** -- Runge, "Ueber die numerische Auflösung von
+  Differentialgleichungen", *Mathematische Annalen* 46:167-178, 1895, doi:10.1007/BF01446807.
+  §2.5 related work (origin of Runge-Kutta).
+- [ ] TODO: cite **Kutta1901** -- Kutta, "Beitrag zur näherungsweisen Integration totaler
+  Differentialgleichungen", *Zeitschrift für Mathematik und Physik* 46:435-453, 1901 (no DOI).
+  §2.5 related work (origin of Runge-Kutta).
+- [ ] Note (2026-09-26): the §2.5 related-work paragraph also uses the already-pending
+  **Gilmer2017, Ronneberger2015, Li2021, LiuSchiaffini2024, Lienen2022, Chen2018**.
 - [ ] Note (2026-09-26): **LeVeque2002** now also backs the FVM sentence in §2.2.1 (replacing
   Brandstetter2022); add doi:10.1017/CBO9780511791253 when the entry is created.
 - [ ] Note (2026-09-25): the §2.2 rework also uses the already-listed markers

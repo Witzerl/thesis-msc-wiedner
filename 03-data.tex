@@ -397,18 +397,16 @@ The evaluation protocol is defined in~\S\ref{sec:experiments:protocol}.
 \label{sec:data:splits}
 
 The data is partitioned by five split files that define a patient-level
-5-fold cross-validation over the universe of 100 patient identifiers. In
-each fold, 80 patients are assigned to training and 20 to validation.
-The five validation sets do not overlap, and together they cover the
-whole universe. The split identifiers carry no eye suffix, so both eyes
+5-fold cross-validation. The five validation sets do not overlap, and
+together they cover all patients. The split identifiers carry no eye
+suffix, so both eyes
 of a patient always fall into the same partition. This prevents leakage
 between the eyes of one patient, which matters because GA is frequently
 bilateral with strongly correlated eyes
 (\S\ref{sec:background:ga-oct:muw}).
 
-Only 51 of the 100 patients have scans. The per-fold eye counts are
-therefore uneven, although the patient split is balanced.
-Table~\ref{tab:data:splits} lists them. On fold~2, the split yields 378
+The per-fold eye counts are uneven; Table~\ref{tab:data:splits} lists
+them. On fold~2, the split yields 378
 training windows and 100 validation windows.
 % TODO: record the training and validation window counts for folds 0,
 % 1, 3 and 4.
@@ -417,9 +415,8 @@ training windows and 100 validation windows.
   \centering
   \caption[Eyes per cross-validation fold.]{%
     Number of training and validation eyes in each of the five
-    cross-validation folds. Each fold assigns 80 of the 100 patient
-    identifiers to training and 20 to validation; the eye counts are
-    uneven because 49 of the identifiers have no scans.}
+    cross-validation folds. The split is made at the patient level, so
+    both eyes of a patient always fall into the same partition.}
   \label{tab:data:splits}
   \begin{tabular}{lrr}
     \toprule
@@ -436,8 +433,7 @@ training windows and 100 validation windows.
 
 The test split is structurally empty. An eye whose patient appeared in
 neither the training nor the validation list would be assigned to a test
-partition. However, every patient with scans lies inside the
-100-identifier universe, and every identifier is assigned to training or
+partition. However, every patient with scans is assigned to training or
 validation in every fold. No test partition is therefore ever produced.
 The protocol is 5-fold train/validation cross-validation, and every
 result reported in this thesis is a validation result.
