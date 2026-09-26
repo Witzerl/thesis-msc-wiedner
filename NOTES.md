@@ -794,17 +794,17 @@ marker itself; `THESIS_FRAMEWORK.md` §10.1 carries verified entries for all of 
   Multi-spatiotemporal-scale Generalized PDE Modeling" (PDEArena). Used in §2.3 as the
   evidence that a U-Net is a standard strong surrogate baseline in the neural-PDE
   literature.
-- [ ] TODO: cite **LiuSchiaffini2024** -- Liu-Schiaffini, Berner, Bonev, Kurth,
+- [x] (added to references.bib 2026-09-26, details checked) TODO: cite **LiuSchiaffini2024** -- Liu-Schiaffini, Berner, Bonev, Kurth,
   Azizzadenesheli & Anandkumar, *ICML* 2024, "Neural Operators with Localized Integral and
   Differential Kernels". Used in §2.3 for the local-kernel bypass over a global operator.
 - [ ] TODO: cite **Gao2019** -- Gao & Ji, *ICML* 2019, "Graph U-Nets". Used in §2.3 as the
   multi-scale counterpart on graphs. Note for §4.4: the repository's own `GAGraphUNet` is
   an image pyramid with a graph operator per block, **not** this work's learned node-score
   pooling — cite it as a disambiguation there, not as the method used.
-- [ ] TODO: cite **Lienen2022** -- Lienen & Günnemann, *ICLR* 2022, "Learning the Dynamics
+- [x] (added to references.bib 2026-09-26, details checked) TODO: cite **Lienen2022** -- Lienen & Günnemann, *ICLR* 2022, "Learning the Dynamics
   of Physical Systems from Sparse Observations with Finite Element Networks". Used in §2.3
   and needed again in §4.4 for the FEN / T-FEN arm.
-- [ ] TODO: cite **Chen2018** -- Chen, Rubanova, Bettencourt & Duvenaud, *NeurIPS* 2018,
+- [x] (added to references.bib 2026-09-26, details checked) TODO: cite **Chen2018** -- Chen, Rubanova, Bettencourt & Duvenaud, *NeurIPS* 2018,
   "Neural Ordinary Differential Equations". Used in §2.3 for the Neural-ODE reading of a
   residual update, and in §4.2.1 for the caution that the Euler form does not make
   f_theta a rate; needed again in §4.4 for the Runge--Kutta wrapper.
@@ -824,7 +824,7 @@ marker itself; `THESIS_FRAMEWORK.md` §10.1 carries verified entries for all of 
   Solution", arXiv:1807.03247. Used in §4.4.1 for the coordinate input channels.
 - [ ] TODO: cite **Wu2018** -- Wu & He, *ECCV* 2018, "Group Normalization", arXiv:1803.08494.
   Used in §4.4.2 for the U-Net / graph U-Net normalisation.
-- [ ] TODO: cite **Gilmer2017** -- Gilmer, Schoenholz, Riley, Vinyals & Dahl, *ICML* 2017,
+- [x] (added to references.bib 2026-09-26, details checked) TODO: cite **Gilmer2017** -- Gilmer, Schoenholz, Riley, Vinyals & Dahl, *ICML* 2017,
   "Neural Message Passing for Quantum Chemistry", arXiv:1704.01212. Used in §4.4.3.
 - [ ] TODO: cite **Courant1928** -- Courant, Friedrichs & Lewy, "Über die partiellen
   Differenzengleichungen der mathematischen Physik", *Mathematische Annalen* 100(1):32-74,
@@ -904,7 +904,7 @@ marker itself; `THESIS_FRAMEWORK.md` §10.1 carries verified entries for all of 
 - [x] (added to references.bib 2026-09-26) TODO: cite **Kutta1901** -- Kutta, "Beitrag zur näherungsweisen Integration totaler
   Differentialgleichungen", *Zeitschrift für Mathematik und Physik* 46:435-453, 1901 (no DOI).
   §2.5 related work (origin of Runge-Kutta).
-- [ ] Note (2026-09-26): the §2.5 related-work paragraph also uses the already-pending
+- [x] (all six added 2026-09-26) Note (2026-09-26): the §2.5 related-work paragraph also uses the already-pending
   **Gilmer2017, Ronneberger2015, Li2021, LiuSchiaffini2024, Lienen2022, Chen2018**.
 - [x] (LeVeque2002 added to references.bib 2026-09-26) Note (2026-09-26): **LeVeque2002** now also backs the FVM sentence in §2.2.1 (replacing
   Brandstetter2022); add doi:10.1017/CBO9780511791253 when the entry is created.
@@ -923,10 +923,10 @@ External references introduced inline in the LaTeX drafts that still need to be 
 - [ ] TODO: cite **Wong2014** -- Wong et al., *Lancet Glob Health* 2014, "Global prevalence of age-related macular degeneration and disease burden projection for 2020 and 2040." Used in `01-introduction.tex` §1.1 opening to support "leading cause of irreversible central vision loss in industrialised countries."
 - [ ] TODO: cite **SchmidtErfurth2018** -- Schmidt-Erfurth et al., *IOVS* 2018, "Prediction of individual disease conversion in early AMD using artificial intelligence." Used in `01-introduction.tex` §1.2 as an AI-on-OCT precedent for cohort-level conversion prediction.
 - [ ] TODO: cite **Bogunovic2017** -- Bogunović et al., *IOVS* 2017, "Machine learning of the progression of intermediate AMD based on OCT imaging." Used in `01-introduction.tex` §1.2 alongside SchmidtErfurth2018 as the supervisor's institutional AI-on-OCT precedent. (Earlier draft of `02-background.tex` §2.1.4 also cited it for the MUW segmentation pipeline; that usage was removed on 2026-05-02 because the MUW pipeline provenance is not actually established by this reference --- if confirmed, restore that usage in `03-data.tex` §3.1 instead.)
-- [ ] TODO: cite **Ronneberger2015** -- Ronneberger et al., *MICCAI* 2015, "U-Net: Convolutional Networks for Biomedical Image Segmentation." Used in `01-introduction.tex` §1.2 to anchor the "standard U-Net" baseline mention. (2026-09-25: that §1.2 sentence was removed; still needed for §2.3 and §4.4.)
+- [x] (added to references.bib 2026-09-26, details checked) TODO: cite **Ronneberger2015** -- Ronneberger et al., *MICCAI* 2015, "U-Net: Convolutional Networks for Biomedical Image Segmentation." Used in `01-introduction.tex` §1.2 to anchor the "standard U-Net" baseline mention. (2026-09-25: that §1.2 sentence was removed; still needed for §2.3 and §4.4.)
 - [ ] TODO: cite **Battaglia2018** -- Battaglia et al., 2018, "Relational inductive biases, deep learning, and graph networks." Used in `01-introduction.tex` §1.3 to attribute the encode--process--decode GNN pattern. (2026-09-25: that §1.3 sentence was removed; the marker went with it. Still relevant for §2.4.)
 - [ ] TODO: cite **SanchezGonzalez2020** -- Sanchez-Gonzalez et al., *ICML* 2020, "Learning to simulate complex physics with graph networks." Used in `01-introduction.tex` §1.3 alongside Battaglia2018 for the encode--process--decode pattern. (2026-09-25: that §1.3 sentence was removed; still relevant for §2.4.)
-- [ ] TODO: cite **Li2021** (FNO) and **Lu2021** (DeepONet) -- needed for `02-background.tex` §2.3 (autoregressive vs operator-style neural solvers). (2026-09-25: the conditional §1.3 acknowledgement is moot; §1.3 names no architecture.)
+- [ ] (Li2021 added to references.bib 2026-09-26; Lu2021 still pending) TODO: cite **Li2021** (FNO) and **Lu2021** (DeepONet) -- needed for `02-background.tex` §2.3 (autoregressive vs operator-style neural solvers). (2026-09-25: the conditional §1.3 acknowledgement is moot; §1.3 names no architecture.)
 - [ ] TODO: cite **Sadda2018** -- Sadda et al., *Ophthalmology* 2018, "Consensus Definition for Atrophy Associated with Age-Related Macular Degeneration on OCT: Classification of Atrophy Report 3." Used in `02-background.tex` §2.1.1 as the primary source for the cRORA criteria currently attributed only to Vallino2024.
 - [ ] TODO: cite **Huang1991** -- Huang et al., *Science* 254:1178-1181, "Optical Coherence Tomography." Used in `02-background.tex` §2.1.2 to anchor the introduction of OCT as the canonical methodological-origin reference for the modality.
 - [ ] TODO: cite an SD-OCT principle reference (e.g. **Wojtkowski2002** or **Drexler2008**) once added to `references.bib`. Used in `02-background.tex` §2.1.2 to support the spectral-domain OCT principle behind the SD-OCT acquisition platform.

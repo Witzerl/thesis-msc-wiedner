@@ -154,14 +154,11 @@ Equation~\eqref{eq:method:residual-update} has the form of an explicit Euler
 step (\S\ref{sec:background:pde-solvers:time}) and generalises the residual
 update of MP-PDE (\S\ref{sec:background:mp-pde}) to a variable step. This
 resemblance needs a caution.
-% TODO: cite Chen2018 (Chen, Rubanova, Bettencourt & Duvenaud, "Neural
-% Ordinary Differential Equations", NeurIPS 2018, arXiv:1806.07366)
 % TODO: cite Ott2021 (Ott, Katiyar, Hennig & Tiemann, "ResNet After All:
 % Neural ODEs and Their Numerical Solution", ICLR 2021, arXiv:2007.15386)
 The Euler form does not by itself make $f_\theta$ a time derivative or a
 rate of change. A network trained with this update need not be a consistent
-discretisation of any continuous-time system (Chen et al., 2018; Ott et
-al., 2021). This thesis therefore does not assume such a reading. Whether
+discretisation of any continuous-time system (\citealp{Chen2018}; Ott et al., 2021). This thesis therefore does not assume such a reading. Whether
 any of the models behaves as a continuous-time system is tested separately
 in Chapter~\ref{ch:experiments}.
 
@@ -550,10 +547,7 @@ precision-matched (\S\ref{sec:method:implementation}).
 \subsection{Dense Operators: U-Net, FNO and a Local-Kernel Hybrid}
 \label{sec:method:family:dense}
 
-% TODO: cite Ronneberger2015 (Ronneberger, Fischer & Brox, "U-Net:
-% Convolutional Networks for Biomedical Image Segmentation", MICCAI 2015,
-% arXiv:1505.04597)
-The first dense operator is a U-Net (Ronneberger et al., 2015). The
+The first dense operator is a U-Net \citep{Ronneberger2015}. The
 original was designed for biomedical image segmentation. It consists of a
 contracting and an expansive path. Each contracting step applies two
 unpadded $3 \times 3$ convolutions, each followed by a ReLU, and then a
@@ -597,11 +591,7 @@ than class scores. Two widths are used: a base width of five gives
 83\,081 parameters (the parameter-matched arm), and a base width of 32 gives
 3\,354\,347 (the capacity control).
 
-% TODO: cite Li2021 (Li, Kovachki, Azizzadenesheli, Liu, Bhattacharya,
-% Stuart & Anandkumar, "Fourier Neural Operator for Parametric Partial
-% Differential Equations", ICLR 2021, arXiv:2010.08895)
-The second dense operator is the Fourier Neural Operator (FNO) of Li et al.
-(2021). The input is first lifted to a wider representation by a local
+The second dense operator is the Fourier Neural Operator (FNO) of \citet{Li2021}. The input is first lifted to a wider representation by a local
 map. Each layer then combines a local linear transform with a non-local
 integral operator and applies a nonlinearity. The integral operator
 transforms its input to Fourier space, multiplies the retained low modes by
@@ -635,10 +625,7 @@ retained mode index, 13, gives a finest retained wavelength of about
 ablated.
 
 The third dense operator is a local-kernel hybrid.
-% TODO: cite LiuSchiaffini2024 (Liu-Schiaffini, Berner, Bonev, Kurth,
-% Azizzadenesheli & Anandkumar, "Neural Operators with Localized Integral
-% and Differential Kernels", ICML 2024, arXiv:2402.16845)
-Liu-Schiaffini et al. (2024) observe that global operations in Fourier
+\citet{LiuSchiaffini2024} observe that global operations in Fourier
 space are prone to over-smoothing and may miss local details. They add
 localised operators in parallel to the Fourier layers and the pointwise
 path. Their differential kernels subtract the kernel mean and rescale by the
@@ -674,12 +661,9 @@ graph. The model has 72\,713 parameters.
 Against the U-Net, this architecture isolates the operator class at a fixed
 multiscale pyramid. Against the graph solver of~\S\ref{sec:method:mppde}, it
 isolates the pyramid at a fixed operator class.
-% TODO: cite Gilmer2017 (Gilmer, Schoenholz, Riley, Vinyals & Dahl,
-% "Neural Message Passing for Quantum Chemistry", ICML 2017,
-% arXiv:1704.01212)
 One caveat applies. A message function that is shared across offsets and
 receives the offset as an input is the standard message-passing
-construction (Gilmer et al., 2017), but it is not a strict superset of a
+construction \citep{Gilmer2017}, but it is not a strict superset of a
 $3 \times 3$ convolution, which has a separate weight matrix for every
 offset. The comparison therefore probes the question whether a convolution
 is a one-hop graph layer in one direction only.
@@ -703,10 +687,7 @@ rounds.
 \subsection{The Finite Element Network}
 \label{sec:method:family:fen}
 
-% TODO: cite Lienen2022 (Lienen & Günnemann, "Learning the Dynamics of
-% Physical Systems from Sparse Observations with Finite Element Networks",
-% ICLR 2022, arXiv:2203.08852)
-The Finite Element Network (FEN) of Lienen and G\"unnemann (2022) builds the
+The Finite Element Network (FEN) of \citet{Lienen2022} builds the
 update from a finite-element discretisation of an unknown PDE. It is the only
 member of the family whose output is defined as a time derivative by
 construction rather than as a next state. This is a property of the
@@ -831,10 +812,8 @@ of the conditioning vector is set to zero inside the wrapper, so $f_\theta$
 becomes a right-hand side that does not depend on the interval, and
 $\Delta t$ only sets the integration horizon. The positions, the graph edges
 and the covariates of a graph stay fixed across the stages of one step.
-% TODO: cite Chen2018 (Chen, Rubanova, Bettencourt & Duvenaud, "Neural
-% Ordinary Differential Equations", NeurIPS 2018, arXiv:1806.07366)
 This is the reading under which the wrapped model is a Neural ODE in the
-sense of Chen et al. (2018). If the sub-step length is fed in place of zero,
+sense of \citet{Chen2018}. If the sub-step length is fed in place of zero,
 the wrapper instead acts as a learned Runge--Kutta integrator, which reduces
 to the canonical operator for a single Euler step. The wrapper applies to
 single-branch models only and requires the $\Delta t$-multiplied residual

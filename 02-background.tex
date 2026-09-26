@@ -861,10 +861,7 @@ Neural operators take several structural forms. Finite-dimensional
 variants are bound to the specific grid geometry they were trained on.
 Infinite-dimensional variants decouple the learned operator from the
 spatial discretisation altogether.
-% TODO: cite Li2021 (Li, Kovachki, Azizzadenesheli, Liu, Bhattacharya,
-% Stuart & Anandkumar, "Fourier Neural Operator for Parametric Partial
-% Differential Equations", ICLR 2021)
-The Fourier Neural Operator (Li et al., 2021) parameterises a kernel
+The Fourier Neural Operator \citep{Li2021} parameterises a kernel
 integral operator in the Fourier domain. This formulation gives the
 network global spatial support in a single layer.
 % TODO: cite Lu2021 (Lu, Jin, Pang, Zhang & Karniadakis, "Learning
@@ -897,42 +894,31 @@ proposed to mitigate it.
 
 Beyond graph networks, several distinct architecture families are used
 as PDE surrogates.
-% TODO: cite Ronneberger2015 (Ronneberger, Fischer & Brox, "U-Net:
-% Convolutional Networks for Biomedical Image Segmentation",
-% MICCAI 2015, pp. 234-241)
 % TODO: cite Gupta2023 (Gupta & Brandstetter, "Towards
 % Multi-spatiotemporal-scale Generalized PDE Modeling", TMLR 2023)
-The U-Net (Ronneberger et al., 2015) is an encoder-decoder
+The U-Net \citep{Ronneberger2015} is an encoder-decoder
 architecture with skip connections and a multi-scale receptive field.
 Although originally introduced for biomedical image segmentation, it
 serves as a standard strong surrogate baseline in the neural-PDE
 literature (Gupta \& Brandstetter, 2023).
-% TODO: cite LiuSchiaffini2024 (Liu-Schiaffini, Berner, Bonev, Kurth,
-% Azizzadenesheli & Anandkumar, "Neural Operators with Localized
-% Integral and Differential Kernels", ICML 2024)
 Surrogate architectures also vary fundamentally in their spatial
 context. Global spectral operators, such as the Fourier Neural
 Operator, contrast directly with local convolutional or
 message-passing operators. Hybrid architectures combine these
 properties by adding a small local kernel bypass to a global operator
 to capture high-frequency details more effectively
-(Liu-Schiaffini et al., 2024).
-% TODO: cite Lienen2022 (Lienen & Gunnemann, "Learning the Dynamics of
-% Physical Systems from Sparse Observations with Finite Element
-% Networks", ICLR 2022)
-Finite Element Networks (Lienen \& G\"unnemann, 2022) adopt a different
+\citep{LiuSchiaffini2024}.
+Finite Element Networks \citep{Lienen2022} adopt a different
 numerical perspective, building the neural update directly from a
 learned finite-element discretisation and carrying an explicit
 transport (advection) term.
-% TODO: cite Chen2018 (Chen, Rubanova, Bettencourt & Duvenaud, "Neural
-% Ordinary Differential Equations", NeurIPS 2018)
 % TODO: cite Ott2021 (Ott, Katiyar, Hennig & Tiemann, "ResNet After
 % All: Neural ODEs and Their Numerical Solution", ICLR 2021)
 % TODO: cite Krishnapriyan2023 (Krishnapriyan, Queiruga, Erichson &
 % Mahoney, "Learning continuous models for continuous physics",
 % Communications Physics 6:319, 2023)
 Finally, because a residual step resembles one explicit Euler step, a
-Neural-ODE reading is sometimes applied (Chen et al., 2018). Under
+Neural-ODE reading is sometimes applied \citep{Chen2018}. Under
 this interpretation, a higher-order integrator such as a Runge--Kutta
 scheme can in principle replace the residual step. It must be stated
 plainly that this reading is only legitimate if the trained model is
@@ -1116,24 +1102,19 @@ inductive biases.
 The application of neural PDE solvers to biomedical problems remains
 sparse.
 
-% TODO: cite Gilmer2017, Ronneberger2015, Li2021, LiuSchiaffini2024,
-% Lienen2022 and Chen2018 (full details in NOTES.md, "Pending external
-% citations") once added to references.bib.
 The architectures that fill the operator slot of
 Chapter~\ref{ch:method} originate in different lines of work. The
 graph solvers build on the graph neural network model of
-\citet{Scarselli2009} and the message-passing formulation of Gilmer et al. (2017),
+\citet{Scarselli2009} and the message-passing formulation of \citet{Gilmer2017},
 brought to PDEs by \citet{Brandstetter2022}. The U-Net was introduced
-by Ronneberger et al. (2015) for biomedical image segmentation, the
-Fourier Neural Operator by Li et al. (2021), and its extension with
-local kernels by Liu-Schiaffini et al. (2024). Finite Element Networks,
-including their transport term, go back to Lienen \& G\"unnemann
-(2022). The graph U-Net arm has no single source; it combines the
+by \citet{Ronneberger2015} for biomedical image segmentation, the
+Fourier Neural Operator by \citet{Li2021}, and its extension with
+local kernels by \citet{LiuSchiaffini2024}. Finite Element Networks,
+including their transport term, go back to \citet{Lienen2022}. The graph U-Net arm has no single source; it combines the
 U-Net pyramid with message-passing layers. Fixed-step integration of a
 learned vector field uses the classical methods of \citet{Runge1895}
 and \citet{Kutta1901}, and the reading of a network as the right-hand side of an
-ordinary differential equation follows the Neural ODEs of Chen et al.
-(2018). How each of these is adapted to the GA setting is described
+ordinary differential equation follows the Neural ODEs of \citet{Chen2018}. How each of these is adapted to the GA setting is described
 in~\S\ref{sec:method:family}.
 
 
