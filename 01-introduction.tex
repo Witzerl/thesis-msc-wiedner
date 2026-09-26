@@ -8,12 +8,8 @@
 \section{Clinical Motivation}
 \label{sec:introduction:motivation}
 
-% TODO: cite Wong2014 (Lancet Glob Health) once added to references.bib --
-% canonical reference for AMD as the leading cause of irreversible central
-% vision loss in industrialised countries; currently the sentence rests
-% indirectly on Flaxman2020.
 Age-related macular degeneration (AMD) is the leading cause of irreversible
-central vision loss in older adults in industrialised countries. Worldwide,
+central vision loss in older adults in industrialised countries \citep{Wong2014}. Worldwide,
 it ranks as the third most frequent cause of moderate-to-severe vision
 impairment and the fourth most frequent cause of blindness
 \citep{Flaxman2020}. Roughly 200~million people are
@@ -76,14 +72,8 @@ underlying retinal layer geometry are traced; given the most recent observed
 state and a target horizon $\Delta t$, the goal is to predict the full
 spatial configuration of the lesion at the future visit. This differs from
 earlier deep-learning work on AMD, which predicts when an eye will convert to
-a later disease stage \citep{Vogl2021}. The output here is not a single risk
+a later disease stage \citep{SchmidtErfurth2018, Vogl2021}. The output here is not a single risk
 score but a complete map of the lesion at the next visit.
-% TODO: cite SchmidtErfurth2018 (IOVS, "Prediction of individual disease
-% conversion in early AMD using artificial intelligence") and
-% Bogunovic2017 (IOVS, "Machine learning of the progression of intermediate
-% AMD based on OCT imaging") once added to references.bib -- both are
-% direct AI-on-OCT precedents for the cohort-level conversion framing,
-% Bogunovic is the supervisor's own institutional precedent.
 
 The clinical reality of OCT follow-up imposes three properties on the data
 that a model has to deal with. First, follow-up visits are
@@ -253,17 +243,17 @@ The work presented in this thesis makes the following contributions:
 \label{sec:introduction:outline}
 
 The remainder of this thesis is organised as follows.
-Chapter~ef{ch:background} introduces GA and OCT imaging, the numerical
+Chapter~\ref{ch:background} introduces GA and OCT imaging, the numerical
 ideas that learned PDE solvers build on, and the families of learned models
-considered in this work. Chapter~ef{ch:data} describes the Medical
+considered in this work. Chapter~\ref{ch:data} describes the Medical
 University of Vienna GA cohort and how each visit is turned into an
-eleven-channel state. Chapter~ef{ch:method} addresses the first part of
+eleven-channel state. Chapter~\ref{ch:method} addresses the first part of
 the research question by developing the framework, and describes the models
-that fill its one free component. Chapter~ef{ch:experiments} addresses the
+that fill its one free component. Chapter~\ref{ch:experiments} addresses the
 second part by comparing these models on equal terms.
-Chapter~ef{ch:discussion} discusses what the results mean clinically and
+Chapter~\ref{ch:discussion} discusses what the results mean clinically and
 methodologically, together with their limitations, and
-Chapter~ef{ch:conclusion} concludes. The appendix reports an additional
+Chapter~\ref{ch:conclusion} concludes. The appendix reports an additional
 experiment with an adaptive moving mesh.
 
 

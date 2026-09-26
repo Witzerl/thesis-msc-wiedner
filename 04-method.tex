@@ -154,11 +154,9 @@ Equation~\eqref{eq:method:residual-update} has the form of an explicit Euler
 step (\S\ref{sec:background:pde-solvers:time}) and generalises the residual
 update of MP-PDE (\S\ref{sec:background:mp-pde}) to a variable step. This
 resemblance needs a caution.
-% TODO: cite Ott2021 (Ott, Katiyar, Hennig & Tiemann, "ResNet After All:
-% Neural ODEs and Their Numerical Solution", ICLR 2021, arXiv:2007.15386)
 The Euler form does not by itself make $f_\theta$ a time derivative or a
 rate of change. A network trained with this update need not be a consistent
-discretisation of any continuous-time system (\citealp{Chen2018}; Ott et al., 2021). This thesis therefore does not assume such a reading. Whether
+discretisation of any continuous-time system \citep{Chen2018, Ott2021}. This thesis therefore does not assume such a reading. Whether
 any of the models behaves as a continuous-time system is tested separately
 in Chapter~\ref{ch:experiments}.
 
@@ -272,18 +270,12 @@ messages. The canonical configuration uses two message-passing rounds and
 a hidden width of 64. This capacity is a configuration choice based on
 experiments reported in Chapter~\ref{ch:experiments}.
 
-% TODO: cite Ba2016 (Ba, Kiros & Hinton, "Layer Normalization",
-% arXiv:1607.06450, 2016)
-% TODO: cite Ioffe2015 (Ioffe & Szegedy, "Batch Normalization:
-% Accelerating Deep Network Training by Reducing Internal Covariate
-% Shift", ICML 2015, arXiv:1502.03167)
-All normalisation layers are per-node layer normalisations (Ba et al.,
-2016). Each node is normalised over its own feature vector. No running
+All normalisation layers are per-node layer normalisations \citep{Ba2016}. Each node is normalised over its own feature vector. No running
 statistics are kept, and no nodes or graphs are coupled, so the operator is
 identical in training and in evaluation. This matters because of the
 training curriculum of~\S\ref{sec:method:training}, which rolls the model
 forward on its own predictions without gradients but in training mode.
-Batch normalisation (Ioffe \& Szegedy, 2015) would normalise these drifted
+Batch normalisation \citep{Ioffe2015} would normalise these drifted
 states with the statistics of the current batch. This would erase the very
 perturbation the curriculum is meant to expose the model to. It would also
 write the drifted statistics into the running estimates that evaluation
@@ -528,11 +520,7 @@ Neural Operator and the graph U-Net --- receive identical inputs. Each takes
 sixteen input channels: the eleven state channels, $\Delta t$ broadcast as a
 constant plane, the two covariates broadcast as constant planes, and two
 coordinate ramps running from zero to one along each axis.
-% TODO: cite Liu2018 (Liu, Lehman, Molino, Petroski Such, Frank, Sergeev &
-% Yosinski, "An Intriguing Failing of Convolutional Neural Networks and the
-% CoordConv Solution", NeurIPS 2018, arXiv:1807.03247)
-The coordinate ramps follow the CoordConv construction of Liu et al.
-(2018). Because the inputs are identical, a difference between these three
+The coordinate ramps follow the CoordConv construction of \citet{Liu2018}. Because the inputs are identical, a difference between these three
 arms reflects the operator, not the information it receives.
 
 The three grid operators and the Finite Element Network run as single-branch
@@ -556,25 +544,17 @@ doubles at each downsampling step. Each expansive step upsamples, halves the
 channels with an up-convolution, concatenates the correspondingly cropped
 feature map from the contracting path, and applies two further $3 \times 3$
 convolutions. A final $1 \times 1$ convolution maps to the output classes.
-% TODO: cite Gupta2023 (Gupta & Brandstetter, "Towards
-% Multi-spatiotemporal-scale Generalized PDE Modeling", TMLR 2023,
-% arXiv:2209.15616)
-Gupta and Brandstetter (2023) study modernised U-Nets as PDE surrogates and
+\citet{Gupta2023} study modernised U-Nets as PDE surrogates and
 attribute their strength to handling local and global information through
 the down- and up-sampling paths.
-% TODO: cite Salvi2025 (Salvi et al., "Deep Learning to Predict the Future
-% Growth of Geographic Atrophy from Fundus Autofluorescence", Ophthalmology
-% Science 5(2):100635, 2025)
-In the GA domain, Salvi et al. (2025) predict future lesion growth with a
+In the GA domain, \citet{Salvi2025} predict future lesion growth with a
 two-dimensional U-Net on fundus autofluorescence images.
 
 The U-Net used here departs from the original in four ways. First, each
 convolution is followed by group normalisation with a single group before
 the ReLU; the original uses no normalisation.
-% TODO: cite Wu2018 (Wu & He, "Group Normalization", ECCV 2018,
-% arXiv:1803.08494)
 With one group, group normalisation normalises each sample over all its
-channels and positions and keeps no batch statistics (Wu \& He, 2018). With
+channels and positions and keeps no batch statistics \citep{Wu2018}. With
 nine such blocks --- an input stage, four downsampling and four upsampling
 stages --- the network has 18 normalised convolution sites. Second, pooling
 is anisotropic. The factors (rows, columns) are $(1, 2)$, $(1, 2)$,
@@ -667,9 +647,7 @@ construction \citep{Gilmer2017}, but it is not a strict superset of a
 $3 \times 3$ convolution, which has a separate weight matrix for every
 offset. The comparison therefore probes the question whether a convolution
 is a one-hop graph layer in one direction only.
-% TODO: cite Gao2019 (Gao & Ji, "Graph U-Nets", ICML 2019,
-% arXiv:1905.05178)
-The name is reused: Gao and Ji (2019) introduced Graph U-Nets that pool a
+The name is reused: \citet{Gao2019} introduced Graph U-Nets that pool a
 general graph by selecting nodes with a learned projection score. That
 pooling is not used here; the pyramid is an ordinary image pyramid.
 
@@ -760,12 +738,9 @@ explicit Euler step therefore amplifies every mode for any non-zero velocity,
 and the second-order midpoint and Heun schemes have no stability interval on
 the imaginary axis. Classical RK4 has one, $|\lambda| h \leq 2\sqrt{2}
 \approx 2.83$.
-% TODO: cite Courant1928 (Courant, Friedrichs & Lewy, "Über die partiellen
-% Differenzengleichungen der mathematischen Physik", Mathematische Annalen
-% 100(1):32-74, 1928)
 The implementation checks the Courant number $C = |v| h$ per sub-step
 against this limit, in the spirit of the classical stability condition of
-Courant et al. (1928). The limit is monitored, not enforced during training.
+\citet{Courant1928}. The limit is monitored, not enforced during training.
 % TODO: resolve the RK4 Courant bound for the assembled transport stencil
 % (2.8 as implemented vs ~2.4 derived from the stencil's spectral radius of
 % about 1.1-1.2).
@@ -790,14 +765,7 @@ of any backbone and integrates it over each graph's own interval with an
 explicit Runge--Kutta scheme, stored as a Butcher tableau. It adds no
 parameters. All reported runs use classical fourth-order Runge--Kutta
 (RK4).
-% TODO: cite Butcher1987 (Butcher, "The Numerical Analysis of Ordinary
-% Differential Equations: Runge-Kutta and General Linear Methods", Wiley
-% 1987)
-% TODO: cite Hairer1993 (Hairer, Nørsett & Wanner, "Solving Ordinary
-% Differential Equations I: Nonstiff Problems", Springer, 2nd revised ed.
-% 1993)
-The schemes follow the standard definitions (Butcher, 1987; Hairer et al.,
-1993).
+The schemes follow the standard definitions \citep{Butcher1987, Hairer1993}.
 
 The step is set per graph. It is either the interval divided by a number of
 sub-steps, $h = \Delta t / n$, or it follows from a physical step length in
@@ -822,18 +790,13 @@ observed convergence orders on the test problem $\mathrm{d}u / \mathrm{d}t =
 -\lambda u$ are 0.99, 2.04, 2.04 and 4.35 for the Euler, midpoint, Heun and
 RK4 schemes, close to their nominal orders of one, two, two and four.
 
-% TODO: cite Ott2021 (Ott, Katiyar, Hennig & Tiemann, "ResNet After All:
-% Neural ODEs and Their Numerical Solution", ICLR 2021, arXiv:2007.15386)
-% TODO: cite Krishnapriyan2023 (Krishnapriyan, Queiruga, Erichson &
-% Mahoney, "Learning continuous models for continuous physics",
-% Communications Physics 6:319, 2023, arXiv:2202.08494)
 Because any trained backbone can be integrated with different schemes and
 step counts after training, the wrapper also enables a solver-invariance
-test. Ott et al. (2021) show that a model trained with an overly coarse step
+test. \citet{Ott2021} show that a model trained with an overly coarse step
 can reach high accuracy and still lose its interpretation as an ODE; they
 test this by evaluating the trained model with solvers of equal or smaller
 discretisation error and checking whether its predictions stay the same.
-Krishnapriyan et al. (2023) make the same point for learned models of
+\citet{Krishnapriyan2023} make the same point for learned models of
 physical systems. The test and its outcome are reported in
 Chapter~\ref{ch:experiments}.
 

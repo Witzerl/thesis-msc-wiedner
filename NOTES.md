@@ -259,6 +259,22 @@ wrong / to change". The author asked for no shortening yet; cuts wait for a late
 
 ### Author's tablet review of §2.2–§3.4 (2026-09-26)
 
+- [x] 2026-09-26 bibliography pass: every reference cited in Chapters 1–4 and Appendix G is now
+  in `references.bib` (63 entries) and cited with `\citep`/`\citet`; each entry was checked
+  against the publisher record or the verified list in THESIS_FRAMEWORK.md §10.1. Corrections
+  made on the way: §1.2 "predicts when an eye will convert" now cites Schmidt-Erfurth (2018)
+  next to Vogl (2021) — Bogunović (2017) predicts drusen regression, so it is cited only in
+  §2.5; the cRORA criteria in §2.1.2 now cite the primary source Sadda (2018) next to Vallino;
+  the opening sentence of §1.1 now cites Wong (2014). Only Huang1991 remains uncited.
+- [ ] TODO: §1.2 cites Vogl (2021) for "earlier deep-learning work on AMD, which predicts when
+  an eye will convert to a later disease stage". Vogl (2021) is a topographic GA progression
+  analysis, not a conversion model; check whether it belongs in that sentence.
+- [x] 2026-09-26: repaired six broken `\ref` commands in the §1.5 outline (committed in
+  1280281): the backslash had been turned into a carriage return, so the PDF read "Chapter
+  efch:background". Cause: a scripted edit whose "\\r" collapsed to a carriage return. All
+  .tex files were scanned; no other occurrence.
+
+
 Second handwritten review (build of 2026-09-26, thesis pp. 13–27), decoded from
 `main-thesis_v2_260926_163353.sdocx`: 33 marks. Blue = rewrite, red = wrong/remove.
 Being worked through one item at a time.
@@ -790,14 +806,14 @@ Introduced by the 2026-09-17 Chapter 2 draft (`02-background.tex` §2.3--§2.6).
 matching `% TODO: cite ...` marker in the .tex, with the full bibliographic detail in the
 marker itself; `THESIS_FRAMEWORK.md` §10.1 carries verified entries for all of them.
 
-- [ ] TODO: cite **Gupta2023** -- Gupta & Brandstetter, *TMLR* 2023, "Towards
+- [x] (added to references.bib 2026-09-26, details checked) TODO: cite **Gupta2023** -- Gupta & Brandstetter, *TMLR* 2023, "Towards
   Multi-spatiotemporal-scale Generalized PDE Modeling" (PDEArena). Used in §2.3 as the
   evidence that a U-Net is a standard strong surrogate baseline in the neural-PDE
   literature.
 - [x] (added to references.bib 2026-09-26, details checked) TODO: cite **LiuSchiaffini2024** -- Liu-Schiaffini, Berner, Bonev, Kurth,
   Azizzadenesheli & Anandkumar, *ICML* 2024, "Neural Operators with Localized Integral and
   Differential Kernels". Used in §2.3 for the local-kernel bypass over a global operator.
-- [ ] TODO: cite **Gao2019** -- Gao & Ji, *ICML* 2019, "Graph U-Nets". Used in §2.3 as the
+- [x] (added to references.bib 2026-09-26, details checked) TODO: cite **Gao2019** -- Gao & Ji, *ICML* 2019, "Graph U-Nets". Used in §2.3 as the
   multi-scale counterpart on graphs. Note for §4.4: the repository's own `GAGraphUNet` is
   an image pyramid with a graph operator per block, **not** this work's learned node-score
   pooling — cite it as a disambiguation there, not as the method used.
@@ -808,50 +824,50 @@ marker itself; `THESIS_FRAMEWORK.md` §10.1 carries verified entries for all of 
   "Neural Ordinary Differential Equations". Used in §2.3 for the Neural-ODE reading of a
   residual update, and in §4.2.1 for the caution that the Euler form does not make
   f_theta a rate; needed again in §4.4 for the Runge--Kutta wrapper.
-- [ ] TODO: cite **Ott2021** -- Ott, Katiyar, Hennig & Tiemann, *ICLR* 2021, "ResNet After
+- [x] (added to references.bib 2026-09-26, details checked) TODO: cite **Ott2021** -- Ott, Katiyar, Hennig & Tiemann, *ICLR* 2021, "ResNet After
   All: Neural ODEs and Their Numerical Solution". Used in §2.3 for the solver-invariance
   requirement; needed again in §5.6 for the solver-swap diagnostic.
-- [ ] TODO: cite **Krishnapriyan2023** -- Krishnapriyan, Queiruga, Erichson & Mahoney,
+- [x] (added to references.bib 2026-09-26, details checked) TODO: cite **Krishnapriyan2023** -- Krishnapriyan, Queiruga, Erichson & Mahoney,
   *Communications Physics* 6:319, 2023, "Learning continuous models for continuous
   physics". Used with Ott2021 in §2.3 and §5.6. Cite the 2023 journal year, not the 2022
   preprint.
-- [ ] TODO: cite **HuangRussell2011** -- Huang & Russell, *Adaptive Moving Mesh Methods*,
+- [x] (added to references.bib 2026-09-26, details checked) TODO: cite **HuangRussell2011** -- Huang & Russell, *Adaptive Moving Mesh Methods*,
   Springer, Applied Mathematical Sciences vol. 174, 2011. Used in §2.5 as the classical
   background for moving meshes; also the source of the equidistribution-CoV mesh-quality
   measure needed in §5.5.
-- [ ] TODO: cite **Liu2018** -- Liu, Lehman, Molino, Petroski Such, Frank, Sergeev & Yosinski,
+- [x] (added to references.bib 2026-09-26, details checked) TODO: cite **Liu2018** -- Liu, Lehman, Molino, Petroski Such, Frank, Sergeev & Yosinski,
   *NeurIPS* 2018, "An Intriguing Failing of Convolutional Neural Networks and the CoordConv
   Solution", arXiv:1807.03247. Used in §4.4.1 for the coordinate input channels.
-- [ ] TODO: cite **Wu2018** -- Wu & He, *ECCV* 2018, "Group Normalization", arXiv:1803.08494.
+- [x] (added to references.bib 2026-09-26, details checked) TODO: cite **Wu2018** -- Wu & He, *ECCV* 2018, "Group Normalization", arXiv:1803.08494.
   Used in §4.4.2 for the U-Net / graph U-Net normalisation.
 - [x] (added to references.bib 2026-09-26, details checked) TODO: cite **Gilmer2017** -- Gilmer, Schoenholz, Riley, Vinyals & Dahl, *ICML* 2017,
   "Neural Message Passing for Quantum Chemistry", arXiv:1704.01212. Used in §4.4.3.
-- [ ] TODO: cite **Courant1928** -- Courant, Friedrichs & Lewy, "Über die partiellen
+- [x] (added to references.bib 2026-09-26, details checked) TODO: cite **Courant1928** -- Courant, Friedrichs & Lewy, "Über die partiellen
   Differenzengleichungen der mathematischen Physik", *Mathematische Annalen* 100(1):32-74,
   1928, doi:10.1007/BF01448839. Used in §4.4.4 for the stability condition.
-- [ ] TODO: cite **Butcher1987** -- Butcher, *The Numerical Analysis of Ordinary Differential
+- [x] (added to references.bib 2026-09-26, details checked) TODO: cite **Butcher1987** -- Butcher, *The Numerical Analysis of Ordinary Differential
   Equations: Runge-Kutta and General Linear Methods*, Wiley 1987. Used in §4.4.5.
-- [ ] TODO: cite **Hairer1993** -- Hairer, Nørsett & Wanner, *Solving Ordinary Differential
+- [x] (added to references.bib 2026-09-26, details checked) TODO: cite **Hairer1993** -- Hairer, Nørsett & Wanner, *Solving Ordinary Differential
   Equations I: Nonstiff Problems*, Springer, 2nd rev. ed. 1993,
   doi:10.1007/978-3-540-78862-1. Used in §4.4.5.
-- [ ] TODO: cite **Ba2016** -- Ba, Kiros & Hinton, "Layer Normalization", arXiv:1607.06450,
+- [x] (added to references.bib 2026-09-26, details checked) TODO: cite **Ba2016** -- Ba, Kiros & Hinton, "Layer Normalization", arXiv:1607.06450,
   2016 (preprint, no peer-reviewed venue). Used in §4.3.1 for the per-node normalisation.
-- [ ] TODO: cite **Ioffe2015** -- Ioffe & Szegedy, *ICML* 2015, "Batch Normalization:
+- [x] (added to references.bib 2026-09-26, details checked) TODO: cite **Ioffe2015** -- Ioffe & Szegedy, *ICML* 2015, "Batch Normalization:
   Accelerating Deep Network Training by Reducing Internal Covariate Shift",
   arXiv:1502.03167. Used in §4.3.1 for the normalisation that is avoided. (Also cited by
   the MP-PDE paper itself for its 2-D experiments.)
-- [ ] TODO: cite **Feuer2013** -- Feuer, Yehoshua, Gregori, Penha, Chew, Ferris, Clemons,
+- [x] (added to references.bib 2026-09-26, details checked) TODO: cite **Feuer2013** -- Feuer, Yehoshua, Gregori, Penha, Chew, Ferris, Clemons,
   Lindblad & Rosenfeld, *JAMA Ophthalmology* 131(1):110-111, 2013, "Square Root
   Transformation of Geographic Atrophy Area Measurements to Eliminate Dependence of Growth
   Rates on Baseline Lesion Measurements". Used in §3.1 for the square-root area scale of
   the cohort growth statistics; needed again in §5.1 for √area MAE and growth rates.
-- [ ] TODO: cite **Mai2024** -- Mai, Lachinov, Reiter, Riedl, Grechenig, Bogunović &
+- [x] (added to references.bib 2026-09-26, details checked) TODO: cite **Mai2024** -- Mai, Lachinov, Reiter, Riedl, Grechenig, Bogunović &
   Schmidt-Erfurth, *Ophthalmology Science* 4(4):100466, 2024, "Deep Learning-Based
   Prediction of Individual Geographic Atrophy Progression from a Single Baseline OCT".
   Used in §2.6 as the closest prior work (same MUW cohort, same task), in §2.1.6 and §3.1 as the
   source of the device model, and in §3.6 for the one-year-anchor
   comparability choice; needed again in §5.7. **The pre-segmented-masks vs raw-OCT caveat must travel with every comparison.**
-- [ ] TODO: cite **Salvi2025** -- Salvi et al., *Ophthalmology Science* 5(2):100635, 2025,
+- [x] (added to references.bib 2026-09-26, details checked) TODO: cite **Salvi2025** -- Salvi et al., *Ophthalmology Science* 5(2):100635, 2025,
   "Deep Learning to Predict the Future Growth of Geographic Atrophy from Fundus
   Autofluorescence". Used in §2.6 as the dense-CNN precedent on this task (different
   modality, so not a comparable number); also the GA-domain motivation for the U-Net arm
@@ -859,15 +875,15 @@ marker itself; `THESIS_FRAMEWORK.md` §10.1 carries verified entries for all of 
 - [x] (obsolete 2026-09-25, method-of-lines sentence removed) cite **Schiesser2012** -- Schiesser, *The Numerical Method of Lines:
   Integration of Partial Differential Equations*, Academic Press / Elsevier (cited as
   Schiesser 2012 by Brandstetter2022; check the edition year). Used in §2.2.2.
-- [ ] TODO: cite **BarSinai2019** -- Bar-Sinai, Hoyer, Hickey & Brenner, "Learning
+- [x] (added to references.bib 2026-09-26, details checked) TODO: cite **BarSinai2019** -- Bar-Sinai, Hoyer, Hickey & Brenner, "Learning
   data-driven discretizations for partial differential equations", *PNAS*
   116(31):15344-15349, 2019. Used in §2.2.6 as the hybrid (learned-stencil) example.
-- [ ] TODO: cite **Kochkov2021** -- Kochkov, Smith, Alieva, Wang, Brenner & Hoyer,
+- [x] (added to references.bib 2026-09-26, details checked) TODO: cite **Kochkov2021** -- Kochkov, Smith, Alieva, Wang, Brenner & Hoyer,
   "Machine learning-accelerated computational fluid dynamics", *PNAS* 118(21):e2101784118,
   2021. Used in §2.2.6.
-- [ ] TODO: cite **Pfaff2021** -- Pfaff, Fortunato, Sanchez-Gonzalez & Battaglia,
+- [x] (added to references.bib 2026-09-26, details checked) TODO: cite **Pfaff2021** -- Pfaff, Fortunato, Sanchez-Gonzalez & Battaglia,
   "Learning Mesh-Based Simulation with Graph Networks", *ICLR* 2021. Used in §2.2.6.
-- [ ] TODO: cite **Lam2023** -- Lam et al., "Learning skillful medium-range global weather
+- [x] (added to references.bib 2026-09-26, details checked) TODO: cite **Lam2023** -- Lam et al., "Learning skillful medium-range global weather
   forecasting", *Science* 382(6677):1416-1421, 2023 (GraphCast). Used in §2.2.6 as the
   weather-forecasting example.
 - [x] (added to references.bib 2026-09-26) TODO: cite **LeVeque2007** -- LeVeque, *Finite Difference Methods for Ordinary and
@@ -908,7 +924,7 @@ marker itself; `THESIS_FRAMEWORK.md` §10.1 carries verified entries for all of 
   **Gilmer2017, Ronneberger2015, Li2021, LiuSchiaffini2024, Lienen2022, Chen2018**.
 - [x] (LeVeque2002 added to references.bib 2026-09-26) Note (2026-09-26): **LeVeque2002** now also backs the FVM sentence in §2.2.1 (replacing
   Brandstetter2022); add doi:10.1017/CBO9780511791253 when the entry is created.
-- [ ] Note (2026-09-25): the §2.2 rework also uses the already-listed markers
+- [x] (all added 2026-09-26) Note (2026-09-25): the §2.2 rework also uses the already-listed markers
   **LeVeque2002** (now for conservation laws / FVM / convergence, no longer as the SWE
   textbook), **SanchezGonzalez2020** (§2.2.6), **Butcher1987** and **Hairer1993**
   (§2.2.4), and **Courant1928** (§2.2.4, CFL).
@@ -920,16 +936,16 @@ marker itself; `THESIS_FRAMEWORK.md` §10.1 carries verified entries for all of 
 
 External references introduced inline in the LaTeX drafts that still need to be added to `references.bib` (one entry per reference; each has a corresponding `% TODO: cite ...` marker in the .tex file). Once an entry is added to the bibliography, replace the placeholder author-year mention with the proper `\citet{}` / `\citep{}` and remove the matching `% TODO:` line.
 
-- [ ] TODO: cite **Wong2014** -- Wong et al., *Lancet Glob Health* 2014, "Global prevalence of age-related macular degeneration and disease burden projection for 2020 and 2040." Used in `01-introduction.tex` §1.1 opening to support "leading cause of irreversible central vision loss in industrialised countries."
-- [ ] TODO: cite **SchmidtErfurth2018** -- Schmidt-Erfurth et al., *IOVS* 2018, "Prediction of individual disease conversion in early AMD using artificial intelligence." Used in `01-introduction.tex` §1.2 as an AI-on-OCT precedent for cohort-level conversion prediction.
-- [ ] TODO: cite **Bogunovic2017** -- Bogunović et al., *IOVS* 2017, "Machine learning of the progression of intermediate AMD based on OCT imaging." Used in `01-introduction.tex` §1.2 alongside SchmidtErfurth2018 as the supervisor's institutional AI-on-OCT precedent. (Earlier draft of `02-background.tex` §2.1.4 also cited it for the MUW segmentation pipeline; that usage was removed on 2026-05-02 because the MUW pipeline provenance is not actually established by this reference --- if confirmed, restore that usage in `03-data.tex` §3.1 instead.)
+- [x] (added to references.bib 2026-09-26, details checked) TODO: cite **Wong2014** -- Wong et al., *Lancet Glob Health* 2014, "Global prevalence of age-related macular degeneration and disease burden projection for 2020 and 2040." Used in `01-introduction.tex` §1.1 opening to support "leading cause of irreversible central vision loss in industrialised countries."
+- [x] (added to references.bib 2026-09-26, details checked) TODO: cite **SchmidtErfurth2018** -- Schmidt-Erfurth et al., *IOVS* 2018, "Prediction of individual disease conversion in early AMD using artificial intelligence." Used in `01-introduction.tex` §1.2 as an AI-on-OCT precedent for cohort-level conversion prediction.
+- [x] (added to references.bib 2026-09-26, details checked) TODO: cite **Bogunovic2017** -- Bogunović et al., *IOVS* 2017, "Machine learning of the progression of intermediate AMD based on OCT imaging." Used in `01-introduction.tex` §1.2 alongside SchmidtErfurth2018 as the supervisor's institutional AI-on-OCT precedent. (Earlier draft of `02-background.tex` §2.1.4 also cited it for the MUW segmentation pipeline; that usage was removed on 2026-05-02 because the MUW pipeline provenance is not actually established by this reference --- if confirmed, restore that usage in `03-data.tex` §3.1 instead.)
 - [x] (added to references.bib 2026-09-26, details checked) TODO: cite **Ronneberger2015** -- Ronneberger et al., *MICCAI* 2015, "U-Net: Convolutional Networks for Biomedical Image Segmentation." Used in `01-introduction.tex` §1.2 to anchor the "standard U-Net" baseline mention. (2026-09-25: that §1.2 sentence was removed; still needed for §2.3 and §4.4.)
-- [ ] TODO: cite **Battaglia2018** -- Battaglia et al., 2018, "Relational inductive biases, deep learning, and graph networks." Used in `01-introduction.tex` §1.3 to attribute the encode--process--decode GNN pattern. (2026-09-25: that §1.3 sentence was removed; the marker went with it. Still relevant for §2.4.)
-- [ ] TODO: cite **SanchezGonzalez2020** -- Sanchez-Gonzalez et al., *ICML* 2020, "Learning to simulate complex physics with graph networks." Used in `01-introduction.tex` §1.3 alongside Battaglia2018 for the encode--process--decode pattern. (2026-09-25: that §1.3 sentence was removed; still relevant for §2.4.)
-- [ ] (Li2021 added to references.bib 2026-09-26; Lu2021 still pending) TODO: cite **Li2021** (FNO) and **Lu2021** (DeepONet) -- needed for `02-background.tex` §2.3 (autoregressive vs operator-style neural solvers). (2026-09-25: the conditional §1.3 acknowledgement is moot; §1.3 names no architecture.)
-- [ ] TODO: cite **Sadda2018** -- Sadda et al., *Ophthalmology* 2018, "Consensus Definition for Atrophy Associated with Age-Related Macular Degeneration on OCT: Classification of Atrophy Report 3." Used in `02-background.tex` §2.1.1 as the primary source for the cRORA criteria currently attributed only to Vallino2024.
-- [ ] TODO: cite **Huang1991** -- Huang et al., *Science* 254:1178-1181, "Optical Coherence Tomography." Used in `02-background.tex` §2.1.2 to anchor the introduction of OCT as the canonical methodological-origin reference for the modality.
-- [ ] TODO: cite an SD-OCT principle reference (e.g. **Wojtkowski2002** or **Drexler2008**) once added to `references.bib`. Used in `02-background.tex` §2.1.2 to support the spectral-domain OCT principle behind the SD-OCT acquisition platform.
+- [x] (added to references.bib 2026-09-26, details checked) TODO: cite **Battaglia2018** -- Battaglia et al., 2018, "Relational inductive biases, deep learning, and graph networks." Used in `01-introduction.tex` §1.3 to attribute the encode--process--decode GNN pattern. (2026-09-25: that §1.3 sentence was removed; the marker went with it. Still relevant for §2.4.)
+- [x] (added to references.bib 2026-09-26, details checked) TODO: cite **SanchezGonzalez2020** -- Sanchez-Gonzalez et al., *ICML* 2020, "Learning to simulate complex physics with graph networks." Used in `01-introduction.tex` §1.3 alongside Battaglia2018 for the encode--process--decode pattern. (2026-09-25: that §1.3 sentence was removed; still relevant for §2.4.)
+- [x] (Li2021 and Lu2021 added to references.bib 2026-09-26) TODO: cite **Li2021** (FNO) and **Lu2021** (DeepONet) -- needed for `02-background.tex` §2.3 (autoregressive vs operator-style neural solvers). (2026-09-25: the conditional §1.3 acknowledgement is moot; §1.3 names no architecture.)
+- [x] (added to references.bib 2026-09-26, details checked) TODO: cite **Sadda2018** -- Sadda et al., *Ophthalmology* 2018, "Consensus Definition for Atrophy Associated with Age-Related Macular Degeneration on OCT: Classification of Atrophy Report 3." Used in `02-background.tex` §2.1.1 as the primary source for the cRORA criteria currently attributed only to Vallino2024.
+- [ ] (2026-09-26: not cited anywhere in the text; the marker in §2.1.3 stays until the author decides whether the OCT section should cite the origin of the modality) TODO: cite **Huang1991** -- Huang et al., *Science* 254:1178-1181, "Optical Coherence Tomography." Used in `02-background.tex` §2.1.2 to anchor the introduction of OCT as the canonical methodological-origin reference for the modality.
+- [x] (obsolete 2026-09-26: the SD-OCT description it supported was cut on 2026-09-25; marker removed) TODO: cite an SD-OCT principle reference (e.g. **Wojtkowski2002** or **Drexler2008**) once added to `references.bib`. Used in `02-background.tex` §2.1.2 to support the spectral-domain OCT principle behind the SD-OCT acquisition platform.
 - [x] (LeVeque2002 added to references.bib 2026-09-26; now used for FVM and convergence, not the SWE) TODO: cite a canonical SWE textbook (e.g. **LeVeque2002**, "Finite Volume Methods for Hyperbolic Problems", Cambridge University Press, Chapter 13; or **Vreugdenhil1994**, "Numerical Methods for Shallow-Water Flow", Springer) once added to `references.bib`. Used in `02-background.tex` §2.2.1 where the shallow-water equations are introduced as the running example for the section.
 
 ### Bibliography

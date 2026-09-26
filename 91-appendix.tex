@@ -158,10 +158,8 @@ optimiser before joint dual-branch training begins, because an
 untrained interpolation would feed unstructured noise into the uniform
 branch, destabilising the system.
 
-% TODO: cite HuangRussell2011 (Huang & Russell, "Adaptive Moving Mesh
-% Methods", Springer, Applied Mathematical Sciences vol. 174, 2011)
 The classical background for adaptive moving meshes on which this
-framework builds is covered extensively by Huang \& Russell (2011).
+framework builds is covered extensively by \citet{HuangRussell2011}.
 \citet{Hu2024} reported several architectural ablations that confirm
 the dual-branch necessity. Removing the moved branch degrades
 performance entirely to the uniform-mesh baseline. Removing the uniform

@@ -197,17 +197,13 @@ isolated layer.
 What this end-stage lesion looks like on OCT has been formalised by an
 international consensus group, the Classification of Atrophy Meetings
 (CAM), under the term \emph{complete RPE and outer retinal atrophy}
-(cRORA) \citep{Vallino2024}. cRORA is identified by three concurrent
+(cRORA) \citep{Sadda2018, Vallino2024}. cRORA is identified by three concurrent
 OCT features: \emph{(a)} a region of choroidal hypertransmission of at
 least 250\,\textmu{}m in diameter; \emph{(b)} co-located attenuation or
 disruption of the RPE band of at least 250\,\textmu{}m; and \emph{(c)}
 overlying photoreceptor degeneration --- with the additional condition
 that no abnormal blood-vessel growth (\emph{macular neovascularisation},
 which is the wet form of AMD) is present in the same region.
-% TODO: cite Sadda2018 (CAM Report 3, "Consensus Definition for Atrophy
-% Associated with Age-Related Macular Degeneration on OCT", Ophthalmology
-% 125:537-548) once added to references.bib -- this is the primary
-% source for the cRORA criteria attributed to Vallino2024 here.
 Put differently, cRORA is the OCT-readable definition of an established
 dry-AMD lesion, and \emph{GA is precisely the subset of cRORA that
 arises in eyes without macular neovascularisation}. The CAM framework
@@ -254,10 +250,6 @@ rather than the mask alone.
 % Coherence Tomography") once added to references.bib -- the seminal
 % paper introducing OCT, conventionally cited as the methodological
 % origin of the modality.
-% TODO: cite Wojtkowski2002 / Drexler2008 (or an equivalent SD-OCT
-% review) once added to references.bib -- the principle behind
-% spectral-domain OCT (the modality used to acquire the MUW cohort)
-% conventionally rests on these works.
 
 % TODO: produce Figure fig:bg:oct-acquisition --- a four-panel
 % schematic showing how an OCT volume is built up from one-dimensional
@@ -465,11 +457,8 @@ multi-channel state propagates through the network.
 The dataset used throughout the thesis is the GA cohort of the Medical
 University of Vienna (MUW), a longitudinal collection of macula-centred
 OCT volumes acquired in routine clinical practice.
-% TODO: cite Mai2024 (Mai, Lachinov, Reiter, Riedl, Grechenig, Bogunovic &
-% Schmidt-Erfurth, Ophthalmology Science 4(4):100466, 2024) once added to
-% references.bib; replace the plain "Mai et al. (2024)" with \citep{Mai2024}.
 The cohort comprises 553 volume scans over 75 eyes, acquired with a
-Heidelberg Spectralis spectral-domain OCT device (Mai et al., 2024). Lateral pixel counts
+Heidelberg Spectralis spectral-domain OCT device \citep{Mai2024}. Lateral pixel counts
 vary per eye across the 553 visits, ranging from 38 to 66 B-scans by 961
 to 1719 A-scans, giving 67 distinct native shapes in total. No visit has
 a native dimension of $49 \times 1024$. Instead, $49 \times 1024$ is the
@@ -648,13 +637,7 @@ and the remaining task is to advance the grid in time using this rate.
 The two parts are independent: the same $f$ can be combined with any
 time-stepping scheme, and the choice of scheme does not change how $f$
 is computed.
-% TODO: cite Butcher1987 (Butcher, "The Numerical Analysis of Ordinary
-% Differential Equations: Runge-Kutta and General Linear Methods",
-% Wiley 1987) and Hairer1993 (Hairer, Norsett & Wanner, "Solving
-% Ordinary Differential Equations I: Nonstiff Problems", Springer,
-% 2nd rev. ed. 1993) once added to references.bib.
-The simplest time-stepping scheme is the explicit Euler step (Butcher, 1987; Hairer et al.,
-1993),
+The simplest time-stepping scheme is the explicit Euler step \citep{Butcher1987, Hairer1993},
 \begin{equation}
   u_i^{k + 1} \;=\; u_i^{k}
   \;+\; \Delta t \, f_i\!\left(t_k, u^{k}\right),
@@ -686,11 +669,7 @@ state at $\Delta t = 0$ by construction; this is called the
 \emph{residual} form. The second is \emph{stability}: errors made in one
 step must not grow from step to step. For explicit schemes this bounds
 the step size.
-% TODO: cite Courant1928 (Courant, Friedrichs & Lewy, "Ueber die
-% partiellen Differenzengleichungen der mathematischen Physik",
-% Mathematische Annalen 100(1):32-74, 1928, doi:10.1007/BF01448839)
-% once added to references.bib.
-The Courant--Friedrichs--Lewy (CFL) condition (Courant et al., 1928)
+The Courant--Friedrichs--Lewy (CFL) condition \citep{Courant1928}
 states that, for a process that moves information at speed $c$, one
 step may not carry information further than the stencil reaches,
 \begin{equation}
@@ -750,34 +729,17 @@ the time step applies. Any of them can be learned from data instead of
 derived from an equation, and much of the neural-solver literature does
 exactly that while keeping the rest of the computation. \emph{Hybrid}
 solvers keep the classical scheme and learn selected parts of it.
-% TODO: cite BarSinai2019 (Bar-Sinai, Hoyer, Hickey & Brenner, "Learning
-% data-driven discretizations for partial differential equations",
-% PNAS 116(31):15344-15349, 2019) once added to references.bib.
-% TODO: cite Kochkov2021 (Kochkov, Smith, Alieva, Wang, Brenner & Hoyer,
-% "Machine learning-accelerated computational fluid dynamics", PNAS
-% 118(21):e2101784118, 2021) once added to references.bib.
-Bar-Sinai et al.\ (2019) learn the stencil coefficients
+\citet{BarSinai2019} learn the stencil coefficients
 of~\eqref{eq:bg:stencil} and obtain accurate solutions on considerably
-coarser grids than hand-designed stencils allow; Kochkov et al.\ (2021)
+coarser grids than hand-designed stencils allow; \citet{Kochkov2021}
 apply the same idea inside a solver for turbulent flow.
 \emph{End-to-end} solvers learn the whole update $\mathcal{A}$ but keep
 its shape: a state on a grid or mesh, a local operator, a step in time.
-% TODO: cite SanchezGonzalez2020 (Sanchez-Gonzalez, Godwin, Pfaff, Ying,
-% Leskovec & Battaglia, "Learning to Simulate Complex Physics with Graph
-% Networks", ICML 2020) once added to references.bib.
-% TODO: cite Pfaff2021 (Pfaff, Fortunato, Sanchez-Gonzalez & Battaglia,
-% "Learning Mesh-Based Simulation with Graph Networks", ICLR 2021) once
-% added to references.bib.
-% TODO: cite Lam2023 (Lam, Sanchez-Gonzalez, Willson, Wirnsberger,
-% Fortunato, Alet, Ravuri, Ewalds, Eaton-Rosen, Hu, Merose, Hoyer,
-% Holland, Vinyals, Stott, Pritzel, Mohamed & Battaglia, "Learning
-% skillful medium-range global weather forecasting", Science
-% 382(6677):1416-1421, 2023) once added to references.bib.
 Graph neural networks built this way simulate fluids, deformable
-materials and cloth (Sanchez-Gonzalez et al., 2020; Pfaff et al., 2021),
+materials and cloth \citep{SanchezGonzalez2020, Pfaff2021},
 and a graph-network weather forecaster trained on decades of
 reanalysis data outperforms a leading operational numerical model on
-most of its verification targets (Lam et al., 2023).
+most of its verification targets \citep{Lam2023}.
 
 The message-passing solver of \citet{Brandstetter2022} (MP-PDE) makes
 the correspondence explicit. The grid becomes a graph whose nodes are
@@ -864,10 +826,7 @@ spatial discretisation altogether.
 The Fourier Neural Operator \citep{Li2021} parameterises a kernel
 integral operator in the Fourier domain. This formulation gives the
 network global spatial support in a single layer.
-% TODO: cite Lu2021 (Lu, Jin, Pang, Zhang & Karniadakis, "Learning
-% nonlinear operators via DeepONet based on the universal approximation
-% theorem of operators", Nature Machine Intelligence 3(3):218-229, 2021)
-Alternatively, DeepONet (Lu et al., 2021) factorises the operator into
+Alternatively, DeepONet \citep{Lu2021} factorises the operator into
 a branch network that encodes the input function and a trunk network
 that encodes the continuous query coordinate. A standard limitation
 applies to both variants: the trained operator is inherently tied to
@@ -894,13 +853,11 @@ proposed to mitigate it.
 
 Beyond graph networks, several distinct architecture families are used
 as PDE surrogates.
-% TODO: cite Gupta2023 (Gupta & Brandstetter, "Towards
-% Multi-spatiotemporal-scale Generalized PDE Modeling", TMLR 2023)
 The U-Net \citep{Ronneberger2015} is an encoder-decoder
 architecture with skip connections and a multi-scale receptive field.
 Although originally introduced for biomedical image segmentation, it
 serves as a standard strong surrogate baseline in the neural-PDE
-literature (Gupta \& Brandstetter, 2023).
+literature \citep{Gupta2023}.
 Surrogate architectures also vary fundamentally in their spatial
 context. Global spectral operators, such as the Fourier Neural
 Operator, contrast directly with local convolutional or
@@ -912,11 +869,6 @@ Finite Element Networks \citep{Lienen2022} adopt a different
 numerical perspective, building the neural update directly from a
 learned finite-element discretisation and carrying an explicit
 transport (advection) term.
-% TODO: cite Ott2021 (Ott, Katiyar, Hennig & Tiemann, "ResNet After
-% All: Neural ODEs and Their Numerical Solution", ICLR 2021)
-% TODO: cite Krishnapriyan2023 (Krishnapriyan, Queiruga, Erichson &
-% Mahoney, "Learning continuous models for continuous physics",
-% Communications Physics 6:319, 2023)
 Finally, because a residual step resembles one explicit Euler step, a
 Neural-ODE reading is sometimes applied \citep{Chen2018}. Under
 this interpretation, a higher-order integrator such as a Runge--Kutta
@@ -925,7 +877,7 @@ plainly that this reading is only legitimate if the trained model is
 nearly invariant to the solver used at inference. This property must
 be tested empirically rather than assumed, as classical solver
 guarantees do not automatically transfer to neural parameterisations
-(Ott et al., 2021; Krishnapriyan et al., 2023).
+\citep{Ott2021, Krishnapriyan2023}.
 
 These architecture families differ in a small number of structural
 properties. The primary distinctions lie in whether the operator has
@@ -947,12 +899,8 @@ The spatial graph is constructed dynamically via a cutoff radius on
 regular grids, or by connecting $k$-nearest-neighbours on irregular
 meshes.
 
-% TODO: cite Battaglia2018 (Battaglia et al., "Relational inductive
-% biases, deep learning, and graph networks", arXiv 2018)
-% TODO: cite SanchezGonzalez2020 (Sanchez-Gonzalez et al., "Learning to
-% simulate complex physics with graph networks", ICML 2020)
 The architecture follows a standard encode--process--decode pattern
-(Battaglia et al., 2018; Sanchez-Gonzalez et al., 2020). An encoder,
+\citep{Battaglia2018, SanchezGonzalez2020}. An encoder,
 implemented as a per-node two-layer multilayer perceptron (MLP), lifts
 the initial node features into a latent space. The encoder input takes
 the form
@@ -1053,15 +1001,9 @@ Chapter~\ref{ch:method}.
 Deep learning models for OCT-based age-related macular degeneration and
 geographic atrophy progression divide broadly into cohort-level risk
 models and spatial-progression models.
-% TODO: cite SchmidtErfurth2018 (Schmidt-Erfurth et al., "Prediction of
-% individual disease conversion in early AMD using artificial
-% intelligence", IOVS 59:3199-3208, 2018)
-Schmidt-Erfurth et al. (2018) reported on the prediction of individual
+\citet{SchmidtErfurth2018} reported on the prediction of individual
 disease conversion in early AMD using artificial intelligence.
-% TODO: cite Bogunovic2017 (Bogunovic et al., "Machine learning of the
-% progression of intermediate AMD based on OCT imaging",
-% IOVS 58:BIO141-BIO150, 2017)
-Bogunovic et al. (2017) demonstrated the machine learning of
+\citet{Bogunovic2017} demonstrated the machine learning of
 intermediate-AMD progression directly from OCT imaging. For established
 geographic atrophy, \citet{Vogl2021} provided a topographic progression
 analysis. The broader landscape of deep-learning progression models in
@@ -1071,22 +1013,15 @@ artificial intelligence applied to OCT can provide predictive
 probabilities of GA development over time, cementing OCT as a
 predictive substrate for structural endpoints.
 
-% TODO: cite Mai2024 (Mai, Lachinov, Reiter, Riedl, Grechenig,
-% Bogunovic & Schmidt-Erfurth, "Deep Learning-Based Prediction of
-% Individual Geographic Atrophy Progression from a Single Baseline
-% OCT", Ophthalmology Science 4(4):100466, 2024)
 The closest prior work on the specific prediction task addressed here
-is by Mai et al. (2024), who predicted individual GA progression from a
+is by \citet{Mai2024}, who predicted individual GA progression from a
 single baseline OCT on the exact MUW cohort used in this thesis. The
 input regime, however, is fundamentally different. While that prior
 work operates directly on raw OCT volumes, the present thesis consumes
 pre-segmented lesion masks and layer surfaces. This difference must be
 kept in mind whenever the approaches are compared.
-% TODO: cite Salvi2025 (Salvi et al., "Deep Learning to Predict the
-% Future Growth of Geographic Atrophy from Fundus Autofluorescence",
-% Ophthalmology Science 5(2):100635, 2025)
 As a precedent for dense convolutional architectures on this task,
-Salvi et al. (2025) predicted future GA growth using a two-dimensional
+\citet{Salvi2025} predicted future GA growth using a two-dimensional
 U-Net on fundus autofluorescence images, establishing a relevant
 multi-scale spatial benchmark on an alternative modality.
 
