@@ -521,15 +521,18 @@ in~\S\ref{sec:data:splits}.
 \section{Partial Differential Equations and Numerical Solvers}
 \label{sec:background:pde-solvers}
 
-The models studied in this thesis borrow their structure from numerical
-solvers for partial differential equations (PDEs). This section first
-introduces the few solver mechanisms that this structure is made of
-(\S\ref{sec:background:pde-solvers:stencils}--\S\ref{sec:background:pde-solvers:limits}),
-then shows how neural solvers take these mechanisms over
-(\S\ref{sec:background:pde-solvers:neural}), and finally argues why the
-same structure is a plausible fit for GA progression
-(\S\ref{sec:background:pde-solvers:ga}). The notation follows
-\citet{Brandstetter2022}.
+The approach of this thesis treats GA progression the way a numerical
+solver treats a partial differential equation (PDE): the state is held
+on a grid and advanced step by step by a local update rule.
+Understanding the framework of Chapter~\ref{ch:method} and the models of
+Chapter~\ref{ch:experiments} therefore requires only a few solver
+mechanisms, and this section introduces exactly those. It covers how
+space is discretised (\S\ref{sec:background:pde-solvers:stencils}), how
+the state is stepped in time (\S\ref{sec:background:pde-solvers:time}),
+the strengths and limits of this design
+(\S\ref{sec:background:pde-solvers:limits}), how neural solvers learn
+its parts (\S\ref{sec:background:pde-solvers:neural}), and why the
+structure fits GA progression (\S\ref{sec:background:pde-solvers:ga}).
 
 A \emph{temporal} PDE describes a field $u(t, x)$ that changes over time
 $t$ at every point $x$ of a spatial domain $\mathcal{X} \subset
@@ -541,9 +544,11 @@ the current field around that point:
   \label{eq:bg:temporal-pde}
 \end{equation}
 where $u: [0, T] \times \mathcal{X} \to \mathbb{R}^n$ has $n$ components
-and $F$ is the law of the process. Because $F$ depends only on $u$ and
-its spatial derivatives at $x$, the rate of change at a point is
-determined by the field in its immediate neighbourhood. Together with an
+and $F$ is the law of the process. Because $F$ involves only $u$ and
+its derivatives at $x$, and derivatives are local quantities, the rate
+of change at a point depends only on the field in an arbitrarily small
+neighbourhood of it. This locality is what the stencils of
+\S\ref{sec:background:pde-solvers:stencils} exploit. Together with an
 initial condition $u(0, x) = u^{0}(x)$ and a condition on the domain
 boundary, \eqref{eq:bg:temporal-pde} determines $u(t, \cdot)$ for all
 $t > 0$. Closed-form solutions exist only in special cases, so the
@@ -559,16 +564,20 @@ grid values in discrete time steps
 
 The domain is partitioned into a grid of $N$ small cells $c_i$ with
 centres $x_i$, and the solution is stored as one value per cell and
-time step, $u_i^{k} \approx u(t_k, x_i)$; $u^{k} = (u_1^{k}, \dots,
-u_N^{k})$ denotes the whole grid \citep{Brandstetter2022}. The simplest
+time step, $u_i^{k} \approx u(t_k, x_i)$;\newline
+$u^{k} = (u_1^{k}, \dots, u_N^{k})$ denotes the whole grid. The simplest
 grid is a uniform one, a regular array of equal rectangular cells with
 constant spacings $\Delta x$ and $\Delta y$. The en-face grid of this
 thesis is of that type, with the particularity that the two spacings
 differ by a factor of about twenty (\S\ref{sec:data:spatial}).
 
-\paragraph{Finite differences.}
+\paragraph{Finite differences and finite volumes.}
+% TODO: cite LeVeque2007 (LeVeque, "Finite Difference Methods for
+% Ordinary and Partial Differential Equations: Steady-State and
+% Time-Dependent Problems", SIAM, 2007, doi:10.1137/1.9780898717839)
+% once added to references.bib.
 The finite difference method (FDM) replaces each spatial derivative by
-a difference of neighbouring grid values. On a uniform one-dimensional
+a difference of neighbouring grid values (LeVeque, 2007). On a uniform one-dimensional
 grid, the central approximation of the first derivative is
 \begin{equation}
   \left.\frac{\partial u}{\partial x}\right|_{x_i}
@@ -587,27 +596,65 @@ polynomial to the neighbourhood and differentiating it. The
 neighbourhood together with its coefficients is called a
 \emph{stencil}. Inserting such stencils into $F$ gives a function $f$
 that maps the grid values $u^{k}$ to a rate of change for every cell.
+% TODO: cite LeVeque2002 (LeVeque, "Finite Volume Methods for Hyperbolic
+% Problems", Cambridge University Press, 2002,
+% doi:10.1017/CBO9780511791253) once added to references.bib.
 The finite volume method (FVM) follows the same pattern, but applies
 its stencils to the flow of a quantity between neighbouring cells
-rather than to derivatives at cell centres \citep{Brandstetter2022}.
+rather than to derivatives at cell centres (LeVeque, 2002).
+
+\paragraph{Finite elements.}
+% TODO: cite Courant1943 (Courant, "Variational methods for the solution
+% of problems of equilibrium and vibrations", Bulletin of the American
+% Mathematical Society 49(1):1-23, 1943, doi:10.1090/S0002-9904-1943-07818-4)
+% and LangtangenMardal2019 (Langtangen & Mardal, "Introduction to
+% Numerical Methods for Variational Problems", Springer, Texts in
+% Computational Science and Engineering vol. 21, 2019,
+% doi:10.1007/978-3-030-23788-2) once added to references.bib.
+The finite element method (FEM) divides the domain into simple
+elements, typically triangles, and represents the solution as a sum of
+basis functions, each of which is non-zero only on the elements around
+one node (Courant, 1943; Langtangen \& Mardal, 2019). With
+piecewise-linear basis functions, the coefficients are exactly the node
+values. Instead of requiring \eqref{eq:bg:temporal-pde} to hold at every
+point, the method requires it to hold on average against each basis
+function, the so-called \emph{weak form}. Because each basis function
+overlaps only those of its immediate neighbours, every node is coupled
+only to the nodes it shares an element with. The result is again a
+local stencil, but one defined by the mesh rather than by a regular
+grid, which makes the method well suited to irregular domains. The
+Finite Element Networks of \S\ref{sec:background:neural-pde} learn their
+dynamics inside this discretisation.
 
 \paragraph{Adaptive stencils.}
+% TODO: cite Liu1994 (Liu, Osher & Chan, "Weighted essentially
+% non-oscillatory schemes", Journal of Computational Physics
+% 115(1):200-212, 1994, doi:10.1006/jcph.1994.1187) and JiangShu1996
+% (Jiang & Shu, "Efficient implementation of weighted ENO schemes",
+% Journal of Computational Physics 126(1):202-228, 1996,
+% doi:10.1006/jcph.1996.0130) once added to references.bib.
 A fixed stencil that straddles a sharp front produces spurious
 oscillations next to it. Weighted essentially non-oscillatory (WENO)
 schemes avoid this by computing several candidate estimates on shifted
 sub-stencils and combining them with weights that depend on how smooth
 the data are in each sub-stencil, so that sub-stencils crossing the
-front receive almost no weight \citep{Brandstetter2022}. The stencil
+front receive almost no weight (Liu et al., 1994; Jiang \& Shu, 1996). The stencil
 thereby becomes a non-linear function of its input. This is the
 mechanism closest to what a learned operator does.
 
 \paragraph{Global methods.}
+% TODO: cite GottliebOrszag1977 (Gottlieb & Orszag, "Numerical Analysis
+% of Spectral Methods: Theory and Applications", SIAM, CBMS-NSF Regional
+% Conference Series in Applied Mathematics vol. 26, 1977,
+% doi:10.1137/1.9781611970425) and Trefethen2000 (Trefethen, "Spectral
+% Methods in MATLAB", SIAM, 2000, doi:10.1137/1.9780898719598) once added
+% to references.bib.
 Pseudospectral methods compute derivatives in Fourier space instead: the
 field is transformed, each mode is multiplied by $(i\omega)^n$, and the
 result is transformed back. The derivative at every point then depends
 on all grid values. The accuracy is excellent for smooth solutions on
 periodic domains, but the method breaks down for non-smooth solutions
-\citep{Brandstetter2022}.
+(Gottlieb \& Orszag, 1977; Trefethen, 2000).
 
 \paragraph{Locality and reach.}
 Stencil methods are \emph{local}: the rate of change of a cell is
@@ -717,8 +764,14 @@ needed.
 Their limits follow from the same design. The equation $F$ must be
 known, including its coefficients: the solver computes what $F$
 prescribes and nothing else. Good schemes are hand-crafted for each
-class of equation; \citet{Brandstetter2022} call numerical analysis a
-``splitter'' field for this reason. And accuracy is expensive: fine
+class of equation. Following Bartels (2016), \citet{Brandstetter2022}
+describe the field of numerical methods as a ``splitter field'' that
+builds a dedicated solver for each sub-problem, rather than a ``lumper
+field'' that seeks one method for all of them.
+% TODO: cite Bartels2016 (Bartels, "Numerical Approximation of Partial
+% Differential Equations", Springer, Texts in Applied Mathematics vol. 64,
+% 2016, doi:10.1007/978-3-319-32354-1) once added to references.bib.
+And accuracy is expensive: fine
 features need fine grids, the CFL condition then forces small steps, and
 the cost grows faster than the resolution.
 
@@ -874,7 +927,7 @@ time therefore differs systematically from the distribution seen
 during training. This distribution shift is the central training
 difficulty for autoregressive rollouts.
 \S\ref{sec:background:mp-pde} describes the two primary mechanisms
-proposed to mitigate it in the graph-network literature.
+proposed to mitigate it.
 
 Beyond graph networks, several distinct architecture families are used
 as PDE surrogates.
@@ -898,9 +951,6 @@ message-passing operators. Hybrid architectures combine these
 properties by adding a small local kernel bypass to a global operator
 to capture high-frequency details more effectively
 (Liu-Schiaffini et al., 2024).
-% TODO: cite Gao2019 (Gao & Ji, "Graph U-Nets", ICML 2019)
-Graph U-Nets (Gao \& Ji, 2019) provide the corresponding multi-scale
-counterpart for data structured as graphs.
 % TODO: cite Lienen2022 (Lienen & Gunnemann, "Learning the Dynamics of
 % Physical Systems from Sparse Observations with Finite Element
 % Networks", ICLR 2022)
@@ -969,7 +1019,7 @@ network. The solution differences $u_i - u_j$ act as a learned local
 difference operator, establishing a flexible learned stencil.
 
 A core representational claim of the MP-PDE framework is that message
-passing can approximate classical numerical schemes. The original
+passing can approximate classical numerical schemes. The
 authors mapped roughly one message-passing layer to a finite-difference
 scheme, two layers to finite volumes, and three layers to a WENO5
 reconstruction.
@@ -992,7 +1042,8 @@ motivated by numerical consistency: the update must necessarily
 converge to the true solution as the temporal step size approaches
 zero.
 
-Two distinct mechanisms mitigate the accumulation of rollout errors.
+In MP-PDE, two distinct mechanisms mitigate the accumulation of rollout
+errors.
 % TODO: verify the bundle sizes against Brandstetter et al. (2022); the
 % set {20, 25, 50} comes from the code-side notes and could not be located
 % in the paper's text. Remove the parenthesis if it cannot be confirmed.
@@ -1032,139 +1083,16 @@ The original paper states three clear limitations. High-quality
 numerical ground truth is strictly required for training. There are no
 formal accuracy guarantees. Finally, a uniform mesh is wasteful in
 smooth regions and under-resolved at sharp gradients. This last
-limitation directly motivates the moving-mesh extension detailed in the
-next section.
+limitation directly motivates the moving-mesh extension, which is
+treated as an additional experiment in
+Appendix~\ref{app:mm-pde}.
 
 This thesis keeps the residual update formulation and the pushforward
 trick. It modifies the architecture by conditioning the update on a
-variable $\Delta t$ and removes temporal bundling entirely. The
+variable $\Delta t$ rather than on the absolute time $t$, and removes
+temporal bundling entirely. The
 specifics of this adaptation are deferred to
 Chapter~\ref{ch:method}.
-
-
-\section{MM-PDE: Moving Mesh PDE Solvers}
-\label{sec:background:mm-pde}
-
-\citet{Hu2024} extend message-passing neural solvers by integrating an
-adaptive moving mesh. A uniform mesh is fundamentally inefficient for
-problems that exhibit localised dynamics. It wastes computational
-resolution in smooth regions while simultaneously under-resolving sharp
-gradients, such as wave fronts.
-
-Mesh adaptation strategies separate into two families. The
-$h$-adaptation approach adds and removes vertices to dynamically refine
-or coarsen the mesh. This changes both the topology and the total
-degrees of freedom between steps, a property that is hostile to
-standard graph-network training. Conversely, $r$-adaptation, or
-moving-mesh adaptation, moves a fixed set of nodes while maintaining
-both the node count and the original graph topology. Prior neural
-$r$-adaptation methods were entirely supervised and required
-ground-truth optimal meshes generated by an expensive classical solver.
-
-The moving-mesh framework is governed by a monitor function. The
-monitor is defined as $M = (1 + \lVert \nabla u \rVert_2 / \alpha) I$,
-a matrix-valued function that takes large values precisely where the
-state solution varies sharply. The identity factor $I$ ensures that the
-refinement is isotropic. The addition of a constant $+1$ keeps $M$
-bounded away from zero, which prevents nodes from collapsing entirely
-in smooth regions. The global scaling constant $\alpha$ dictates the
-trade-off between mesh adaptivity and numerical stability. The
-corresponding mesh density is given by $\rho(x) = \sqrt{\det M(x)}$.
-This specific functional form is derived from an established upper
-bound on finite-element interpolation error.
-
-The equidistribution principle formalises the objective of the mesh
-adaptation. A coordinate map $f$ produces an $M$-uniform mesh if the
-integral of the density $\rho$ over the image of every single cell is
-equal. Specifically, this integral must equal $\sigma / N$, where
-$\sigma$ is the total integral of $\rho$ over the domain and $N$ is the
-total number of cells. Intuitively, every cell must carry the identical
-amount of monitor-weighted information, which forces cells to shrink in
-regions where $M$ is large.
-
-Because infinitely many maps satisfy the equidistribution principle,
-choosing the optimal map is framed as an optimal transport problem. The
-objective is to select the mapping closest to the identity. By
-Brenier's theorem, the unique solution to this problem is the gradient
-of a convex scalar potential, such that $f = \nabla \phi$. Substituting
-this gradient into the equidistribution constraint yields the
-Monge--Amp\`ere equation,
-\[
-  \det H(\phi) \;=\; \frac{\sigma}{|\Omega| \, \rho(\nabla \phi)},
-\]
-which is a fully non-linear second-order PDE for the scalar potential
-$\phi$. The problem is constrained by the boundary condition that the
-domain boundary maps exactly to itself. A scalar potential is learned
-rather than the full vector map because the convexity of $\phi$ is
-mathematically equivalent to a non-singular Jacobian of $f$. A
-non-singular Jacobian guarantees that the resulting mesh does not
-tangle. Crucially, enforcing convexity on a scalar potential is far
-easier to regularise than imposing a global non-tangling constraint on
-a vector field.
-
-The network architecture reformulates the scalar potential residually
-as $\phi(x) = 0.5 \|x\|^2 + \psi(x)$. The gradient therefore becomes
-$\nabla \phi = x + \nabla \psi$. The network is tasked with predicting
-only the displacement field $\psi$. This formulation removes the
-trivial identity component from the network's objective and ensures
-that the coordinate map is approximately the identity mapping at
-initialisation.
-
-The Data-free Mesh Mover (DMM) follows a DeepONet-style architecture. A
-branch network encodes the full spatial state $u$, and a trunk network
-processes a continuous query coordinate. Together, they output the
-scalar potential. The DMM is trained entirely without mesh supervision
-via a dedicated physics loss
-$L = L_{\text{eq}} + \beta L_{\text{bound}} + \gamma L_{\text{convex}}$.
-In this formulation, $L_{\text{eq}}$ is the squared residual of the
-Monge--Amp\`ere equation evaluated at sampled interior points,
-$L_{\text{bound}}$ enforces the boundary condition, and
-$L_{\text{convex}}$ penalises violations of convexity. The convexity
-term is critical; a non-convex potential inevitably yields a tangled
-and useless mesh, regardless of how small the equation residual
-becomes. Training uses the Adam optimiser followed by L-BFGS
-fine-tuning applied exclusively to the last layer. The DMM is
-pretrained and subsequently frozen during solver training. This
-decouples a well-posed geometric problem from the main solver objective
-and allows the identical mesh mover to be reused across different
-experiments.
-
-The full moving-mesh update operator is constructed as a dual-branch
-composition, defined as $M(u_t) = G_1(u_t) + I(G_2, \tilde{f}, u_t)$.
-Here, $G_1$ represents a graph neural network operating on the uniform
-mesh, $G_2$ is a graph neural network operating on the moved mesh,
-$\tilde{f}$ is the coordinate map predicted by the DMM, and $I$ is a
-learned interpolation operator mapping features back to uniform
-coordinates. The uniform branch supplies a stable global view of the
-domain, while the moved branch supplies a locally refined correction
-where gradients are steep.
-
-The interpolation network, ItpNet, learns adaptive interpolation
-weights directly from the moved-mesh geometry rather than relying on
-fixed finite-element basis functions. It is pretrained with its own
-optimiser before joint dual-branch training begins, because an
-untrained interpolation would feed unstructured noise into the uniform
-branch, destabilising the system.
-
-% TODO: cite HuangRussell2011 (Huang & Russell, "Adaptive Moving Mesh
-% Methods", Springer, Applied Mathematical Sciences vol. 174, 2011)
-The classical background for adaptive moving meshes on which this
-framework builds is covered extensively by Huang \& Russell (2011).
-\citet{Hu2024} reported several architectural ablations that confirm
-the dual-branch necessity. Removing the moved branch degrades
-performance entirely to the uniform-mesh baseline. Removing the uniform
-branch degrades performance even further, because the moved mesh
-inherently under-covers smooth regions. Replacing the DMM-generated
-mesh with a random mesh isolates and degrades the performance of the
-moved branch specifically. Finally, removing the interpolation
-pretraining severely harms overall training stability, even if it does
-not permanently cap the final accuracy.
-
-Whether mesh adaptation provides a measurable benefit for slowly
-evolving clinical data remains an open question, and one that this
-thesis tests. How a monitor function should be defined over a
-multi-channel state tensor is similarly treated as an open question
-deferred to Chapter~\ref{ch:method}.
 
 
 \section{Related Work}
@@ -1221,6 +1149,10 @@ inductive biases.
 % citation if one exists; otherwise note the absence explicitly.
 The application of neural PDE solvers to biomedical problems remains
 sparse.
+% TODO: also describe the related work for the other methods used in this
+% thesis (U-Net, FNO and the local-kernel hybrid, Finite Element Networks,
+% Runge--Kutta / Neural-ODE integration), not only neural PDE solvers
+% (author review #23, 2026-09-26; postponed).
 
 
 %%

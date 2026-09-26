@@ -21,24 +21,19 @@ ranges from 720 to 2160 days, with a median of 1080 days, or roughly
 three years.
 
 The acquisition setting recorded in the data is the same for all 553
-visits. The vendor is logged as Heidelberg Engineering, the protocol as
-a volume scan in ART mode, and the study identifier as ``HRF SPEC''. The
-device model is not a recorded field.
+visits. The vendor is logged as Heidelberg Engineering and the protocol
+as a volume scan in ART mode.
 % TODO: cite Mai2024 (Mai, Lachinov, Reiter, Riedl, Grechenig, Bogunovic
 % & Schmidt-Erfurth, "Deep Learning-Based Prediction of Individual
 % Geographic Atrophy Progression from a Single Baseline OCT",
 % Ophthalmology Science 4(4):100466, 2024)
 Mai et al. (2024), who describe the same MUW cohort, report that it was
-acquired on a Spectralis device. The scanner is therefore taken to be a
-Heidelberg Spectralis, but this is an inference from that source rather
-than a property of the data.
+acquired on a Spectralis device.
 % TODO: confirm the device model (Heidelberg Spectralis) with the MUW
 % data provider; it is currently an inference from Mai et al. (2024).
 
-The splits (\S\ref{sec:data:splits}) are defined over a universe of 100
-patient identifiers. Of these, 49 have no imaging data. The remaining 51
-patients contribute the 75 eyes: 24 patients contribute both eyes and 27
-contribute a single eye. Of the 75 eyes, 47 belong to female and 28 to
+The 75 eyes come from 51 patients: 24 patients contribute both eyes and
+27 contribute a single eye. Of the 75 eyes, 47 belong to female and 28 to
 male patients. Age at baseline ranges from 60.7 to 88.0 years, with a
 mean of 76.4 years over the eyes. Ages are decimal values computed from
 the date of birth to the baseline visit, not hand-entered integers.
@@ -68,12 +63,10 @@ constant across the cohort, while pixel counts, and with them the
 physical extent of each native grid, differ between eyes.
 
 % TODO: settle the constant-spacing assumption by obtaining the original
-% DICOM spacing fields from the data provider.
-This constant spacing is an assumption rather than a measurement.
-Checked against the visits' own transform files, it holds to within
-about 2\,\%. Settling it requires the original DICOM spacing fields,
-which are not part of the data used here. Every area reported in square
-millimetres in this thesis inherits this assumption.
+% DICOM spacing fields from the data provider. (The paragraph stating it
+% as an assumption was removed at the author's request, review #27,
+% 2026-09-26; the preceding paragraph still says spacing is "treated as"
+% constant, and the ~2 % check belongs in the Limitations, §6.3.)
 
 Lesion growth is summarised on the square-root area scale.
 % TODO: cite Feuer2013 (Feuer, Yehoshua, Gregori, Penha, Chew, Ferris,
@@ -146,27 +139,14 @@ outside it. The 16-bit layer array is cast to floating point. Mask and
 layers are then concatenated along the channel axis into a tensor of
 shape $11 \times \text{rows} \times \text{columns}$.
 
-The channel order --- the mask first, followed by the ten layers --- is a
-fixed invariant of the pipeline. The loss weighting and the layer
-encoder both rely on channel~0 being the mask, and the order is checked
-by an explicit assertion at load time.
-
 Each layer channel is a depth map. Fixing a pixel of the en-face grid
 selects a single A-scan of the underlying volume. The channel value at
 that pixel is the axial pixel index at which the boundary surface lies
 along that A-scan. Together, the ten channels describe the vertical
 layer structure of the retina at every en-face position. Across the
-cohort, the raw depth values range from $-14$ to $499$. This slightly
-exceeds the nominal 496-pixel depth of the volume, because the upstream
-segmentation occasionally returns values just above the top of the
-volume or just below its bottom.
+cohort, the raw depth values range from $-14$ to $499$ axial pixels,
+where 0 is the top of the scan volume and 496 its nominal depth.
 
-On the training split of the canonical fold, the mean depth of the ten
-layer channels increases monotonically from 137 to 204 axial pixels. At
-0.003867\,mm per axial pixel, this corresponds to a mean depth of about
-0.53 to 0.79\,mm below the top of the scan volume. The anatomical names
-of the ten boundary surfaces are not recorded in the data as delivered;
-the channels carry generic identifiers only.
 % TODO: obtain the anatomical names of the ten layer-boundary surfaces
 % from the MUW segmentation-pipeline documentation.
 
@@ -199,8 +179,8 @@ in~\S\ref{sec:background:ga-oct:muw}.
 
 The resulting window spans $49 \times 0.12118$\,mm by
 $1024 \times 0.00568$\,mm, or about $5.938 \times 5.816$\,mm, and holds
-50\,176 grid positions. The spacing between B-scans is 21.335 times
-larger than the spacing along them. The grid is therefore strongly
+50\,176 grid positions. The spacing between B-scans is \textbf{21.335
+times larger} than the spacing along them. The grid is therefore strongly
 anisotropic: moving by one row covers about the same physical distance
 as moving by 21 columns. This property matters for every
 spatial operator applied to the grid and is taken up again in
@@ -214,8 +194,11 @@ statistics are computed (\S\ref{sec:data:normalization}), so the padded
 zeros enter the per-channel mean and standard deviation. After
 normalisation, the zero fill of the layer channels sits between $-2.35$
 and $-2.94$ standard deviations, which is an extreme value. Unless the
-pad positions are excluded from the loss, the models are trained to
-reproduce this value at full weight. Zero also cannot serve as a
+pad positions are excluded from the loss (\S\ref{sec:method:training}),
+the models are trained to reproduce this value at full weight.
+% TODO: make sure \S4.7 (Training) actually describes the optional
+% pad-position loss masking (--exclude_pad_nodes) and whether any
+% reported run uses it (author review #32, 2026-09-26). Zero also cannot serve as a
 sentinel that marks padding, because real layer values range from $-14$
 to $499$ and so include zero.
 

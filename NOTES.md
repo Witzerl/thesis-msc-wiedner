@@ -166,7 +166,8 @@ wrong / to change". The author asked for no shortening yet; cuts wait for a late
   2026-09-25: `THESIS_STRUCTURE.md` updated (Framing revision, §2.5/§4.5/§5.5 marked as moved,
   new Appendix G), plus short notes in `CLAUDE.md` and `README.md`. The mirrors
   (`PROJECT_CONTEXT.md`, `THESIS_FRAMEWORK.md`) are code-side and untouched. **Still open:**
-  moving the drafted `02-background.tex` §2.5 text into `91-appendix.tex`.
+  moving the drafted `02-background.tex` §2.5 text into `91-appendix.tex`. (Done 2026-09-26,
+  review #22; §4.5 and §5.5 still to move.)
 - [x] §1.1: split the first sentence after "industrialised countries". Done 2026-09-25.
 - [x] §1.1: "Crucially, AMD is not classified as avoidable…" — author clarified: keep the
   content, fix the construction. Rewritten 2026-09-25 (avoidable-cause list checked against
@@ -255,6 +256,102 @@ wrong / to change". The author asked for no shortening yet; cuts wait for a late
   to match. The chapter .tex files have **not** been touched.
 - [x] 2026-09-17: `02-background.tex` §2.1–§2.2 (drafted 2026-05-02, uncommitted since)
   committed together with the new §2.1.6 corrections and the §2.3–§2.6 drafts.
+
+### Author's tablet review of §2.2–§3.4 (2026-09-26)
+
+Second handwritten review (build of 2026-09-26, thesis pp. 13–27), decoded from
+`main-thesis_v2_260926_163353.sdocx`: 33 marks. Blue = rewrite, red = wrong/remove.
+Being worked through one item at a time.
+
+- [x] #1–#3 §2.2 intro: needs more introduction ("this section feels lost"); first sentence
+  disliked; "The notation follows Brandstetter" to be removed. Done 2026-09-26: new opening
+  (author's choice of three drafts) states that the approach treats GA progression as a solver
+  treats a PDE and that Chapters 4–5 need only these mechanisms, then a per-subsection roadmap.
+- [x] #4 §2.2 "Because F depends only on u and its spatial derivatives at x…" — "Is this the
+  traditional approach to formulating a PDE?" Done 2026-09-26: the form is standard; the
+  sentence now states locality as a property of derivatives and links it to the stencils.
+- [x] #5 §2.2.1 line break after the ";" of the grid notation. Done 2026-09-26 (`\newline`;
+  a first attempt as a display equation was reverted at the author's request).
+- [x] #6 §2.2.1 Brandstetter citation after the grid notation removed (2026-09-26).
+- [x] #7 heading → "Finite differences and finite volumes." (2026-09-26).
+- [x] #8 FVM sentence: Brandstetter replaced by LeVeque (2002); FDM sentence gets LeVeque (2007)
+  (2026-09-26, placeholder + `% TODO: cite`).
+- [x] #10 WENO: Brandstetter → Liu et al. (1994) + Jiang & Shu (1996) (2026-09-26).
+- [x] #11 the general "this chapter always quotes Brandstetter" comment — addressed item by
+  item (#6, #8, #10, #12, #13, #14).
+- [x] #12 pseudospectral: Brandstetter → Gottlieb & Orszag (1977) + Trefethen (2000)
+  (2026-09-26).
+- [x] #13 consistency limit "certainly not in this paper" — checked: it IS in MP-PDE p.5
+  (citing Arnold 2015). Author: keep the Brandstetter citation (2026-09-26).
+- [x] #14 "splitter" quote — checked against MP-PDE p.1: the paper says "field of numerical
+  methods", attributed to Bartels (2016). Sentence rewritten with the correct wording and
+  "Following Bartels (2016), Brandstetter et al. (2022)…" (2026-09-26).
+- [x] (original entry for #6, #8, #10–#14) Brandstetter over-citation across §2.2 ("the methods
+  are not described in that paper, some don't need a citation"); #13 the consistency limit is
+  "certainly not in this paper"; #14 look up the exact "splitter field" quote. All resolved
+  2026-09-26, see the items above.
+- [x] #7 "Finite differences" heading → "Finite differences and FVM" (done, see above).
+- [x] #9 add a short FEM paragraph (part of the hybrid / FEN arm). Done 2026-09-26: new
+  "Finite elements." paragraph in §2.2.1 (weak form, local coupling via shared elements,
+  pointer to the FENs of §2.3); cites Courant (1943) and Langtangen & Mardal (2019).
+- [x] #15 §2.3 remove "in the graph-network literature". Done 2026-09-26.
+- [x] #16 §2.3 remove the Graph U-Nets (Gao & Ji) sentence — "not used, no?" Done 2026-09-26
+  (sentence and its Gao2019 marker removed from §2.3). Author: the graph U-Net arm "was more
+  of a test than serious" and showed nothing significant.
+- [ ] TODO (follow-up to #16, decision needed): the graph U-Net arm is still a full arm in
+  `04-method.tex` (overview list l.41, l.492/502/530, own subsection §4.4.3 "The Graph U-Net
+  and the Locality Floors" with the Gao & Ji disambiguation, parameter table l.911) and in the
+  project framing ("nine settings, six architecture classes"). Decide whether to keep it as
+  a reported arm, demote it (e.g. to an appendix row), or drop it; the counts in CLAUDE.md /
+  THESIS_STRUCTURE.md / Ch. 1 would change with it. Gao2019 is now needed only in §4.4.3.
+- [x] #17 §2.4 remove "original"; #18 WENO5 layer mapping — quote the methods. Done
+  2026-09-26: "original" removed; claim verified against MP-PDE p.6 ("1 layer for FDM, 2 layers
+  for FVM, and 3 layers for WENO"), sentence otherwise kept as is at the author's request.
+- [x] #19 §2.4 "In this paper, two distinct mechanisms…"; #20 "detailed in the next section"
+  → appendix; #21 "variable Δt rather than t". Done 2026-09-26: "In MP-PDE, two distinct
+  mechanisms…"; "…treated as an additional experiment in Appendix~G" (plain text);
+  "…on a variable Δt rather than on the absolute time t".
+- [x] TODO: §2.4 refers to "Appendix~G" in plain text (inline `% TODO`); switch to `\ref` once
+  the MM-PDE appendix and its label exist (together with #22). Done: `\ref{app:mm-pde}`.
+- [x] #22 §2.5 MM-PDE → Appendix G. Done 2026-09-26: the whole former §2.5 moved verbatim to
+  `91-appendix.tex` as Appendix G "The Moving-Mesh Extension (MM-PDE)" (`app:mm-pde`),
+  section G.1 "Background: MM-PDE" (`app:mm-pde:background`); Related Work is now §2.5. The
+  closing sentence about "how a monitor function should be defined over a multi-channel
+  state tensor … deferred to Chapter 4" was dropped (superseded design: the monitor is a
+  scalar on the blurred mask) and replaced by "…is the question this appendix tests."
+- [ ] TODO: Appendix G still needs the rest of its content (inline `% TODO` at its end): DMM
+  for GA, dual branch + α gate, the null result with its scope, mesh-quality study, ~10×
+  cost. Chapters 4 and 5 still contain the MM-PDE sections to be moved ("The Moving-Mesh
+  Extension as a Tested Hypothesis" §4.5, "Moving Mesh Quality" §5.5).
+- [ ] #23 §2.5 related work: add related work for all other surveyed methods. Postponed
+  2026-09-26; inline `% TODO` placed at the end of Related Work (U-Net, FNO + hybrid, FENs,
+  RK / Neural-ODE). Needs a literature search first.
+- [x] #24–#26 §3.1 remove "HRF SPEC"/device-model sentences, the Spectralis-inference sentence
+  ("useless information"), and the 100-identifier / 49-without-data sentences. Done
+  2026-09-26: the Mai et al. (2024) Spectralis sentence and the device-model TODO are kept;
+  the patient paragraph now opens "The 75 eyes come from 51 patients: …".
+- [ ] TODO (follow-up to #26): §3.7 still explains the split over "the universe of 100 patient
+  identifiers", 80/20 per fold, and "Only 51 of the 100 patients have scans". That is where
+  the uneven per-fold eye counts come from, so it may be needed there; author to decide
+  whether it stays in §3.7.
+- [x] #27 §3.1 remove the constant-spacing-assumption paragraph. Done 2026-09-26; the DICOM
+  TODO comment is kept. §3.1 still says spacing is "treated as" constant; the ~2 % check is
+  still stated in §2.1.6 (02-background.tex ~l.484) and belongs in §6.3 Limitations.
+- [x] #28 §3.2 channel-order paragraph removed (2026-09-26).
+- [x] #29 §3.2 replace the 496-pixel explanation with a plain statement of the −14…499 range.
+  Done 2026-09-26 (option B): "…range from −14 to 499 axial pixels, where 0 is the top of the
+  scan volume and 496 its nominal depth."
+- [x] #31 §3.3 "21.335 times larger" set in bold (2026-09-26).
+- [x] #30 §3.2 mean-depth / anatomical-names paragraph removed (2026-09-26); the TODO comment
+  on the boundary names is kept.
+- [x] #31 §3.3 bold "21.335 times larger"; #32 forward reference for pad positions excluded
+  from the loss; #33 add an outlook TODO: find better cropping pre-processing. All done
+  2026-09-26: #32 points to §4.7 (`sec:method:training`), #33 is a `% TODO` in §6.4.
+- [ ] TODO (from #32): §4.7 Training (still unwritten) must describe the optional pad-position
+  loss masking (`--exclude_pad_nodes`) and state whether any reported run uses it, since
+  §3.3 now points there (inline `% TODO` in 03-data.tex).
+- [ ] TODO (from #33): §6.4 Future Work — find a better cropping / spatial pre-processing than
+  the fixed 49×1024 centre crop (inline `% TODO` in 06-discussion.tex).
 
 ### Assets that now exist and should be reused
 
@@ -770,6 +867,33 @@ marker itself; `THESIS_FRAMEWORK.md` §10.1 carries verified entries for all of 
 - [ ] TODO: cite **Lam2023** -- Lam et al., "Learning skillful medium-range global weather
   forecasting", *Science* 382(6677):1416-1421, 2023 (GraphCast). Used in §2.2.6 as the
   weather-forecasting example.
+- [ ] TODO: cite **LeVeque2007** -- LeVeque, *Finite Difference Methods for Ordinary and
+  Partial Differential Equations: Steady-State and Time-Dependent Problems*, SIAM 2007,
+  doi:10.1137/1.9780898717839. Used in §2.2.1 for the finite difference method (replaces a
+  Brandstetter2022 citation, author review #8, 2026-09-26).
+- [ ] TODO: cite **Courant1943** -- Courant, "Variational methods for the solution of problems
+  of equilibrium and vibrations", *Bulletin of the AMS* 49(1):1-23, 1943,
+  doi:10.1090/S0002-9904-1943-07818-4. Used in §2.2.1 as the original FEM reference.
+- [ ] TODO: cite **LangtangenMardal2019** -- Langtangen & Mardal, *Introduction to Numerical
+  Methods for Variational Problems*, Springer, Texts in Computational Science and Engineering
+  vol. 21, 2019, doi:10.1007/978-3-030-23788-2 (author-supplied; the author's copy is the
+  2016 draft of the same book). Used in §2.2.1 as the FEM textbook.
+- [ ] TODO: cite **Liu1994** -- Liu, Osher & Chan, "Weighted essentially non-oscillatory
+  schemes", *J. Comput. Phys.* 115(1):200-212, 1994, doi:10.1006/jcph.1994.1187. §2.2.1 WENO.
+- [ ] TODO: cite **JiangShu1996** -- Jiang & Shu, "Efficient implementation of weighted ENO
+  schemes", *J. Comput. Phys.* 126(1):202-228, 1996, doi:10.1006/jcph.1996.0130. §2.2.1 WENO;
+  also a candidate for the WENO5 mention in §2.4 (review #18).
+- [ ] TODO: cite **GottliebOrszag1977** -- Gottlieb & Orszag, *Numerical Analysis of Spectral
+  Methods: Theory and Applications*, SIAM (CBMS-NSF vol. 26), 1977,
+  doi:10.1137/1.9781611970425. §2.2.1 pseudospectral methods.
+- [ ] TODO: cite **Trefethen2000** -- Trefethen, *Spectral Methods in MATLAB*, SIAM 2000,
+  doi:10.1137/1.9780898719598. §2.2.1 pseudospectral methods (textbook).
+- [ ] TODO: cite **Bartels2016** -- Bartels, *Numerical Approximation of Partial Differential
+  Equations*, Springer, Texts in Applied Mathematics vol. 64, 2016,
+  doi:10.1007/978-3-319-32354-1. §2.2.3, origin of the "splitter field" remark quoted via
+  MP-PDE.
+- [ ] Note (2026-09-26): **LeVeque2002** now also backs the FVM sentence in §2.2.1 (replacing
+  Brandstetter2022); add doi:10.1017/CBO9780511791253 when the entry is created.
 - [ ] Note (2026-09-25): the §2.2 rework also uses the already-listed markers
   **LeVeque2002** (now for conservation laws / FVM / convergence, no longer as the SWE
   textbook), **SanchezGonzalez2020** (§2.2.6), **Butcher1987** and **Hairer1993**
