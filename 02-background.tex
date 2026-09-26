@@ -572,13 +572,9 @@ thesis is of that type, with the particularity that the two spacings
 differ by a factor of about twenty (\S\ref{sec:data:spatial}).
 
 \paragraph{Finite differences and finite volumes.}
-% TODO: cite LeVeque2007 (LeVeque, "Finite Difference Methods for
-% Ordinary and Partial Differential Equations: Steady-State and
-% Time-Dependent Problems", SIAM, 2007, doi:10.1137/1.9780898717839)
-% once added to references.bib.
 The finite difference method (FDM) replaces each spatial derivative by
-a difference of neighbouring grid values (LeVeque, 2007). On a uniform one-dimensional
-grid, the central approximation of the first derivative is
+a difference of neighbouring grid values \citep{LeVeque2007}. On a
+uniform one-dimensional grid, the central approximation of the first derivative is
 \begin{equation}
   \left.\frac{\partial u}{\partial x}\right|_{x_i}
   \;\approx\; \frac{u_{i+1} - u_{i-1}}{2 \Delta x}.
@@ -596,25 +592,15 @@ polynomial to the neighbourhood and differentiating it. The
 neighbourhood together with its coefficients is called a
 \emph{stencil}. Inserting such stencils into $F$ gives a function $f$
 that maps the grid values $u^{k}$ to a rate of change for every cell.
-% TODO: cite LeVeque2002 (LeVeque, "Finite Volume Methods for Hyperbolic
-% Problems", Cambridge University Press, 2002,
-% doi:10.1017/CBO9780511791253) once added to references.bib.
 The finite volume method (FVM) follows the same pattern, but applies
 its stencils to the flow of a quantity between neighbouring cells
-rather than to derivatives at cell centres (LeVeque, 2002).
+rather than to derivatives at cell centres \citep{LeVeque2002}.
 
 \paragraph{Finite elements.}
-% TODO: cite Courant1943 (Courant, "Variational methods for the solution
-% of problems of equilibrium and vibrations", Bulletin of the American
-% Mathematical Society 49(1):1-23, 1943, doi:10.1090/S0002-9904-1943-07818-4)
-% and LangtangenMardal2019 (Langtangen & Mardal, "Introduction to
-% Numerical Methods for Variational Problems", Springer, Texts in
-% Computational Science and Engineering vol. 21, 2019,
-% doi:10.1007/978-3-030-23788-2) once added to references.bib.
 The finite element method (FEM) divides the domain into simple
 elements, typically triangles, and represents the solution as a sum of
 basis functions, each of which is non-zero only on the elements around
-one node (Courant, 1943; Langtangen \& Mardal, 2019). With
+one node \citep{Courant1943, LangtangenMardal2019}. With
 piecewise-linear basis functions, the coefficients are exactly the node
 values. Instead of requiring \eqref{eq:bg:temporal-pde} to hold at every
 point, the method requires it to hold on average against each basis
@@ -627,34 +613,22 @@ Finite Element Networks of \S\ref{sec:background:neural-pde} learn their
 dynamics inside this discretisation.
 
 \paragraph{Adaptive stencils.}
-% TODO: cite Liu1994 (Liu, Osher & Chan, "Weighted essentially
-% non-oscillatory schemes", Journal of Computational Physics
-% 115(1):200-212, 1994, doi:10.1006/jcph.1994.1187) and JiangShu1996
-% (Jiang & Shu, "Efficient implementation of weighted ENO schemes",
-% Journal of Computational Physics 126(1):202-228, 1996,
-% doi:10.1006/jcph.1996.0130) once added to references.bib.
 A fixed stencil that straddles a sharp front produces spurious
 oscillations next to it. Weighted essentially non-oscillatory (WENO)
 schemes avoid this by computing several candidate estimates on shifted
 sub-stencils and combining them with weights that depend on how smooth
 the data are in each sub-stencil, so that sub-stencils crossing the
-front receive almost no weight (Liu et al., 1994; Jiang \& Shu, 1996). The stencil
-thereby becomes a non-linear function of its input. This is the
+front receive almost no weight \citep{Liu1994, JiangShu1996}. The
+stencil thereby becomes a non-linear function of its input. This is the
 mechanism closest to what a learned operator does.
 
 \paragraph{Global methods.}
-% TODO: cite GottliebOrszag1977 (Gottlieb & Orszag, "Numerical Analysis
-% of Spectral Methods: Theory and Applications", SIAM, CBMS-NSF Regional
-% Conference Series in Applied Mathematics vol. 26, 1977,
-% doi:10.1137/1.9781611970425) and Trefethen2000 (Trefethen, "Spectral
-% Methods in MATLAB", SIAM, 2000, doi:10.1137/1.9780898719598) once added
-% to references.bib.
 Pseudospectral methods compute derivatives in Fourier space instead: the
 field is transformed, each mode is multiplied by $(i\omega)^n$, and the
 result is transformed back. The derivative at every point then depends
 on all grid values. The accuracy is excellent for smooth solutions on
 periodic domains, but the method breaks down for non-smooth solutions
-(Gottlieb \& Orszag, 1977; Trefethen, 2000).
+\citep{GottliebOrszag1977, Trefethen2000}.
 
 \paragraph{Locality and reach.}
 Stencil methods are \emph{local}: the rate of change of a cell is
@@ -754,24 +728,16 @@ enough to cover the distance the solution moves during that step.
 
 Classical solvers are well understood. Each component has a known error
 behaviour, convergence to the true solution can be proven for broad
-classes of problems as the grid is refined, and no training data are
-needed.
-% TODO: cite LeVeque2002 (LeVeque, "Finite Volume Methods for Hyperbolic
-% Problems", Cambridge University Press, 2002) once added to
-% references.bib -- textbook reference for convergence of classical
-% schemes.
+classes of problems as the grid is refined \citep{LeVeque2002}, and no
+training data are needed.
 
 Their limits follow from the same design. The equation $F$ must be
 known, including its coefficients: the solver computes what $F$
 prescribes and nothing else. Good schemes are hand-crafted for each
-class of equation. Following Bartels (2016), \citet{Brandstetter2022}
+class of equation. Following \citet{Bartels2016}, \citet{Brandstetter2022}
 describe the field of numerical methods as a ``splitter field'' that
 builds a dedicated solver for each sub-problem, rather than a ``lumper
-field'' that seeks one method for all of them.
-% TODO: cite Bartels2016 (Bartels, "Numerical Approximation of Partial
-% Differential Equations", Springer, Texts in Applied Mathematics vol. 64,
-% 2016, doi:10.1007/978-3-319-32354-1) once added to references.bib.
-And accuracy is expensive: fine
+field'' that seeks one method for all of them. And accuracy is expensive: fine
 features need fine grids, the CFL condition then forces small steps, and
 the cost grows faster than the resolution.
 
@@ -1150,20 +1116,13 @@ inductive biases.
 The application of neural PDE solvers to biomedical problems remains
 sparse.
 
-% TODO: cite Scarselli2009 (Scarselli, Gori, Tsoi, Hagenbuchner &
-% Monfardini, "The Graph Neural Network Model", IEEE Transactions on
-% Neural Networks 20(1):61-80, 2009, doi:10.1109/TNN.2008.2005605),
-% Gilmer2017, Ronneberger2015, Li2021, LiuSchiaffini2024, Lienen2022,
-% Chen2018, Runge1895 (Runge, "Ueber die numerische Aufloesung von
-% Differentialgleichungen", Mathematische Annalen 46:167-178, 1895,
-% doi:10.1007/BF01446807) and Kutta1901 (Kutta, "Beitrag zur
-% naeherungsweisen Integration totaler Differentialgleichungen",
-% Zeitschrift fuer Mathematik und Physik 46:435-453, 1901) once added to
-% references.bib.
+% TODO: cite Gilmer2017, Ronneberger2015, Li2021, LiuSchiaffini2024,
+% Lienen2022 and Chen2018 (full details in NOTES.md, "Pending external
+% citations") once added to references.bib.
 The architectures that fill the operator slot of
 Chapter~\ref{ch:method} originate in different lines of work. The
-graph solvers build on the graph neural network model of Scarselli et
-al. (2009) and the message-passing formulation of Gilmer et al. (2017),
+graph solvers build on the graph neural network model of
+\citet{Scarselli2009} and the message-passing formulation of Gilmer et al. (2017),
 brought to PDEs by \citet{Brandstetter2022}. The U-Net was introduced
 by Ronneberger et al. (2015) for biomedical image segmentation, the
 Fourier Neural Operator by Li et al. (2021), and its extension with
@@ -1171,8 +1130,8 @@ local kernels by Liu-Schiaffini et al. (2024). Finite Element Networks,
 including their transport term, go back to Lienen \& G\"unnemann
 (2022). The graph U-Net arm has no single source; it combines the
 U-Net pyramid with message-passing layers. Fixed-step integration of a
-learned vector field uses the classical methods of Runge (1895) and
-Kutta (1901), and the reading of a network as the right-hand side of an
+learned vector field uses the classical methods of \citet{Runge1895}
+and \citet{Kutta1901}, and the reading of a network as the right-hand side of an
 ordinary differential equation follows the Neural ODEs of Chen et al.
 (2018). How each of these is adapted to the GA setting is described
 in~\S\ref{sec:method:family}.

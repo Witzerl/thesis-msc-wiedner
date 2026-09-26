@@ -870,43 +870,43 @@ marker itself; `THESIS_FRAMEWORK.md` §10.1 carries verified entries for all of 
 - [ ] TODO: cite **Lam2023** -- Lam et al., "Learning skillful medium-range global weather
   forecasting", *Science* 382(6677):1416-1421, 2023 (GraphCast). Used in §2.2.6 as the
   weather-forecasting example.
-- [ ] TODO: cite **LeVeque2007** -- LeVeque, *Finite Difference Methods for Ordinary and
+- [x] (added to references.bib 2026-09-26) TODO: cite **LeVeque2007** -- LeVeque, *Finite Difference Methods for Ordinary and
   Partial Differential Equations: Steady-State and Time-Dependent Problems*, SIAM 2007,
   doi:10.1137/1.9780898717839. Used in §2.2.1 for the finite difference method (replaces a
   Brandstetter2022 citation, author review #8, 2026-09-26).
-- [ ] TODO: cite **Courant1943** -- Courant, "Variational methods for the solution of problems
+- [x] (added to references.bib 2026-09-26) TODO: cite **Courant1943** -- Courant, "Variational methods for the solution of problems
   of equilibrium and vibrations", *Bulletin of the AMS* 49(1):1-23, 1943,
   doi:10.1090/S0002-9904-1943-07818-4. Used in §2.2.1 as the original FEM reference.
-- [ ] TODO: cite **LangtangenMardal2019** -- Langtangen & Mardal, *Introduction to Numerical
+- [x] (added to references.bib 2026-09-26) TODO: cite **LangtangenMardal2019** -- Langtangen & Mardal, *Introduction to Numerical
   Methods for Variational Problems*, Springer, Texts in Computational Science and Engineering
   vol. 21, 2019, doi:10.1007/978-3-030-23788-2 (author-supplied; the author's copy is the
   2016 draft of the same book). Used in §2.2.1 as the FEM textbook.
-- [ ] TODO: cite **Liu1994** -- Liu, Osher & Chan, "Weighted essentially non-oscillatory
+- [x] (added to references.bib 2026-09-26) TODO: cite **Liu1994** -- Liu, Osher & Chan, "Weighted essentially non-oscillatory
   schemes", *J. Comput. Phys.* 115(1):200-212, 1994, doi:10.1006/jcph.1994.1187. §2.2.1 WENO.
-- [ ] TODO: cite **JiangShu1996** -- Jiang & Shu, "Efficient implementation of weighted ENO
+- [x] (added to references.bib 2026-09-26) TODO: cite **JiangShu1996** -- Jiang & Shu, "Efficient implementation of weighted ENO
   schemes", *J. Comput. Phys.* 126(1):202-228, 1996, doi:10.1006/jcph.1996.0130. §2.2.1 WENO;
   also a candidate for the WENO5 mention in §2.4 (review #18).
-- [ ] TODO: cite **GottliebOrszag1977** -- Gottlieb & Orszag, *Numerical Analysis of Spectral
+- [x] (added to references.bib 2026-09-26) TODO: cite **GottliebOrszag1977** -- Gottlieb & Orszag, *Numerical Analysis of Spectral
   Methods: Theory and Applications*, SIAM (CBMS-NSF vol. 26), 1977,
   doi:10.1137/1.9781611970425. §2.2.1 pseudospectral methods.
-- [ ] TODO: cite **Trefethen2000** -- Trefethen, *Spectral Methods in MATLAB*, SIAM 2000,
+- [x] (added to references.bib 2026-09-26) TODO: cite **Trefethen2000** -- Trefethen, *Spectral Methods in MATLAB*, SIAM 2000,
   doi:10.1137/1.9780898719598. §2.2.1 pseudospectral methods (textbook).
-- [ ] TODO: cite **Bartels2016** -- Bartels, *Numerical Approximation of Partial Differential
+- [x] (added to references.bib 2026-09-26) TODO: cite **Bartels2016** -- Bartels, *Numerical Approximation of Partial Differential
   Equations*, Springer, Texts in Applied Mathematics vol. 64, 2016,
   doi:10.1007/978-3-319-32354-1. §2.2.3, origin of the "splitter field" remark quoted via
   MP-PDE.
-- [ ] TODO: cite **Scarselli2009** -- Scarselli, Gori, Tsoi, Hagenbuchner & Monfardini, "The
+- [x] (added to references.bib 2026-09-26) TODO: cite **Scarselli2009** -- Scarselli, Gori, Tsoi, Hagenbuchner & Monfardini, "The
   Graph Neural Network Model", *IEEE Trans. Neural Networks* 20(1):61-80, 2009,
   doi:10.1109/TNN.2008.2005605. §2.5 related work (origin of GNNs).
-- [ ] TODO: cite **Runge1895** -- Runge, "Ueber die numerische Auflösung von
+- [x] (added to references.bib 2026-09-26) TODO: cite **Runge1895** -- Runge, "Ueber die numerische Auflösung von
   Differentialgleichungen", *Mathematische Annalen* 46:167-178, 1895, doi:10.1007/BF01446807.
   §2.5 related work (origin of Runge-Kutta).
-- [ ] TODO: cite **Kutta1901** -- Kutta, "Beitrag zur näherungsweisen Integration totaler
+- [x] (added to references.bib 2026-09-26) TODO: cite **Kutta1901** -- Kutta, "Beitrag zur näherungsweisen Integration totaler
   Differentialgleichungen", *Zeitschrift für Mathematik und Physik* 46:435-453, 1901 (no DOI).
   §2.5 related work (origin of Runge-Kutta).
 - [ ] Note (2026-09-26): the §2.5 related-work paragraph also uses the already-pending
   **Gilmer2017, Ronneberger2015, Li2021, LiuSchiaffini2024, Lienen2022, Chen2018**.
-- [ ] Note (2026-09-26): **LeVeque2002** now also backs the FVM sentence in §2.2.1 (replacing
+- [x] (LeVeque2002 added to references.bib 2026-09-26) Note (2026-09-26): **LeVeque2002** now also backs the FVM sentence in §2.2.1 (replacing
   Brandstetter2022); add doi:10.1017/CBO9780511791253 when the entry is created.
 - [ ] Note (2026-09-25): the §2.2 rework also uses the already-listed markers
   **LeVeque2002** (now for conservation laws / FVM / convergence, no longer as the SWE
@@ -930,7 +930,7 @@ External references introduced inline in the LaTeX drafts that still need to be 
 - [ ] TODO: cite **Sadda2018** -- Sadda et al., *Ophthalmology* 2018, "Consensus Definition for Atrophy Associated with Age-Related Macular Degeneration on OCT: Classification of Atrophy Report 3." Used in `02-background.tex` §2.1.1 as the primary source for the cRORA criteria currently attributed only to Vallino2024.
 - [ ] TODO: cite **Huang1991** -- Huang et al., *Science* 254:1178-1181, "Optical Coherence Tomography." Used in `02-background.tex` §2.1.2 to anchor the introduction of OCT as the canonical methodological-origin reference for the modality.
 - [ ] TODO: cite an SD-OCT principle reference (e.g. **Wojtkowski2002** or **Drexler2008**) once added to `references.bib`. Used in `02-background.tex` §2.1.2 to support the spectral-domain OCT principle behind the SD-OCT acquisition platform.
-- [ ] TODO: cite a canonical SWE textbook (e.g. **LeVeque2002**, "Finite Volume Methods for Hyperbolic Problems", Cambridge University Press, Chapter 13; or **Vreugdenhil1994**, "Numerical Methods for Shallow-Water Flow", Springer) once added to `references.bib`. Used in `02-background.tex` §2.2.1 where the shallow-water equations are introduced as the running example for the section.
+- [x] (LeVeque2002 added to references.bib 2026-09-26; now used for FVM and convergence, not the SWE) TODO: cite a canonical SWE textbook (e.g. **LeVeque2002**, "Finite Volume Methods for Hyperbolic Problems", Cambridge University Press, Chapter 13; or **Vreugdenhil1994**, "Numerical Methods for Shallow-Water Flow", Springer) once added to `references.bib`. Used in `02-background.tex` §2.2.1 where the shallow-water equations are introduced as the running example for the section.
 
 ### Bibliography
 
