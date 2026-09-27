@@ -165,14 +165,11 @@ the slot. This resemblance to a numerical integrator needs a caution.
 The Euler form does not by itself make $f_\theta$ a time derivative or a
 rate of change. A network trained with this update need not be a consistent
 discretisation of any continuous-time system \citep{Chen2018, Ott2021}. This thesis therefore does not assume such a reading. Instead, it is tested
-directly with a solver-swap diagnostic, reported in
-Chapter~\ref{ch:experiments}: a trained model is re-evaluated, without
+directly with a solver-swap diagnostic, reported
+in~\S\ref{sec:experiments:validity}: a trained model is re-evaluated, without
 retraining, under several integration schemes and step counts. A model that
 represents a continuous-time system gives nearly the same predictions under
 all of them.
-% TODO: replace "Chapter~\ref{ch:experiments}" with a \ref to the
-% validity-diagnostics section (planned Section 5.6) once it exists
-% (author review #16, 2026-09-27).
 
 \subsection{Multi-Channel State Propagation}
 \label{sec:method:multichannel}

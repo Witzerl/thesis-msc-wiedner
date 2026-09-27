@@ -4,62 +4,76 @@
 \chapter{Experiments}
 \label{ch:experiments}
 
+% Skeleton rebuilt 2026-09-27 to the outline of THESIS_STRUCTURE.md (Chapter 5).
+% The former "Baselines" section was removed: in the survey framing every
+% architecture is a peer arm of one table (5.2); the only references that fix
+% the scale are persistence (defined in 5.1) and the per-pixel floor (an arm).
+% Moving-mesh items (former 5.5 mesh quality, dual-branch null) are in
+% Appendix G.
+
 
 \section{Evaluation Protocol}
 \label{sec:experiments:protocol}
 
-% TODO (crucial): before introducing the other metrics, explicitly explain
-% why per-pixel MSE is a deceptive metric for slow-moving GA pathology.
-% Then: per-timestep MSE and RMSE in normalized space; Dice and IoU on the
-% GA mask channel at a clinically meaningful 360-day horizon. Persistence
-% baseline (repeat last observed state) as the floor any learned model must
-% beat.
+% TODO: (1) why per-pixel MSE is deceptive for slow GA and why persistence is
+% the floor; (2) never compare raw RMSE across arms; (3) the clinical metrics:
+% change-region Dice/IoU at the one-year anchor, sqrt-area MAE, growth-rate
+% agreement; (4) the two statistical instruments, always quoted together, and
+% the replicate noise floor; (5) the era rule; (6) 5-fold CV, no test split.
 
 
-\section{Baselines}
-\label{sec:experiments:baselines}
-
-% TODO:
-%   - Persistence (last-state repetition)
-%   - Single-branch GNN (MP-PDE style, no moving mesh)
-%   - Multi-branch GNN, larger parameter budget (isolate moving-mesh
-%     contribution from capacity)
-%   - Optional: simple CNN baseline (U-Net or similar) for context against
-%     standard medical imaging approaches.
-
-
-\section{Main Results}
+\section{The Arm Table}
 \label{sec:experiments:main-results}
 
-% TODO: table comparing all methods on MSE, RMSE, Dice@360d, IoU@360d.
-% Figure with example rollouts: ground-truth sequence vs each baseline's
-% predictions over several visits for a representative eye.
+% TODO: every setting of the operator slot in one table: change-region
+% Dice@360d (5-fold mean +- sd), parameters, ratio, cost (minimum epoch time,
+% fold named). Headline: the three strongest arms are indistinguishable; the
+% per-pixel floor is bit-exactly persistence. Rollout figure for one eye.
 
 
-\section{Ablations}
+\section{The Ingredient Study}
+\label{sec:experiments:ingredients}
+
+% TODO: spatial context at all; physical reach at lesion scale (dilated
+% stencil vs k-NN, reach ladder); global and local context together (FNO,
+% FNO + 3x3); the transport term (T-FEN vs free-form, NOT parameter-matched,
+% 1.97x -- say so every time); the convergence argument.
+
+
+\section{Negative Results}
 \label{sec:experiments:ablations}
 
-% TODO: each component on/off:
-%   (moving-mesh / dual-branch / ItpNet items: Appendix G only)
-%   - pushforward training vs no pushforward
-%   - covariates (Age, Sex) vs no covariates
-%   - layer encoder $d_{\text{embed}} \in \{0, 32, 64, 128, 256\}$
-%   - mask-channel loss-weight sweep.
+% TODO: patient covariates; the layer encoder (width sweep); capacity (U-Net
+% width 32); time-integration order (RK4 vs Euler); GNN-internal knobs
+% (normalisation, aggregation, edge features, k at fixed reach); the loss
+% ablation; the intermediate-time-point regulariser. The moving-mesh null is
+% one pointer sentence to Appendix G.
 
 
-\section{Qualitative Analysis}
+\section{Validity Diagnostics}
+\label{sec:experiments:validity}
+
+% TODO: the solver-swap diagnostic (locked model fails, autonomous-RK4 arm
+% passes; fold 2, one seed per model) -- forbids ODE / rate-field language;
+% the T-FEN's numerical validity (free-running divergence, Courant bound) --
+% the learned velocity is not quotable.
+
+
+\section{Qualitative Analysis and Clinical Comparison}
 \label{sec:experiments:qualitative}
 
-% TODO: per-eye rollout visualizations. Success cases (accurate lesion
-% growth prediction). Failure modes (atypical progression patterns, very
-% sparse visit schedules, very short vs long $\Delta t$).
+% TODO: per-eye rollouts, success cases and failure modes (atypical
+% progression, sparse schedules, short vs long Delta t, border-censored
+% lesions). Comparison with Mai et al. (2024) on the same cohort, with the
+% mandatory caveat: this model consumes pre-segmented masks, Mai raw OCT.
 
 
 \section{Computational Cost}
 \label{sec:experiments:cost}
 
-% TODO: training time, inference time per rollout step, memory footprint,
-% comparison with baselines.
+% TODO: training time (minimum epoch time, fold named), inference time per
+% rollout step, memory; estimator-independent ratios (RK4/Euler ~4.8x,
+% T-FEN/stencil ~4x).
 
 
 %%

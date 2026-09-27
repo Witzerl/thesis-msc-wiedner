@@ -910,11 +910,26 @@ Pulled from the code repository (`masterthesis-docker/NOTES.md` + `PROJECT_CONTE
 
 ### Chapter 5 - Experiments (`05-experiments.tex`)
 
+- [x] 2026-09-27: `05-experiments.tex` skeleton rebuilt to the THESIS_STRUCTURE.md outline:
+  5.1 Evaluation Protocol, 5.2 The Arm Table (label `sec:experiments:main-results` kept),
+  5.3 The Ingredient Study (`sec:experiments:ingredients`), 5.4 Negative Results (label
+  `sec:experiments:ablations` kept), 5.5 Validity Diagnostics (`sec:experiments:validity`),
+  5.6 Qualitative Analysis and Clinical Comparison, 5.7 Computational Cost. **"Baselines"
+  removed** (author question): it was the pre-survey plan (persistence / single-branch /
+  dual-branch / optional U-Net); in the survey every architecture is a peer arm of the one
+  table, and only persistence and the per-pixel floor fix the scale. §4.2.1 now points to
+  `sec:experiments:validity` (review #16 TODO closed).
+- [ ] 2026-09-27: §5.1-§5.3 to be drafted by an external LLM from a fact-sheet prompt (numbers
+  from THESIS_FRAMEWORK.md §7.1-§7.5 and PROJECT_CONTEXT.md), then audited here. Known gaps the
+  prompt leaves as TODOs: the one-hop floor's minimum epoch time; per-horizon growth-region Dice
+  (FNO vs U-Net beyond one year; T-FEN / free-form / one-hop / stencil in the 0-1 y bin) --
+  needed from SOLVER_FINAL_RUNS.md in the code repo.
+
 - [ ] TODO: 5.1 Evaluation protocol (MSE caveat first, then Dice/IoU@360d, persistence floor).
-- [ ] TODO: 5.2 Baselines.
+- [x] (obsolete 2026-09-27: section removed, see above) TODO: 5.2 Baselines.
 - [ ] TODO: 5.3 Main results table + rollout figure.
 - [ ] TODO: 5.4 Ablations sweep.
-- [ ] TODO: 5.5 Moving mesh quality.
+- [x] (moved to Appendix G.3 2026-09-27) TODO: 5.5 Moving mesh quality.
 - [ ] TODO: 5.6 Qualitative analysis (success + failure modes).
 - [ ] TODO: 5.7 Computational cost.
 
