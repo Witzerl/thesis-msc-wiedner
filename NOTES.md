@@ -410,9 +410,33 @@ Being worked through one item at a time.
   terms. Each was taken from the literature and adapted to the same framework: §4.3 describes
   the graph solver adapted from MP-PDE, and §4.4 the remaining architectures." (2026-09-27).
   Author: the graph solver must not be highlighted above the other arms.
-- [ ] TODO (from #10): §4.3 intro still says the graph solver "is described in more depth than
+- [x] TODO (from #10): §4.3 intro still says the graph solver "is described in more depth than
   the others because this project built it rather than imported it"; to be fixed when §4.3 is
-  reviewed (author: later sections deal with this extra highlighting).
+  reviewed (author: later sections deal with this extra highlighting). Resolved 2026-09-27 by
+  the restructure below; the sentence is gone.
+
+### Restructure: MP-PDE out of the Background, one Operators section (2026-09-27)
+
+Author decision: the Background holds no method descriptions; all methods are explained in
+Chapter 4, and the MP-PDE graph network sits next to the other operators on equal terms (it may
+be longer, since it supplies two arms and the floors).
+- [x] `02-background.tex`: §2.4 "MP-PDE" deleted. Temporal bundling, the pushforward trick and
+  zero stability are now two short paragraphs in §2.3 (after the distribution-shift paragraph;
+  author: keep them brief). §2.2.4 keeps MP-PDE only as the learned-stencil example and now
+  points to §4.3.2. Related Work is §2.4. Dropped with the section: the unverified bundle
+  sizes {20, 25, 50}, the "This thesis keeps …" paragraph (covered by the differences table).
+- [x] `04-method.tex`: "Backbone I" and "Backbone II" merged into §4.3 "The Operators"
+  (label `sec:method:family`). Order: 4.3.1 Operator Contract (now carries the full
+  batch-statistics argument, moved from the GNN normalisation paragraph) → 4.3.2
+  Message-Passing Graph Neural Network (`sec:method:mppde`; paragraphs "The original MP-PDE"
+  = the former §2.4 text, "The architecture used here" = former §4.3.1, "Differences from the
+  original" = former §4.3.3 with its table) → 4.3.3 Graph Construction → 4.3.4 Dense → 4.3.5
+  Floors → 4.3.6 FEN → 4.3.7 RK → 4.3.8 Parameter Matching. Removed labels:
+  `sec:background:mp-pde`, `sec:method:mppde:arch`, `sec:method:mppde:diff` (no references
+  left). "member of the family" / "countermodel" wording replaced by "operator".
+- [ ] Author to review Chapter 4 after this restructure (planned). The MP-PDE limitations
+  paragraph in §4.3.2 still points to the moving-mesh section §4.4, which is itself due to
+  move to Appendix G.
 - [x] #11 §4.2 "no memory of the trajectory": TODO added in 04-method.tex and a matching one in
   06-discussion.tex §6.3 (2026-09-27).
 - [ ] TODO (from #11): §6.3/§6.4 — discuss the missing trajectory memory (one visit in, no
@@ -777,7 +801,7 @@ Pulled from the code repository (`masterthesis-docker/NOTES.md` + `PROJECT_CONTE
 - [ ] TODO: confirm which persistence-baseline quantities are bit-identical across arms,
   and cite the runs (§4.1 inline TODO). `THESIS_FRAMEWORK.md` §0.2 asserts the
   "bit-identical persistence fingerprints across arms" without defining them.
-- [ ] TODO: verify the temporal-bundle sizes of the original MP-PDE. The set {20, 25, 50}
+- [x] (obsolete 2026-09-27: the sizes are no longer quoted anywhere, both inline TODOs removed) TODO: verify the temporal-bundle sizes of the original MP-PDE. The set {20, 25, 50}
   (from code-side notes) could not be found in the paper text; §2.4 carries an inline
   TODO, and the §4.3.3 table states only "K steps".
 - [ ] TODO: produce Figure `fig:method:pipeline` (§4.1) -- the shared pipeline with the

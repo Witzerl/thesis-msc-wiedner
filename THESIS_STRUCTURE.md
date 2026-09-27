@@ -72,13 +72,13 @@ Short primer on temporal PDEs, the method of lines, finite differences/volumes, 
 ### 2.3 Neural PDE solvers and surrogate architectures
 Widened from the original "operators vs autoregressive" framing so that every class later surveyed in §4.4 has its background here: neural operators (FNO, DeepONet), autoregressive solvers (MP-PDE), the U-Net as the standard strong surrogate baseline in this literature, finite-element / transport-based networks, and the Neural-ODE reading of a residual update. Explain why autoregressive is the right framing for clinical longitudinal data, and introduce the notion of an *inductive-bias ingredient* that the survey later measures.
 
-### 2.4 MP-PDE: Message-Passing Neural PDE Solvers
-Focused summary of Brandstetter et al. (2022): encode-process-decode architecture, temporal bundling, the pushforward trick and its zero-stability interpretation.
+### 2.4 ~~MP-PDE: Message-Passing Neural PDE Solvers~~ → removed (2026-09-27)
+Author decision: the Background holds no method descriptions; every method is explained in Chapter 4, on equal terms. The framework-level ideas from MP-PDE (temporal bundling, the pushforward trick, zero stability) are now two short paragraphs in §2.3 — keep them brief. The readable summary of the MP-PDE architecture opens the GNN subsection §4.3.2 ("The original MP-PDE"). §2.2.4 keeps MP-PDE only as the example of a learned stencil. Related Work is now §2.4.
 
 ### 2.5 ~~MM-PDE: Moving Mesh PDE Solvers~~ → moved to Appendix G (2026-09-25)
 The focused summary of Hu et al. (2024) (DMM, monitor function, equidistribution, dual branch, ItpNet) becomes the background part of Appendix G. The draft currently in `02-background.tex` §2.5 is to be moved there; Chapter 2 keeps at most one sentence in §2.3 pointing to it. Related work then becomes §2.5.
 
-### 2.6 Related work (becomes §2.5 once the MM-PDE section is moved)
+### 2.6 Related work (now §2.4, after the MM-PDE and MP-PDE sections left the Background)
 Short section on: deep learning for retinal imaging, GA progression models in the clinical literature (including Mai et al. 2024 as the direct comparison on the same cohort), other neural solvers applied to biomedical problems (if any).
 
 ## 3. Data and Preprocessing (~8-10 pages)
@@ -118,12 +118,15 @@ The part that is common to every arm and that demonstrably transfers.
 - **One visit in, no history**, and why (short clinical sequences).
 - Pointer forward to the shared loss and curriculum (§4.7) and shared evaluation (§5.1).
 
-### 4.3 Backbone I: the GA-adapted MP-PDE graph solver
+### 4.3 The Operators (merged 2026-09-27; formerly "Backbone I" + "Backbone II")
+One section, every operator on equal terms; for each, the original is summarised first, then the adaptation. Order: 4.3.1 operator contract (incl. the no-batch-statistics rule) → 4.3.2 message-passing GNN (original MP-PDE in the simple style of the former §2.4, the architecture used here, differences table) → 4.3.3 graph construction → 4.3.4 dense operators → 4.3.5 locality floors → 4.3.6 FEN → 4.3.7 RK wrapper → 4.3.8 parameter matching. The GNN may be longer (it supplies two arms and the floors), but is not framed as privileged; no "Backbone I/II", "countermodel" or "built rather than imported" wording. The two blocks below are the original specs, kept for content.
+
+#### (former 4.3) Backbone I: the GA-adapted MP-PDE graph solver
 The arm the project built rather than imported, in full detail — encoder, message passing, decoder, the Δt-conditioned output head. Explicitly note that the original MP-PDE's temporal bundling is removed entirely (strict K=1) because clinical sequences are short and a moved mesh computed from a single snapshot would be stale for later steps in a window.
 
 **The graph construction is the load-bearing part of this section**, not an implementation detail: the ~21:1 pixel-spacing anisotropy means an index-space k-NN hop reaches ±0.25 mm across B-scans but only ±0.011 mm along them, against a GA front that advances a median ~12 columns per visit. Present the index-space k-NN as the v1 construction and the dilated physical-scale stencil (rows ±1 x columns {0, ±7, ±14, ±21}) as the v2 lock, deriving the offsets from the lesion scale rather than presenting them as a hyperparameter. This is where §5.3's largest effect is set up.
 
-### 4.4 Backbone II: the countermodel family
+#### (former 4.4) Backbone II: the countermodel family
 Everything else that occupies the same slot, described on identical terms and at comparable depth — this section carries equal weight with §4.3.
 - The shared backbone contract every module satisfies.
 - **Dense countermodels:** U-Net (at two capacities), FNO, and the FNO + 3x3 local-kernel hybrid.

@@ -50,11 +50,11 @@ every run by the same evaluation code. Its values come out identical
 across all arms. This indicates that every arm was trained and evaluated on
 the same data through the same evaluation routine.
 
-All operators are described on the same terms. Each was taken from the
-literature and adapted to the same framework:
-\S\ref{sec:method:mppde} describes the graph solver adapted from MP-PDE,
-and \S\ref{sec:method:family} the remaining architectures. Before them, \S\ref{sec:method:framework} defines the parts every arm
-shares. After them, \S\ref{sec:method:mmpde} describes the moving-mesh
+\S\ref{sec:method:framework} defines the parts every arm shares.
+\S\ref{sec:method:family} then describes all operators on the same terms:
+each was taken from the literature, and for each the original is
+summarised before its adaptation to the framework. After that,
+\S\ref{sec:method:mmpde} describes the moving-mesh
 extension, \S\ref{sec:method:covariates} the conditioning inputs,
 \S\ref{sec:method:training} the shared training setup, and
 \S\ref{sec:method:implementation} the implementation.
@@ -106,7 +106,7 @@ several past visits as input would leave fewer visits available as
 prediction targets. Second, the framework predicts strictly one step at a
 time. Some neural PDE solvers, such as MP-PDE, predict several future
 steps in one forward pass (temporal bundling,
-\S\ref{sec:background:mp-pde}), but not all of the operators compared here
+\S\ref{sec:background:neural-pde}), but not all of the operators compared here
 support this. Bundling is therefore removed, so that every operator makes
 the same kind of prediction. In addition, as noted above, the sequences
 are so short that splitting them into multi-step windows would not be
@@ -205,27 +205,145 @@ the weights set in~\S\ref{sec:method:training}.
 % #19, 2026-09-27); see the TODO in Appendix G (91-appendix.tex).
 
 
-\section{Backbone I: The GA-Adapted Graph Solver}
+\section{The Operators}
+\label{sec:method:family}
+
+The framework of~\S\ref{sec:method:framework} provides one slot for the
+update operator $f_\theta$. This section describes every operator that
+occupies it. Each was chosen to isolate one property. A message-passing
+graph neural network, run on two different graphs, tests how far the
+spatial context of one step has to reach. A U-Net tests multiscale local
+detail. A Fourier Neural Operator tests global spectral support without a
+local path, and a hybrid adds a minimal local path to it. Two truncated
+graph networks test how much spatial context is needed at all. A Finite
+Element Network adds an explicit transport term. Finally, a Runge--Kutta
+wrapper changes the time integration of any of these operators. Because
+all of them run in the same training environment, differences between
+them can be attributed to the architecture rather than to the training
+protocol.
+
+\S\ref{sec:method:family:contract} states the interface every operator
+satisfies. \S\ref{sec:method:mppde} describes the message-passing network
+and \S\ref{sec:method:graph} the two graphs it runs on.
+\S\ref{sec:method:family:dense} describes the three dense grid operators,
+\S\ref{sec:method:family:floors} the locality floors, and
+\S\ref{sec:method:family:fen} the Finite Element Network.
+\S\ref{sec:method:family:rk} describes the integration wrapper, and
+\S\ref{sec:method:family:params} the parameter matching.
+
+\subsection{The Operator Contract}
+\label{sec:method:family:contract}
+
+Every operator satisfies the same interface. It is built from
+the same metadata --- one time step, eleven state channels and two
+covariates --- and it consumes the same batch. It returns the full next
+state in the residual form of Equation~\eqref{eq:method:residual-update}:
+the predicted residual is scaled by $\Delta t$ and added to the input
+state. The final layer of every architecture is initialised to zero, so
+every operator starts training at exact persistence. Each module computes the
+residual and the next state from one shared internal computation, so the
+two cannot diverge. The integration wrapper of~\S\ref{sec:method:family:rk}
+integrates exactly this residual.
+
+No operator uses a normalisation that keeps batch statistics. The training
+curriculum of~\S\ref{sec:method:training} rolls the model forward on its
+own predictions without gradients but in training mode. Batch
+normalisation \citep{Ioffe2015} would normalise these drifted states with
+the statistics of the current batch, which would erase the very
+perturbation the curriculum is meant to expose the model to. It would also
+write the drifted statistics into the running estimates that evaluation
+later uses, so that training and evaluation would behave as two different
+operators. The loss, the curriculum, the optimiser, the computational
+budget, the model selection and the random seeds are identical for every
+operator. The operators differ in their architecture only.
+
+The operators that work on the image grid --- the U-Net and the Fourier
+Neural Operator with its local-kernel hybrid --- receive identical inputs. Each takes
+sixteen input channels: the eleven state channels, $\Delta t$ broadcast as a
+constant plane, the two covariates broadcast as constant planes, and two
+coordinate ramps running from zero to one along each axis.
+The coordinate ramps follow the CoordConv construction of \citet{Liu2018}. Because the inputs are identical, a difference between these
+arms reflects the operator, not the information it receives.
+
+The grid operators and the Finite Element Network run as single-branch
+models and without the layer encoder of~\S\ref{sec:method:encoder}. The
+U-Net is therefore a like-for-like comparison with the single-branch graph
+solver, not with the moving-mesh variant of~\S\ref{sec:method:mmpde}. One
+technical difference remains: the convolutional arms run their convolutions
+at the default TF32 precision of the GPU, whereas the linear layers of the
+graph solver run in standard 32-bit precision. The arms are therefore not
+precision-matched (\S\ref{sec:method:implementation}).
+
+\subsection{Message-Passing Graph Neural Network}
 \label{sec:method:mppde}
 
-The first backbone is the encode--process--decode message-passing network
-of MP-PDE (\S\ref{sec:background:mp-pde}), adapted to the clinical setting.
-It is not a privileged arm. It is described in more depth than the others
-because this project built it rather than imported it, and because several
+The graph operator is the message-passing neural PDE solver (MP-PDE) of
+\citet{Brandstetter2022}, the learned-stencil solver introduced
+in~\S\ref{sec:background:pde-solvers:neural}. It supplies more than one arm
+of the survey: it is run on two different graphs
+(\S\ref{sec:method:graph}), and with fewer message-passing rounds it also
+provides the locality floors of~\S\ref{sec:method:family:floors}. Several
 of its design decisions --- the time handling, the output layer and the
-strict one-step prediction --- became part of the shared framework. The
-same network class is used for both branches of the moving-mesh extension
-of~\S\ref{sec:method:mmpde}. Temporal bundling is removed entirely, for the
-reasons given in~\S\ref{sec:method:framework}. \S\ref{sec:method:mppde:arch}
-describes the architecture, \S\ref{sec:method:graph} the graph it operates
-on, and \S\ref{sec:method:mppde:diff} summarises the departures from the
-original.
+strict one-step prediction --- also became part of the shared framework.
+The original is summarised first, followed by the architecture used here
+and the differences between the two.
 
-\subsection{Architecture}
-\label{sec:method:mppde:arch}
+\paragraph{The original MP-PDE.}
+MP-PDE is an autoregressive neural solver for time-dependent PDEs. It
+operates on a spatial graph, built on the analogy that grid points or
+finite-volume cells become nodes and numerical stencils become edges. The
+graph is built from a cut-off radius on regular grids, or by connecting
+the $k$ nearest neighbours on irregular meshes.
 
+The architecture follows the encode--process--decode pattern
+\citep{Battaglia2018, SanchezGonzalez2020}. An encoder, a per-node
+two-layer multilayer perceptron (MLP), lifts the node features into a
+latent space. Its input is
+$f_i^0 = \epsilon([u_i^{k-K:k}, x_i, t_k, \theta_{\text{PDE}}])$: the last
+$K$ states of the node, its position, the current time and the equation
+features.
+
+The processor applies several rounds of message passing to the latent
+node states; the original uses six. The message function is
+$m_{ij}^m = \phi(f_i^m, f_j^m, u_i^{k-K:k} - u_j^{k-K:k}, x_i - x_j,
+\theta_{\text{PDE}})$, and the node update is
+$f_i^{m+1} = \psi(f_i^m, \sum_j m_{ij}^m, \theta_{\text{PDE}})$. Both
+$\phi$ and $\psi$ are two-layer MLPs with skip connections and
+normalisation layers. The relative position $x_i - x_j$ builds
+translational symmetry into the network. The solution difference
+$u_i - u_j$ lets each message act as a learned local difference operator,
+a flexible learned stencil.
+
+The equation feature vector $\theta_{\text{PDE}}$ holds the PDE
+coefficients and the boundary-condition identifiers. It is injected at the
+encoder and at every message-passing layer. This persistent injection is
+what lets a single trained solver generalise across a family of equations;
+removing it hurts most when the equation parameters vary across the
+dataset.
+
+The decoder is a shallow one-dimensional convolutional network with
+weights shared across space. It treats the final hidden vector of each
+node as a temporal signal and convolves along it, producing one update per
+bundled step, $d_i = (d_i^1, \dots, d_i^K)$. The residual update
+$u_i^{k+l} = u_i^k + (t_{k+l} - t_k)\, d_i^l$ gives the prediction for each
+substep $1 \leq l \leq K$. As the step size approaches zero, the prediction
+approaches the current state, which keeps the update consistent
+(\S\ref{sec:background:pde-solvers:time}). The model is trained with
+temporal bundling and the pushforward trick
+(\S\ref{sec:background:neural-pde}). The original models have roughly one
+million parameters and a hidden size of the order of 128, and they are
+trained with AdamW.
+
+The original paper names three limitations: it needs high-quality
+numerical ground truth for training, it has no formal accuracy guarantees,
+and a uniform mesh is wasteful in smooth regions and under-resolved at
+sharp gradients. The last one motivates the moving-mesh extension
+of~\S\ref{sec:method:mmpde}, which uses the same network class for both of
+its branches.
+
+\paragraph{The architecture used here.}
 The forward pass consists of an encoder, a number of message-passing
-rounds and a decoder. The notation follows~\S\ref{sec:background:mp-pde}.
+rounds and a decoder. The notation follows the summary above.
 Each node $i$ carries the normalised eleven-channel state $u_i$ and its
 physical position $(x_i, y_i)$ in millimetres. The positions enter the
 network divided by the domain size, as $(x_i / L_x,\, y_i / L_y)$.
@@ -282,17 +400,12 @@ experiments reported in Chapter~\ref{ch:experiments}.
 
 All normalisation layers are per-node layer normalisations \citep{Ba2016}. Each node is normalised over its own feature vector. No running
 statistics are kept, and no nodes or graphs are coupled, so the operator is
-identical in training and in evaluation. This matters because of the
-training curriculum of~\S\ref{sec:method:training}, which rolls the model
-forward on its own predictions without gradients but in training mode.
-Batch normalisation \citep{Ioffe2015} would normalise these drifted
-states with the statistics of the current batch. This would erase the very
-perturbation the curriculum is meant to expose the model to. It would also
-write the drifted statistics into the running estimates that evaluation
-later uses. Before this change, training and evaluation measurably behaved
+identical in training and in evaluation, as the contract
+of~\S\ref{sec:method:family:contract} requires. Before this change, when
+batch normalisation was used, training and evaluation measurably behaved
 as two different operators. A graph-level variant that normalises a whole
-batch as one graph was avoided for the same reason, because it would couple
-the samples of a batch.
+batch as one graph was avoided as well, because it would couple the
+samples of a batch.
 
 The decoder maps the final hidden vector $f_i^{M}$ to one output per
 channel. It consists of a linear layer, layer normalisation and a ReLU,
@@ -315,6 +428,65 @@ restores full rank. Its final layer is initialised to zero on the uniform
 branch, which yields the persistence start
 of~\S\ref{sec:method:dt-residual}. On the correction branch of the moving
 mesh it must not be, for reasons given in~\S\ref{sec:method:dual}.
+
+\paragraph{Differences from the original.}
+Table~\ref{tab:method:mppde-diff} lists every departure from the original
+MP-PDE \citep{Brandstetter2022}. The original entries refer to the
+published paper; the original was evaluated mainly on one-dimensional
+equations, with additional two-dimensional smoke-inflow experiments, and
+used different settings for the two.
+
+\begin{table}[t]
+  \centering
+  \caption[Differences between the original MP-PDE and the graph solver of
+  this thesis.]{%
+    Differences between the original MP-PDE \citep{Brandstetter2022} and
+    the graph solver of this thesis. \emph{1-D} and \emph{2-D} refer to the
+    one-dimensional experiments and the two-dimensional smoke-inflow
+    experiments of the original. The original's aggregation is the sum
+    written in its node-update equation; the paper does not describe the
+    aggregation of its reference implementation.}
+  \label{tab:method:mppde-diff}
+  \small
+  \begin{tabular}{p{0.18\textwidth} p{0.35\textwidth} p{0.35\textwidth}}
+    \toprule
+    Aspect & Original MP-PDE & This thesis \\
+    \midrule
+    State & Scalar field of a PDE & Eleven-channel clinical state on a
+      2-D grid \\
+    Temporal bundling & $K$ future steps per forward pass & Removed;
+      one step per pass ($K = 1$) \\
+    Time & Fixed time step; current time as an input & Irregular
+      per-window $\Delta t$ as input and as multiplier; no shared time
+      origin \\
+    Equation identity & Known coefficients and boundary conditions
+      ($\theta_{\text{PDE}}$) & None known; $\Delta t$ and covariates in
+      that slot (\S\ref{sec:method:covariates}) \\
+    Graph & Cut-off radius (1-D, 2-D) or $k$-nearest neighbours (wave
+      equations), on positions & Index-space $k$-nearest neighbours, then
+      the dilated stencil (\S\ref{sec:method:graph}) \\
+    Aggregation & Sum over neighbours & Mean (canonical); mean and maximum
+      for the index-space arm \\
+    Activation & Swish (1-D); ReLU (2-D) & ReLU \\
+    Normalisation & Instance normalisation (1-D); batch normalisation
+      (2-D) & Per-node layer normalisation \\
+    Decoder & 1-D convolution along the node's hidden vector, read as a
+      temporal signal, emitting $K$ steps & Full-rank three-layer MLP;
+      last layer zero-initialised \\
+    Branches & One network & One class for the uniform and the correction
+      branch (\S\ref{sec:method:mmpde}) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Each change is motivated where it is introduced. The irregular time
+handling and the removal of bundling follow from the clinical visit
+schedule (\S\ref{sec:method:framework}, \S\ref{sec:method:dt-residual}).
+The conditioning vector replaces the unknown equation identity. The graph
+constructions follow from the anisotropy of the grid
+(\S\ref{sec:method:graph}). The normalisation and the decoder were changed
+so that the operator behaves identically under the training curriculum and
+represents all eleven channels independently (see above).
 
 \subsection{Graph Construction on an Anisotropic Grid}
 \label{sec:method:graph}
@@ -413,132 +585,6 @@ index-space graph with mean aggregation also 67\,147.
     GA front between two visits 180 days apart.}
   \label{fig:method:stencils}
 \end{figure}
-
-\subsection{Differences from the Original MP-PDE}
-\label{sec:method:mppde:diff}
-
-Table~\ref{tab:method:mppde-diff} lists every departure from the original
-MP-PDE \citep{Brandstetter2022}. The original entries refer to the
-published paper; the original was evaluated mainly on one-dimensional
-equations, with additional two-dimensional smoke-inflow experiments, and
-used different settings for the two.
-
-% TODO: verify the bundle sizes K used in Brandstetter et al. (2022). The
-% set {20, 25, 50} quoted in Section 2.4 could not be located in the
-% paper's text; the table therefore states only "K steps".
-\begin{table}[t]
-  \centering
-  \caption[Differences between the original MP-PDE and the graph solver of
-  this thesis.]{%
-    Differences between the original MP-PDE \citep{Brandstetter2022} and
-    the graph solver of this thesis. \emph{1-D} and \emph{2-D} refer to the
-    one-dimensional experiments and the two-dimensional smoke-inflow
-    experiments of the original. The original's aggregation is the sum
-    written in its node-update equation; the paper does not describe the
-    aggregation of its reference implementation.}
-  \label{tab:method:mppde-diff}
-  \small
-  \begin{tabular}{p{0.18\textwidth} p{0.35\textwidth} p{0.35\textwidth}}
-    \toprule
-    Aspect & Original MP-PDE & This thesis \\
-    \midrule
-    State & Scalar field of a PDE & Eleven-channel clinical state on a
-      2-D grid \\
-    Temporal bundling & $K$ future steps per forward pass & Removed;
-      one step per pass ($K = 1$) \\
-    Time & Fixed time step; current time as an input & Irregular
-      per-window $\Delta t$ as input and as multiplier; no shared time
-      origin \\
-    Equation identity & Known coefficients and boundary conditions
-      ($\theta_{\text{PDE}}$) & None known; $\Delta t$ and covariates in
-      that slot (\S\ref{sec:method:covariates}) \\
-    Graph & Cut-off radius (1-D, 2-D) or $k$-nearest neighbours (wave
-      equations), on positions & Index-space $k$-nearest neighbours, then
-      the dilated stencil (\S\ref{sec:method:graph}) \\
-    Aggregation & Sum over neighbours & Mean (canonical); mean and maximum
-      for the index-space arm \\
-    Activation & Swish (1-D); ReLU (2-D) & ReLU \\
-    Normalisation & Instance normalisation (1-D); batch normalisation
-      (2-D) & Per-node layer normalisation \\
-    Decoder & 1-D convolution along the node's hidden vector, read as a
-      temporal signal, emitting $K$ steps & Full-rank three-layer MLP;
-      last layer zero-initialised \\
-    Branches & One network & One class for the uniform and the correction
-      branch (\S\ref{sec:method:mmpde}) \\
-    \bottomrule
-  \end{tabular}
-\end{table}
-
-Each change is motivated where it is introduced. The irregular time
-handling and the removal of bundling follow from the clinical visit
-schedule (\S\ref{sec:method:framework}, \S\ref{sec:method:dt-residual}).
-The conditioning vector replaces the unknown equation identity. The graph
-constructions follow from the anisotropy of the grid
-(\S\ref{sec:method:graph}). The normalisation and the decoder were changed
-so that the operator behaves identically under the training curriculum and
-represents all eleven channels independently (\S\ref{sec:method:mppde:arch}).
-
-
-\section{Backbone II: The Countermodel Family}
-\label{sec:method:family}
-
-The framework of~\S\ref{sec:method:framework} provides one slot for the
-update operator $f_\theta$. This section describes every architecture other
-than the graph solver of~\S\ref{sec:method:mppde} that occupies that slot.
-Each of them is a comparison model --- a countermodel --- chosen to isolate
-one property. A U-Net tests multiscale local detail. A Fourier Neural
-Operator tests global spectral support without a local path, and a hybrid
-adds a minimal local path to it. Two truncated graph solvers test how much
-spatial context is needed at all. A Finite Element Network adds an explicit
-transport term. Finally, a Runge--Kutta wrapper changes the time integration
-of any of these operators. Because all of them run in the same training
-environment, differences between them can be attributed to the architecture
-rather than to the training protocol.
-
-\S\ref{sec:method:family:contract} states the interface every member
-satisfies. \S\ref{sec:method:family:dense} describes the three dense grid
-operators, \S\ref{sec:method:family:floors} the locality floors, and \S\ref{sec:method:family:fen} the Finite Element Network.
-\S\ref{sec:method:family:rk} describes the integration wrapper, and
-\S\ref{sec:method:family:params} the parameter matching.
-
-\subsection{The Backbone Contract}
-\label{sec:method:family:contract}
-
-Every member of the family satisfies the same interface. It is built from
-the same metadata --- one time step, eleven state channels and two
-covariates --- and it consumes the same batch. It returns the full next
-state in the residual form of Equation~\eqref{eq:method:residual-update}:
-the predicted residual is scaled by $\Delta t$ and added to the input
-state. The final layer of every architecture is initialised to zero, so
-every member starts training at exact persistence. Each module computes the
-residual and the next state from one shared internal computation, so the
-two cannot diverge. The integration wrapper of~\S\ref{sec:method:family:rk}
-integrates exactly this residual.
-
-No member uses a normalisation that keeps batch statistics. The reason is
-the one given in~\S\ref{sec:method:mppde:arch}: the training curriculum
-rolls the model forward on its own predictions in training mode, and batch
-statistics would make training and evaluation behave as two different
-operators. The loss, the curriculum, the optimiser, the computational
-budget, the model selection and the random seeds are identical for every
-member. The members differ in their architecture only.
-
-The operators that work on the image grid --- the U-Net and the Fourier
-Neural Operator with its local-kernel hybrid --- receive identical inputs. Each takes
-sixteen input channels: the eleven state channels, $\Delta t$ broadcast as a
-constant plane, the two covariates broadcast as constant planes, and two
-coordinate ramps running from zero to one along each axis.
-The coordinate ramps follow the CoordConv construction of \citet{Liu2018}. Because the inputs are identical, a difference between these
-arms reflects the operator, not the information it receives.
-
-The grid operators and the Finite Element Network run as single-branch
-models and without the layer encoder of~\S\ref{sec:method:encoder}. The
-U-Net is therefore a like-for-like comparison with the single-branch graph
-solver, not with the moving-mesh variant of~\S\ref{sec:method:mmpde}. One
-technical difference remains: the convolutional arms run their convolutions
-at the default TF32 precision of the GPU, whereas the linear layers of the
-graph solver run in standard 32-bit precision. The arms are therefore not
-precision-matched (\S\ref{sec:method:implementation}).
 
 \subsection{Dense Operators: U-Net, FNO and a Local-Kernel Hybrid}
 \label{sec:method:family:dense}
@@ -677,7 +723,7 @@ rounds.
 
 The Finite Element Network (FEN) of \citet{Lienen2022} builds the
 update from a finite-element discretisation of an unknown PDE. It is the only
-member of the family whose output is defined as a time derivative by
+operator whose output is defined as a time derivative by
 construction rather than as a next state. This is a property of the
 architecture. It is not a claim that the trained model behaves as a valid
 continuous-time system, which is tested in Chapter~\ref{ch:experiments}.
@@ -813,7 +859,7 @@ Chapter~\ref{ch:experiments}.
 \subsection{Parameter Matching}
 \label{sec:method:family:params}
 
-Every member of the family is matched in size to the canonical graph solver
+Every operator is matched in size to the canonical graph solver
 of~\S\ref{sec:method:graph}, which has 67\,147 parameters. The widths are
 chosen so that each arm comes as close to this count as its width
 granularity allows. The principle follows \citet{Hu2024}, who compare MM-PDE

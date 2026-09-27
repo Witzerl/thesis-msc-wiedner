@@ -750,8 +750,8 @@ non-linear stencil. The authors show that one, two and three rounds can
 represent finite differences, finite volumes and WENO respectively, so
 the classical schemes are special cases of the learned one. The output
 is applied in the residual form of~\eqref{eq:bg:euler}, which keeps the
-update consistent. \S\ref{sec:background:mp-pde} describes the
-architecture in detail.
+update consistent. The graph operator of this thesis is built on this
+solver and is described in~\S\ref{sec:method:mppde}.
 
 What the learned version gains is that $f$ no longer has to be written
 down: it is fitted to data, so the solver can be used where the
@@ -760,8 +760,8 @@ at all, and it can often run on coarser grids with larger steps. What it
 loses are the guarantees. A learned solver needs training data, has no
 convergence proof, and in a rollout it consumes its own predictions, so
 its errors can accumulate from step to step;
-\S\ref{sec:background:neural-pde} and~\S\ref{sec:background:mp-pde}
-discuss this problem and its remedies.
+\S\ref{sec:background:neural-pde} discusses this problem and its
+remedies.
 
 \subsection{Why this structure suits GA progression}
 \label{sec:background:pde-solvers:ga}
@@ -848,8 +848,29 @@ rather than numerical ground truth. The input distribution at test
 time therefore differs systematically from the distribution seen
 during training. This distribution shift is the central training
 difficulty for autoregressive rollouts.
-\S\ref{sec:background:mp-pde} describes the two primary mechanisms
-proposed to mitigate it.
+
+\citet{Brandstetter2022} propose two mechanisms against it together with
+their message-passing solver (\S\ref{sec:background:pde-solvers:neural}).
+The first is temporal bundling: the model predicts $K$ future steps in
+one forward pass. A rollout of a given length then needs $K$ times fewer
+solver calls, and the model is exposed to fewer shifts in its input
+distribution. The second is the pushforward trick. During training, the
+input state is replaced by the model's own one-step prediction from the
+preceding state, so the model is trained on the kind of input it will
+meet during a rollout. Two steps are unrolled, and gradients are
+propagated only through the last. Backpropagating through the first step
+as well would teach the model to make its errors small rather than to
+correct them.
+
+The authors relate the pushforward trick to zero stability. An update
+operator is zero-stable if a small perturbation of its input changes the
+output only by a bounded multiple,
+$\lVert \mathcal{A}(u^0 + \epsilon) - u^1 \rVert \leq \kappa \lVert
+\epsilon \rVert$, and the pushforward loss pushes the constant $\kappa$
+down. Together with the consistency of the residual form
+(\S\ref{sec:background:pde-solvers:time}), zero stability is the
+classical basis of a convergence argument. Chapter~\ref{ch:method}
+describes how the framework of this thesis uses the two mechanisms.
 
 Beyond graph networks, several distinct architecture families are used
 as PDE surrogates.
@@ -886,113 +907,6 @@ whether it combines global and local information, and whether it
 carries an explicit transport term. This thesis refers to these
 structural differences as inductive-bias ingredients.
 Chapter~\ref{ch:experiments} isolates and measures them.
-
-
-\section{MP-PDE: Message-Passing Neural PDE Solvers}
-\label{sec:background:mp-pde}
-
-\citet{Brandstetter2022} introduced an autoregressive neural solver for
-time-dependent PDEs in conservation form. The solver operates on a
-spatial graph, leveraging a direct analogy where grid points or
-finite-volume cells become nodes, and numerical stencils become edges.
-The spatial graph is constructed dynamically via a cutoff radius on
-regular grids, or by connecting $k$-nearest-neighbours on irregular
-meshes.
-
-The architecture follows a standard encode--process--decode pattern
-\citep{Battaglia2018, SanchezGonzalez2020}. An encoder,
-implemented as a per-node two-layer multilayer perceptron (MLP), lifts
-the initial node features into a latent space. The encoder input takes
-the form
-$f_i^0 = \epsilon([u_i^{k-K:k}, x_i, t_k, \theta_{\text{PDE}}])$.
-
-The processor applies multiple rounds of message passing to update the
-latent node state; the original paper sets the number of rounds to six.
-The message function is defined as
-$m_{ij}^m = \phi(f_i^m, f_j^m, u_i^{k-K:k} - u_j^{k-K:k}, x_i - x_j,
-\theta_{\text{PDE}})$, and the subsequent node update is
-$f_i^{m+1} = \psi(f_i^m, \sum_j m_{ij}^m, \theta_{\text{PDE}})$. Both
-$\phi$ and $\psi$ are parameterised as two-layer MLPs with skip
-connections and normalisation layers. The inclusion of relative
-positions $x_i - x_j$ directly encodes translational symmetry into the
-network. The solution differences $u_i - u_j$ act as a learned local
-difference operator, establishing a flexible learned stencil.
-
-A core representational claim of the MP-PDE framework is that message
-passing can approximate classical numerical schemes. The
-authors mapped roughly one message-passing layer to a finite-difference
-scheme, two layers to finite volumes, and three layers to a WENO5
-reconstruction.
-
-The equation feature vector, denoted $\theta_{\text{PDE}}$, holds the
-PDE coefficients and the boundary-condition identifiers. Crucially,
-this vector is injected both at the encoder and at every single
-message-passing layer. This persistent injection is what enables a
-single trained solver to generalise across a family of equations.
-Ablating the $\theta_{\text{PDE}}$ injection degrades performance most
-severely when the equation parameters vary across the dataset.
-
-The decoder is a shallow one-dimensional convolutional neural network
-with weights shared across the spatial dimensions. It treats the final
-hidden vector of each node as a temporal signal and convolves along it,
-producing a sequence of updates $d_i = (d_i^1, \dots, d_i^K)$. A residual update
-$u_i^{k+l} = u_i^k + (t_{k+l} - t_k) d_i^l$ produces the final
-prediction for each substep $1 \leq l \leq K$. This formulation is
-motivated by numerical consistency: the update must necessarily
-converge to the true solution as the temporal step size approaches
-zero.
-
-In MP-PDE, two distinct mechanisms mitigate the accumulation of rollout
-errors.
-% TODO: verify the bundle sizes against Brandstetter et al. (2022); the
-% set {20, 25, 50} comes from the code-side notes and could not be located
-% in the paper's text. Remove the parenthesis if it cannot be confirmed.
-The first is temporal bundling. The model predicts $K$ future steps per
-forward pass (with $K \in \{20, 25, 50\}$ in the original evaluation).
-This reduces the total number of solver calls required along a given
-rollout by a factor of $K$, which in turn reduces the number of
-accumulated distribution shifts the model is exposed to.
-
-The second mechanism is the pushforward trick, an adversarial stability
-loss. During training, the input state is perturbed by the model's own
-one-step prediction from the preceding state. This ensures that the
-perturbation applied to the training input is drawn from the exact
-distribution the solver will subsequently face at inference time. The
-trick is implemented by unrolling two steps and backpropagating only
-through the last; gradients on the earlier step are deliberately cut.
-Cutting the gradients is both faster and more stable, because
-backpropagating through the perturbation itself would teach the model
-to make the perturbation small rather than learning to correct it. This
-technique empirically outperforms training with Gaussian noise, which
-improves stability but consistently incurs a cost to predictive
-accuracy.
-
-The pushforward trick is theoretically grounded in the concept of zero
-stability. An update operator is considered zero-stable if
-$\lVert A(u^0 + \epsilon) - u^1 \rVert \leq \kappa \lVert \epsilon
-\rVert$ for a small constant $\kappa$. The pushforward loss directly
-minimises this constant $\kappa$. Zero stability, together with
-consistency, provides the fundamental convergence argument that the
-MP-PDE architecture relies upon.
-
-At scale, the original MP-PDE models comprise roughly one million
-parameters. The hidden representation size is of the order of 128, and
-the networks are trained using the AdamW optimiser.
-
-The original paper states three clear limitations. High-quality
-numerical ground truth is strictly required for training. There are no
-formal accuracy guarantees. Finally, a uniform mesh is wasteful in
-smooth regions and under-resolved at sharp gradients. This last
-limitation directly motivates the moving-mesh extension, which is
-treated as an additional experiment in
-Appendix~\ref{app:mm-pde}.
-
-This thesis keeps the residual update formulation and the pushforward
-trick. It modifies the architecture by conditioning the update on a
-variable $\Delta t$ rather than on the absolute time $t$, and removes
-temporal bundling entirely. The
-specifics of this adaptation are deferred to
-Chapter~\ref{ch:method}.
 
 
 \section{Related Work}
