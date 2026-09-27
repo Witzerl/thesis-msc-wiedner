@@ -443,8 +443,19 @@ be longer, since it supplies two arms and the floors).
   RK wrapper, and ItpNet from the §4.5 Training TODO; each is kept as a TODO in Appendix G.
   Chapter 4 now mentions the mesh twice: one pointer sentence in §4.1 and a parenthetical
   Appendix G reference in the MP-PDE limitations paragraph (§4.3.2). Chapter 4 renumbers:
-  4.4 Conditioning, 4.5 Training, 4.6 Implementation. **Still open:** §5.5 "Moving Mesh
-  Quality" is still in Chapter 5 and is due to move to Appendix G.
+  4.4 Conditioning, 4.5 Training, 4.6 Implementation.
+- [x] 2026-09-27: §5.5 "Moving Mesh Quality" (placeholder) moved to Appendix G as G.3
+  (`app:mm-pde:mesh-quality`); Chapter 5 renumbers (5.5 Qualitative, 5.6 Cost). The mesh items
+  of the §5.4 ablation TODO list were removed.
+- [x] 2026-09-27: §4.4 retitled "Conditioning: Patient Covariates"; the "Surrogate Equation
+  Encoder" subsection is commented out (author: off in every reported arm, only the T5 ablation,
+  a null). It is to become one short paragraph in §4.4. The two references to it (operator
+  contract, GNN conditioning vector) now point to §4.4.
+- [ ] 2026-09-27: §4.4 Conditioning, §4.5 Training and §4.6 Implementation to be drafted by an
+  external LLM from a fact-sheet prompt (same format as the §4.4-family prompt of 2026-09-18),
+  then audited line by line here. Pending external citations proposed in that prompt:
+  **Milletari2016** (soft-Dice, V-Net, 3DV 2016, arXiv:1606.04797) and **Loshchilov2019**
+  (AdamW, ICLR 2019, arXiv:1711.05101).
 - [x] #11 §4.2 "no memory of the trajectory": TODO added in 04-method.tex and a matching one in
   06-discussion.tex §6.3 (2026-09-27).
 - [ ] TODO (from #11): §6.3/§6.4 — discuss the missing trajectory memory (one visit in, no

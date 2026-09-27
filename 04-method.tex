@@ -263,11 +263,9 @@ coordinate ramps running from zero to one along each axis.
 The coordinate ramps follow the CoordConv construction of \citet{Liu2018}. Because the inputs are identical, a difference between these
 arms reflects the operator, not the information it receives.
 
-The grid operators and the Finite Element Network run without the layer
-encoder of~\S\ref{sec:method:encoder}, as does the canonical graph
-operator. The U-Net is therefore a like-for-like comparison with the graph
-operator. One
-technical difference remains: the convolutional arms run their convolutions
+None of the operators uses the optional layer encoder
+of~\S\ref{sec:method:covariates}. One technical difference between the arms
+remains: the convolutional arms run their convolutions
 at the default TF32 precision of the GPU, whereas the linear layers of the
 graph solver run in standard 32-bit precision. The arms are therefore not
 precision-matched (\S\ref{sec:method:implementation}).
@@ -349,7 +347,7 @@ Each node also receives a conditioning vector $\mathbf{c}_i$. In the
 canonical configuration it has three entries: the interval $\Delta t$ in
 years, the z-scored age and the sex of the patient. All three are
 graph-level quantities, broadcast to every node of the graph. An optional
-learned layer embedding can be appended (\S\ref{sec:method:encoder}); it is
+learned layer embedding can be appended (\S\ref{sec:method:covariates}); it is
 switched off in the canonical configuration. The conditioning vector fills
 the slot that the equation feature vector $\theta_{\text{PDE}}$ occupies in
 the original. No governing equation or coefficients are known for GA, so
@@ -910,15 +908,19 @@ The Runge--Kutta wrapper adds no parameters to any backbone.
 \end{table}
 
 
-\section{Conditioning: Covariates and the Coefficient Surrogate}
+\section{Conditioning: Patient Covariates}
 \label{sec:method:covariates}
 
 % TODO: age and sex broadcast per node into the conditioning vector. Their
-% value is an open question at this point; Chapter 5 reports it.
+% value is an open question at this point; Chapter 5 reports it. One short
+% paragraph on the optional layer encoder (off in every reported arm,
+% tested only as an ablation).
 
-\subsection{Surrogate Equation Encoder}
-\label{sec:method:encoder}
-
+% Subsection "Surrogate Equation Encoder" commented out 2026-09-27 (author:
+% the encoder is off in every reported arm and was only tested in the T5
+% ablation, a null). It is reduced to one paragraph in this section.
+% \subsection{Surrogate Equation Encoder}
+% \label{sec:method:encoder}
 % TODO: the LayerEncoder CNN, framed as a learned stand-in for theta_PDE.
 % Its stride schedule corrects only ~2x of the ~21:1 anisotropy.
 

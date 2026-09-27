@@ -212,9 +212,21 @@ evolving clinical data is the question this appendix tests.
 % TODO: ItpNet pretraining at epoch 0 with its own optimiser (moved out of
 % Section 4.7).
 
+\section{Moving Mesh Quality}
+\label{app:mm-pde:mesh-quality}
+
+% Moved here from Chapter 5 (former \S5.5) on 2026-09-27; still to be written.
+% TODO: the DMM judged on its own terms, independent of whether the dual
+% branch helped: equidistribution CoV, tangled-cell counts, geometric
+% quality, capacity/overfitting behaviour across branch architectures and
+% seeds (native-grid canonical checkpoint; metrics in-sample, see
+% THESIS_FRAMEWORK.md). Visualise example moved meshes overlaid on sample
+% states. This licenses reading the null as "the correction branch did not
+% engage" rather than "the mesh was bad".
+
 % TODO: remaining Appendix G content (THESIS_STRUCTURE.md): the result (dual - bypass =
 % -0.0001 +- 0.0060, scoped as the correction branch's failure to
-% optimise), the mesh-quality study (former \S5.5) and the ~10x cost.
+% optimise), and the ~10x cost.
 % TODO: state here why the moving mesh also requires one-step prediction:
 % the mesh is computed from a single state, so a mesh built at the start
 % of a multi-step window would no longer reflect the lesion at the later
