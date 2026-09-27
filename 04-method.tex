@@ -911,34 +911,308 @@ The Runge--Kutta wrapper adds no parameters to any backbone.
 \section{Conditioning: Patient Covariates}
 \label{sec:method:covariates}
 
-% TODO: age and sex broadcast per node into the conditioning vector. Their
-% value is an open question at this point; Chapter 5 reports it. One short
-% paragraph on the optional layer encoder (off in every reported arm,
-% tested only as an ablation).
+Every window carries two patient-level covariates, the age of the patient
+at the start visit and the sex. Their extraction and encoding are described
+in~\S\ref{sec:data:covariates}. This section describes how they enter the
+operators. Both covariates are graph-level quantities: a visit has one
+value of each, and that value is shared by all $50\,176$ grid positions.
+Along the trajectory of one eye, the sex is constant and the age advances
+only with the elapsed time. Because the covariates carry no spatial
+information, they can only shift the prediction of an operator as a
+whole. They cannot point to a location on the grid or shape the lesion
+boundary locally.
+
+The covariates are included because age and sex are plausible modulators
+of how fast GA progresses. Together with $\Delta t$, they fill the slot
+that the equation features $\theta_{\text{PDE}}$ occupy in MP-PDE, since
+no governing equation with known coefficients exists for GA
+(\S\ref{sec:method:mppde}). How they enter the forward pass depends on the
+operator. In the graph network, they are two of the three entries of the
+conditioning vector, broadcast to every node and injected at the encoder
+input, into every message and into every node update
+(\S\ref{sec:method:mppde}). The per-pixel and one-hop floors are truncated
+graph networks and receive them in the same way
+(\S\ref{sec:method:family:floors}). In the dense grid operators --- the
+U-Net, the Fourier Neural Operator and the local-kernel hybrid --- each
+covariate is an extra input channel holding a constant plane
+(\S\ref{sec:method:family:contract}). The free-form network of the Finite
+Element Network receives them as additional inputs
+(\S\ref{sec:method:family:fen}). Inside the Runge--Kutta wrapper, they are
+held fixed across the stages of one integration step
+(\S\ref{sec:method:family:rk}).
+
+The covariates are enabled in the canonical configuration of every
+operator. Whether they carry useful information about progression is an
+open question at this point. Chapter~\ref{ch:experiments} tests it by
+training a model without them, and by comparing the per-visit age with the
+baseline age (\S\ref{sec:experiments:ablations}).
+
+The framework also provides an optional layer encoder. It compresses the
+ten layer-boundary channels of the current state into one global embedding
+vector per visit, which is appended to the conditioning vector of the graph
+network next to $\Delta t$ and the covariates. It was intended as a learned
+stand-in for the equation features: a summary of the retinal structure the
+operator is evolving, so that the network does not have to extract the
+layer geometry through message passing. The encoder consists of four
+$3 \times 3$ convolutions with group normalisation and ReLU activations,
+with strides that reduce the rows by a factor of four and the columns by a
+factor of eight, followed by adaptive average pooling and a linear layer.
+It is recomputed at every forward pass, so during a rollout it encodes
+predicted rather than observed layers. The encoder is switched off in the
+canonical configuration and in every operator of the main comparison. It
+was run only as an ablation over four embedding widths (32, 64, 128 and
+256), reported in Chapter~\ref{ch:experiments}.
 
 % Subsection "Surrogate Equation Encoder" commented out 2026-09-27 (author:
 % the encoder is off in every reported arm and was only tested in the T5
 % ablation, a null). It is reduced to one paragraph in this section.
-% \subsection{Surrogate Equation Encoder}
-% \label{sec:method:encoder}
-% TODO: the LayerEncoder CNN, framed as a learned stand-in for theta_PDE.
-% Its stride schedule corrects only ~2x of the ~21:1 anisotropy.
 
 
 \section{Training}
 \label{sec:method:training}
 
-% TODO: channel-weighted MSE + soft-Dice objective; time-budgeted
-% pushforward curriculum (unroll depth in elapsed days); per-module
-% gradient clipping (ItpNet pretraining goes to Appendix G); optimiser
-% and schedule. Monotonic penalty is 0.0 and the residual is signed.
+Everything in this section is shared by every operator of the survey
+(\S\ref{sec:method:family:contract}). The objective, the curriculum and the
+optimisation settings do not change between arms, so that a difference
+between two arms can be attributed to the operator.
+
+\subsection{Objective}
+\label{sec:method:training:loss}
+
+The loss is computed on the normalised state (\S\ref{sec:data:normalization})
+and has two terms, a channel-weighted mean squared error (MSE) and a
+soft-Dice term on the mask channel:
+\begin{equation}
+  \mathcal{L} \;=\; \frac{1}{\bar{w}} \sum_{c=0}^{10} w_c\,
+  \mathcal{L}_{\text{MSE}}^{(c)} \;+\; \lambda_{\text{Dice}}\,
+  \mathcal{L}_{\text{Dice}},
+  \label{eq:method:loss}
+\end{equation}
+where $\mathcal{L}_{\text{MSE}}^{(c)}$ is the mean squared error of
+channel~$c$, $w_c$ its weight and $\bar{w}$ the mean of the weights.
+The mask channel ($c = 0$) has the weight $w_0 = 5$, and each of the ten
+layer channels has the weight $w_c = 1$. Dividing by the mean weight keeps
+the scale of the term comparable to an unweighted MSE. The mask is the
+clinical target. The layer channels are auxiliary targets, but the
+operator must still predict them, because they are part of the next state
+that is fed back during a rollout.
+
+% TODO: cite Milletari2016 (Milletari, Navab & Ahmadi, "V-Net: Fully
+% Convolutional Neural Networks for Volumetric Medical Image
+% Segmentation", 3DV 2016, arXiv:1606.04797)
+The second term is a soft-Dice loss on the mask channel (Milletari et al.,
+2016), with the weight $\lambda_{\text{Dice}} = 5$. It addresses a property
+of the data. Between two consecutive visits, almost all mask pixels are
+unchanged, so a plain MSE is dominated by static pixels and gives little
+gradient at the moving lesion boundary. A model trained on it can settle on
+copying its input. The soft-Dice term restores gradient in the band around
+the binarisation threshold, which is where the boundary lies. Unlike the
+original, which scores a segmentation probability map, it is applied here
+to a regression output. The prediction $p$ of the mask channel is first
+turned into a soft mask,
+\begin{equation}
+  p_{\text{soft}} \;=\; \sigma\!\left(s\,(p - \tau)\right),
+  \label{eq:method:soft-mask}
+\end{equation}
+where $\sigma$ is the logistic sigmoid, $s = 2$ the sharpness and $\tau$
+the physical threshold of 0.5 mapped into normalised space. The evaluation
+uses the same mapping (\S\ref{sec:data:normalization}), so the loss and the
+metric agree on where the threshold lies. With the hard-thresholded target
+mask $t$, the term is
+$\mathcal{L}_{\text{Dice}} = 1 - 2 \sum p_{\text{soft}} t \,/\,
+(\sum p_{\text{soft}} + \sum t)$.
+
+The soft-Dice term is computed per eye and then averaged over the batch.
+A Dice score is a ratio of sums. If the sums were pooled over the whole
+batch, the gradient for one eye would depend on which other eyes it was
+batched with. Scoring per eye also matches the evaluation, which scores
+each eye separately before averaging. One side effect is accepted. The
+sigmoid of Equation~\eqref{eq:method:soft-mask} does not saturate at the
+physical mask values, so the term stretches the raw mask regression about
+the threshold. This cannot change a thresholded prediction, but it changes
+the raw error of the mask channel. It is one reason why the evaluation does
+not compare operators on raw errors (Chapter~\ref{ch:experiments}).
+
+Two further options exist in the implementation and are off in every
+reported run. First, the loss can exclude grid positions whose target
+equals the fill value of the crop padding (\S\ref{sec:data:spatial}), from
+both terms.
+% TODO: confirm with the author whether the pad-masked ablation leg (fold 2)
+% is reported in Chapter 5; if not, say only "off in every reported run".
+Since this option is off, the padded positions are regressed at full
+weight. The evaluation handles padding instead, through pad-masked
+variants of its metrics (\S\ref{sec:experiments:protocol}). Second, a
+monotonic-growth penalty can be added, which penalises a decrease of the
+mask where the previous state is atrophic. Its weight is zero in every
+reported run; \S\ref{sec:method:dt-residual} explains why no monotonic
+constraint is imposed. The same loss is used in training and in
+validation.
+
+\subsection{Time-Budgeted Pushforward Curriculum}
+\label{sec:method:training:curriculum}
+
+The operators are trained with the pushforward trick of
+\citet{Brandstetter2022} (\S\ref{sec:background:neural-pde}): the model is
+rolled forward on its own predictions without gradients, and only the
+final step is supervised. The original counts the depth of this rollout in
+steps. With irregular visit intervals (\S\ref{sec:data:temporal}), a step
+count is not a comparable quantity: two steps can mean 180 days for one eye
+and 720 days for another. The framework therefore counts the depth in
+elapsed days.
+
+Each training pass draws a time budget $B$ uniformly from
+$\{0, 1, \dots, \min(e, U)\} \times 180$ days, where $e$ is the current
+epoch. The base of 180 days is the modal visit interval of the cohort
+(\S\ref{sec:data:temporal}). Every reported run uses $U = 2$, so the
+largest budget is 360 days, which matches the one-year evaluation anchor.
+Because of the $\min(e, U)$, the horizon ramps in over the first $U$
+epochs; after that, budgets of 0, 180 and 360 days are drawn with equal
+probability. A budget of zero gives a plain one-step pass on observed
+inputs.
+
+For a given budget, only start windows that can realise it are sampled.
+The chain of consecutive visits from such a window must reach at least $B$
+days in total, and its first interval must not exceed $B$. If an eye has no
+such window, sampling for that eye falls back to all of its windows.
+% TODO: confirm that the feasibility restriction is applied only for B > 0
+% (for B = 0 the first-interval condition could never hold).
+The number of unrolled steps for each eye then follows an undershoot rule:
+it is the largest $n$ for which the $n$ rolled intervals and the final,
+supervised interval together stay within $B$. The chain never overshoots
+the budget, so eyes on different visit schedules are trained to the same
+elapsed horizon. This is also why the base is 180 days and not the
+shortest interval of 90 days. Under the undershoot rule, a 90-day budget
+can never chain two visits (\S\ref{sec:data:temporal}), and the curriculum
+would never unroll at all.
+
+Within a batch, the eyes are grouped by their number of unrolled steps.
+Each group is rolled forward $n$ steps without gradients: at every step,
+the next window of the eye is fetched and its input state is replaced by
+the model's own prediction. All channels are rolled, including the
+predicted mask. An eye whose sequence ends is dropped from the chain. The
+group then receives one forward pass with gradients, and the loss is taken
+against the observed next state. The group losses are weighted by the
+share of the batch each group holds and combined. The rollout runs in
+training mode, which is why no operator may use batch statistics
+(\S\ref{sec:method:family:contract}).
+
+\subsection{Optimisation}
+\label{sec:method:training:optim}
+
+% TODO: cite Loshchilov2019 (Loshchilov & Hutter, "Decoupled Weight Decay
+% Regularization", ICLR 2019, arXiv:1711.05101)
+All operators are trained with AdamW (Loshchilov and Hutter, 2019), a
+learning rate of $2 \times 10^{-3}$ and a weight decay of
+$1 \times 10^{-2}$ on all trainable parameters. The learning rate is
+multiplied by 0.4 after epoch 5 and again after epoch 20.
+
+Training runs for 30 epochs. One epoch consists of 20 passes. In each pass,
+a new time budget is drawn, and every training eye contributes one randomly
+chosen start window that can realise it. The batch size is four eyes.
+Because the number of training eyes differs between the folds
+(\S\ref{sec:data:splits}), an epoch has between 280 and 320 optimiser
+steps, depending on the fold.
+
+Gradients are clipped to a norm of 1.0, separately for each trainable
+module: each module is clipped by its own gradient norm, so that a large
+gradient in one module cannot shrink the updates of another. For the
+single-network operators of the main comparison, this amounts to one clip
+over the whole model. The separation matters for the moving-mesh extension
+of Appendix~\ref{app:mm-pde}.
+
+Every reported run uses the seed 42; replication runs with the seed 7 are
+reported in Chapter~\ref{ch:experiments}. The model is validated on the
+held-out fold after every epoch (\S\ref{sec:data:splits}). Model selection
+and the reporting of late-epoch means are part of the evaluation protocol
+(\S\ref{sec:experiments:protocol}). Table~\ref{tab:method:hparams}
+summarises the shared settings.
+
+\begin{table}[t]
+  \centering
+  \caption[Shared training settings.]{%
+    Training settings shared by every operator of the survey. None of
+    these settings changes between arms.}
+  \label{tab:method:hparams}
+  \small
+  \begin{tabular}{p{0.32\textwidth} p{0.58\textwidth}}
+    \toprule
+    Setting & Value \\
+    \midrule
+    Optimiser & AdamW \\
+    Learning rate & $2 \times 10^{-3}$, multiplied by 0.4 after epochs 5
+      and 20 \\
+    Weight decay & $1 \times 10^{-2}$ \\
+    Epochs $\times$ passes per epoch & $30 \times 20$ \\
+    Batch size & 4 eyes \\
+    Gradient clipping & Norm 1.0, per module \\
+    Loss weights & Mask MSE 5, layer MSE 1 each, soft-Dice 5 (sharpness
+      2), monotonic penalty 0 \\
+    Pad-position masking & Off \\
+    Pushforward budget & Base 180 days, maximum 360 days ($U = 2$) \\
+    Seeds & 42 (replication: 7) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
 
 \section{Implementation Details}
 \label{sec:method:implementation}
 
-% TODO: hardware, framework versions, run identity / checkpointing,
-% graph precomputation, notable engineering choices.
+% TODO: cite Paszke2019 (Paszke et al., "PyTorch: An Imperative Style,
+% High-Performance Deep Learning Library", NeurIPS 2019, arXiv:1912.01703)
+% TODO: cite Fey2019 (Fey & Lenssen, "Fast Graph Representation Learning
+% with PyTorch Geometric", ICLR 2019 Workshop on Representation Learning on
+% Graphs and Manifolds, arXiv:1903.02428)
+The framework is implemented in Python with PyTorch 2.4.1 and CUDA 12.1
+(Paszke et al., 2019). The graph operators use PyTorch Geometric (Fey and
+Lenssen, 2019).
+% TODO: record the PyTorch Geometric version from the container.
+All dependencies are pinned in a fixed container image. Every reported run
+was trained on a single NVIDIA RTX A6000 GPU on a cluster managed by
+Slurm, and the five folds of an experiment are submitted together as a job
+array.
+
+The windows of each fold are precomputed once before training. This step
+performs the crop and pad, the normalisation and the extraction of
+$\Delta t$ and the covariates, and it builds the index-space neighbour
+graph. Because the grid is the same for every visit, one graph serves all
+windows. The dilated stencil of the canonical graph network
+(\S\ref{sec:method:graph}) is built at run time from the grid indices
+rather than stored. All precomputed data are held in memory during
+training.
+
+All random number generators --- those of Python, NumPy, PyTorch and CUDA
+--- are seeded, and deterministic cuDNN algorithms are enforced. The data
+loader runs in the main process. This is required, because the curriculum
+changes the sampling restriction of the dataset at every pass, and a change
+made in the main process would not reach separate worker processes. Even
+so, repeated runs of the same configuration do not give identical results
+on the GPU. Chapter~\ref{ch:experiments} quantifies this run-to-run
+variation, and it defines the noise floor against which every comparison
+is read. The operators are also not matched in numerical precision: the
+convolutional operators run at the default TF32 precision of the GPU,
+whereas the linear layers of the graph network run in standard 32-bit
+precision (\S\ref{sec:method:family:contract}).
+
+Every run writes its complete configuration into its run directory at the
+start. The name of the directory encodes the key settings, the fold and the
+data variant. Since 2 September 2026, each run also records the version of
+the code it ran; earlier runs are dated by the timestamp of their
+directory. Because every fold is mounted at the same path on the cluster,
+each run also records which fold and data variant it loaded. After every
+epoch, the latest state of the model is saved, together with the best
+state according to the validation metric. Resuming an interrupted run is
+disabled, so every reported run was trained in one piece.
+
+The per-epoch metrics of all runs are collected into one version-controlled
+results table, and every training result reported in this thesis is read
+from it. Each reported number can therefore be traced to a recorded run and
+its configuration. Training cost is reported as the minimum epoch time of a
+run, taken from the fold on which it is lowest, and that fold is named. The
+mean is not used, because the epoch times of a run carry a near-constant
+additive overhead, which would penalise cheap operators. The number of
+optimiser steps per epoch also differs slightly between the folds. The
+measurements are reported in~\S\ref{sec:experiments:cost}.
 
 
 %%

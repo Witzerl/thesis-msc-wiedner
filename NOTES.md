@@ -366,7 +366,7 @@ Being worked through one item at a time.
 - [x] #31 §3.3 bold "21.335 times larger"; #32 forward reference for pad positions excluded
   from the loss; #33 add an outlook TODO: find better cropping pre-processing. All done
   2026-09-26: #32 points to §4.7 (`sec:method:training`), #33 is a `% TODO` in §6.4.
-- [ ] TODO (from #32): §4.7 Training (still unwritten) must describe the optional pad-position
+- [x] (2026-09-27: §4.5.1 describes the option and states it is off in every reported run) TODO (from #32): §4.7 Training (still unwritten) must describe the optional pad-position
   loss masking (`--exclude_pad_nodes`) and state whether any reported run uses it, since
   §3.3 now points there (inline `% TODO` in 03-data.tex).
 - [ ] TODO (from #33): §6.4 Future Work — find a better cropping / spatial pre-processing than
@@ -451,11 +451,35 @@ be longer, since it supplies two arms and the floors).
   Encoder" subsection is commented out (author: off in every reported arm, only the T5 ablation,
   a null). It is to become one short paragraph in §4.4. The two references to it (operator
   contract, GNN conditioning vector) now point to §4.4.
-- [ ] 2026-09-27: §4.4 Conditioning, §4.5 Training and §4.6 Implementation to be drafted by an
+- [x] 2026-09-27: §4.4 Conditioning, §4.5 Training and §4.6 Implementation to be drafted by an
   external LLM from a fact-sheet prompt (same format as the §4.4-family prompt of 2026-09-18),
   then audited line by line here. Pending external citations proposed in that prompt:
   **Milletari2016** (soft-Dice, V-Net, 3DV 2016, arXiv:1606.04797) and **Loshchilov2019**
   (AdamW, ICLR 2019, arXiv:1711.05101).
+- [x] 2026-09-27: §4.4-§4.6 drafted externally, audited line by line against THESIS_FRAMEWORK.md
+  §2.6, §4.6, §6, §8 and PROJECT_CONTEXT.md, spliced in (pages 40-45). Corrections made:
+  - **Wrong:** the dilated stencil was attributed to "the local-kernel hybrid (§4.2.2)" -- it is
+    the graph network's (§4.3.3). The cost convention read "minimum epoch time during a run on a
+    named fold"; it is the minimum over folds, with that fold named.
+  - **Invented, removed:** "the network quickly learns to reproduce [the fill values]"; "data
+    processing is front-loaded to ensure high throughput"; the additive epoch overhead attributed
+    to "validation and checkpointing routines" (the source gives no cause); cost reported
+    "conservatively" (the minimum is not conservative); "operators are trained without them"
+    (the covariate ablation trains *a* model, not every operator); the gradient-clip grouping
+    called "architecturally required" for the mesh extension.
+  - **Broken by the paste:** the loss equation's subscripts (`*{...}`) and the table row ends
+    (`\` collapsed to `\`); channel index changed to c = 0..10 so the mask is channel 0 as in
+    Ch. 3.
+  - **Trimmed repeats** of the pushforward trick and the batch-statistics argument; filler
+    removed ("strictly", "massive", "inadvertently", "rigorous", "pivotal", "monolithic").
+- [ ] TODO (§4.5.1 inline): decide whether the pad-masked loss ablation (fold 2, L5nopad leg) is
+  reported in Chapter 5; if not, the text stays "off in every reported run".
+- [ ] TODO (§4.5.2 inline): confirm in the code that the feasible-window restriction applies only
+  for B > 0 (for B = 0 the first-interval condition could never hold).
+- [ ] TODO (§4.6 inline): record the PyTorch Geometric version of the container.
+- [ ] Pending external citations from §4.5-§4.6: **Milletari2016**, **Loshchilov2019**,
+  **Paszke2019** (PyTorch, NeurIPS 2019, arXiv:1912.01703), **Fey2019** (PyTorch Geometric,
+  ICLR 2019 RLGM workshop, arXiv:1903.02428); each has a `% TODO: cite` marker.
 - [x] #11 §4.2 "no memory of the trajectory": TODO added in 04-method.tex and a matching one in
   06-discussion.tex §6.3 (2026-09-27).
 - [ ] TODO (from #11): §6.3/§6.4 — discuss the missing trajectory memory (one visit in, no
@@ -879,10 +903,10 @@ Pulled from the code repository (`masterthesis-docker/NOTES.md` + `PROJECT_CONTE
   is also only per-cell constant (Appendix B assumes div v = 0 to reach the same advective
   form); both implementations are the same in this respect; (3) the "44x" U-Net ratio is
   against the k-NN arm (75,339); against the canonical 67,147 it is 50x.
-- [ ] TODO: 4.5 Moving-mesh extension as a tested hypothesis (DMM, dual branch, alpha gate).
-- [ ] TODO: 4.6 Conditioning (covariates, LayerEncoder).
-- [ ] TODO: 4.7 Training.
-- [ ] TODO: 4.8 Implementation details.
+- [x] (2026-09-27: done / moved, see the restructure section) TODO: 4.5 Moving-mesh extension as a tested hypothesis (DMM, dual branch, alpha gate).
+- [x] (2026-09-27: done / moved, see the restructure section) TODO: 4.6 Conditioning (covariates, LayerEncoder).
+- [x] (2026-09-27: done / moved, see the restructure section) TODO: 4.7 Training.
+- [x] (2026-09-27: done / moved, see the restructure section) TODO: 4.8 Implementation details.
 
 ### Chapter 5 - Experiments (`05-experiments.tex`)
 
