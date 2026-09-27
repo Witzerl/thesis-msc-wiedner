@@ -173,9 +173,46 @@ not permanently cap the final accuracy.
 Whether mesh adaptation provides a measurable benefit for slowly
 evolving clinical data is the question this appendix tests.
 
-% TODO: remaining Appendix G content (THESIS_STRUCTURE.md): the DMM for GA
-% (native-grid scalar monitor, physics loss; former \S4.5), the dual-branch
-% composition with the alpha gate, the result (dual - bypass =
+\section{The Moving-Mesh Extension for GA}
+\label{app:mm-pde:extension}
+
+% Moved here from Chapter 4 (former \S4.4, "The Moving-Mesh Extension as a
+% Tested Hypothesis") on 2026-09-27; the text is still to be written.
+% TODO: DMM + dual branch, framed as a hypothesis the design was built to
+% measure. The alpha gate (zero-initialised) is the instrument; alpha -> 0
+% was a pre-registered reportable outcome. res_cut is NOT part of the
+% framework and must not be described as a component.
+
+\subsection{Data-Free Mesh Mover for GA}
+\label{app:mm-pde:dmm}
+
+% TODO: physics loss (Monge--Amp\`ere + boundary + convexity), sampling,
+% monitor function. The monitor is a plain scalar monitor on the Gaussian-
+% blurred mask; the DMM trains and is applied on the native (49, 1024) grid.
+% The Frobenius-norm multi-channel monitor and the 256^2 SLO path are
+% superseded -- historical steps only, never the design. Pretrained, frozen.
+
+\subsection{Dual-Branch Composition}
+\label{app:mm-pde:dual}
+
+% TODO: uniform branch returns the full next state; moved branch returns a
+% pure Delta-t delta; ItpNet interpolation renormalised to sum to one; the
+% learnable scalar gate alpha. Both branches use the same network class as
+% the graph operator of Section 4.3.2.
+% TODO (moved from Chapter 4, 2026-09-27): the decoder's final layer is NOT
+% zero-initialised on the correction branch (the alpha gate supplies the
+% zero start; zero-init on both would deadlock the gradients).
+% TODO (moved from Chapter 4, 2026-09-27): the moved-mesh nodes lie off the
+% lattice, where the dilated stencil is undefined, so the correction branch
+% builds its own k-NN graph on the moved positions (in index space).
+% TODO (moved from Chapter 4, 2026-09-27): the Runge--Kutta wrapper applies
+% to single-branch models only; the grid operators and the FEN run as
+% single-branch models, so the U-Net is compared with the single-branch
+% graph operator, not with the dual branch.
+% TODO: ItpNet pretraining at epoch 0 with its own optimiser (moved out of
+% Section 4.7).
+
+% TODO: remaining Appendix G content (THESIS_STRUCTURE.md): the result (dual - bypass =
 % -0.0001 +- 0.0060, scoped as the correction branch's failure to
 % optimise), the mesh-quality study (former \S5.5) and the ~10x cost.
 % TODO: state here why the moving mesh also requires one-step prediction:

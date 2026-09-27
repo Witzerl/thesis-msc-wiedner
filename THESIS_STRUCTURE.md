@@ -135,8 +135,8 @@ Everything else that occupies the same slot, described on identical terms and at
 - **Time integration:** the fixed-step Runge-Kutta wrapper over any backbone, and what a continuous-time reading would require.
 - **Parameter matching:** what is matched to what, the 1.25x band, and the two deliberate out-of-band controls (the width-32 U-Net at ~50x the canonical model -- 44.5x the k-NN arm -- and the 0.22x per-pixel floor) and why each exists.
 
-### 4.5 ~~The moving-mesh extension as a tested hypothesis~~ → moved to Appendix G (2026-09-25)
-Content below is retained as the specification for Appendix G. Once moved, §4.6–§4.8 renumber to §4.5–§4.7.
+### 4.5 ~~The moving-mesh extension as a tested hypothesis~~ → moved to Appendix G (done 2026-09-27, now G.2)
+Content below is retained as the specification for Appendix G. Chapter 4 now reads 4.1 Overview, 4.2 Framework, 4.3 Operators, 4.4 Conditioning, 4.5 Training, 4.6 Implementation.
 
 DMM + dual branch, framed from the outset as a hypothesis the design was built to measure rather than a component assumed to help.
 - **DMM for GA:** the physics loss (Monge-Ampère + boundary + convexity), sampling strategy, and the monitor function. **Constraint: the monitor is a plain scalar monitor on the Gaussian-blurred mask, and the DMM trains and is applied on the native anisotropic (49, 1024) grid (since 2026-08-04). The multi-channel Frobenius-norm monitor and the square 256² SLO-mask path are superseded — mention them, if at all, only as documented intermediate steps, and never as the design.** DMM is pretrained separately and frozen.

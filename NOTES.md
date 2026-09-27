@@ -434,9 +434,17 @@ be longer, since it supplies two arms and the floors).
   Floors → 4.3.6 FEN → 4.3.7 RK → 4.3.8 Parameter Matching. Removed labels:
   `sec:background:mp-pde`, `sec:method:mppde:arch`, `sec:method:mppde:diff` (no references
   left). "member of the family" / "countermodel" wording replaced by "operator".
-- [ ] Author to review Chapter 4 after this restructure (planned). The MP-PDE limitations
-  paragraph in §4.3.2 still points to the moving-mesh section §4.4, which is itself due to
-  move to Appendix G.
+- [ ] Author to review Chapter 4 after this restructure (planned).
+- [x] 2026-09-27: moving-mesh section (former §4.4, placeholders only) moved to Appendix G as
+  G.2 "The Moving-Mesh Extension for GA" with G.2.1 DMM (`app:mm-pde:dmm`) and G.2.2 Dual-Branch
+  Composition (`app:mm-pde:dual`). Removed from Chapter 4: the dashed mesh path in the pipeline
+  figure, the correction-branch zero-init exception, the moved-mesh k-NN sentence, the
+  "Branches" row of the MP-PDE difference table, "single-branch" wording in the contract and the
+  RK wrapper, and ItpNet from the §4.5 Training TODO; each is kept as a TODO in Appendix G.
+  Chapter 4 now mentions the mesh twice: one pointer sentence in §4.1 and a parenthetical
+  Appendix G reference in the MP-PDE limitations paragraph (§4.3.2). Chapter 4 renumbers:
+  4.4 Conditioning, 4.5 Training, 4.6 Implementation. **Still open:** §5.5 "Moving Mesh
+  Quality" is still in Chapter 5 and is due to move to Appendix G.
 - [x] #11 §4.2 "no memory of the trajectory": TODO added in 04-method.tex and a matching one in
   06-discussion.tex §6.3 (2026-09-27).
 - [ ] TODO (from #11): §6.3/§6.4 — discuss the missing trajectory memory (one visit in, no

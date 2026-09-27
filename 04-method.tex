@@ -54,11 +54,13 @@ the same data through the same evaluation routine.
 \S\ref{sec:method:family} then describes all operators on the same terms:
 each was taken from the literature, and for each the original is
 summarised before its adaptation to the framework. After that,
-\S\ref{sec:method:mmpde} describes the moving-mesh
-extension, \S\ref{sec:method:covariates} the conditioning inputs,
+\S\ref{sec:method:covariates} describes the conditioning inputs,
 \S\ref{sec:method:training} the shared training setup, and
 \S\ref{sec:method:implementation} the implementation.
-Figure~\ref{fig:method:pipeline} summarises the pipeline.
+Figure~\ref{fig:method:pipeline} summarises the pipeline. A moving-mesh
+extension of the graph operator, following MM-PDE \citep{Hu2024}, is
+reported separately as an additional experiment in
+Appendix~\ref{app:mm-pde}.
 
 % TODO: produce Figure fig:method:pipeline. Raw visits -> precomputation
 % (crop/pad, normalisation, windows with Delta t and covariates, graph
@@ -67,8 +69,7 @@ Figure~\ref{fig:method:pipeline} summarises the pipeline.
 % residual update u + Delta t * f -> next state, fed back for multi-step
 % rollout during training and evaluation -> evaluation. The operator slot
 % is drawn as the one box that changes, listing the architecture classes.
-% A separate, optional path shows the pretrained, frozen mesh mover
-% feeding a second branch (Section 4.5), drawn dashed.
+% No moving-mesh path (reported in Appendix G only).
 \begin{figure}[t]
   \centering
   \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering\itshape Placeholder
@@ -79,10 +80,7 @@ Figure~\ref{fig:method:pipeline} summarises the pipeline.
     The fixed framework and its swappable operator slot. Precomputation,
     conditioning, the residual update, the training curriculum and the
     evaluation are shared by every experiment. Only the operator
-    $f_\theta$ in the highlighted box changes between arms. The dashed
-    path shows the optional moving-mesh extension of
-    \S\ref{sec:method:mmpde}, in which a pretrained and frozen mesh mover
-    feeds a second branch.}
+    $f_\theta$ in the highlighted box changes between arms.}
   \label{fig:method:pipeline}
 \end{figure}
 
@@ -265,10 +263,10 @@ coordinate ramps running from zero to one along each axis.
 The coordinate ramps follow the CoordConv construction of \citet{Liu2018}. Because the inputs are identical, a difference between these
 arms reflects the operator, not the information it receives.
 
-The grid operators and the Finite Element Network run as single-branch
-models and without the layer encoder of~\S\ref{sec:method:encoder}. The
-U-Net is therefore a like-for-like comparison with the single-branch graph
-solver, not with the moving-mesh variant of~\S\ref{sec:method:mmpde}. One
+The grid operators and the Finite Element Network run without the layer
+encoder of~\S\ref{sec:method:encoder}, as does the canonical graph
+operator. The U-Net is therefore a like-for-like comparison with the graph
+operator. One
 technical difference remains: the convolutional arms run their convolutions
 at the default TF32 precision of the GPU, whereas the linear layers of the
 graph solver run in standard 32-bit precision. The arms are therefore not
@@ -337,9 +335,8 @@ trained with AdamW.
 The original paper names three limitations: it needs high-quality
 numerical ground truth for training, it has no formal accuracy guarantees,
 and a uniform mesh is wasteful in smooth regions and under-resolved at
-sharp gradients. The last one motivates the moving-mesh extension
-of~\S\ref{sec:method:mmpde}, which uses the same network class for both of
-its branches.
+sharp gradients. The last one motivates the moving-mesh extension of
+\citet{Hu2024} (Appendix~\ref{app:mm-pde}).
 
 \paragraph{The architecture used here.}
 The forward pass consists of an encoder, a number of message-passing
@@ -411,8 +408,8 @@ The decoder maps the final hidden vector $f_i^{M}$ to one output per
 channel. It consists of a linear layer, layer normalisation and a ReLU,
 applied twice, followed by a final linear layer to $C \cdot K = 11$
 outputs. The final layer is bare, without normalisation or activation,
-because the output is a signed and unbounded residual. On the uniform
-branch, the node update is then
+because the output is a signed and unbounded residual. The node update is
+then
 $u_i + \Delta t \cdot \delta(f_i^{M})$, where $\delta$ denotes the decoder;
 this is Equation~\eqref{eq:method:residual-update} at node level.
 
@@ -424,10 +421,9 @@ the hidden vector to a single scalar per node and then expanded that scalar
 linearly to all eleven channels. The eleven outputs were therefore perfectly
 collinear, a rank-1 bottleneck. The head also required a hidden width of at
 least 113. The replacement gives every channel an independent output and
-restores full rank. Its final layer is initialised to zero on the uniform
-branch, which yields the persistence start
-of~\S\ref{sec:method:dt-residual}. On the correction branch of the moving
-mesh it must not be, for reasons given in~\S\ref{sec:method:dual}.
+restores full rank. Its final layer is initialised to zero, which yields
+the persistence start of~\S\ref{sec:method:dt-residual}.
+% Correction-branch exception (no zero-init there) moved to Appendix G.
 
 \paragraph{Differences from the original.}
 Table~\ref{tab:method:mppde-diff} lists every departure from the original
@@ -473,8 +469,6 @@ used different settings for the two.
     Decoder & 1-D convolution along the node's hidden vector, read as a
       temporal signal, emitting $K$ steps & Full-rank three-layer MLP;
       last layer zero-initialised \\
-    Branches & One network & One class for the uniform and the correction
-      branch (\S\ref{sec:method:mmpde}) \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -546,10 +540,8 @@ this choice against smaller and larger reaches.
 
 The dilated stencil replaces only the edge set. The network, its weights
 and every other component stay unchanged, and the stencil adds no
-parameters. It is used on the uniform grid only. The nodes of the moved
-mesh in~\S\ref{sec:method:mmpde} lie off the lattice, where a lattice
-stencil is undefined, so that branch builds its own $k$-nearest-neighbour
-graph on the moved positions (\S\ref{sec:method:dual}).
+parameters.
+% Moved-mesh graph (own k-NN off the lattice) moved to Appendix G.
 
 The two canonical configurations differ slightly in size, and the
 difference comes from the aggregation, not from the graph. With the
@@ -839,8 +831,7 @@ and the covariates of a graph stay fixed across the stages of one step.
 This is the reading under which the wrapped model is a Neural ODE in the
 sense of \citet{Chen2018}. If the sub-step length is fed in place of zero,
 the wrapper instead acts as a learned Runge--Kutta integrator, which reduces
-to the canonical operator for a single Euler step. The wrapper applies to
-single-branch models only and requires the $\Delta t$-multiplied residual
+to the canonical operator for a single Euler step. The wrapper requires the $\Delta t$-multiplied residual
 form of Equation~\eqref{eq:method:residual-update}. As a unit check, the
 observed convergence orders on the test problem $\mathrm{d}u / \mathrm{d}t =
 -\lambda u$ are 0.99, 2.04, 2.04 and 4.35 for the Euler, midpoint, Heun and
@@ -919,31 +910,6 @@ The Runge--Kutta wrapper adds no parameters to any backbone.
 \end{table}
 
 
-\section{The Moving-Mesh Extension as a Tested Hypothesis}
-\label{sec:method:mmpde}
-
-% TODO: DMM + dual branch, framed as a hypothesis the design was built to
-% measure. The alpha gate (zero-initialised) is the instrument; alpha -> 0
-% was a pre-registered reportable outcome. res_cut is NOT part of the
-% framework and must not be described as a component.
-
-\subsection{Data-Free Mesh Mover for GA}
-\label{sec:method:dmm}
-
-% TODO: physics loss (Monge--Amp\`ere + boundary + convexity), sampling,
-% monitor function. The monitor is a plain scalar monitor on the Gaussian-
-% blurred mask; the DMM trains and is applied on the native (49, 1024) grid.
-% The Frobenius-norm multi-channel monitor and the 256^2 SLO path are
-% superseded -- historical steps only, never the design. Pretrained, frozen.
-
-\subsection{Dual-Branch Composition}
-\label{sec:method:dual}
-
-% TODO: uniform branch returns the full next state; moved branch returns a
-% pure Delta-t delta; ItpNet interpolation renormalised to sum to one; the
-% learnable scalar gate alpha.
-
-
 \section{Conditioning: Covariates and the Coefficient Surrogate}
 \label{sec:method:covariates}
 
@@ -961,8 +927,8 @@ The Runge--Kutta wrapper adds no parameters to any backbone.
 \label{sec:method:training}
 
 % TODO: channel-weighted MSE + soft-Dice objective; time-budgeted
-% pushforward curriculum (unroll depth in elapsed days); ItpNet pretraining
-% at epoch 0 for the dual branch; per-module gradient clipping; optimiser
+% pushforward curriculum (unroll depth in elapsed days); per-module
+% gradient clipping (ItpNet pretraining goes to Appendix G); optimiser
 % and schedule. Monotonic penalty is 0.0 and the residual is signed.
 
 
