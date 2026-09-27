@@ -178,6 +178,14 @@ evolving clinical data is the question this appendix tests.
 % composition with the alpha gate, the result (dual - bypass =
 % -0.0001 +- 0.0060, scoped as the correction branch's failure to
 % optimise), the mesh-quality study (former \S5.5) and the ~10x cost.
+% TODO: state here why the moving mesh also requires one-step prediction:
+% the mesh is computed from a single state, so a mesh built at the start
+% of a multi-step window would no longer reflect the lesion at the later
+% steps (moved from \S4.2, author review #13, 2026-09-27).
+% TODO: state which channels each part of the moving-mesh extension uses:
+% the mesh mover reads only the mask channel to compute the moved mesh,
+% while the network branch on the moved mesh still processes all eleven
+% channels (moved from \S4.2.2, author review #19, 2026-09-27).
 
 
 %%

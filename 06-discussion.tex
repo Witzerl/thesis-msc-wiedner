@@ -30,6 +30,12 @@
 % derived for vector-valued states; fixed-grid assumption discards
 % peripheral retina; encoder sees predicted (not observed) layers during
 % pushforward unrolling.
+% TODO: every operator sees one visit and has no memory of the trajectory
+% so far (\S4.2). Discuss what this excludes (e.g. an individual eye's
+% growth rate estimated from its own past visits) and whether a model
+% with history -- several past visits as input, or a recurrent state --
+% would be worth testing given 5-13 visits per eye (author review #11,
+% 2026-09-27).
 
 
 \section{Future Work}

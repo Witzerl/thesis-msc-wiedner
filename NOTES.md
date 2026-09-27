@@ -372,6 +372,77 @@ Being worked through one item at a time.
 - [ ] TODO (from #33): §6.4 Future Work — find a better cropping / spatial pre-processing than
   the fixed 49×1024 centre crop (inline `% TODO` in 06-discussion.tex).
 
+### Author's tablet review of §3.4–§4.3 (2026-09-27)
+
+Third handwritten review (build of 2026-09-26, thesis pp. 25–32), decoded from
+`main-thesis_v3_260927_145104.sdocx`: 19 marks. Blue = rewrite, red = wrong/remove.
+Being worked through one item at a time.
+
+- [x] #1 §3.4 min-max scaling to [−1, 1] "kept as an ablation variant" removed (no run uses
+  it, nothing was tested with it). Done 2026-09-27.
+- [x] #2 §3.4 Table 3.1 (`tab:data:norm-stats`) removed with its reference and fill-in TODO:
+  the mask row is already given in the text as mapped values, and the layer rows (raw
+  depths in axial px) give the reader nothing. Done 2026-09-27.
+- [x] #3 Table 3.1 "is this relevant?" — resolved by #2 (table removed).
+- [x] #4 §3.5 clinical-table variables paragraph removed in full, including the pointers to
+  §6.4 and §5.4 ("I think this can go"). Done 2026-09-27.
+- [x] #5 §4.1 heading "Overview: One Framework, One Swappable Slot" -> "Overview" (2026-09-27).
+- [x] #6 §4.1 GNN clause rewritten: "a message-passing graph neural network (GNN) on two
+  different neighbourhood graphs (§4.3.2), one of which is the canonical model of this thesis"
+  (2026-09-27).
+- [x] #7 §4.1 variant explanations (U-Net, FNO, FEN) removed; one sentence "Several of these
+  are run in more than one variant (§4.4)" added (2026-09-27).
+- [x] #8 §4.1 graph U-Net removed from the list of arms (author: not used). The count
+  "Nine settings of the slot, spanning six architecture classes" was dropped rather than
+  re-counted: the list itself gave ten settings, and the six classes are never defined in the
+  sources (2026-09-27). Follow-up below.
+- [x] #9 §4.1 "a hybrid Finite Element Network (FEN)" (2026-09-27).
+- [x] Follow-up to #8 (2026-09-27, author: comment out, remove elsewhere): graph U-Net removed from
+  the §4.4 intro, the roadmap, the grid-operator input paragraph, the parameter table (row
+  commented out) and the §2.5 related-work sentence; its paragraphs in §4.4.3 are commented out
+  and the subsection renamed "The Locality Floors" (label unchanged). Gao2019 is now uncited
+  (bib entry kept). Counts "nine settings, six classes" removed from CLAUDE.md and
+  THESIS_STRUCTURE.md; the code-side mirrors (PROJECT_CONTEXT.md, THESIS_FRAMEWORK.md) still
+  carry them and were not touched.
+- [x] 2026-09-27: repaired another broken `\ref` in §4.4.6 ("locality ladder of~\S" + line break
+  + "ef{…}"), same scripted-edit fault as in §1.5. All .tex files scanned; no other occurrence.
+- [x] #10 §4.1 "built rather than imported" replaced: "All operators are described on the same
+  terms. Each was taken from the literature and adapted to the same framework: §4.3 describes
+  the graph solver adapted from MP-PDE, and §4.4 the remaining architectures." (2026-09-27).
+  Author: the graph solver must not be highlighted above the other arms.
+- [ ] TODO (from #10): §4.3 intro still says the graph solver "is described in more depth than
+  the others because this project built it rather than imported it"; to be fixed when §4.3 is
+  reviewed (author: later sections deal with this extra highlighting).
+- [x] #11 §4.2 "no memory of the trajectory": TODO added in 04-method.tex and a matching one in
+  06-discussion.tex §6.3 (2026-09-27).
+- [ ] TODO (from #11): §6.3/§6.4 — discuss the missing trajectory memory (one visit in, no
+  history): what it excludes, and whether a model with history (past visits as input or a
+  recurrent state) is worth testing at 5-13 visits per eye.
+- [x] #12 §4.2 temporal bundling rewritten: some solvers (MP-PDE) predict several steps, not all
+  operators compared here support it, so bundling is removed; "as noted above, the sequences are
+  so short that splitting them into multi-step windows would not be useful anyway" (2026-09-27).
+- [x] #13 §4.2 moving-mesh staleness sentence removed from the main text; TODO added at the end
+  of Appendix G to state it there (2026-09-27).
+- [x] #14 §4.2.1 option B applied (2026-09-27): the model can in principle predict shrinkage,
+  although atrophic tissue does not regenerate; no monotonic constraint "because the reference
+  segmentations themselves shrink locally between some visits (§6.3)". Inline TODO added; the
+  quantification is the existing open item "Ground-truth GA retraction/shrinkage … should be
+  quantified" (2026-09-17 sync section).
+- [x] #15 §4.2.1 Euler-step sentence rewritten without MP-PDE: "takes the form of one explicit
+  Euler step (§2.2.2), with a step size that differs from window to window. It is the same for
+  every operator placed in the slot." (2026-09-27).
+- [x] #16 §4.2.1 "where and how?" — the test exists (solver-swap diagnostic, T10, 2026-09-17,
+  fold 2, one seed per model). Sentence rewritten to name the diagnostic and explain it: a
+  trained model is re-evaluated, without retraining, under several integration schemes and step
+  counts (2026-09-27). Result not previewed.
+- [ ] TODO (from #16): replace "Chapter 5" in §4.2.1 by a \ref to the validity-diagnostics
+  section (planned §5.6) once it exists; that section must state the fold-2 / one-seed scope.
+- [x] #17 §4.2.2 view/permute tensor-layout explanation removed (2026-09-27).
+- [x] #18 §4.2.2 "for the graph solver, this is guaranteed by the full-rank decoder" removed
+  (2026-09-27).
+- [x] #19 §4.2.2 mesh-mover channel sentences removed from the main text; TODO added in
+  Appendix G (2026-09-27). All 19 items of this review are now worked through.
+
 ### Assets that now exist and should be reused
 
 - **The Practical Work report** (`masterthesis-docker/practical/`) was handed in
@@ -649,7 +720,7 @@ Pulled from the code repository (`masterthesis-docker/NOTES.md` + `PROJECT_CONTE
   the 49 x 1024 grid at the physical aspect ratio (~5.94 x 5.82 mm), so the ~21:1 pixel
   anisotropy is visible; (c) one or two layer depth maps as heatmaps with the mask outline
   overlaid. Mark padded regions. A B-scan panel would need raw data from MUW.
-- [ ] TODO: fill Table `tab:data:norm-stats` (§3.4) -- per-channel mean/std of the ten layer
+- [x] (obsolete 2026-09-27, table removed in review #2 of §3.4-§4.3) TODO: fill Table `tab:data:norm-stats` (§3.4) -- per-channel mean/std of the ten layer
   channels from `meta["norm_params"]` of the canonical fold (split 2) precompute. Means
   should rise monotonically from ~137 to ~204 axial px.
 - [ ] TODO: record the training/validation window counts for folds 0, 1, 3 and 4 (§3.7);

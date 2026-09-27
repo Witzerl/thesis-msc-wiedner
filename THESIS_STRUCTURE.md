@@ -31,7 +31,7 @@ Several originally-planned contributions are **measured nulls** and must be writ
 ## Front Matter
 
 - **Title page** — Thesis title, your name, supervisor(s), institution (Johannes Kepler University), date.
-- **Abstract** — One paragraph each on: problem (GA progression prediction), approach (a Δt-conditioned autoregressive framework with a swappable operator, surveyed across six architecture classes), key contributions (the framework itself, physical reach at lesion scale, global+local context, the transport term, and the reported nulls), headline results.
+- **Abstract** — One paragraph each on: problem (GA progression prediction), approach (a Δt-conditioned autoregressive framework with a swappable operator, surveyed across several architecture classes), key contributions (the framework itself, physical reach at lesion scale, global+local context, the transport term, and the reported nulls), headline results.
 - **Acknowledgments** — Medical University of Vienna, specifically Supervisor Hrvoje Bogunović and Co-supervisor Dmitrii Lachinov.
 - **Table of contents / List of figures / List of tables / List of abbreviations** — Auto-generated.
 
@@ -49,7 +49,7 @@ Argue that GA progression has the structural properties of a locally driven grow
 ### 1.4 Contributions (TODO: maybe remove — headline in the .tex carries this marker)
 Bulleted list, rewritten against the measured results:
 - A Δt-conditioned autoregressive framework for irregular clinical visit schedules, with a persistence-exact initialisation, that makes architecture classes comparable under one loss, curriculum, evaluation and parameter budget.
-- The first controlled comparison of six architecture classes on longitudinal OCT GA progression, parameter-matched, 5-fold, with two agreeing statistical instruments and a replicate noise floor.
+- The first controlled comparison of several architecture classes on longitudinal OCT GA progression, parameter-matched, 5-fold, with two agreeing statistical instruments and a replicate noise floor.
 - The identification of **physical reach at lesion scale** as the dominant ingredient — the largest effect in the project, obtained at fewer parameters by changing only the graph's edge set.
 - The finding that **global context and local detail are separable and both required**, demonstrated by two architecturally unrelated constructions landing at the same place.
 - An explicit **transport term** as a second, independent route to the same deficit (with its parameter-matching caveat stated in the same breath).
@@ -95,7 +95,7 @@ Center-crop/pad to the canonical (49, 1024) grid. **Constraint: Explicitly state
 **Constraint (corrected 2026-09-17 — the previous justification was false as measured and must not appear):** do **not** claim the discarded periphery is clinically irrelevant. Report the census instead: the window cuts real lesion area in **27.3 %** of visits (more than 5 % of the lesion in 6.0 %, worst case 25.7 %), and **31.1 %** of cropped lesions touch the crop border, so growth across it is censored with no missingness flag. Frame the 49x1024 choice as a deliberate trade-off — larger windows trade truncation for up to 35 % zero-pad and ~1.9x the node count, and ~19 % border-touch is irreducible — and point forward to how the consequences are handled downstream (border-touching vs interior split of the change-region metric, the pad-masked `_anat` variant, optional pad-node loss masking).
 
 ### 3.4 Normalization
-Per-channel z-score normalization from training-split statistics. Table with the computed mean/std per channel.
+Per-channel z-score normalization from training-split statistics. No per-channel statistics table (removed 2026-09-27, author review: raw layer depths give the reader nothing); the mask's mapped values stay in the text.
 
 ### 3.5 Patient-level covariates
 Age and sex extraction from the patient index. Training-split z-score for age, binary encoding for sex, mean imputation for missing values. Note the per-visit vs baseline age encoding and that both are later measured (§5.4, negative results).
@@ -127,7 +127,7 @@ The arm the project built rather than imported, in full detail — encoder, mess
 Everything else that occupies the same slot, described on identical terms and at comparable depth — this section carries equal weight with §4.3.
 - The shared backbone contract every module satisfies.
 - **Dense countermodels:** U-Net (at two capacities), FNO, and the FNO + 3x3 local-kernel hybrid.
-- **Graph countermodels and the floors:** the graph U-Net, and the per-pixel model with no spatial context as the lower floor.
+- **The locality floors:** the one-hop floor and the per-pixel model with no spatial context as the lower floor. (The graph U-Net arm was dropped 2026-09-27, author review: not used; its subsection is commented out in `04-method.tex`.)
 - **The Finite Element Network**, free-form and with the learned transport (advection) term.
 - **Time integration:** the fixed-step Runge-Kutta wrapper over any backbone, and what a continuous-time reading would require.
 - **Parameter matching:** what is matched to what, the 1.25x band, and the two deliberate out-of-band controls (the width-32 U-Net at ~50x the canonical model -- 44.5x the k-NN arm -- and the 0.22x per-pixel floor) and why each exists.
@@ -161,7 +161,7 @@ Hardware, framework versions, the run-identity/checkpoint/resume infrastructure,
 6. 5-fold CV, no test split (repeat from §3.7).
 
 ### 5.2 The arm table and main results
-The nine settings of the operator slot presented as one table: change-region Dice@360d (5-fold mean ± SE), the per-eye instrument, parameter count and its ratio to the locked model, and cost. **Constraint: quote cost as the minimum epoch time of the cheapest fold and name the fold; the mean carries a near-constant additive overhead that systematically penalises cheap architectures. The GPU co-scheduling explanation for the spread is refuted — do not repeat it.** Include a figure with example rollouts (ground truth vs a representative subset of arms) for a representative eye.
+The settings of the operator slot presented as one table (no graph U-Net row): change-region Dice@360d (5-fold mean ± SE), the per-eye instrument, parameter count and its ratio to the locked model, and cost. **Constraint: quote cost as the minimum epoch time of the cheapest fold and name the fold; the mean carries a near-constant additive overhead that systematically penalises cheap architectures. The GPU co-scheduling explanation for the spread is refuted — do not repeat it.** Include a figure with example rollouts (ground truth vs a representative subset of arms) for a representative eye.
 
 The headline this table supports: the three strongest arms are statistically indistinguishable, and a model with no spatial context is bit-exactly persistence. Architecture class does not decide the outcome.
 

@@ -235,11 +235,7 @@ The canonical scheme is a z-score,
 \]
 where $\mu_c$ and $\sigma_c$ are the training mean and standard
 deviation of channel~$c$. A vanishing standard deviation is replaced by
-one to avoid division by zero. A min-max scaling to $[-1, 1]$,
-\[
-  x' \;=\; 2\,\frac{x - \min_c}{\max_c - \min_c} \;-\; 1,
-\]
-is kept as an ablation variant.
+one to avoid division by zero.
 
 The binary mask is z-scored in the same way as the layer channels. On
 the canonical fold, the background value 0 maps to $-0.602$ and the
@@ -248,40 +244,6 @@ maps to $+0.529$. Two consequences follow. First, the normalised mask
 has a hard step at the lesion edge. Second, evaluation maps every
 threshold into normalised space rather than mapping the prediction back
 to the original scale, and this mapping must be applied consistently.
-Table~\ref{tab:data:norm-stats} lists the statistics for the canonical
-fold.
-
-\begin{table}[t]
-  \centering
-  \caption[Per-channel normalisation statistics.]{%
-    Per-channel normalisation statistics (mean and standard deviation),
-    computed over the training split of the canonical fold after
-    cropping and padding. The mask statistics are derived from the two
-    mapped values given in the text and rounded to three decimals; the
-    layer statistics are still to be extracted.}
-  \label{tab:data:norm-stats}
-  \begin{tabular}{lrr}
-    \toprule
-    Channel & Mean & Standard deviation \\
-    \midrule
-    0 (GA mask)  & 0.266 & 0.442 \\
-    1 (layer 0)  & -- & -- \\
-    2 (layer 1)  & -- & -- \\
-    3 (layer 2)  & -- & -- \\
-    4 (layer 3)  & -- & -- \\
-    5 (layer 4)  & -- & -- \\
-    6 (layer 5)  & -- & -- \\
-    7 (layer 6)  & -- & -- \\
-    8 (layer 7)  & -- & -- \\
-    9 (layer 8)  & -- & -- \\
-    10 (layer 9) & -- & -- \\
-    \bottomrule
-  \end{tabular}
-\end{table}
-% TODO: extract the per-channel mean and standard deviation of the ten
-% layer channels from the precompute metadata (norm_params) of the
-% canonical fold and fill Table tab:data:norm-stats. Layer means should
-% increase monotonically from about 137 to 204 axial pixels.
 
 
 \section{Patient-Level Covariates}
@@ -312,14 +274,6 @@ days per year for the age covariate but 365 days per year for $\Delta
 t$. The resulting difference is at most 0.07\,\%. It is deliberately
 left unchanged, because aligning the two would invalidate every
 precomputed dataset.}
-
-The source clinical table also records, per eye, the progression rate,
-the pseudodrusen status, the predominant fundus-autofluorescence pattern
-and the concentration of hyperreflective foci. None of these variables
-is used in this thesis; their possible use is discussed
-in~\S\ref{sec:discussion:future}. Whether age and sex contribute to the
-predictions is measured in~\S\ref{sec:experiments:ablations}.
-
 
 \section{Temporal Structure}
 \label{sec:data:temporal}
