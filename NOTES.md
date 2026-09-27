@@ -919,11 +919,34 @@ Pulled from the code repository (`masterthesis-docker/NOTES.md` + `PROJECT_CONTE
   dual-branch / optional U-Net); in the survey every architecture is a peer arm of the one
   table, and only persistence and the per-pixel floor fix the scale. §4.2.1 now points to
   `sec:experiments:validity` (review #16 TODO closed).
-- [ ] 2026-09-27: §5.1-§5.3 to be drafted by an external LLM from a fact-sheet prompt (numbers
+- [x] 2026-09-27: §5.1-§5.3 to be drafted by an external LLM from a fact-sheet prompt (numbers
   from THESIS_FRAMEWORK.md §7.1-§7.5 and PROJECT_CONTEXT.md), then audited here. Known gaps the
   prompt leaves as TODOs: the one-hop floor's minimum epoch time; per-horizon growth-region Dice
   (FNO vs U-Net beyond one year; T-FEN / free-form / one-hop / stencil in the 0-1 y bin) --
   needed from SOLVER_FINAL_RUNS.md in the code repo.
+- [x] 2026-09-27: §5.1-§5.3 drafted externally, audited against THESIS_FRAMEWORK.md §7.1-§7.5 and
+  PROJECT_CONTEXT.md, spliced in (pages 46-54). Every number checked against the fact sheet; none
+  was altered or invented. Corrections made:
+  - **Wrong:** §5.3 intro said the leading classes "produce identical aggregate metrics" (they
+    are indistinguishable, not identical); the floors were referenced to the operator contract
+    (now `sec:method:family:floors`); the reach ladder said "the two extremes" exceed the floor
+    (it is the ±12 and ±42 rows, one on each side); the mechanism for the null second ring was
+    stated as fact (now "one possible reason"); `\citep[the square-root transform of][...]` was a
+    malformed natbib call.
+  - **Build-breaking:** `	exttt{% TODO}` in the figure placeholder (unescaped %), table row ends
+    collapsed to `\`, "3x3" in text mode.
+  - **Removed:** the repeat of the 68/75 and 7/75 anchor counts from §3.6; "not create one" (noise
+    can mask an effect); "strictly", "entirely", "firmly", "purely", "exactly at".
+  - **Added:** the neutral logging-limitation sentence the prompt left to the author; a sentence
+    that the T-FEN velocity field is not interpreted (§5.5); the U-Net-vs-k-NN numbers moved
+    before the conclusion they support; "per-pixel baseline" renamed to "floor"; `\Sef` style.
+- [ ] TODO (§5.2 inline): the one-hop floor's minimum epoch time and fold.
+- [ ] TODO (§5.3.3/§5.3.4 inline): per-horizon growth-region Dice -- FNO vs U-Net beyond one
+  year; T-FEN / free-form FEN / one-hop floor / dilated stencil in the 0-1 y bin; horizon
+  profiles of the T-FEN and the dilated stencil. From SOLVER_FINAL_RUNS.md (code repo). The
+  transport-vs-capacity argument in §5.3.4 rests partly on these.
+- [ ] TODO: produce Figure `fig:experiments:rollout` (§5.2) -- rollout strip for one eye, from
+  masterthesis-docker/practical/scripts/fig_rollout.py and the final-epoch rollout exports.
 
 - [ ] TODO: 5.1 Evaluation protocol (MSE caveat first, then Dice/IoU@360d, persistence floor).
 - [x] (obsolete 2026-09-27: section removed, see above) TODO: 5.2 Baselines.
