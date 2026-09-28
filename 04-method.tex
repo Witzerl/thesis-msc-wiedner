@@ -39,9 +39,9 @@ thesis; a U-Net; a Fourier Neural Operator (FNO); and a hybrid Finite
 Element Network (FEN). Several of these are run in more than one variant
 (\S\ref{sec:method:family}). A fixed-step Runge--Kutta wrapper can be placed around any
 of these operators, and a per-pixel model with no spatial context marks the
-lower floor. All arms are parameter-matched to the canonical
-configuration's 67\,147 parameters within a narrow band, except for two
-deliberate controls. The matching is described in~\S\ref{sec:method:family}.
+lower floor. The arms are parameter-matched to the canonical
+configuration's 67\,147 parameters within a narrow band; the matching and
+its exceptions are described in~\S\ref{sec:method:family:params}.
 
 % TODO: confirm exactly which persistence-baseline quantities are
 % bit-identical across arms, and cite the runs.
@@ -608,9 +608,10 @@ has been optimised against this dataset would be a weaker control, not a
 stronger one. Third, upsampling is nearest-neighbour instead of an
 up-convolution, and the output has the grid size of the input. Fourth, the
 final $1 \times 1$ layer is zero-initialised and returns a residual rather
-than class scores. Two widths are used: a base width of five gives
-83\,081 parameters (the parameter-matched arm), and a base width of 32 gives
-3\,354\,347 (the capacity control).
+than class scores. A base width of five gives 83\,081 parameters.
+% Width-32 U-Net (3,354,347 parameters, "capacity control") removed
+% 2026-09-28 (author: a single 50x arm against parameter-matched models does
+% not answer the capacity question; separate capacity experiments planned).
 
 The second dense operator is the Fourier Neural Operator (FNO) of \citet{Li2021}. The input is first lifted to a wider representation by a local
 map. Each layer then combines a local linear transform with a non-local
@@ -856,11 +857,11 @@ lists every configuration. All architecture arms lie within a factor of
 a rung of the locality ladder of~\S\ref{sec:method:family:floors}, not an
 architecture arm.
 
-Two deliberate controls lie outside this band and bound the parameter
-question from both sides. The width-32 U-Net has about 50 times the
-parameters of the canonical configuration and tests whether capacity alone
-changes the picture. The per-pixel floor has about a fifth of them and
-marks what a model without spatial context can do.
+The per-pixel floor also lies outside the band, with about a fifth of the
+parameters. It is a control, not an architecture arm: it marks what a model
+without spatial context can do.
+% TODO: capacity experiments (author, 2026-09-28): the width-32 U-Net was
+% removed; whether capacity matters is to be tested separately.
 
 One comparison is not matched. The free-form FEN control has 34\,785
 parameters, half the reference and a factor of 1.97 below the T-FEN it
@@ -874,12 +875,11 @@ The Runge--Kutta wrapper adds no parameters to any backbone.
     Parameter counts of all arms, with their ratio to the canonical
     configuration (67\,147 parameters) and the property each arm isolates.
     The architecture arms lie within a factor of 1.25 of the canonical
-    configuration. Four arms lie outside this band by design: the width-32
-    U-Net and the per-pixel floor bound the parameter question from above
-    and below; the one-hop floor is a rung of the locality ladder, a
-    truncation of the index-space arm; and the free-form FEN is the one
-    control that is not matched to the arm it is compared with (factor
-    1.97 against the T-FEN).}
+    configuration. Three arms lie outside this band: the per-pixel floor,
+    a control without spatial context; the one-hop floor, a rung of the
+    locality ladder and a truncation of the index-space arm; and the
+    free-form FEN, the one control that is not matched to the arm it is
+    compared with (factor 1.97 against the T-FEN).}
   \label{tab:method:params}
   \small
   \begin{tabular}{p{0.34\textwidth} r r p{0.30\textwidth}}
@@ -896,7 +896,7 @@ The Runge--Kutta wrapper adds no parameters to any backbone.
     FNO with $3 \times 3$ local path & 79\,960 & 1.19 & global support plus
       local detail \\
     U-Net, width 5 & 83\,081 & 1.24 & multiscale local detail \\
-    U-Net, width 32 & 3\,354\,347 & 49.95 & capacity (control) \\
+    % U-Net, width 32 & 3\,354\,347 & 49.95 & capacity (control) \\ % removed 2026-09-28
     One-hop floor & 45\,067 & 0.67 & one ring of spatial context \\
     Per-pixel floor & 14\,795 & 0.22 & no spatial context (control) \\
     Any backbone with RK4 wrapper & unchanged & --- & integration order \\
@@ -1204,12 +1204,13 @@ disabled, so every reported run was trained in one piece.
 The per-epoch metrics of all runs are collected into one version-controlled
 results table, and every training result reported in this thesis is read
 from it. Each reported number can therefore be traced to a recorded run and
-its configuration. Training cost is reported as the minimum epoch time of a
-run, taken from the fold on which it is lowest, and that fold is named. The
-mean is not used, because the epoch times of a run carry a near-constant
-additive overhead, which would penalise cheap operators. The number of
-optimiser steps per epoch also differs slightly between the folds. The
-measurements are reported in~\S\ref{sec:experiments:cost}.
+its configuration. Training cost is reported as the minimum epoch time
+over the five folds of an arm. The mean is not used, because the epoch
+times of a run carry a near-constant additive overhead, which would
+penalise cheap operators. The number of optimiser steps per epoch differs
+slightly between the folds (280 to 320), which limits the cost figures to
+order-of-magnitude statements. The measurements are reported
+in~\S\ref{sec:experiments:cost}.
 
 
 %%

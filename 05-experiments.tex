@@ -206,53 +206,57 @@ in Appendix~\ref{app:mm-pde}.
   \caption[All arms on the headline metric.]{%
     All arms on the change-region Dice at the one-year anchor, seed 42.
     Each fold value is the late-epoch mean (epochs 10 to 29) of one run;
-    the table gives the mean $\pm$ sd over the five folds. Persistence
-    scores 0 by construction. The ratio is the parameter count divided by
-    that of the canonical dilated-stencil graph network (67\,147). Cost is
-    the minimum epoch time in seconds, with the fold on which it occurred
-    in brackets; it supports order-of-magnitude statements only
-    (\S\ref{sec:experiments:cost}). The arms are ordered by mean, with the
-    two locality floors and persistence at the bottom; adjacent arms mostly
-    differ by less than the noise floor.}
+    the table gives the mean $\pm$ sd over the five folds and the highest of
+    the five fold values (best fold). Persistence scores 0 by construction.
+    The ratio is the parameter count divided by that of the canonical
+    dilated-stencil graph network (67\,147). Cost is the minimum epoch time
+    in seconds over the five folds; it supports order-of-magnitude
+    statements only (\S\ref{sec:experiments:cost}). The arms are ordered by
+    mean, with the two locality floors and persistence at the bottom;
+    adjacent arms mostly differ by less than the noise floor.
+    $^\dagger$The T-FEN is not a valid free-running integrator as trained
+    (\S\ref{sec:experiments:validity}); its Dice values stand, but it is
+    not a stable forecasting model.}
   \label{tab:experiments:arms}
   \small
-  \begin{tabular}{p{0.36\textwidth} r r c r}
+  \begin{tabular}{p{0.34\textwidth} r r c c r}
     \toprule
-    Arm & Params & Ratio & Mean $\pm$ sd & s/epoch \\
+    Arm & Params & Ratio & Mean $\pm$ sd & Best fold & s/epoch \
     \midrule
-    T-FEN (\S\ref{sec:method:family:fen}) & 68\,503 & 1.02 &
-      $0.5337 \pm 0.0453$ & 364 [0] \\
+    T-FEN$^\dagger$ (\S\ref{sec:method:family:fen}) & 68\,503 & 1.02 &
+      $0.5337 \pm 0.0453$ & 0.6011 & 364 \
     Graph network, dilated stencil (\S\ref{sec:method:graph}) & 67\,147 &
-      1.00 & $0.5258 \pm 0.0497$ & 91 [0] \\
+      1.00 & $0.5258 \pm 0.0497$ & 0.6060 & 91 \
     Graph network, dilated stencil, RK4
       (\S\ref{sec:method:family:rk}) & 67\,147 & 1.00 &
-      $0.5139 \pm 0.0497$ & 439 [0] \\
+      $0.5139 \pm 0.0497$ & 0.5907 & 439 \
     U-Net, width 5 (\S\ref{sec:method:family:dense}) & 83\,081 & 1.24 &
-      $0.5046 \pm 0.0632$ & 21 [2] \\
+      $0.5046 \pm 0.0632$ & 0.5918 & 21 \
     FNO with $3 \times 3$ local path (\S\ref{sec:method:family:dense}) &
-      79\,960 & 1.19 & $0.4984 \pm 0.0398$ & 29 [3] \\
+      79\,960 & 1.19 & $0.4984 \pm 0.0398$ & 0.5509 & 29 \
     FNO, RK4 (\S\ref{sec:method:family:rk}) & 79\,160 & 1.18 &
-      $0.4893 \pm 0.0398$ & 45 [0] \\
+      $0.4893 \pm 0.0398$ & 0.5276 & 45 \
     FNO (\S\ref{sec:method:family:dense}) & 79\,160 & 1.18 &
-      $0.4831 \pm 0.0477$ & 23 [4] \\
+      $0.4831 \pm 0.0477$ & 0.5391 & 23 \
     FEN, free-form only (\S\ref{sec:method:family:fen}) & 34\,785 & 0.52 &
-      $0.4810 \pm 0.0348$ & 180 [0] \\
-    U-Net, width 32 (\S\ref{sec:method:family:dense}) & 3\,354\,347 &
-      49.95 & $0.4566 \pm 0.0526$ & 35 [2] \\
+      $0.4810 \pm 0.0348$ & 0.5323 & 180 \
     Graph network, $k$-NN, $k = 20$ (\S\ref{sec:method:graph}) & 75\,339 &
-      1.12 & $0.4519 \pm 0.0436$ & 108 [2] \\
+      1.12 & $0.4519 \pm 0.0436$ & 0.5223 & 108 \
     Graph network, $k$-NN, $k = 12$ (\S\ref{sec:method:graph}) & 75\,339 &
-      1.12 & $0.4515 \pm 0.0429$ & 75 [2] \\
+      1.12 & $0.4515 \pm 0.0429$ & 0.5178 & 75 \
     \midrule
     One-hop floor (\S\ref{sec:method:family:floors}) & 45\,067 & 0.67 &
-      $0.4529 \pm 0.0403$ & --- \\
+      $0.4529 \pm 0.0403$ & 0.5092 & 59 \
     Per-pixel floor (\S\ref{sec:method:family:floors}) & 14\,795 & 0.22 &
-      $0.0000 \pm 0.0000$ & 28 [2] \\
-    Persistence & 0 & --- & 0 & --- \\
+      $0.0000 \pm 0.0000$ & 0.0000 & 28 \
+    Persistence & 0 & --- & 0 & 0 & --- \
     \bottomrule
   \end{tabular}
 \end{table}
-% TODO: insert the one-hop floor's minimum epoch time and fold.
+% Best-fold values and the one-hop floor's cost (59.42 s) computed
+% 2026-09-28 from masterthesis-docker/.../solver_results.csv (final era,
+% max over folds of late_change_region_dice_360d_mean; min of
+% curve_sec_per_epoch_min). U-Net width 32 row removed 2026-09-28.
 
 % TODO: produce Figure fig:experiments:rollout. Rollout strip for one
 % representative validation eye: rows = ground truth, dilated-stencil graph
@@ -293,6 +297,16 @@ sits at the mixed floor, and its minimum when one fold is left out falls
 below it, so this pair is also read as indistinguishable. No ordering
 among the three is quotable.
 
+The T-FEN has the highest mean in the table, but it should not be read as
+the best model. As trained, it is not a valid free-running integrator: its
+free-running rollout is unstable on seven of its ten runs (five folds, two
+seeds), and nine of its ten final checkpoints exceed the stability bound of
+the explicit scheme on at least one channel
+(\S\ref{sec:experiments:validity}). Its Dice values at the anchor are
+unaffected and stand, but it is not a stable forecasting model in its
+current form, and its learned velocity field is not interpreted anywhere
+in this thesis.
+
 The per-pixel floor reads exactly 0.0000 on all five folds, identical to
 persistence; its collapse counter flags every validation eye as unchanged
 from baseline. A model without spatial context predicts no change at all.
@@ -308,11 +322,12 @@ the table is not a leaderboard. What it provides is the evidence for which
 components of an operator move the metric, which
 \S\ref{sec:experiments:ingredients} examines one at a time.
 
-Three further rows are taken up later. The U-Net at width 32, with about
-50 times the parameters, is lower than the width-5 U-Net; the capacity
-comparison is reported in~\S\ref{sec:experiments:ablations}, as are the
-Runge--Kutta arms, which are nulls against their single-step counterparts.
-The cost column is discussed in~\S\ref{sec:experiments:cost}.
+The best-fold column shows how far a single fold can lie above the mean.
+For every arm except the FNO and the FNO with the Runge--Kutta wrapper,
+the best fold is fold 2, so the column mostly reflects the spread between
+folds rather than a separate result. The Runge--Kutta arms are nulls against their single-step
+counterparts and are taken up in~\S\ref{sec:experiments:ablations}. The
+cost column is discussed in~\S\ref{sec:experiments:cost}.
 
 
 \section{The Ingredient Study}
@@ -413,9 +428,7 @@ Fold 3 reads $-0.022$, so the effect is fold-heterogeneous. With the
 dilated stencil, the graph network is indistinguishable from the U-Net
 (\S\ref{sec:experiments:main-results}). The deficit of the graph network
 was therefore located in its graph --- in where its neighbours lie
-physically --- and not in its operator class. Capacity, normalisation and
-the message function are ruled out separately
-in~\S\ref{sec:experiments:ablations}.
+physically --- and not in its operator class.
 
 \subsection{Global and Local Context Together}
 \label{sec:experiments:ingredients:global}
@@ -467,14 +480,15 @@ both instruments at both seeds.
 This is, however, the only architecture comparison in the survey that is
 not parameter-matched: the T-FEN has 68\,503 parameters and the free-form
 control 34\,785, a factor of 1.97. A matched free-form control was not run.
-Two observations argue, indirectly, against reading the result as a
-capacity effect. Capacity is a measured null on every other axis of the
-project: the U-Net at 50 times the parameters, the depth and width of the
-graph network, and the width of the layer encoder
-(\S\ref{sec:experiments:ablations}). And the effect is concentrated in the
-near-term growth bin, horizons up to one year, where it brings the T-FEN to
-the level of the dilated stencil, rather than being spread over all
-horizons as a generic gain from capacity would be.
+Part of the gain may therefore come from the extra parameters. One
+observation argues, indirectly, against reading all of it that way: the
+effect is concentrated in the near-term growth bin, horizons up to one
+year, where it brings the T-FEN to the level of the dilated stencil,
+rather than being spread over all horizons as a generic gain from capacity
+would be. Settling the question needs the matched control.
+% TODO: capacity experiments (author, 2026-09-28) -- the earlier capacity
+% argument (width-32 U-Net, GNN depth/width, encoder widths) was removed; a
+% matched free-form FEN control (width ~139) belongs to that plan.
 % TODO: insert the near-term (0-1 y) growth-region Dice of the free-form
 % FEN, the T-FEN, the one-hop floor and the dilated stencil, from
 % SOLVER_FINAL_RUNS.md in the code repo.
@@ -513,11 +527,12 @@ was measured and did not matter.
 \section{Negative Results}
 \label{sec:experiments:ablations}
 
-% TODO: patient covariates; the layer encoder (width sweep); capacity (U-Net
-% width 32); time-integration order (RK4 vs Euler); GNN-internal knobs
-% (normalisation, aggregation, edge features, k at fixed reach); the loss
-% ablation; the intermediate-time-point regulariser. The moving-mesh null is
-% one pointer sentence to Appendix G.
+% TODO: (plan of 2026-09-28) 5.4.1 time handling (Delta t scaling, with why it
+% could be dropped; RK4 vs Euler); 5.4.2 the objective (monotonic penalty,
+% loss ladder, regulariser); 5.4.3 covariates + layer encoder and 5.4.4
+% GNN-internal settings -- to be drafted, then commented out (author). No
+% capacity subsection (width-32 U-Net removed); no moving-mesh sentence
+% (Appendix G only).
 
 
 \section{Validity Diagnostics}

@@ -939,12 +939,45 @@ Pulled from the code repository (`masterthesis-docker/NOTES.md` + `PROJECT_CONTE
     can mask an effect); "strictly", "entirely", "firmly", "purely", "exactly at".
   - **Added:** the neutral logging-limitation sentence the prompt left to the author; a sentence
     that the T-FEN velocity field is not interpreted (§5.5); the U-Net-vs-k-NN numbers moved
-    before the conclusion they support; "per-pixel baseline" renamed to "floor"; `\Sef` style.
+    before the conclusion they support; "per-pixel baseline" renamed to "floor"; `\S
+ef` style.
 - [ ] TODO (§5.2 inline): the one-hop floor's minimum epoch time and fold.
 - [ ] TODO (§5.3.3/§5.3.4 inline): per-horizon growth-region Dice -- FNO vs U-Net beyond one
   year; T-FEN / free-form FEN / one-hop floor / dilated stencil in the 0-1 y bin; horizon
   profiles of the T-FEN and the dilated stencil. From SOLVER_FINAL_RUNS.md (code repo). The
   transport-vs-capacity argument in §5.3.4 rests partly on these.
+- [x] 2026-09-28 (author decisions on the §5.4-§5.7 plan):
+  - **Capacity question dropped from the thesis as it stands.** A single 50x arm compared
+    with parameter-matched models does not answer it. The width-32 U-Net is removed from
+    Table 5.1, from §4.3.4, the parameter table and §4.3.8 (commented out); §5.2 no longer
+    mentions it; §5.3.4 no longer argues "capacity is a null elsewhere" for the T-FEN (only
+    the near-term-bin argument remains, plus "settling it needs the matched control"); the
+    §5.3.2 sentence "capacity, normalisation and message function are ruled out in §5.4" is
+    removed.
+  - Table 5.1: new "Best fold" column (highest of the five late-epoch fold means, from
+    solver_results.csv; fold 2 for every arm except FNO and FNO + RK4, fold 4); fold index
+    removed from the cost column; one-hop floor cost filled in (59 s, min over folds).
+    Author's belief that slow folds were GPU-occupied: the 2026-09-17 audit found 0 runs ever
+    sharing a GPU; the spread is the 280-320 steps per fold plus an additive overhead. The
+    minimum remains the reported value.
+  - §5.2 now flags the T-FEN in the table (dagger) and in the text as not a valid free-running
+    integrator, before §5.5 (author: otherwise readers take it for the best model).
+  - §5.4: time handling (explain why the Delta t scaling could be dropped) and the objective
+    are kept; covariates + layer encoder and GNN-internal settings are drafted and then
+    commented out; the encoder result must be scoped to one backbone and one design (only the
+    width was varied; 20 runs). No moving-mesh sentence in §5.4 (Appendix G only).
+  - §5.7: training cost only; inference time and memory were never measured and are dropped.
+- [ ] TODO (author, 2026-09-28): design separate **capacity experiments** (the question is open
+  again). Include the parameter-matched free-form FEN control (width ~139) for the transport
+  term. Discuss right after the §5.4-§5.5 prompt.
+- [ ] TODO: after §5.4.3 is commented out, §4.4 still says the covariates and the layer encoder
+  are "tested in Chapter 5" (two sentences) -- adjust them.
+- [ ] ⚠️ Mirror is stale (code repo wins): the T-FEN's free-running rollout is unstable on
+  **7 of 10** runs (corrected in SOLVER_FINAL_RUNS.md §9.15 on 2026-09-16), not "5 of 10" as
+  PROJECT_CONTEXT.md, THESIS_FRAMEWORK.md and the 2026-09-17 entry above say. The Courant bound
+  the runs were judged against is 2.8; the correct bound for the assembled stencil is ~2.4
+  (spectral radius ~1.17 |v|) -- this resolves the §4.3.6 TODO; fix §4.3.6 in the Chapter 4
+  review. Re-mirror when convenient.
 - [ ] TODO: produce Figure `fig:experiments:rollout` (§5.2) -- rollout strip for one eye, from
   masterthesis-docker/practical/scripts/fig_rollout.py and the final-epoch rollout exports.
 
