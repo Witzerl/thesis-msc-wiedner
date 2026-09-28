@@ -527,21 +527,429 @@ was measured and did not matter.
 \section{Negative Results}
 \label{sec:experiments:ablations}
 
-% TODO: (plan of 2026-09-28) 5.4.1 time handling (Delta t scaling, with why it
-% could be dropped; RK4 vs Euler); 5.4.2 the objective (monotonic penalty,
-% loss ladder, regulariser); 5.4.3 covariates + layer encoder and 5.4.4
-% GNN-internal settings -- to be drafted, then commented out (author). No
-% capacity subsection (width-32 U-Net removed); no moving-mesh sentence
-% (Appendix G only).
+A negative result here is a comparison whose difference stays under the
+floor of the instruments defined in~\S\ref{sec:experiments:protocol:stats}.
+It is a null at the available precision. It does not show that the tested
+alternative is equivalent, or that the mechanism behind it has no effect,
+and each finding is scoped to the backbone, the folds and the seed on which
+it was measured. This section reports two groups of such results: the time
+handling of the update (\S\ref{sec:experiments:ablations:time}) and the
+composition of the training objective (\S\ref{sec:experiments:ablations:loss}).
+
+\subsection{Time Handling}
+\label{sec:experiments:ablations:time}
+
+The residual update of~\S\ref{sec:method:dt-residual} multiplies the output
+of the operator by the interval,
+$u_{t+\Delta t} = u_t + \Delta t \cdot f_\theta(u_t, \Delta t, z)$. In the
+ablation, this outer multiplication was removed, so the update became
+$u_t + f_\theta$, while $\Delta t$ was kept as an input feature of the
+operator. The comparison was run on the index-space $k$-nearest-neighbour
+graph network (\S\ref{sec:method:graph}) over five folds at seed 42.
+Removing the scaling gives $\Delta = +0.0134 \pm 0.0059$~SE (4/5) against
+the canonical update.
+% TODO: insert the per-eye instrument for the Delta t-scaling ablation, if
+% it was computed.
+This is under the five-fold paired floor of 0.016, so by the pre-registered
+rule the change does not graduate, and the canonical update keeps the
+multiplication.
+
+The scaling could be removed without a measurable loss because, on the mask
+channel, it is a reparameterisation rather than an inductive bias. The mask
+is binary, and in normalised units its two values differ by a fixed gap: 0
+maps to $-0.602$ and 1 to $+1.660$ (\S\ref{sec:data:normalization}). At a
+pixel that changes between two visits, the target of the scaled form,
+$(y - u)/\Delta t$, is therefore exactly plus or minus that gap divided by
+$\Delta t$, at every interval length. The operator has to produce an
+internal division by $\Delta t$, which the outer multiplication then
+cancels. The operator is thus a one-step map conditioned on $\Delta t$, not
+a rate that can be queried. Because $\Delta t$ remains an input, the
+operator receives the same time information with or without the
+multiplication, which is why dropping it loses nothing measurable. The
+multiplication is kept because it is the form MP-PDE defines
+\citep{Brandstetter2022} and because it gives the $\Delta t \to 0$ limit in
+which the prediction reduces to persistence (\S\ref{sec:method:dt-residual}).
+A reading of the operator as a learned rate is not supported by this
+result; \S\ref{sec:experiments:validity:swap} tests it directly.
+
+The integration order is the second test of the time handling. The
+Runge--Kutta wrapper (\S\ref{sec:method:family:rk}) was placed around the
+canonical dilated-stencil graph network in its autonomous setting, in which
+the $\Delta t$ input is set to zero and $\Delta t$ only sets the
+integration horizon, and compared with a single Euler step of the same
+network. The difference is $\Delta = -0.0119 \pm 0.0037$~SE (1/5), and per
+eye $-0.0132 \pm 0.0055$ (28/75): a null, in the direction of the single
+step. Over the FNO, the wrapper against the plain FNO gives
+$\Delta = +0.0062 \pm 0.0056$~SE (4/5), and per eye $+0.0064 \pm 0.0069$
+(43/75), also a null. Raising the integration order therefore gives no
+detectable benefit over either a local graph operator or a global spectral
+one.
+
+A single-fold decomposition on fold 2 shows where the five-fold difference
+comes from. Every step is under the single-fold floor of 0.036, so it is
+indicative only. The wrapper at one Euler step reproduces the canonical
+operator to $-0.010$; removing the $\Delta t$ input feature, as in the
+autonomous setting, costs a further $-0.005$; and raising the order from
+Euler to RK4 costs $-0.0002$. Most of the five-fold difference is thus the
+wrapper's own offset at the scale of the replicate noise, not the
+integration order.
+
+The higher order is expensive. The minimum epoch time is 439\,s for RK4 over
+the stencil network against 91\,s for one Euler step, about $4.8\times$
+(Table~\ref{tab:experiments:arms}), and 45\,s against 23\,s for the FNO. The
+factor of $4.8$ holds where the forward pass of the backbone dominates the
+epoch. Finally, the change-region Dice at the anchor is thresholded and
+blind to the trajectory between visits, so these nulls license no statement
+about continuous-time behaviour; \S\ref{sec:experiments:validity:swap}
+addresses that question.
+
+\subsection{The Objective}
+\label{sec:experiments:ablations:loss}
+
+The monotonic-growth penalty discourages a decrease of the mask where the
+previous state is atrophic (\S\ref{sec:method:training:loss}). It was
+measured on fold 2 at seed 42, as an epoch-paired comparison over the 20
+late epochs. The run with the penalty at weight 2.0 minus the run without
+it reads $-0.0032 \pm 0.0033$~SE, and the penalised run is higher on only 7
+of the 20 paired epochs. This is an order of magnitude under the
+single-fold floor of 0.036, so the simpler objective was kept, and the
+weight is zero in every reported run. Two limits apply. The comparison ran
+with the loss configuration used at the time, which did not multiply the
+output by $\Delta t$, and the penalty was not re-tested with the final
+update. And epoch-paired standard errors are optimistic, because successive
+epochs of one run are correlated.
+
+A separate mechanism argues against the penalty under the pushforward
+curriculum (\S\ref{sec:method:training:curriculum}). On unrolled steps, the
+previous state the penalty refers to is the model's own earlier
+prediction, so the penalty locks in the model's own false positives: a
+pixel wrongly marked as atrophic can no longer be corrected toward the
+healthy ground truth without paying the penalty. On such a pixel, the
+gradient of the penalty was measured at 31.8 times the gradient of the data
+terms. The penalty would therefore enforce two different priors on
+teacher-forced and on unrolled steps. In addition, GA is not constrained to
+grow monotonically in this thesis, because the reference segmentations
+themselves shrink locally between some visits (\S\ref{sec:method:dt-residual}).
+
+The loss ladder separates the channel weighting from the soft-Dice term. All
+of its runs are single runs on fold 2 at seed 42, so the single-fold floor
+of 0.036 applies. On the late-epoch change-region Dice, plain unweighted
+MSE reads 0.0318: it escapes the collapse in which the model copies its
+input only at epoch 26 and does not recover. MSE with the mask channel
+weighted by 5 and no soft-Dice term reads 0.4885, and the canonical
+objective, which adds the soft-Dice term, reads 0.4963. The last two are
+equal within noise. It is therefore the channel weighting, not the
+soft-Dice term, that escapes the collapse. What the soft-Dice term adds is
+an immediate escape, from epoch 0, and roughly half the epoch-to-epoch
+standard deviation of the metric (0.049 to 0.025), not a higher final
+score.
+
+The epoch of escape follows the strength of the mask-channel gradient:
+epoch 0 at soft-Dice sharpness 2, epoch 2 at sharpness 4, epoch 5 at
+sharpness 6, epoch 9 with mask weight 5 and no soft-Dice, and epoch 26 with
+plain MSE. Sharpness 2 is kept for its immediate escape and its lowest
+epoch-to-epoch variance, not for a higher score. It has a calibration cost.
+The raw mask RMSE rises to 0.880 at sharpness 2, against 0.336 without the
+soft-Dice term and 0.362 at sharpness 6. These raw values are quoted only
+to show the stretch described in~\S\ref{sec:method:training:loss}; it does
+not change any thresholded metric. Excluding the padded positions from the
+loss was tested on the same ladder, and the single-fold difference was
+under the floor.
+
+An intermediate-time-point regulariser was also evaluated. It queried the
+model at random intermediate times $\alpha\,\Delta t$, with $\alpha$ drawn
+uniformly between 0.1 and 0.9, and penalised the prediction against the
+linear interpolation between the two observed visits. At weights 1, 3 and
+10, the runs without it matched or beat the regularised runs on
+change-region Dice, and it was removed. These runs predate the final
+version of the pipeline, so by the rule of~\S\ref{sec:experiments:protocol:rollout}
+no number is quoted.
+
+% Subsections "Patient Covariates and the Layer Encoder" and "Settings Inside
+% the Graph Network" commented out 2026-09-28 (author: covariate result carried
+% largely by one fold; encoder tested on one backbone and one design only;
+% GNN-internal settings not needed). Kept for reference, not compiled.
+\iffalse
+\subsection{Patient Covariates and the Layer Encoder}
+\label{sec:experiments:ablations:conditioning}
+
+The patient covariates (age and sex) were evaluated on the index-space
+$k$-nearest-neighbour graph network (\S\ref{sec:method:graph}) over five
+folds at seed 42. Removing both covariates, minus keeping them, gives
+$\Delta = +0.0198 \pm 0.0140$~SE (3/5), with one fold (fold 4) carrying
+about 60\,\% of it; per eye it reads $+0.0190 \pm 0.0080$ (43/75,
+$t = 2.36$). Leaving out fold 4, the per-eye value falls to $+0.0089$
+($t = 1.11$). The removal graduates on neither instrument. The covariates
+give no detectable benefit at this precision, and the residual points
+against them; this does not show that the two conditions are equivalent,
+and the result is carried largely by one fold. Baseline age against
+per-visit age gives $+0.0045 \pm 0.0042$, a null. The covariates are
+graph-level scalars, constant across the grid and nearly constant along a
+trajectory (\S\ref{sec:method:covariates}).
+
+The optional layer encoder (\S\ref{sec:method:covariates}) was tested on one
+backbone, the index-space $k$-nearest-neighbour graph network, with one
+encoder design; only its embedding width was varied. The result therefore
+says nothing about other designs or other backbones, and it is not a
+general statement that a learned summary of the layers does not help. The
+widths 32, 64, 128 and 256 were each run over five folds at seed 42 against
+the same network without the encoder. The paired differences are
+$-0.0015$, $+0.0006$, $-0.0008$ and $+0.0034$, all far under the floor of
+0.016, with no monotonic trend over the eightfold range of widths; per eye,
+the result is mildly negative at every width (32 to 40 of 75 eyes). The
+encoder added 30 to 55\,\% to the training time. Its strides reduce the
+rows by a factor of four and the columns by eight, which corrects only
+about $2\times$ of the grid's physical anisotropy of about 21:1; the final
+receptive field remains about $14\times$ skewed. The sweep therefore cannot
+separate a failure of this encoder from a failure of a layer summary in
+general.
+
+\subsection{Settings Inside the Graph Network}
+\label{sec:experiments:ablations:gnn}
+
+The following settings were compared on the index-space
+$k$-nearest-neighbour graph network, over five folds at seed 42 unless
+stated otherwise. Replacing the per-node layer normalisation by a per-graph
+normalisation, which computes one mean and variance over all nodes and
+features of a graph and is the graph analogue of the U-Net's normalisation
+at the same parameter count, gives $+0.0146 \pm 0.0074$~SE, and per eye
+$+0.0129 \pm 0.0060$ (42/75), under the floor on both instruments. Combined
+with mean-only aggregation it reads $+0.0196 \pm 0.0088$ at seed 42 but
+only $+0.0058 \pm 0.0059$ at seed 7, so it does not replicate. Adding a
+normalisation between every linear layer and activation, to match the
+U-Net's density of normalised sites, adds $+0.0081 \pm 0.0087$ over its own
+control. On the dilated-stencil network, the per-graph normalisation reads
+$-0.0121$ on fold 2, under the single-fold floor. A spatially global
+normalisation statistic is therefore not what separated the U-Net from the
+graph network, and the per-node layer normalisation is kept.
+
+Mean-only aggregation against mean-and-maximum aggregation gives
+$+0.0108 \pm 0.0039$~SE, under the floor; mean-only aggregation is used in
+the canonical configuration, at fewer parameters. Rescaling the position
+offsets in the messages to grid-index units gives $+0.0023 \pm 0.0043$, and
+removing them entirely gives $-0.0099 \pm 0.0056$, per eye
+$-0.0080 \pm 0.0031$ (28/75). The trained weights show that the rescaling
+raised the network's effective sensitivity to direction by factors of 24
+and 308, and the metric did not move. The neighbour degree at a fixed reach
+is reported in~\S\ref{sec:experiments:ingredients:reach}. The geometry of
+the graph mattered (\S\ref{sec:experiments:ingredients:reach}); the
+settings of the message function did not, at this precision.
+\fi
 
 
 \section{Validity Diagnostics}
 \label{sec:experiments:validity}
 
-% TODO: the solver-swap diagnostic (locked model fails, autonomous-RK4 arm
-% passes; fold 2, one seed per model) -- forbids ODE / rate-field language;
-% the T-FEN's numerical validity (free-running divergence, Courant bound) --
-% the learned velocity is not quotable.
+The two diagnostics of this section are not accuracy numbers. They decide
+which statements about the operators are licensed. The first tests whether
+a trained operator can be read as a continuous-time system; the second
+tests whether the T-FEN, whose Dice scores are among the highest, is a
+numerically valid free-running model.
+
+\subsection{The Solver-Swap Test}
+\label{sec:experiments:validity:swap}
+
+The solver-swap test asks whether a trained network represents a
+continuous-time system. A trained checkpoint is rebuilt from its own
+configuration and re-evaluated with the unmodified evaluation code under
+several integration schemes and step counts. The wrapper adds no
+parameters (\S\ref{sec:method:family:rk}), so every setting applies the
+same weights with a different quadrature. As a control, the canonical model
+evaluated at one Euler step through the wrapper reproduces its own recorded
+epoch-29 change-region Dice exactly (0.596418). Following \citet{Ott2021}
+and \citet{Krishnapriyan2023}, a model that represents a continuous-time
+system should give nearly the same predictions under schemes of equal or
+smaller discretisation error. The test was run after training, on fold 2,
+with one seed per model and no retraining.
+
+The first model is the canonical dilated-stencil network, trained with one
+Euler step and with the real $\Delta t$ as an input.
+Table~\ref{tab:experiments:swap} gives its change-region Dice at the
+anchor, the difference to the trained setting, and the raw mask RMSE, which
+is used only to follow the trajectory within one model and never to compare
+models. The Dice spreads by 0.0856 across the five settings, 2.4 times the
+single-fold floor of 0.036 and 6.7 times the replicate standard deviation of
+0.0127. It does not converge: successive Euler refinements change the
+result by $-0.0162$ and then by a further $-0.0596$, so the change grows by
+a factor of 3.7 when the step is halved again, and the order of the schemes
+is not monotone (RK4 with one step lies above the trained setting, RK4 with
+two steps below it). The canonical model fails the test. It is a
+$\Delta t$-conditioned one-step map, not a discretisation of a
+continuous-time system. For a step-conditioned model the test cannot be
+posed cleanly, because changing the number of steps changes the $\Delta t$
+the operator is conditioned on, so the failure mixes refinement of the
+integration with conditioning outside the training range. That is itself
+the point of the test: an operator whose update depends on the step it is
+about to take does not define a continuous system to refine.
+
+The second model is the network trained inside the autonomous RK4 wrapper,
+with one RK4 step and the $\Delta t$ input always zero, so that only the
+integrator carries time. It is the one checkpoint for which the test is
+properly posed. Its four refined settings (Euler with two and four steps,
+RK4 with two and four steps) agree to within 0.0044, below the replicate
+standard deviation. The Euler sequence converges, with successive
+differences of $+0.0179$ and then $+0.0044$, a ratio of 4.05, and the mask
+RMSE falls monotonically and flattens, so the trajectory converges as well
+as the endpoint. The only outlier is Euler with one step, the crudest
+scheme over the full interval, which lies 0.020 low, as a first-order step
+is expected to. This model passes the test: its field is
+solver-independent. The two models' fold-2 Dice values (0.5964 and 0.5667)
+are not a comparison between them, since the first belongs to one
+quadrature and the second is the value the model converges to. Two
+variants were not run: the canonical model with its $\Delta t$ input set to
+zero, which would be far outside its training distribution, and a
+five-fold version of the test.
+
+Together, the two results restrict the vocabulary. No statement about
+continuous-time behaviour, ordinary differential equations, rate fields or
+learned dynamics is licensed for the canonical model or for any headline
+result. A continuous-time reading is licensed for the RK4-trained arm only,
+on fold 2 and one seed, and that arm is a five-fold null in accuracy against
+the canonical model ($-0.0119 \pm 0.0037$~SE,
+\S\ref{sec:experiments:ablations:time}) at about $4.8\times$ the training
+cost. On this task the continuous-time property is real and obtainable,
+and it buys nothing in accuracy; the difficulty lies in spatial reach
+(\S\ref{sec:experiments:ingredients:reach}), not in the time formulation.
+
+\begin{table}[t]
+  \centering
+  \caption[The solver-swap test.]{%
+    The solver-swap test on fold 2. Each trained model is re-evaluated
+    without retraining under several integration schemes and step counts;
+    the values are the change-region Dice at the one-year anchor, its
+    difference to the setting the model was trained with, and the raw mask
+    RMSE, which follows the trajectory within one model and is not
+    comparable between models. The canonical model does not converge under
+    refinement; the model trained inside the autonomous RK4 wrapper does.}
+  \label{tab:experiments:swap}
+  \small
+  \begin{tabular}{l r r r}
+    \toprule
+    Scheme / steps & Dice & $\Delta$ vs.\ trained & Mask RMSE \\
+    \midrule
+    \multicolumn{4}{l}{\emph{Canonical dilated-stencil network (trained: Euler / 1)}} \\
+    Euler / 1 (trained) & 0.596418 & $+0.0000$ & 1.1106 \\
+    Euler / 2 & 0.580195 & $-0.0162$ & 1.2294 \\
+    Euler / 4 & 0.520589 & $-0.0758$ & 1.4346 \\
+    RK4 / 1 & 0.606155 & $+0.0097$ & 0.9568 \\
+    RK4 / 2 & 0.579796 & $-0.0166$ & 1.1657 \\
+    \midrule
+    \multicolumn{4}{l}{\emph{Autonomous RK4 wrapper (trained: RK4 / 1)}} \\
+    Euler / 1 & 0.546568 & $-0.0201$ & 1.2830 \\
+    Euler / 2 & 0.564468 & $-0.0022$ & 0.9660 \\
+    Euler / 4 & 0.568892 & $+0.0022$ & 0.9092 \\
+    RK4 / 1 (trained) & 0.566656 & $+0.0000$ & 0.8942 \\
+    RK4 / 2 & 0.567121 & $+0.0005$ & 0.8831 \\
+    RK4 / 4 & 0.566857 & $+0.0002$ & 0.8804 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Numerical Stability of the T-FEN}
+\label{sec:experiments:validity:tfen}
+
+The stability of the T-FEN (\S\ref{sec:method:family:fen}) was assessed on
+its ten runs, five folds at two seeds. A run counts as stable if both its
+raw mask RMSE and its raw layer RMSE in the free-running validation rollout
+stay at or below 5 on at least 19 of its 20 late epochs. RMSE is used here
+only to detect divergence within one arm. The criterion was fixed for
+follow-up runs and is applied to these runs retrospectively.
+Table~\ref{tab:experiments:courant} lists the runs. Seven of the ten fail
+the criterion and three pass. Four of the seven diverge heavily on the mask
+channel, on 19, 15, 14 and 8 of the 20 late epochs; the other three fail
+mainly through the layer channels. The largest late-epoch mask RMSE reaches
+24\,418.
+
+The instability comes from the transport term: the free-form FEN, which
+differs only by its absence, never exceeds a mask RMSE of 1.43, and neither
+it nor the dilated-stencil network has a late epoch above the threshold on
+any fold. It builds up over the rollout. The teacher-forced one-step error
+of every T-FEN run lies within $\pm 0.02$ of the free-form FEN on the same
+fold, while the validation rollout reaches about 44 RK4 sub-steps at 45
+days, against about 8 within the 360-day training curriculum
+(\S\ref{sec:method:training:curriculum}). The thresholded metrics do not see
+it. On the heavily diverging runs, the predicted lesion area stays at 0.64
+to 1.00 of the true area (median per horizon bin), and the change-region
+Dice at the anchor is about the same on diverging and clean epochs of one
+run (0.529 against 0.513 in one example). Every Dice number
+in~\S\ref{sec:experiments:main-results} and~\S\ref{sec:experiments:ingredients}
+therefore stands.
+
+A Courant read-back points to the learned velocities. The runs were judged
+against a bound of 2.8, the stability limit $2\sqrt{2}$ of RK4 on the
+imaginary axis, in the sense of the stability condition of
+\citet{Courant1928}. The combined column and row Courant number was read per
+channel on all ten final checkpoints. Nine of the ten exceed 2.8 on at
+least one channel, with values from 3.16 to 5.71, while nine of the ten
+best checkpoints do not; the velocities grow past the stable region as
+training continues. Exceedance on a layer channel coincides with
+divergence on all six runs where it occurs, and the one run that stays
+under the bound on every channel is stable. A plausible reading, not
+tested, is that the near-binary mask is flat away from the lesion edge, so
+a fast mask velocity mostly acts on a zero gradient, whereas the layer
+channels have texture everywhere.
+
+The bound of 2.8 is itself too loose. The assembled transport stencil has a
+spectral radius of about 1.17 times the velocity in grid units, so the
+correct bound is about 2.4; against it, three further mask-channel
+readings in Table~\ref{tab:experiments:courant} fall on the wrong side. This
+settles the open value in~\S\ref{sec:method:family:fen}. An earlier check,
+made before the five-fold runs, used one fold and the mask channel only and
+did not detect the problem; a stability check for a multi-channel transport
+operator has to cover every advected channel, both velocity components, the
+final as well as the best checkpoint, and more than one fold and seed. A
+smaller step does not fix it either. At a 30-day step on fold 0, every
+channel falls back under the bound of 2.8 used during the runs (maximum
+2.42), and the free-running rollout still diverges, so the Courant
+condition is necessary but not sufficient. The principled remedy, a
+velocity head whose parameterisation bounds the speed, was deliberately not
+implemented; the instability is reported as a finding.
+
+Four consequences follow. The T-FEN as trained is not a numerically valid
+long-horizon integrator. Its learned velocity field and its raw fields are
+not quotable. Its Dice results at the anchor and its transport effect
+(\S\ref{sec:experiments:ingredients:transport}) stand, because they are
+measured on thresholded metrics that the divergence does not reach. And a
+learned advection velocity is a usable solver component only if its
+parameterisation respects the stability bound on every advected channel.
+Separately, the FEN family shows a long-horizon deficit that is not caused
+by the instability: the free-form FEN, which never diverges, also
+under-predicts long-horizon lesion area and lies 0.134 below the
+dilated-stencil network in the late growth-region Dice beyond three years
+(0.507 against 0.641).
+
+\begin{table}[t]
+  \centering
+  \caption[Stability of the ten T-FEN runs.]{%
+    Stability of the ten T-FEN runs (five folds, two seeds). ``Epochs
+    $> 5$'' counts late epochs (10 to 29) with a free-running mask RMSE
+    above 5. The two right-hand columns give the highest combined Courant
+    number on the final checkpoint, for the mask channel and over the layer
+    channels, against the bound of 2.8 used during the runs (the correct
+    bound is about 2.4). A run is stable if both its mask and its layer
+    RMSE stay at or below 5 on at least 19 late epochs; seed 42, folds 2
+    and 4, therefore fail through the layer channels despite few mask
+    exceedances, and seed 7, folds 1 and 3, pass despite a mask-channel
+    Courant number above the bound.}
+  \label{tab:experiments:courant}
+  \small
+  \begin{tabular}{l c c c}
+    \toprule
+    Run & Epochs $> 5$ & Courant, mask & Courant, layers (max) \\
+    \midrule
+    Seed 42, fold 0 & 19/20 & 2.37 & 3.16 \\
+    Seed 7, fold 4 & 15/20 & 5.65 & 2.06 \\
+    Seed 7, fold 0 & 14/20 & 2.75 & 3.86 \\
+    Seed 42, fold 1 & 8/20 & 2.46 & 3.22 \\
+    Seed 7, fold 2 & 4/20 & 2.28 & 3.79 \\
+    Seed 42, fold 2 & 2/20 & 2.68 & 3.39 \\
+    Seed 42, fold 4 & 1/20 & 3.05 & 3.70 \\
+    Seed 7, fold 1 & 0/20 & 5.71 & 2.15 \\
+    Seed 7, fold 3 & 0/20 & 5.32 & 1.16 \\
+    Seed 42, fold 3 & 0/20 & 2.08 & 2.16 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
 
 \section{Qualitative Analysis and Clinical Comparison}

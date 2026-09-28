@@ -1055,8 +1055,31 @@ Memory to watch: stencil h128 (the k-NN 6x128 ran at batch 4, so it should fit) 
 depth x width grid (depth 1-12, width 32-256) is fold 3 of an older pipeline version, flat;
 6x128 on fold 2 at the old loss setting, under the floor; the 50x U-Net (removed). The stencil
 GNN, FNO and FEN have never been run at another size.
-- [ ] TODO: after §5.4.3 is commented out, §4.4 still says the covariates and the layer encoder
-  are "tested in Chapter 5" (two sentences) -- adjust them.
+- [x] TODO: after §5.4.3 is commented out, §4.4 still says the covariates and the layer encoder
+  are "tested in Chapter 5" (two sentences) -- adjust them. Done 2026-09-28: covariates "not
+  settled by the experiments of this thesis"; encoder "not examined further". Also removed
+  §4.3.2 "this capacity is a configuration choice based on experiments reported in Chapter 5"
+  (inline TODO: point to the capacity subsection once it exists).
+- [x] 2026-09-28: §5.4-§5.5 drafted externally, audited against the fact sheet (prompt of
+  2026-09-28, numbers from THESIS_FRAMEWORK.md §7.5/§9.3 and SOLVER_FINAL_RUNS.md §9.15-§9.17),
+  spliced in (pages 54-58). §5.4.3 (covariates + layer encoder) and §5.4.4 (GNN-internal
+  settings) are written but wrapped in `\iffalse ... \fi` (author). Corrections made:
+  - **Wrong:** "at a 30-day step every channel falls back within the 2.4 bound, peaking at
+    2.42" (2.42 > 2.4; it is within the 2.8 bound used during the runs); "a Courant read-back
+    identifies the cause" (it is a correlation: "points to"); §5.4 opening called the ablations
+    "choices that did not graduate to the final pipeline" (the Delta t scaling *is* in the
+    pipeline); the k-NN network referenced as `ch:method` (now `sec:method:graph`); the RK4
+    limit 2*sqrt(2) cited to Courant et al. (now "in the sense of the stability condition of");
+    "the dilated-stencil network logs zero epochs ... for both models" (garbled); the Courant
+    table's columns were labelled as if they were RMSE maxima and the caption did not say they
+    are Courant numbers; the swap-table caption "confirming it is a conditioned map" overclaimed.
+  - **Added:** the era statement for the intermediate-time-point regulariser ("no number is
+    quoted"); "raw values quoted only to show the stretch" for the sharpness RMSE; the ± on the
+    reparameterisation target; `\times` for "4.8x", "2x", "14x".
+  - The §4.3.6 TODO on the Courant bound (2.8 vs ~2.4) is answered in §5.5.2 ("settles the open
+    value"); §4.3.6 itself still carries the TODO -- fix in the Chapter 4 review.
+- [ ] TODO (§5.4.1 inline): per-eye instrument for the Delta t-scaling ablation, if computed
+  (SOLVER_FINAL_RUNS.md, the `nodts` / `euler_dt_scale False` arm).
 - [ ] ⚠️ Mirror is stale (code repo wins): the T-FEN's free-running rollout is unstable on
   **7 of 10** runs (corrected in SOLVER_FINAL_RUNS.md §9.15 on 2026-09-16), not "5 of 10" as
   PROJECT_CONTEXT.md, THESIS_FRAMEWORK.md and the 2026-09-17 entry above say. The Courant bound

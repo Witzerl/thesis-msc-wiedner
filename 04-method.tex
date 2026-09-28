@@ -387,8 +387,10 @@ normalisation differs. The canonical configuration aggregates messages by their
 mean, as written in Equation~\eqref{eq:method:update}. The arm on the
 index-space graph instead concatenates the mean and the maximum of the
 messages. The canonical configuration uses two message-passing rounds and
-a hidden width of 64. This capacity is a configuration choice based on
-experiments reported in Chapter~\ref{ch:experiments}.
+a hidden width of 64.
+% TODO: point to the capacity experiment (pre-registered 2026-09-28, runs
+% in progress) once its subsection exists in Chapter 5; the earlier claim
+% that this size rests on reported experiments was removed.
 
 All normalisation layers are per-node layer normalisations \citep{Ba2016}. Each node is normalised over its own feature vector. No running
 statistics are kept, and no nodes or graphs are coupled, so the operator is
@@ -939,10 +941,10 @@ held fixed across the stages of one integration step
 (\S\ref{sec:method:family:rk}).
 
 The covariates are enabled in the canonical configuration of every
-operator. Whether they carry useful information about progression is an
-open question at this point. Chapter~\ref{ch:experiments} tests it by
-training a model without them, and by comparing the per-visit age with the
-baseline age (\S\ref{sec:experiments:ablations}).
+operator. Whether they carry useful information about progression is not
+settled by the experiments of this thesis.
+% Pointer to the covariate ablation removed 2026-09-28: that subsection of
+% Chapter 5 is commented out (author).
 
 The framework also provides an optional layer encoder. It compresses the
 ten layer-boundary channels of the current state into one global embedding
@@ -956,9 +958,10 @@ with strides that reduce the rows by a factor of four and the columns by a
 factor of eight, followed by adaptive average pooling and a linear layer.
 It is recomputed at every forward pass, so during a rollout it encodes
 predicted rather than observed layers. The encoder is switched off in the
-canonical configuration and in every operator of the main comparison. It
-was run only as an ablation over four embedding widths (32, 64, 128 and
-256), reported in Chapter~\ref{ch:experiments}.
+canonical configuration and in every operator of the main comparison, and
+it is not examined further in this thesis.
+% It was run only as an ablation of its width (32-256) on the k-NN graph
+% network; that subsection of Chapter 5 is commented out (author, 2026-09-28).
 
 % Subsection "Surrogate Equation Encoder" commented out 2026-09-27 (author:
 % the encoder is off in every reported arm and was only tested in the T5
