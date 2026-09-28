@@ -967,9 +967,94 @@ ef` style.
     commented out; the encoder result must be scoped to one backbone and one design (only the
     width was varied; 20 runs). No moving-mesh sentence in §5.4 (Appendix G only).
   - §5.7: training cost only; inference time and memory were never measured and are dropped.
-- [ ] TODO (author, 2026-09-28): design separate **capacity experiments** (the question is open
+- [x] TODO (author, 2026-09-28): design separate **capacity experiments** (the question is open
   again). Include the parameter-matched free-form FEN control (width ~139) for the transport
-  term. Discuss right after the §5.4-§5.5 prompt.
+  term. Discuss right after the §5.4-§5.5 prompt. -> pre-registered below.
+
+### Capacity experiment -- PRE-REGISTRATION (fixed 2026-09-28, Monday evening; deadline Thursday 2026-10-01 evening)
+
+**Question.** With the architecture and the shared training recipe fixed, does adding capacity
+move change-region Dice@360d by more than the floor -- and do the three architecture classes
+stay indistinguishable when all are scaled to the same parameter count? Plus: is the transport
+term still established against a parameter-matched free-form control?
+
+**Rules fixed now.** Training recipe unchanged (author: no learning-rate study; the one
+curriculum stays). 5 folds, seed 42, final pipeline, late-epoch mean, both instruments
+(fold-paired vs 1x, floor 0.016 / 0.020 with a U-Net; per-eye, LOFO). Width is the *comparable*
+capacity axis (it adds parameters without changing reach, receptive field or bandwidth); depth
+is *arm-specific* and is never compared across arms (GNN depth = more message-passing hops =
+more reach; FEN depth = MLP depth; U-Net and FNO have no depth knob without a code change). For
+the T-FEN, the stability criterion of §5.5.2 is read on every new run as well.
+
+**Parameter counts** (computed 2026-09-28 by building each model in the MPPDE env from the
+code repo, read-only; they reproduce 67,147 / 83,081 / 79,960 / 68,503 / 34,785 exactly):
+
+| arm | 1/4x | 1x (exists) | ~2x depth | ~4x width | ~16x width |
+|---|---|---|---|---|---|
+| stencil GNN (L = layers) | h32 L2 18,219 (0.27x) | h64 L2 67,147 | h64 **L4** 119,499 (1.78x) | **h128** L2 257,163 (3.83x) | h256 L2 1,005,835 (14.98x) |
+| U-Net | w2 13,637 (0.20x) | w5 83,081 | -- | **w9** 267,149 (3.98x) | w18 1,063,541 (15.84x) |
+| FNO + 3x3 | w2 13,189 (0.20x) | w5 79,960 | -- | **w9** 257,804 (3.84x) | w18 1,029,077 (15.33x) |
+| T-FEN (d = MLP depth) | w48 20,455 (0.30x) | w96 d4 68,503 | w96 **d8** 142,999 (2.13x) | **w192** d4 247,543 (3.69x) | w400 d4 1,014,855 (15.11x) |
+| free-form FEN | -- | w96 34,785 (0.52x) | -- | w266 231,985 (3.45x) | -- |
+| **matched transport control** | | **w139 68,282 (1.02x vs T-FEN 68,503)** | | | |
+
+**Stage 1 -- submit Monday night (7 arrays, 35 runs), in this priority order:**
+1. free-form FEN w139 (matched transport control) -- closes the 1.97x caveat of §5.3.4.
+2. stencil GNN h128 L2 (4x width).
+3. U-Net w9 (4x width).
+4. FNO + 3x3 w9 (4x width).
+5. stencil GNN h64 L4 (depth; note: 4 hops of +/-21 columns = more reach, so this is also a
+   reach test).
+6. T-FEN w96 d8 (depth).
+7. T-FEN w192 d4 (4x width) -- by far the most expensive (see cost).
+
+**Decision rule for Stage 2 (Tuesday evening), fixed now:**
+- An arm whose 4x-width run is higher than its 1x twin by more than the floor on *both*
+  instruments -> run its 16x width point.
+- An arm with no such gain -> no 16x; instead run its 1/4x point, so every arm gets a
+  three-point curve (1/4x, 1x, 4x). The 1/4x points are cheap.
+- Depth: only if a depth run is higher than its 1x twin on both instruments, try one step
+  further (stencil L3 or L6, T-FEN d6); otherwise depth stops at one point.
+- If the matched transport control leaves T-FEN minus free-form above the floor on both
+  instruments, §5.3.4 drops the 1.97x caveat; if not, the transport result is re-read as
+  (partly) capacity. Optional at 4x: free-form FEN w266 vs T-FEN w192.
+
+**Cost (rough, GPU-h per 5-fold array; min-epoch x 30 epochs x ~1.3 for the median epoch;
+GNN width scaling from the k-NN runs: per layer ~23 s at width 64, ~42 s at 128):**
+U-Net w9 ~3; FNO w9 ~3; stencil h128 ~8; stencil L4 ~8; free-form FEN w139 ~15-20 (MLP time
+~ width^2); T-FEN d8 ~35-40; **T-FEN w192 ~60-80 (about 12-16 h per run)**. Stage 1 total
+~130-160 GPU-h, i.e. one night only if ~35 GPUs are free at once; with fewer GPUs the T-FEN
+arrays are the ones that spill into Tuesday. If the queue is full on Tuesday morning, drop
+T-FEN w192 first (keep T-FEN d8 as the T-FEN capacity point) and say so in the write-up.
+
+**Schedule.**
+- Mon night: submit Stage 1 in the order above.
+- Tue morning: check the queue; harvest the finished cheap arrays (U-Net, FNO, stencil).
+- Tue afternoon: harvest the rest, pull the per-eye records, apply the decision rule.
+- Tue night: submit Stage 2 (16x or 1/4x points, depth follow-up if earned).
+- Wed: harvest Stage 2; figure (Dice vs log parameters, one line per arm, 1x points from
+  the existing runs) and the paired table; rerun failures on Wednesday night if needed.
+- Thu: write the subsection (prompt -> external draft -> audit), update Table 4.3 / §4.3.8
+  and §5.3.4, compile, commit.
+
+**Launch lines** (to be checked against the canonical arms' `args.json` before submitting --
+the diff of each new run against its 1x twin must contain only the size knob and the
+experiment name):
+```
+BACKBONE=fen HIDDEN_DIM=139 FEN_TRANSPORT=False INTEGRATOR=rk4 ODE_STEP_DAYS=45 EXP_TAG=w139Frk4d45 ARM=sb sbatch --array=0-4 --gres=gpu:nva6000:1 ~/jobs/train_solver.slurm
+HIDDEN_DIM=128 EXP_TAG=dilmean_h128 ARM=sb sbatch --array=0-4 --gres=gpu:nva6000:1 ~/jobs/train_solver.slurm
+BACKBONE=unet HIDDEN_DIM=9 EXP_TAG=w9 ARM=sb sbatch --array=0-4 --gres=gpu:nva6000:1 ~/jobs/train_solver.slurm
+BACKBONE=fno HIDDEN_DIM=9 FNO_LOCAL_KERNEL=3 EXP_TAG=w9k3 ARM=sb sbatch --array=0-4 --gres=gpu:nva6000:1 ~/jobs/train_solver.slurm
+HIDDEN_LAYERS=4 EXP_TAG=dilmean_l4 ARM=sb sbatch --array=0-4 --gres=gpu:nva6000:1 ~/jobs/train_solver.slurm
+BACKBONE=fen HIDDEN_DIM=96 FEN_DEPTH=8 FEN_TRANSPORT_PITCH=7 INTEGRATOR=rk4 ODE_STEP_DAYS=45 EXP_TAG=w96d8ftp7rk4d45 ARM=sb sbatch --array=0-4 --gres=gpu:nva6000:1 ~/jobs/train_solver.slurm
+BACKBONE=fen HIDDEN_DIM=192 FEN_TRANSPORT_PITCH=7 INTEGRATOR=rk4 ODE_STEP_DAYS=45 EXP_TAG=w192ftp7rk4d45 ARM=sb sbatch --array=0-4 --gres=gpu:nva6000:1 ~/jobs/train_solver.slurm
+```
+Memory to watch: stencil h128 (the k-NN 6x128 ran at batch 4, so it should fit) and T-FEN w192.
+
+**Existing capacity evidence, for the record (none of it usable as the answer):** the k-NN
+depth x width grid (depth 1-12, width 32-256) is fold 3 of an older pipeline version, flat;
+6x128 on fold 2 at the old loss setting, under the floor; the 50x U-Net (removed). The stencil
+GNN, FNO and FEN have never been run at another size.
 - [ ] TODO: after §5.4.3 is commented out, §4.4 still says the covariates and the layer encoder
   are "tested in Chapter 5" (two sentences) -- adjust them.
 - [ ] ⚠️ Mirror is stale (code repo wins): the T-FEN's free-running rollout is unstable on
