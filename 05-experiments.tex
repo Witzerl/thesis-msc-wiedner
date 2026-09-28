@@ -221,35 +221,35 @@ in Appendix~\ref{app:mm-pde}.
   \small
   \begin{tabular}{p{0.34\textwidth} r r c c r}
     \toprule
-    Arm & Params & Ratio & Mean $\pm$ sd & Best fold & s/epoch \
+    Arm & Params & Ratio & Mean $\pm$ sd & Best fold & s/epoch \\
     \midrule
     T-FEN$^\dagger$ (\S\ref{sec:method:family:fen}) & 68\,503 & 1.02 &
-      $0.5337 \pm 0.0453$ & 0.6011 & 364 \
+      $0.5337 \pm 0.0453$ & 0.6011 & 364 \\
     Graph network, dilated stencil (\S\ref{sec:method:graph}) & 67\,147 &
-      1.00 & $0.5258 \pm 0.0497$ & 0.6060 & 91 \
+      1.00 & $0.5258 \pm 0.0497$ & 0.6060 & 91 \\
     Graph network, dilated stencil, RK4
       (\S\ref{sec:method:family:rk}) & 67\,147 & 1.00 &
-      $0.5139 \pm 0.0497$ & 0.5907 & 439 \
+      $0.5139 \pm 0.0497$ & 0.5907 & 439 \\
     U-Net, width 5 (\S\ref{sec:method:family:dense}) & 83\,081 & 1.24 &
-      $0.5046 \pm 0.0632$ & 0.5918 & 21 \
+      $0.5046 \pm 0.0632$ & 0.5918 & 21 \\
     FNO with $3 \times 3$ local path (\S\ref{sec:method:family:dense}) &
-      79\,960 & 1.19 & $0.4984 \pm 0.0398$ & 0.5509 & 29 \
+      79\,960 & 1.19 & $0.4984 \pm 0.0398$ & 0.5509 & 29 \\
     FNO, RK4 (\S\ref{sec:method:family:rk}) & 79\,160 & 1.18 &
-      $0.4893 \pm 0.0398$ & 0.5276 & 45 \
+      $0.4893 \pm 0.0398$ & 0.5276 & 45 \\
     FNO (\S\ref{sec:method:family:dense}) & 79\,160 & 1.18 &
-      $0.4831 \pm 0.0477$ & 0.5391 & 23 \
+      $0.4831 \pm 0.0477$ & 0.5391 & 23 \\
     FEN, free-form only (\S\ref{sec:method:family:fen}) & 34\,785 & 0.52 &
-      $0.4810 \pm 0.0348$ & 0.5323 & 180 \
+      $0.4810 \pm 0.0348$ & 0.5323 & 180 \\
     Graph network, $k$-NN, $k = 20$ (\S\ref{sec:method:graph}) & 75\,339 &
-      1.12 & $0.4519 \pm 0.0436$ & 0.5223 & 108 \
+      1.12 & $0.4519 \pm 0.0436$ & 0.5223 & 108 \\
     Graph network, $k$-NN, $k = 12$ (\S\ref{sec:method:graph}) & 75\,339 &
-      1.12 & $0.4515 \pm 0.0429$ & 0.5178 & 75 \
+      1.12 & $0.4515 \pm 0.0429$ & 0.5178 & 75 \\
     \midrule
     One-hop floor (\S\ref{sec:method:family:floors}) & 45\,067 & 0.67 &
-      $0.4529 \pm 0.0403$ & 0.5092 & 59 \
+      $0.4529 \pm 0.0403$ & 0.5092 & 59 \\
     Per-pixel floor (\S\ref{sec:method:family:floors}) & 14\,795 & 0.22 &
-      $0.0000 \pm 0.0000$ & 0.0000 & 28 \
-    Persistence & 0 & --- & 0 & 0 & --- \
+      $0.0000 \pm 0.0000$ & 0.0000 & 28 \\
+    Persistence & 0 & --- & 0 & 0 & --- \\
     \bottomrule
   \end{tabular}
 \end{table}
