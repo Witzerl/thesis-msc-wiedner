@@ -248,9 +248,7 @@ the statistics of the current batch, which would erase the very
 perturbation the curriculum is meant to expose the model to. It would also
 write the drifted statistics into the running estimates that evaluation
 later uses, so that training and evaluation would behave as two different
-operators. The loss, the curriculum, the optimiser, the computational
-budget, the model selection and the random seeds are identical for every
-operator. The operators differ in their architecture only.
+operators.
 
 The operators that work on the image grid --- the U-Net and the Fourier
 Neural Operator with its local-kernel hybrid --- receive identical inputs. Each takes
@@ -259,13 +257,6 @@ constant plane, the two covariates broadcast as constant planes, and two
 coordinate ramps running from zero to one along each axis.
 The coordinate ramps follow the CoordConv construction of \citet{Liu2018}. Because the inputs are identical, a difference between these
 arms reflects the operator, not the information it receives.
-
-None of the operators uses the optional layer encoder
-of~\S\ref{sec:method:covariates}. One technical difference between the arms
-remains: the convolutional arms run their convolutions
-at the default TF32 precision of the GPU, whereas the linear layers of the
-graph solver run in standard 32-bit precision. The arms are therefore not
-precision-matched (\S\ref{sec:method:implementation}).
 
 \subsection{Message-Passing Graph Neural Network}
 \label{sec:method:mppde}
@@ -307,6 +298,10 @@ translational symmetry into the network. The solution difference
 $u_i - u_j$ lets each message act as a learned local difference operator,
 a flexible learned stencil.
 
+% TODO: discuss in Chapter 6 that the theta_PDE conditioning is a key
+% ingredient of MP-PDE and that GA has no counterpart; the stand-ins tried
+% here (covariates, layer encoder) did not help. See the matching TODO in
+% 06-discussion.tex (author review v4 #3, 2026-09-29).
 The equation feature vector $\theta_{\text{PDE}}$ holds the PDE
 coefficients and the boundary-condition identifiers. It is injected at the
 encoder and at every message-passing layer. This persistent injection is
@@ -343,9 +338,8 @@ network divided by the domain size, as $(x_i / L_x,\, y_i / L_y)$.
 Each node also receives a conditioning vector $\mathbf{c}_i$. In the
 canonical configuration it has three entries: the interval $\Delta t$ in
 years, the z-scored age and the sex of the patient. All three are
-graph-level quantities, broadcast to every node of the graph. An optional
-learned layer embedding can be appended (\S\ref{sec:method:covariates}); it is
-switched off in the canonical configuration. The conditioning vector fills
+graph-level quantities, broadcast to every node of the graph. The
+conditioning vector fills
 the slot that the equation feature vector $\theta_{\text{PDE}}$ occupies in
 the original. No governing equation or coefficients are known for GA, so
 the interval and the covariates take this place. As in the original, the
@@ -384,13 +378,10 @@ this information is available at every depth. As in the original, which
 uses skip connections in its message-passing layers, each update ends in a
 residual connection followed by a normalisation layer; only the type of
 normalisation differs. The canonical configuration aggregates messages by their
-mean, as written in Equation~\eqref{eq:method:update}. The arm on the
-index-space graph instead concatenates the mean and the maximum of the
-messages. The canonical configuration uses two message-passing rounds and
-a hidden width of 64.
-% TODO: point to the capacity experiment (pre-registered 2026-09-28, runs
-% in progress) once its subsection exists in Chapter 5; the earlier claim
-% that this size rests on reported experiments was removed.
+mean, as written in Equation~\eqref{eq:method:update}. The canonical
+configuration uses two message-passing rounds and a hidden width of 64;
+larger and smaller settings are compared
+in~\S\ref{sec:experiments:ablations:capacity}.
 
 All normalisation layers are per-node layer normalisations \citep{Ba2016}. Each node is normalised over its own feature vector. No running
 statistics are kept, and no nodes or graphs are coupled, so the operator is
@@ -410,16 +401,16 @@ then
 $u_i + \Delta t \cdot \delta(f_i^{M})$, where $\delta$ denotes the decoder;
 this is Equation~\eqref{eq:method:residual-update} at node level.
 
-This decoder replaces the convolutional output head of the original. That
-head treats the final hidden vector of a node as a temporal signal and
-convolves along it to emit the $K$ bundled future steps
-\citep{Brandstetter2022}. With $K = 1$ and eleven channels, the head reduced
-the hidden vector to a single scalar per node and then expanded that scalar
-linearly to all eleven channels. The eleven outputs were therefore perfectly
-collinear, a rank-1 bottleneck. The head also required a hidden width of at
-least 113. The replacement gives every channel an independent output and
-restores full rank. Its final layer is initialised to zero, which yields
-the persistence start of~\S\ref{sec:method:dt-residual}.
+In the original, the output head is a one-dimensional convolution. It
+treats the final hidden vector of a node as a temporal signal and convolves
+along it to emit the $K$ bundled future steps \citep{Brandstetter2022}. This
+head exists to produce several time steps at once. Because the framework
+predicts exactly one step ($K = 1$, \S\ref{sec:method:framework}), the
+convolutional head was removed and replaced by the decoder described above.
+The decoder maps the hidden vector of each node directly to the eleven
+channels with a full-rank linear output layer, so every channel receives
+its own independent prediction. Its final layer is initialised to zero,
+which yields the persistence start of~\S\ref{sec:method:dt-residual}.
 % Correction-branch exception (no zero-init there) moved to Appendix G.
 
 \paragraph{Differences from the original.}
@@ -458,8 +449,7 @@ used different settings for the two.
     Graph & Cut-off radius (1-D, 2-D) or $k$-nearest neighbours (wave
       equations), on positions & Index-space $k$-nearest neighbours, then
       the dilated stencil (\S\ref{sec:method:graph}) \\
-    Aggregation & Sum over neighbours & Mean (canonical); mean and maximum
-      for the index-space arm \\
+    Aggregation & Sum over neighbours & Mean \\
     Activation & Swish (1-D); ReLU (2-D) & ReLU \\
     Normalisation & Instance normalisation (1-D); batch normalisation
       (2-D) & Per-node layer normalisation \\
@@ -521,7 +511,11 @@ Between two visits 180 days apart, the GA front advances a median of about
 12 columns, or roughly 0.07\,mm. The upper quartile is 17 columns and the
 90th percentile 23 columns. A single hop along a row therefore covers only
 a small fraction of the distance the front typically moves between two
-visits.
+visits, and even the four columns reached after two rounds are about a
+third of the median advance. The index-space graph thus solves the
+connectivity problem but not the reach problem. This is why a second graph
+construction was needed, one whose reach along a row matches the scale of
+the lesion change.
 
 The dilated stencil is designed to close this gap
 (Figure~\ref{fig:method:stencils}). Each interior node is connected to the
@@ -540,15 +534,6 @@ and every other component stay unchanged, and the stencil adds no
 parameters.
 % Moved-mesh graph (own k-NN off the lattice) moved to Appendix G.
 
-The two canonical configurations differ slightly in size, and the
-difference comes from the aggregation, not from the graph. With the
-dilated stencil and mean aggregation, the network has 67\,147 parameters;
-the arm on the index-space graph, with concatenated mean and maximum, has
-75\,339. The concatenation doubles the width of the aggregated message that
-enters the update function. The same network on the dilated stencil with
-mean-and-maximum aggregation also has 75\,339 parameters, and on the
-index-space graph with mean aggregation also 67\,147.
-
 % TODO: produce Figure fig:method:stencils. The two neighbourhoods side
 % by side, drawn at the physical aspect ratio (a row step ~21x a column
 % step): left the index-space k-NN diamond (12 neighbours, +/-2 rows and
@@ -556,6 +541,14 @@ index-space graph with mean aggregation also 67\,147.
 % 0,+/-7,+/-14,+/-21, 20 neighbours). Add a 0.1 mm scale bar and mark the
 % median (12 columns, ~0.07 mm) and 90th-percentile (23 columns) per-visit
 % front advance along the row axis for comparison.
+% Extension (author review v4 #30, 2026-10-01): also show the region reached
+% after the two message-passing rounds of the canonical configuration with
+% each graph -- about +/-4 columns (~0.023 mm) with the k-NN graph against
+% +/-42 columns (~0.24 mm) with the dilated stencil -- since that is the
+% argument of 4.3.3 and 5.3.1-5.3.2. The figure needs only the grid spacing
+% (0.12118 mm between rows, 0.00568 mm between columns) and the stencil
+% offsets, so it can be rendered by a small script in the code repo (like the
+% practical report's scripts/), not drawn by hand.
 \begin{figure}[t]
   \centering
   \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering\itshape Placeholder
@@ -701,7 +694,7 @@ Two arms test how much spatial context is needed at all. Both are
 the graph solver on the index-space $k$-nearest-neighbour graph
 of~\S\ref{sec:method:graph} with fewer message-passing rounds, so neither
 needs a separate module. The one-hop floor uses a single round at width 64,
-so each node sees exactly one ring of neighbours; it has 45\,067 parameters.
+so each node sees exactly one ring of neighbours; it has 40\,971 parameters.
 The per-pixel floor uses no message passing at all. Each node's next state
 then depends only on its own state and its conditioning inputs, and the
 model has no spatial context; it has 14\,795 parameters. Together with the
@@ -756,10 +749,7 @@ implementation makes the velocity divergence-free across triangles, so
 reading it as a physical advection speed rests on an assumption the model
 does not enforce globally. The gradient coefficients are assembled in grid
 units, so the 21:1 axis imbalance never reaches the MLPs; only the velocity
-conversion uses millimetres. No flux term is assembled at the edge of the
-domain, so the crop border carries a natural, no-flux boundary condition by
-construction --- a statement about the crop, not about the anatomy
-(\S\ref{sec:data:spatial}). The transport term runs on its own coarser mesh,
+conversion uses millimetres. The transport term runs on its own coarser mesh,
 built on every seventh column (97\,632 triangles), while the free-form term
 uses the full-resolution mesh. This coarser mesh is the finite-element
 counterpart of the dilated stencil of~\S\ref{sec:method:graph}.
@@ -771,39 +761,77 @@ only two forms. The covariates are added as inputs. The time is not an
 input, so the learned dynamics are autonomous, a variant the original paper
 explicitly allows. Integration uses a fixed-step scheme instead of the
 adaptive dopri5 solver. The advective form and the per-cell velocity are the
-same as in the original.
+same as in the original; the energy-conserving form of the transport
+operator described below is a further departure.
 
 One evaluation of the time derivative only couples nodes that share a
 triangle, so spatial reach has to come from sub-steps. The FEN is therefore
 always run inside the Runge--Kutta wrapper of~\S\ref{sec:method:family:rk},
 with classical RK4 and a fixed physical step of 45 days; $\Delta t$ sets
-only the integration horizon. The step is constrained by stability. On the
-lattice, the assembled transport operator is a skew-symmetric
-central-difference stencil whose interior spectrum is purely imaginary. An
-explicit Euler step therefore amplifies every mode for any non-zero velocity,
-and the second-order midpoint and Heun schemes have no stability interval on
-the imaginary axis. Classical RK4 has one, $|\lambda| h \leq 2\sqrt{2}
-\approx 2.83$.
-The implementation checks the Courant number $C = |v| h$ per sub-step
-against this limit, in the spirit of the classical stability condition of
-\citet{Courant1928}. The limit is monitored, not enforced during training.
-% TODO: resolve the RK4 Courant bound for the assembled transport stencil
-% (2.8 as implemented vs ~2.4 derived from the stencil's spectral radius of
-% about 1.1-1.2).
-Its exact value also depends on the spectral radius of the assembled
-stencil, which was estimated at about 1.1 to 1.2 per unit velocity and step
-and would place the bound nearer $C \approx 2.4$.
+only the integration horizon. RK4 is used because, in the interior of the
+lattice, the assembled transport operator has a purely imaginary spectrum:
+an explicit Euler step would amplify every mode for any non-zero velocity,
+whereas RK4 has a stability interval on the imaginary axis. It remains
+stable only while the velocity times the step, the Courant number in the
+sense of~\citet{Courant1928}, stays below a limit of about 2.4 for this
+stencil.
+
+\paragraph{Two forms of the transport operator.}
+Two forms of the assembled transport operator were trained. The first is
+the Galerkin form described above, as in the original. At a constant
+velocity and away from the edge of the domain, it conserves a discrete
+energy of the state, the mass-weighted sum of squares $u^\top M u$, as
+pure transport should: content is moved, not created. At the edge of the
+crop, and for a velocity that varies from triangle to triangle, it does
+not. No flux term is assembled at the boundary, so transported content
+accumulates there, and the operator has modes that grow instead of
+travelling. The second form removes this defect. It keeps only the
+energy-conserving part of the Galerkin operator $L$,
+\begin{equation}
+  L_{\text{skew}} \;=\; \tfrac{1}{2}\left(L - M^{-1} L^\top M\right),
+  \label{eq:method:fen-skew}
+\end{equation}
+which conserves $u^\top M u$ for any per-triangle velocity, including at
+the edge, where it acts as a closed wall. In the interior and at a constant
+velocity, the two forms coincide. The energy-conserving form adds no
+parameters and no measurable cost.
+
+The Galerkin form turned out to be unstable, and the T-FEN reported in
+Chapter~\ref{ch:experiments} uses the energy-conserving form; the Galerkin
+runs are reported in~\S\ref{sec:experiments:validity:tfen}. \emph{Unstable}
+has a specific meaning here. During evaluation, every model is run freely:
+it predicts the next visit from its own previous prediction, over each
+eye's whole follow-up of up to about six years, without any ground truth
+fed back. A run is called stable if, in this free-running rollout, the root
+mean squared error of the mask channel and of the layer channels, both in
+normalised units, stays at or below 5 on at least 19 of its 20 late
+epochs. The normalised values of a correct prediction lie within a few
+units of zero, so an error above 5 means that the rollout has left the
+range of plausible states; in an unstable run it keeps growing, up to
+values of several thousand. The criterion was fixed before the
+energy-conserving form was trained.
+% Source: SOLVER_FINAL_RUNS section 9.13.3 (criterion, fixed 2026-09-11),
+% section 9.19 (diagnosis) and 9.19a (skew-form result, 2026-10-01).
 
 The T-FEN has 68\,503 parameters, of which 34\,785 belong to the free-form
 term and 33\,718 to the transport head. The free-form-only control removes
 the transport head at the same width and has 34\,785 parameters. This
 control is therefore not parameter-matched to the T-FEN: the two differ by a
-factor of 1.97.
-% TODO: a parameter-matched free-form FEN control (width ~139) has not been
-% run.
-A matched free-form control, at a width of about 139, was not run.
+factor of 1.97. A second control widens the free-form network to a width
+of 139, which gives 68\,282 parameters, level with the T-FEN; its comparison
+is reported in~\S\ref{sec:experiments:ingredients:transport}.
 
 \subsection{Fixed-Step Runge--Kutta Integration}
+% TODO (author, 2026-09-30): the whole RK4 setting must be explained much
+% more plainly here, in 5.4.1 and in 5.5.1 -- the author did not understand it
+% from reading. Cover: (1) Euler = one rate x step; RK4 = four evaluations per
+% step averaged, optionally several sub-steps; (2) "autonomous" = the Delta t
+% input is set to zero, only the integrator carries time (the update itself
+% is not zero); (3) why the wrapper exists: the FEN needs it (it outputs a
+% rate, and its reach grows with the number of evaluations), the
+% integration-order test (null, ~4.8x cost), and the continuous-time question;
+% (4) jump model vs continuous-time model (splitting the interval must not
+% change the answer), which is what the solver-swap test checks.
 \label{sec:method:family:rk}
 
 The Runge--Kutta wrapper is not a backbone. It takes the residual $f_\theta$
@@ -851,9 +879,8 @@ Chapter~\ref{ch:experiments}.
 Every operator is matched in size to the canonical graph solver
 of~\S\ref{sec:method:graph}, which has 67\,147 parameters. The widths are
 chosen so that each arm comes as close to this count as its width
-granularity allows. The principle follows \citet{Hu2024}, who compare MM-PDE
-with a deepened and widened GNN of similar parameter count, so that gains
-cannot be attributed to extra parameters. Table~\ref{tab:method:params}
+granularity allows, so that differences between arms cannot be attributed
+to extra parameters. Table~\ref{tab:method:params}
 lists every configuration. All architecture arms lie within a factor of
 1.25 of the reference. The one-hop floor lies below this band because it is
 a rung of the locality ladder of~\S\ref{sec:method:family:floors}, not an
@@ -861,15 +888,17 @@ architecture arm.
 
 The per-pixel floor also lies outside the band, with about a fifth of the
 parameters. It is a control, not an architecture arm: it marks what a model
-without spatial context can do.
-% TODO: capacity experiments (author, 2026-09-28): the width-32 U-Net was
-% removed; whether capacity matters is to be tested separately.
+without spatial context can do. Whether the size at which the arms are
+matched affects the comparison is tested separately, by scaling every
+architecture class from about a quarter to about four times its size
+(\S\ref{sec:experiments:ablations:capacity}).
 
-One comparison is not matched. The free-form FEN control has 34\,785
-parameters, half the reference and a factor of 1.97 below the T-FEN it
-controls, because it is the T-FEN with the transport head removed
-(\S\ref{sec:method:family:fen}). A matched free-form control was not run.
-The Runge--Kutta wrapper adds no parameters to any backbone.
+The free-form FEN control at width 96 has 34\,785 parameters, half the
+reference and a factor of 1.97 below the T-FEN it controls, because it is
+the T-FEN with the transport head removed (\S\ref{sec:method:family:fen}).
+A second free-form control at width 139 has 68\,282 parameters and is
+matched to the T-FEN. The Runge--Kutta wrapper adds no parameters to any
+backbone.
 
 \begin{table}[t]
   \centering
@@ -880,8 +909,8 @@ The Runge--Kutta wrapper adds no parameters to any backbone.
     configuration. Three arms lie outside this band: the per-pixel floor,
     a control without spatial context; the one-hop floor, a rung of the
     locality ladder and a truncation of the index-space arm; and the
-    free-form FEN, the one control that is not matched to the arm it is
-    compared with (factor 1.97 against the T-FEN).}
+    free-form FEN at width 96, which is not matched to the T-FEN it is
+    compared with (factor 1.97); the width-139 control is.}
   \label{tab:method:params}
   \small
   \begin{tabular}{p{0.34\textwidth} r r p{0.30\textwidth}}
@@ -889,17 +918,19 @@ The Runge--Kutta wrapper adds no parameters to any backbone.
     Arm & Parameters & Ratio & Isolates \\
     \midrule
     Graph solver, dilated stencil (canonical) & 67\,147 & 1.00 & reference \\
-    Graph solver, index-space $k$-NN & 75\,339 & 1.12 & graph geometry and
-      aggregation \\
+    Graph solver, index-space $k$-NN & 67\,147 & 1.00 & graph geometry \\
     T-FEN & 68\,503 & 1.02 & finite-element operator with transport \\
-    FEN, free-form only & 34\,785 & 0.52 & transport term (not matched) \\
+    FEN, free-form only, width 96 & 34\,785 & 0.52 & transport term (not
+      matched) \\
+    FEN, free-form only, width 139 & 68\,282 & 1.02 & transport term
+      (matched) \\
     % Graph U-Net & 72\,713 & 1.08 & pyramid with a graph operator \\ % arm dropped 2026-09-27
     FNO & 79\,160 & 1.18 & global support, no local path \\
     FNO with $3 \times 3$ local path & 79\,960 & 1.19 & global support plus
       local detail \\
     U-Net, width 5 & 83\,081 & 1.24 & multiscale local detail \\
     % U-Net, width 32 & 3\,354\,347 & 49.95 & capacity (control) \\ % removed 2026-09-28
-    One-hop floor & 45\,067 & 0.67 & one ring of spatial context \\
+    One-hop floor & 40\,971 & 0.61 & one ring of spatial context \\
     Per-pixel floor & 14\,795 & 0.22 & no spatial context (control) \\
     Any backbone with RK4 wrapper & unchanged & --- & integration order \\
     \bottomrule
@@ -941,11 +972,16 @@ held fixed across the stages of one integration step
 (\S\ref{sec:method:family:rk}).
 
 The covariates are enabled in the canonical configuration of every
-operator. Whether they carry useful information about progression is not
-settled by the experiments of this thesis.
+operator.
+% Sentence on the unsettled value of the covariates removed (author review v4
+% #12, 2026-09-30); the open question is a TODO in Section 6.3.
 % Pointer to the covariate ablation removed 2026-09-28: that subsection of
 % Chapter 5 is commented out (author).
 
+% Layer-encoder paragraph moved to Future Work (author review v4 #13,
+% 2026-09-30); see the TODO in Section 6.4. Kept here, commented out, as the
+% source text.
+\iffalse
 The framework also provides an optional layer encoder. It compresses the
 ten layer-boundary channels of the current state into one global embedding
 vector per visit, which is appended to the conditioning vector of the graph
@@ -960,6 +996,7 @@ It is recomputed at every forward pass, so during a rollout it encodes
 predicted rather than observed layers. The encoder is switched off in the
 canonical configuration and in every operator of the main comparison, and
 it is not examined further in this thesis.
+\fi
 % It was run only as an ablation of its width (32-256) on the k-NN graph
 % network; that subsection of Chapter 5 is commented out (author, 2026-09-28).
 
@@ -972,7 +1009,8 @@ it is not examined further in this thesis.
 \label{sec:method:training}
 
 Everything in this section is shared by every operator of the survey
-(\S\ref{sec:method:family:contract}). The objective, the curriculum and the
+(\S\ref{sec:method:family:contract}), and Table~\ref{tab:method:hparams}
+lists the settings. The objective, the curriculum and the
 optimisation settings do not change between arms, so that a difference
 between two arms can be attributed to the operator.
 
@@ -1036,16 +1074,12 @@ not compare operators on raw errors (Chapter~\ref{ch:experiments}).
 Two further options exist in the implementation and are off in every
 reported run. First, the loss can exclude grid positions whose target
 equals the fill value of the crop padding (\S\ref{sec:data:spatial}), from
-both terms.
-% TODO: confirm with the author whether the pad-masked ablation leg (fold 2)
-% is reported in Chapter 5; if not, say only "off in every reported run".
-Since this option is off, the padded positions are regressed at full
-weight. The evaluation handles padding instead, through pad-masked
-variants of its metrics (\S\ref{sec:experiments:protocol}). Second, a
-monotonic-growth penalty can be added, which penalises a decrease of the
-mask where the previous state is atrophic. Its weight is zero in every
-reported run; \S\ref{sec:method:dt-residual} explains why no monotonic
-constraint is imposed. The same loss is used in training and in
+both terms. Since this option is off, the padded positions are regressed at
+full weight. Second, a monotonic-growth penalty can be added, which
+penalises a decrease of the mask where the previous state is atrophic. Its
+weight is zero for every operator of the comparison;
+\S\ref{sec:method:dt-residual} explains why no monotonic constraint is
+imposed, and~\S\ref{sec:experiments:ablations:loss} tests the penalty. The same loss is used in training and in
 validation.
 
 \subsection{Time-Budgeted Pushforward Curriculum}
@@ -1122,10 +1156,9 @@ of Appendix~\ref{app:mm-pde}.
 
 Every reported run uses the seed 42; replication runs with the seed 7 are
 reported in Chapter~\ref{ch:experiments}. The model is validated on the
-held-out fold after every epoch (\S\ref{sec:data:splits}). Model selection
-and the reporting of late-epoch means are part of the evaluation protocol
-(\S\ref{sec:experiments:protocol}). Table~\ref{tab:method:hparams}
-summarises the shared settings.
+held-out fold after every epoch (\S\ref{sec:data:splits}); which epochs
+enter the reported numbers, and why, is set out
+in~\S\ref{sec:experiments:protocol}.
 
 \begin{table}[t]
   \centering
@@ -1189,31 +1222,13 @@ made in the main process would not reach separate worker processes. Even
 so, repeated runs of the same configuration do not give identical results
 on the GPU. Chapter~\ref{ch:experiments} quantifies this run-to-run
 variation, and it defines the noise floor against which every comparison
-is read. The operators are also not matched in numerical precision: the
-convolutional operators run at the default TF32 precision of the GPU,
-whereas the linear layers of the graph network run in standard 32-bit
-precision (\S\ref{sec:method:family:contract}).
-
-Every run writes its complete configuration into its run directory at the
-start. The name of the directory encodes the key settings, the fold and the
-data variant. Since 2 September 2026, each run also records the version of
-the code it ran; earlier runs are dated by the timestamp of their
-directory. Because every fold is mounted at the same path on the cluster,
-each run also records which fold and data variant it loaded. After every
-epoch, the latest state of the model is saved, together with the best
-state according to the validation metric. Resuming an interrupted run is
-disabled, so every reported run was trained in one piece.
-
-The per-epoch metrics of all runs are collected into one version-controlled
-results table, and every training result reported in this thesis is read
-from it. Each reported number can therefore be traced to a recorded run and
-its configuration. Training cost is reported as the minimum epoch time
-over the five folds of an arm. The mean is not used, because the epoch
-times of a run carry a near-constant additive overhead, which would
-penalise cheap operators. The number of optimiser steps per epoch differs
-slightly between the folds (280 to 320), which limits the cost figures to
-order-of-magnitude statements. The measurements are reported
-in~\S\ref{sec:experiments:cost}.
+is read.
+% Precision sentence removed (author review v4 #15, 2026-09-30): the
+% convolutional operators run at TF32, the graph network's linear layers at
+% standard FP32; the arms are not precision-matched.
+% Run-identity and results-table paragraphs removed (author review v4 #16,
+% #17, 2026-09-30); run identity -> TODO in Appendix F, cost convention ->
+% TODO in Section 5.7.
 
 
 %%

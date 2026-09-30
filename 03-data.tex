@@ -209,13 +209,13 @@ The window was nevertheless kept on purpose. Larger windows reduce the
 truncation, but they require up to 35\,\% zero-padding and about 1.9
 times as many grid positions. They also cannot remove the problem: for
 about 19\,\% of lesions, border contact is unavoidable with any window,
-because those lesions reach the edge of the scan itself. The
-consequences are therefore handled in the evaluation instead
-(\S\ref{sec:experiments:protocol}). There, the change-region metric is
-split into border-touching and interior lesions, a pad-masked variant of
-the metric is reported, and layer errors are computed over non-padded
-positions only. In addition, the training loss can optionally exclude
-pad positions.
+because those lesions reach the edge of the scan itself. The censoring
+therefore remains in the data and in the reported metrics, and it is
+discussed as a limitation (\S\ref{sec:discussion:limitations}). The
+training loss can optionally exclude pad positions.
+% TODO (author review v4 #19, 2026-09-30): the evaluation variants
+% (border-touching vs interior split, pad-masked metric) were commented out
+% of 5.1.2; restore this pointer if they are reinstated.
 
 
 \section{Normalisation}

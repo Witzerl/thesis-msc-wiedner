@@ -13,9 +13,29 @@
 % or was uniform mesh enough? Did the surrogate encoder improve
 % generalization across patients?
 
+% TODO (must be included, author review v4 #3, 2026-09-29): the equation
+% feature vector theta_PDE (PDE coefficients, boundary-condition ids) is a
+% key ingredient of MP-PDE -- it is what lets one trained solver generalise
+% across a family of equations. GA has no governing equation, so there is
+% no counterpart; Delta t and the covariates fill the slot (Section 4.3.2).
+% The stand-ins tried here did not help: the covariates are a null and the
+% learned layer encoder (a surrogate for theta_PDE) is a null at every
+% width. Discuss what is lost without it and what could fill the slot
+% (e.g. patient- or lesion-level descriptors that vary across eyes).
+
 
 \section{Clinical Implications}
 \label{sec:discussion:clinical}
+
+% TODO (author review v4 #20, 2026-10-01): "good at where, weaker at how
+% fast". The survey optimises where the lesion changes (change-region Dice at
+% one year), but per-eye growth speed over the whole follow-up is only
+% moderately captured (r = 0.40 vs 0.61 for Mai et al. 2024; fast-progressor
+% AUC 0.70-0.74 vs 0.77-0.81), for every arm alike -- even though the model
+% starts from segmented masks. Discuss what this means for clinical use
+% (triage of fast progressors needs growth speed) and possible reasons
+% (drift of local models over multi-year rollouts, crop censoring, no
+% trajectory memory).
 
 % TODO: which prediction horizon is reliable? What RMSE/Dice level would be
 % clinically useful? Where does the model fail, and would those failures
@@ -36,6 +56,19 @@
 % with history -- several past visits as input, or a recurrent state --
 % would be worth testing given 5-13 visits per eye (author review #11,
 % 2026-09-27).
+% TODO: the patient covariates (age, sex) are enabled in every operator, but
+% whether they carry useful information about progression is not settled:
+% the ablation that removed them (k-NN graph network, mean+max era; no
+% detectable benefit, residual pointing against them, neither instrument
+% graduating) is not reported in Chapter 5. Two graph-level scalars broadcast
+% to every node cannot localise anything. State this as an open limitation
+% (author review v4 #12, 2026-09-30).
+% TODO: crop censoring (Section 3.3 now points here): the fixed 49 x 1024
+% window cuts real lesion area in 27.3 % of visits and 31.1 % of cropped
+% lesions touch the border, so growth across it is censored in the training
+% targets and in the reported metrics. The evaluation variants that would
+% quantify this (border vs interior split) are not reported (author review
+% v4 #19, 2026-09-30); if they stay out, say so here.
 
 
 \section{Future Work}
@@ -49,6 +82,18 @@
 % 49 x 1024 centre crop, which censors lesion growth at the window border
 % in 31.1 % of cropped lesions and cuts real lesion area in 27.3 % of
 % visits (see \S3.3; author review #33, 2026-09-26).
+% TODO: a learned summary of the retinal structure as a stand-in for the
+% equation features theta_PDE (moved here from Section 4.4, author review v4
+% #13, 2026-09-30). The code has a first version, a layer encoder (four 3x3
+% convolutions with group normalisation and ReLU, strides reducing rows x4
+% and columns x8, adaptive average pooling, linear layer) that compresses the
+% ten layer channels into one global embedding appended to the graph
+% network's conditioning vector. It was off in every reported arm; only its
+% width (32-256) was varied, on one backbone (k-NN graph network), with no
+% detectable effect. Future work: a design that sees observed rather than
+% predicted layers during rollout, corrects the grid anisotropy (the strides
+% correct only ~2x of ~21:1), or conditions locally rather than globally.
+% Link to the theta_PDE point in Section 6.1 (review v4 #3).
 
 
 %%

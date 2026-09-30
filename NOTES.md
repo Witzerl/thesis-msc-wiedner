@@ -510,6 +510,353 @@ be longer, since it supplies two arms and the floors).
 - [x] #19 §4.2.2 mesh-mover channel sentences removed from the main text; TODO added in
   Appendix G (2026-09-27). All 19 items of this review are now worked through.
 
+### Author's tablet review of §4.3–§5.5 (2026-09-29)
+
+Fourth handwritten review (thesis pp. 30–57), decoded from
+`main-thesis_v4_260929_230116.sdocx`: 38 marks. Blue = rewrite, red = wrong/remove.
+Being worked through one item at a time.
+
+- [x] #1 §4.3.1 "The loss, the curriculum, … differ in their architecture only." removed
+  (already said in §4.1 and the §4.3 intro) (2026-09-29).
+- [x] #2 §4.3.1 layer-encoder / TF32-precision paragraph removed (2026-09-29).
+- [x] #3 §4.3.2 θ_PDE: TODO added above the paragraph and in 06-discussion.tex §6.1
+  (2026-09-29).
+- [ ] TODO (from #3, author: must be included): §6.1 — θ_PDE conditioning is a key
+  ingredient of MP-PDE; GA has no counterpart, and the stand-ins tried here (covariates,
+  layer encoder) were nulls. Discuss what is lost and what could fill the slot.
+- [x] #4/#7/#29 mean+max aggregation (author: mean is the default and the only aggregation
+  the thesis refers to). Removed: §4.3.2 sentence, §4.3.3 parameter-bookkeeping paragraph,
+  §5.3.2 "(mean and maximum)" and the matched mean+max comparison (+0.0691), the Table 4.1
+  "mean and maximum for the index-space arm" entry. The reported k-NN arm (k = 12) is now the
+  existing mean-aggregation run `MPPDE_final_aggrmean` (seed 42, 5 folds) instead of the
+  mean+max run `MPPDE_final_dts`. Answer to #7: mean+max is not better (mean − mean+max =
+  +0.0108 ± 0.0039 SE, 4/5; per eye +0.0105 ± 0.0052, 43/75) (2026-09-29).
+  - **Factual error fixed:** the k = 20 arm (`MPPDE_final_k20`) was always mean aggregation;
+    Table 5.1 had 75,339 params / 1.12, now 67,147 / 1.00.
+  - Numbers changed (seed 42, fold-paired from `solver_results.csv`
+    `late_change_region_dice_360d_mean`; per eye with the SOLVER_FINAL_RUNS §9.8b instrument,
+    which reproduced U-Net − dts +0.0504/55/75/t 5.36 and dilmean − aggrmean +0.0647/70/75
+    exactly before use):
+    k-NN arm 0.4515 ± 0.0429 → **0.4623 ± 0.0361**, best fold 0.5178 → 0.5153 (f2), cost
+    75 → 76 s (f3), params 75,339 → 67,147 (Tables 4.2, 5.1);
+    stencil − k-NN +0.0743 ± 0.0083 / +0.0752 (74/75) → **+0.0635 ± 0.0106 (5/5) / +0.0647 ±
+    0.0062 (70/75, t 10.4)**, now at equal parameters;
+    U-Net − k-NN +0.0531 ± 0.0226 / +0.0504 (55/75) → **+0.0423 ± 0.0246 (4/5) / +0.0399 ±
+    0.0102 (53/75, t 3.93)**, fold 3 −0.022 → −0.042;
+    FNO − k-NN +0.0316 ± 0.0259 / +0.0225 (40/75) → **+0.0208 ± 0.0258 (3/5) / +0.0120 ±
+    0.0135 (41/75)**, without fold 4 −0.001;
+    hybrid − k-NN +0.0470 ± 0.0160 (5/5) / +0.0414 (47/75) → **+0.0361 ± 0.0166 (4/5) /
+    +0.0310 ± 0.0111 (49/75, t 2.79)**, LOFO min +0.024 / +0.020 — still established, but no
+    longer higher on every fold (sentence removed);
+    k = 20 − k = 12 (mean twin, unchanged −0.010 ± 0.005, 1/5) now also per eye **−0.011 ±
+    0.003 (20/75, t −4.1)** — instruments disagree, not established;
+    k-NN fold range 0.41–0.52 → 0.43–0.52.
+- [ ] TODO (verify, author 2026-09-29): **re-check every number changed on 2026-09-29 for
+  #4/#7/#29** (listed above) against `solver_results.csv` and the per-eye records, including
+  that the CSV row used per fold is the right run where a fold has two rows (e.g. `dts` f2
+  has two; the table values match the later row).
+- [x] 2026-10-01: the four mean-aggregation twins are in (seed 42 / 7, 5 folds each, all
+  30/30 epochs, one run dir per fold). Integrity: args diff vs each twin = experiment + the
+  intended knob (`gnn_aggr` / `hidden_layers` / `euler_dt_scale`) + presence-only keys added
+  later, at their defaults; logged params 67,147 / 40,971 (one-hop, as predicted) / 14,795.
+  Not yet read out in SOLVER_FINAL_RUNS.md (code repo) — numbers computed here with the same
+  instruments (fold-paired from `solver_results.csv`, superseded rows skipped; per eye §9.8b).
+  Changes made:
+  - **Seed-7 reach** (§5.3.2): dilmeans7 − aggrmeans7 **+0.0629 ± 0.0131 SE (5/5) / +0.0620 ±
+    0.0071 (66/75, t 8.7)**; seed-pooled per eye **+0.0633 ± 0.0047 (136/150)** (was +0.0736,
+    144/150 against mean+max).
+  - **Seed-7 U-Net − k-NN** (§5.3.2): **+0.0548 ± 0.0181 (5/5) / +0.0517 ± 0.0109 (59/75)** (was
+    +0.0655 / +0.0618); "fold 3 reads −0.042" now marked "at seed 42".
+  - **One-hop floor** (Tables 4.2, 5.1, §4.3.5, §5.3.1): 40,971 params (0.61), **0.4515 ±
+    0.0243**, best 0.4856 (f2), 37 s (f0) (was 45,067, 0.4529 ± 0.0403, 0.5092, 59 s).
+    One − two rounds: **−0.0108 ± 0.0061 SE (1/5) / −0.0122 ± 0.0051 (33/75, t −2.4)** (was
+    a null, +0.0014 / 39/75). §5.3.1 now reads "the second round adds about 0.01, consistent in
+    direction but not established; a single ring buys almost everything, the second adds
+    little" (was "buys nothing measurable").
+  - **Per-pixel floor** (Table 5.1): pxmean, still 0.0000 on every fold; cost 28 → 16 s (f0).
+  - **Δt-scaling ablation** (§5.4.1): **+0.0019 ± 0.0071 SE (3/5) / +0.0004 ± 0.0042 (40/75)**
+    (was +0.0134 ± 0.0059, 4/5, mean+max) — now a clear null on both instruments.
+  - For reference: aggrmeans7 0.4651 ± 0.0267 (mean − mean+max at seed 7 +0.0107 ± 0.0062).
+- [x] 2026-10-01 **Matched free-form FEN control** (`FEN_final_w139Frk4d45`, 68,282 params) in
+  §5.3.4 (review v4 #32): fold 4 does not train, reproducibly (0.0469, rerun 0.0467; training
+  error rises from epoch 0; w96 control trains on f4, 0.501) → excluded. Folds 0–3: T-FEN −
+  matched **+0.0617 ± 0.0127 SE (4/4) / +0.0648 ± 0.0064 (58/63, t 10.1)**; unmatched on the
+  same folds +0.0532; w139 − w96 −0.0084 ± 0.0053 (0/4); with the failed fold +0.150. The 1.97×
+  caveat is dropped (§5.3.4, §5.3.5); §4.3.6/§4.3.8/Table 4.2 "pending" TODOs removed. Verified
+  against the CSV (superseded f4 attempt skipped) and SOLVER_FINAL_RUNS §9.18.
+- [ ] TODO (#32 follow-up): seed-7 matched control `FEN_final_w139Frk4d45s7` (5 folds) to be
+  queued 2026-10-01 — tests whether the fold-4 failure is seed-specific; add the seed-7
+  comparison against `FEN_final_w96ftp7rk4d45s7` and revise the fold-4 sentence (inline TODO).
+- [x] 2026-10-01 **Capacity study written up** as new §5.4.3 "Capacity" (`sec:experiments:
+  ablations:capacity`) with Table `tab:experiments:capacity` (stencil GNN w32/64/128 + 4
+  rounds; U-Net w2/5/9/32; FNO+3×3 w2/5/9; T-FEN w48/96/192 + depth 8), both instruments. All
+  values re-computed from the CSV and per-eye records; they match SOLVER_FINAL_RUNS §9.18
+  except the width-32 U-Net per eye (−0.0453 ± 0.0113 here vs −0.0469 ± 0.0090 there; one run
+  dir per fold — check the §9.18/§9.6d source). The width-32 U-Net is back as a capacity point
+  (not in Table 5.1). §5.4 intro, §4.3.2 and §4.3.8 now point to §5.4.3; the §4.3.2/§4.3.8
+  capacity TODOs are closed. **Author to review §5.4.3** (written directly, not via the
+  external-draft + audit workflow).
+- [x] (2026-10-01, resolved below) TODO: **T-FEN instability re-diagnosed** (SOLVER_FINAL_RUNS §9.19):
+  crop-edge discretisation of the Galerkin transport operator, not step size (Courant at onset
+  below the RK4 limit). Supersedes the CFL reading in §4.3.6 and §5.5.2 (inline TODOs in both).
+  Skew-form retrain `FEN_final_w96ftp7rk4d45skew` running; re-discuss once in.
+- [x] 2026-10-01 **Skew-form T-FEN in (§9.19a, outcome A) — the reported T-FEN is now the
+  energy-conserving form** (author: describe both forms, say the Galerkin one became unstable,
+  define instability). Verified here: 0.5428 ± 0.0401, best 0.6047 (f2), 367 s (f0); skew −
+  Galerkin +0.0091 ± 0.0029 (5/5) / +0.0085 (45/75); skew − free-form w96 **+0.0618 ± 0.0040
+  (5/5) / +0.0640 ± 0.0058 (68/75, t 11.0)**; skew − matched w139 folds 0–3 **+0.0716 ± 0.0094
+  (4/4) / +0.0737 ± 0.0063 (59/63, t 11.7)** (unmatched same folds +0.0631; incl. failed f4
+  +0.159); skew − stencil +0.0170 ± 0.0085 (4/5) / +0.0136 ± 0.0062 (46/75, t 2.2) = tie;
+  skew − U-Net +0.0383 ± 0.0134 (5/5) / +0.0383 ± 0.0075 (51/75, t 5.1) — above the mixed
+  floor at seed 42, **not established before seed 7**; skew − k-NN (mean) +0.0805 (5/5) /
+  +0.0782 (66/75). Growth-rate r (Mai measure) 0.32 → 0.40 [0.22, 0.55]; AUC10 0.72, AUC20 0.74.
+  Changes: §4.3.6 new paragraph "Two forms of the transport operator" (Galerkin conserves
+  u^T M u only in the interior at constant velocity; no boundary flux → growing modes at the
+  crop edge; L_skew = ½(L − M⁻¹LᵀM), Eq. `eq:method:fen-skew`, closed wall, same in the interior,
+  no parameters) + **definition of "unstable"** (free-running rollout; mask and layer RMSE in
+  normalised units ≤ 5 on ≥ 19/20 late epochs; criterion fixed 2026-09-11, before the skew form);
+  long Courant/2.8-vs-2.4 paragraph replaced by one sentence (RK4 limit ≈ 2.4); the "natural
+  no-flux boundary" sentence removed. §5.5.2 rewritten: Galerkin 7/10 unstable, where/why
+  (edge onset 79–93 % of eyes, layer channel 33/34, transport 13–290× free-form, onset day
+  ≈585–720 > 360-d training horizon, ×1.3 per substep, Courant at onset 1.9–2.3 < 2.4, 30-day
+  step still diverges), **why Dice at 1 y stays valid** (onset after the anchor, at the edge, in
+  the layers), skew form stable 5/5, border 0.516 → 0.544, >3 y growth Dice 0.537 → 0.611; new
+  Table `tab:experiments:tfen-stability` (Galerkin vs skew per fold); the old Courant table
+  removed. Table 5.1 T-FEN row = skew, dagger removed; §5.2 T-FEN paragraphs rewritten (tie with
+  stencil; U-Net lead pending seed 7); §5.3.4 transport numbers = skew (Galerkin values kept as
+  "the effect does not depend on the form"); horizon profiles inserted (§9.19a); §5.3.5 no longer
+  claims "indistinguishable from the U-Net"; capacity table T-FEN points marked Galerkin;
+  §5.5 intro reworded; Mai section r range 0.33–0.47. **Resolves review #26, #28, #38.**
+- [ ] TODO (T-FEN, pending): seed-7 skew run `FEN_final_w96ftp7rk4d45skews7` (5 folds, command
+  given 2026-10-01) → T-FEN vs U-Net (established or tie), §5.2, §5.3.5, headline wording,
+  seed-7 transport value (§5.3.4). Courant read-back of the skew checkpoints (needs `last.pt`)
+  before the velocity map is quotable. Verify the §9.19a horizon values against the mai/ records.
+- [ ] Code-side discrepancy (not editable here): SOLVER_FINAL_RUNS §9.19a says the Galerkin form
+  "failed on 3/5" folds at seed 42, but its own table (and the old §5.5.2 table) give 4/5
+  (folds 0, 1, 2, 4). Thesis uses 4/5 at seed 42, 7/10 overall.
+- [ ] Removed with the old §5.5.2 (not in the text any more): the free-form FEN's long-horizon
+  deficit (0.507 vs 0.641 beyond 3 y, older per-step computation) — conflicts with §9.19a's
+  stencil value 0.655; re-derive before reinstating.
+- [x] (fixed 2026-10-01 with #27: first column narrowed to 0.28\textwidth) TODO: Table 5.1 is
+  ~10 pt wider than the text block (overfull hbox since the best-fold column was added
+  2026-09-28).
+- [x] #24 §5.2 "The moving-mesh arms are reported in Appendix G." removed (2026-10-01).
+- [x] #25 folded into the Chapter 5 reporting scheme (#23).
+- [x] #27 Table 5.1: best-fold values carry their fold index in brackets ("0.6047 [2]"); caption
+  says so; per-pixel floor without index (every fold 0). §5.2 sentence now "every arm except the
+  two FNO arms without a local path" (both fold 4) (2026-10-01).
+- [x] 2026-10-01 §5.5.2 Galerkin part shortened (author: short — what was tried, why it failed,
+  then the working version): one paragraph "The first version"; diagnostic details kept as a
+  LaTeX comment (possible appendix material). A scripted edit turned two `\S\ref` into
+  `\S<CR>ef` again; fixed at byte level, all chapter files checked (no stray CR).
+- [x] #30 §5.3.2 now points to Figure 4.2 (`fig:method:stencils`); figure spec in §4.3.3 extended
+  (two-round reach: ±4 columns ≈ 0.023 mm k-NN vs ±42 ≈ 0.24 mm stencil; render by script from
+  grid spacing + offsets) (2026-10-01).
+- [x] #31 folded into the Chapter 5 reporting scheme (#23).
+- [x] #33/#34 §5.4.1 "Time Handling" rewritten around its purpose (author: explain what the
+  section must achieve): the framework's time handling is simple (one step, Δt as input and
+  multiplier); two tests ask whether its details carry accuracy, both on the canonical stencil;
+  (1) Δt multiplication — result pending on the stencil (inline TODO); the k-NN run of this
+  ablation is deliberately not reported (author 2026-10-01: "pretend it never happened");
+  reparameterisation explanation kept; (2) Euler vs RK4 — stencil −0.012
+  (4/5 lower), FNO +0.006, both within noise, ~4.8× cost; conclusion: the interval must reach
+  the operator (as input or via the integrator), how does not matter; accuracy is decided by
+  the spatial operator. Dropped: the fold-2 decomposition (#33). Cost details moved to a §5.7
+  TODO (#34). Corrected my own draft: the RK4 arm is autonomous (no Δt input) and still ties,
+  so the text says "the interval must reach the operator", not "Δt as an input is necessary"
+  (2026-10-01).
+- [ ] TODO (#33 follow-up): `ANISOGNN_final_dilmean_nodts` queued 2026-10-01 (author) — fill the
+  §5.4.1 Δt-multiplication result on the canonical stencil (both instruments); if not a null,
+  rewrite the paragraph and the subsection's conclusion.
+- [x] #35/#36 §5.4.2 "The Objective" rewritten like §5.4.1 (2026-10-01): purpose (the objective
+  is part of the shared framework; which parts carry the result?), three questions answered by
+  three new runs on the canonical stencil (author queued them 2026-10-01): mask weighting
+  (`ANISOGNN_final_dilmean_plainmse`), soft-Dice (`…_nodice`), monotonic penalty (`…_mono2`),
+  each with an inline TODO placeholder listing what to fill in (both instruments, collapse
+  counter / escape epoch, epoch-to-epoch sd, raw mask RMSE for the calibration stretch). The
+  pushforward/31.8× and shrinkage arguments against the penalty are kept (TODO: confirm the
+  31.8× measurement setting). Removed: fold-2 loss ladder, sharpness sweep, old fold-2 penalty
+  comparison, pad-exclusion leg, and the intermediate-time-point regulariser paragraph (#36;
+  its point stays as the §6.1 TODO). §4.5.1: pad-exclusion TODO closed ("off in every reported
+  run"); monotonic penalty "zero for every operator of the comparison … §5.4.2 tests it".
+- [x] #37 §5.5.1 solver-swap test rewritten formally (author: keep it, but explain what is shown
+  and the criteria; no informal analogies) (2026-10-01): what is tested and why (Neural-ODE
+  reading of f_θ; Ott/Krishnapriyan) → principle (every convergent scheme approaches the ODE
+  solution, error ∝ h^p, Hairer1993) → **criteria stated before results: C1 convergence
+  (changes shrink under refinement), C2 agreement (settings at least as fine as training agree
+  within the 0.0127 run-to-run sd)** → setup (no retraining, control reproduces the recorded
+  Dice exactly) → results for three models → what follows. New: the **skew T-FEN passes**
+  (fold 0, RK4 at 45/30/22.5/15 d within 0.0003; 90 d −0.0015; SOLVER_FINAL_RUNS §9.19b).
+  Canonical fails (Euler refinements −0.016 then −0.060; span 0.086 ≈ 6.7× noise); RK4-stencil
+  passes (+0.018 then +0.004; within 0.0044, RK4 settings within 0.0005). Table
+  `tab:experiments:swap` now has three blocks with the verdict in each header; raw mask RMSE
+  column dropped. Note in the .tex: C1/C2 make the §9.17 reading explicit; they were not fixed as
+  numbers before §9.17 ran.
+- [x] 2026-10-01 §5.5.2: Courant read-back and residual added (§9.19b, fold 0): layers ≤ 1.36,
+  mask median 2.64 / max 2.85 at 45 d (slightly over ≈ 2.4); residual in 9/20 eyes, ≤ 26
+  values, ≤ 36, from ~day 1,260, ×1.04 per sub-step, mask channel, top/bottom row → the step-size
+  limit, minor vs the Galerkin defect (×1.3 from ~day 585); criterion still passes; a 30-day
+  evaluation step (mask Courant ≈ 1.8) removes it at unchanged Dice. Velocity map quotable at a
+  30-day evaluation step (not interpreted in the thesis).
+- [ ] TODO (pending, T-FEN capacity in skew form queued 2026-10-01): replace the four Galerkin
+  T-FEN rows of Table `tab:experiments:capacity` by `w48…skew`, `w192…skew`, `w96d8…skew`
+  against the skew 1× (0.5428); drop the Galerkin footnote/sentence (inline TODO).
+- [x] 2026-10-01 filled from SOLVER_FINAL_RUNS §9.20 (`thesis_numbers.py`, self-checked against
+  the §9.8b anchor and our matched-transport numbers): §5.3.3 FNO vs U-Net beyond one year
+  (growth-region Dice 1–2 / 2–3 / 3+ y: FNO 0.546 / 0.583 / 0.594, U-Net 0.563 / 0.581 / 0.555;
+  FNO trails, ties, leads — stated as descriptive, not tested); §5.3.4 near-term (0–1 y) bin
+  (free-form 0.388, one-hop 0.395, k-NN 0.393 vs T-FEN skew 0.519, stencil 0.503 — "the two
+  constructions close the same near-term gap"); §5.3.4 horizon values marked verified. Pooled
+  per-step aggregation; §9.8a per-eye-bin values must not be mixed with these.
+- [x] 2026-10-01 SOLVER_FINAL_RUNS.md exists only once (code repo). THESIS_FRAMEWORK.md: code copy
+  and thesis mirror identical apart from the mirror banner — both still at 2026-09-17, i.e. they
+  contain none of: mean twins, capacity study, skew T-FEN, §9.19b/§9.20. Re-mirror once the code
+  side updates it.
+- [ ] Code-side §9.20 is out of date on the queue: it says "no seed-7 free-form FEN" and that
+  `dilmean_plainmse/_nodice/_mono2` are "not known to be queued" — all four were queued by the
+  author on 2026-10-01 (plus `dilmean_nodts`, FNO/hybrid/one-hop seed 7). When the seed-7
+  free-form run is in, read the seed-7 transport effect against it, not against the seed-42
+  control.
+- [ ] TODO (optional): solver-swap on the skew T-FEN at fold 2 (common fold with the graph
+  networks) and on the seed-7 skew T-FEN.
+- [ ] TODO (#35 follow-up): fill §5.4.2 once `dilmean_plainmse`, `dilmean_nodice`,
+  `dilmean_mono2` are in (queued 2026-10-01).
+- [ ] 2026-10-01 seed-7 runs queued (author): `FEN_final_w96Frk4d45s7` (free-form, fixes the
+  mixed-seed seed-7 transport value +0.0495, which used the seed-42 free-form control),
+  `FNO_final_w5s7`, `FNO_final_w5k3s7` (global+local ingredient has no replication),
+  `MPPDE_final_l1means7` (optional, locality ladder); plus earlier: skew T-FEN s7 and
+  T-FEN capacity points in skew form (w48, w192, d8). Read out with the usual integrity checks
+  and fill the Appendix E seed-7 table of the reporting scheme.
+- [ ] TODO (code repo, not editable from here): add a SOLVER_FINAL_RUNS.md readout for the
+  four mean twins (aggrmeans7, l1mean, nodtsmean, pxmean), so the numbers above have a source
+  entry there; re-mirror THESIS_FRAMEWORK.md afterwards.
+- [x] (superseded 2026-10-01, see above) TODO (pending runs queued 2026-09-29, mean-aggregation
+  twins; review and confirm when finished): `MPPDE_final_aggrmeans7` (k-NN, seed 7) → seed-7 reach replication vs
+  `ANISOGNN_final_dilmeans7` and seed-7 U-Net vs k-NN (§5.3.2, both removed and marked
+  inline); `MPPDE_final_l1mean` (one-hop floor) → Tables 4.2/5.1, §4.3.5 parameter count,
+  §5.3.1 ladder (note: against the mean two-round arm the old one-hop floor reads −0.0094 ±
+  0.0026 fold-paired, 5/5 — "the second ring buys nothing" must be re-checked);
+  `MPPDE_final_nodtsmean` → §5.4.1 Δt-scaling ablation (currently mean+max, marked inline);
+  optional `MPPDE_final_pxmean` (per-pixel floor; aggregation inert).
+- [x] #5 §4.3.2 decoder paragraph rewritten: the original's 1-D convolutional head emits K
+  bundled steps; with K = 1 it was removed and replaced by the MLP decoder with a full-rank
+  linear output layer; no rank-1 / width-113 wording (2026-09-29).
+- [x] #6 §4.3.3 bridge added: two-round reach ≈ a third of the median advance; the index-space
+  graph solves connectivity but not reach, hence a second construction (2026-09-29).
+- [x] #8 p. 37 red wavy line: a divider, no action (author, 2026-09-29).
+- [x] #9 §4.3.6 "A matched free-form control … was not run" replaced: the width-139 control
+  (68,282 params) is compared in §5.3.4; inline TODO pending the run (2026-09-29).
+- [ ] TODO (from #9, with #11/#32): once `FEN_final_w139Frk4d45` is in — fill §5.3.4, add a
+  Table 4.2 row (FEN free-form w139, 68,282, 1.02, transport term (matched)), reword the
+  Table 4.2 caption and §4.3.8 "One comparison is not matched"; decide whether the 1.97×
+  caveat can be dropped (pre-registered decision rule, 2026-09-28).
+- [x] #10 §4.3.8 Hu et al. (2023) sentence removed; kept "so that differences between arms
+  cannot be attributed to extra parameters" (2026-09-30).
+- [x] #11 §4.3.8 unmatched-control paragraph rewritten (w96 half-size, w139 matched, TODO
+  pending the run); Table 4.2 row for the w139 control added, caption reworded (2026-09-30).
+- [x] #12 §4.4 "Whether they carry useful information … not settled" removed (2026-09-30).
+- [x] #13 §4.4 layer-encoder paragraph moved to Future Work: wrapped in \iffalse in §4.4 (source
+  text kept), the §4.3.2 pointer to it removed, a detailed TODO added in §6.4 (2026-09-30).
+- [x] #14 + #21 late-epoch mean explained in §5.1.3: noise (sd 0.02–0.10 at 12–20 eyes) and
+  upward bias of a best-epoch value chosen on the validation eyes (no test split); window
+  fixed in advance and identical for every arm; starts at epoch 10 because the learning rate
+  has been reduced once (after epoch 5) and the fast early phase is over (author's reason).
+  §4.5 keeps a one-clause pointer; the Table 4.3 reference moved to the §4.5 intro
+  (2026-09-30).
+- [x] #15 §4.6 TF32/FP32 precision sentence removed (kept as a LaTeX comment). With #2, the
+  precision mismatch is no longer stated in the text (2026-09-30).
+- [x] #16/#17 §4.6 run-identity and results-table/cost paragraphs removed; run identity →
+  TODO in Appendix F, cost convention → TODO in §5.7 (2026-09-30).
+- [x] #18 §5.1.2 "Third, the metric differs …" rewritten: growth-region Dice = new atrophy
+  only, change-region Dice = every changed pixel; Table 5.1 / fold-paired values use the
+  change-region Dice, the per-eye instrument the growth-region Dice (2026-09-30).
+- [x] #19 §5.1.2 crop-variant paragraph (border/interior split, pad-masked metric) commented
+  out — neither enters a reported number. §3.3 now points to §6.3 instead, §4.5.1 pointer
+  removed, §6.3 crop-censoring TODO added (2026-09-30).
+- [ ] TODO (from #19, later): decide whether to report the border vs interior split once
+  (sentence in §5.2 or Appendix E table). 5-fold late means (all / border / interior):
+  stencil 0.526/0.516/0.522, U-Net 0.505/0.483/0.511, T-FEN 0.534/0.516/0.535, hybrid
+  0.498/0.479/0.506, FNO 0.483/0.452/0.495, k-NN mean 0.462/0.464/0.455; ranking unchanged
+  on interior eyes; descriptive only (small subgroups). Pad-masked (`_anat`) differs by
+  ≤ 0.002 everywhere — drop it.
+- [x] #20 §5.1.2 metrics trimmed and explained (2026-10-01, author: every metric that is
+  mentioned needs a plain description). Kept with descriptions: change-region Dice (plain
+  meaning of Dice added), growth-region Dice with horizon bins, collapse counter. Removed from
+  §5.1.2: √area MAE, full-mask Dice per bin, change-region IoU / full-mask Dice/IoU sentence
+  (never reported). Growth rate, Pearson r and fast-progressor AUC moved to a new §5.5.1
+  "Comparison with Mai et al. (2024)" (`sec:experiments:qualitative:mai`) with Table
+  `tab:experiments:mai`.
+  - Checked against Mai et al. 2024 (PMC11000109, Statistical Analysis + Results): growth rate
+    = √-transform difference baseline → follow-up per year, r "calculated over the entire
+    follow-up period", AUC for top 10/15/20 % of growth rates — the same definitions as our
+    code (`train.py` per-eye record: (√A_last − √A_base)/cum_dt over the whole rollout). Open:
+    two-point vs fit (paper does not say), "patients" vs eyes in the top-x % cut-off.
+  - Canonical model, pooled 75 eyes, late-epoch mean of predicted rates, bootstrap 2000:
+    r 0.40 [0.22, 0.56] (Mai 0.61); AUC top 10 % 0.74 [0.52, 0.91] (8 eyes, Mai 0.81); top
+    15 % 0.70 [0.53, 0.86] (11, Mai 0.79); top 20 % 0.70 [0.53, 0.84] (15, Mai 0.77).
+    Baseline √area alone r −0.10. Mean follow-up 3.3 y (median 3.0, 2.0–5.9); Mai 32 months.
+  - All arms (r; AUC10; AUC20): stencil 0.40/0.74/0.70, U-Net 0.43/0.68/0.76, T-FEN
+    0.32/0.70/0.67, FNO+3×3 0.33/0.75/0.78, FNO 0.33/0.72/0.70, k-NN mean 0.41/0.74/0.73,
+    one-hop 0.47/0.76/0.71 — all intervals overlap; the arms do not differ on these measures.
+  - The per-fold r/AUC logged by the code (16 eyes, 2 positives) are not usable; only the
+    pooled values are.
+- [ ] TODO (from #20): §5.5.1 — compare growth-region Dice per horizon bin with Mai Table 2
+  (inline TODO); optional appendix table of r/AUC for all arms.
+- [ ] TODO (from #20): §6.2 — "good at where, weaker at how fast" (inline TODO).
+- [ ] TODO (from #20, author 2026-10-01): **every metric mentioned anywhere must have a plain
+  description** of what it measures — check Chapters 5–6 for metrics used without one.
+- [x] #22 §5.1.3 "Runs are compared only when … same version of the pipeline" removed
+  (2026-10-01).
+- [ ] **#23 / #25 / #31 — Chapter 5 reporting scheme (agreed 2026-10-01, author to review once
+  more on 2026-10-02; apply as ONE dedicated pass after the remaining review items):**
+  1. **One seed in the text** (seed 42). One sentence in §5.1: the main comparisons were
+     repeated with a second seed and every conclusion held (Appendix E). All seed-7 numbers
+     move to an appendix table (reach, U-Net vs k-NN, T-FEN, transport term, stencil / U-Net /
+     T-FEN ties — all replicated).
+  2. **One noise level as an intuition** instead of the 0.036 / 0.016 / 0.020 thresholds:
+     "retraining the same model already changes its score by up to about 0.02; smaller
+     differences are not interpreted". The √2/√5 derivation and the U-Net 1.9× spread go to
+     the appendix.
+  3. **Results in words, statistics in the appendix**: e.g. "the dilated stencil is higher by
+     0.064 on average, on all five folds and on 70 of the 75 eyes". SE, t, LOFO in one
+     Appendix E table (one row per comparison). The notations "Δ = x ± y SE (k/5)" and "per
+     eye x ± y (m/75, t)" disappear from the chapter (this also dissolves the §5.1.4
+     same-sign-vs-higher counting TODO — "higher on k folds" everywhere).
+  4. **Detail only where there is a claim**: established effects one sentence; nulls "no
+     difference beyond the noise level"; the two instrument disagreements (hybrid vs FNO,
+     k = 20) one honest sentence each.
+  5. **§5.1.4 shrinks to ~½ page**: what varies (training noise, folds), the noise level, "a
+     difference is real when it exceeds the noise level and holds on most folds and most
+     eyes", pointer to the appendix. The precise rule (fold-paired above the floor; per eye
+     |t| ≳ 2.7 — fixed after the fact, say so; both robust to leaving out a fold) and the
+     fellow-eye caveat (75 eyes from 51 patients, t optimistic) go to the appendix.
+  Keep "mean ± sd" over the five folds in tables (author: understandable).
+- [ ] TODO (from #17): §5.7 must state the cost convention (min epoch time over folds, why
+  not the mean, 280–320 steps per epoch) — Table 5.1's caption points to §5.7.
+- [ ] TODO (from #13): §6.4 — a learned summary of the retinal structure as a θ_PDE stand-in;
+  first version (layer encoder) tried only at four widths on one backbone, null (inline TODO).
+- [ ] TODO (from #12): §6.3 — covariates are enabled but their value is unsettled; the
+  ablation (k-NN, mean+max era) is not reported in Ch. 5 (inline TODO in 06-discussion.tex).
+- [ ] TODO (author, 2026-09-30): **explain the RK4 setting much more plainly** in §4.3.7,
+  §5.4.1 and §5.5.1 (inline TODO in §4.3.7 lists what to cover: Euler vs RK4, "autonomous"
+  = Δt input zeroed, why the wrapper exists — FEN integrator, integration-order null,
+  continuous-time question — and jump model vs continuous-time model). Decide the fate of
+  the RK paragraphs together with #33, #34, #37.
+- [ ] TODO (§6.1/§6.4, from the RK discussion 2026-09-30): two attempts to make the model
+  behave sensibly between visits — the intermediate-time-point regulariser (supervision
+  against the linear interpolant) and the autonomous-RK4 arm (continuous-time by
+  construction) — neither improves Dice at the anchor. The RK4 arm is time-consistent (fold 2,
+  one seed) at ~4.8× cost; if intermediate-time predictions are needed clinically it is the
+  principled variant, but its in-between predictions are unverified (no ground truth between
+  visits).
+- [ ] TODO: the commented-out §5.4.3 (covariates) and §5.4.4 (GNN-internal settings) were run
+  on the mean+max k-NN arm; if either is reinstated, it needs mean twins or an explicit note.
+- [ ] TODO: fold/eye-count convention. §5.1.4 defines k (and m) as the number of folds (eyes)
+  on which the difference has **the same sign as the mean**, but Chapter 5 counts the folds
+  where the first arm is **higher** (e.g. FNO − U-Net −0.0215 "(1/5)", per eye "(30/75)";
+  Table 5.2 "0/5" for negative means). Fix the definition in §5.1.4 (and the Table 5.2
+  caption) to match the usage, or recount everything.
+
 ### Assets that now exist and should be reused
 
 - **The Practical Work report** (`masterthesis-docker/practical/`) was handed in
@@ -547,6 +894,10 @@ be longer, since it supplies two arms and the floors).
   same MUW cohort, same task. Our growth-region Dice is higher, **with the mandatory
   caveat that this model takes pre-segmented masks as input whereas Mai works from raw
   OCT**. Needs a `references.bib` entry.
+  ⚠️ 2026-10-01: "our growth-region Dice is higher" is **unverified** — never checked against
+  Mai's Table 2 (growth-region DSC 0.25 / 0.38 / 0.38 / 0.37 for 0–1 / 1–2 / 2–3 / >3 y). On
+  growth *speed* the canonical model is clearly **weaker** than Mai (r 0.40 vs 0.61). Do not
+  quote the old claim; see §5.5 inline TODO. (Mai2024 is in references.bib since 2026-09-26.)
 - [ ] Ground-truth GA **retraction/shrinkage** between visits should be quantified before
   it is discussed in Limitations.
 

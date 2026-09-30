@@ -61,19 +61,36 @@ regions are
   \label{eq:experiments:change-region}
 \end{equation}
 and the change-region Dice is $2\,|\hat{C} \cap C| \,/\, (|\hat{C}| + |C|)$.
+A Dice score measures the overlap of two regions: it is 1 when they
+coincide and 0 when they share no pixel. Applied to the change regions, it
+asks whether the model predicts change where change actually happened, and
+it ignores the large part of the lesion that stays the same.
 
 Three consequences follow. First, persistence predicts no change, so its
 score is 0 by construction, and every positive value is lift over "no
 progression". Second, the metric is symmetric. A predicted shrinkage counts
 as predicted change and is scored against the truth, which is consistent
 with the absence of a monotonic-growth constraint
-(\S\ref{sec:method:dt-residual}). Third, the metric differs from the
-growth-region Dice of \citet{Mai2024} defined below. Both have a
-persistence floor of 0 and are easy to conflate. The change-region Dice is
-also the model-selection metric. The change-region intersection over union
-(IoU) is computed alongside it; full-mask Dice and IoU are reported for
-comparability only.
+(\S\ref{sec:method:dt-residual}). Third, it is not the growth-region Dice
+of \citet{Mai2024}, which this chapter also uses. The growth-region Dice
+scores only new atrophy, the pixels that are lesion at the anchor but not
+at baseline. The change-region Dice scores every changed pixel, growth and
+shrinkage alike. Both have a persistence floor of 0 and are easy to
+confuse: Table~\ref{tab:experiments:arms} and all fold-paired values use
+the change-region Dice, while the per-eye instrument uses the growth-region
+Dice (\S\ref{sec:experiments:protocol:stats}). The change-region Dice is
+also the model-selection metric.
 
+% TODO (author review v4 #19, 2026-09-30): crop-variant paragraph commented
+% out; neither variant enters any reported number. Decide later whether to
+% report the border-touching vs interior split once (e.g. a sentence in 5.2
+% or a table in Appendix E; 5-fold late-epoch means exist in
+% solver_results.csv, columns late_change_region_dice_360d_{border,interior}
+% _mean; the ranking of the arms is unchanged on interior eyes). The
+% pad-masked variant (_anat) differs from the plain metric by <= 0.002 on
+% every arm and can be dropped. If reinstated, restore the pointers in 3.3
+% and 4.5.1.
+\iffalse
 Two variants handle the crop (\S\ref{sec:data:spatial}). The first splits
 the per-eye change-region Dice by whether the ground-truth lesion at the
 anchor touches the boundary of the imaged field. This boundary is
@@ -84,28 +101,24 @@ is the part of the cohort whose growth is not censored by the crop. On the
 canonical fold (fold 2), 6 of the 16 validation eyes are border-touching
 and 10 are interior. The second variant is the same change-region Dice with
 the padded grid positions excluded from both sides.
+\fi
 
-The growth-region Dice scores only new atrophy: the region
-$\{\, i : y_i = 1 \text{ and } b_i = 0 \,\}$ against its predicted
+Formally, the growth-region Dice compares the true new-atrophy region
+$\{\, i : y_i = 1 \text{ and } b_i = 0 \,\}$ with its predicted
 counterpart. It is used by the per-eye statistical instrument
-(\S\ref{sec:experiments:protocol:stats}) and in the comparison
-of~\S\ref{sec:experiments:qualitative}. For that comparison, a set of
-cohort metrics is also computed. Per-step records are binned by horizon
-into $(0, 1]$, $(1, 2]$, $(2, 3]$ and more than three years, each with
-total-mask and growth-region Dice. Lesion area is recorded in square
-millimetres, together with its square root in millimetres; the
-square-root transform of \citet{Feuer2013} removes the dependence of the
-growth rate on the baseline lesion size. From these follow the mean
-absolute error of the square-root area, per-eye growth rates (change in
-square-root area per year) with the cohort Pearson correlation between
-predicted and true rates, and the area under the receiver operating
-characteristic curve for identifying fast progressors, defined as the top
-10, 15 and 20\,\% of growth rates. \citet{Mai2024} study the same cohort
-and target. Their numbers are an anchor, not a head-to-head comparison:
-this thesis starts from pre-segmented masks and layer depths, whereas
-\citet{Mai2024} work from raw OCT. Finally, a collapse counter records how
-many eyes have a thresholded prediction at the anchor that is identical,
-pixel for pixel, to their baseline mask.
+(\S\ref{sec:experiments:protocol:stats}). It is also computed at every
+rollout step and grouped by the time since baseline into $(0, 1]$,
+$(1, 2]$, $(2, 3]$ and more than three years. These horizon bins show how
+the prediction degrades as the forecast reaches further than the one-year
+anchor, and they are the bins in which \citet{Mai2024} report the same
+metric.
+
+Finally, a collapse counter records how many eyes have a thresholded
+prediction at the anchor that is identical, pixel for pixel, to their
+baseline mask. It detects a model that has learned to copy its input,
+which would score exactly as persistence does. The eye-level growth-rate
+measures used for the clinical comparison are defined
+in~\S\ref{sec:experiments:qualitative:mai}.
 
 \subsection{Rollout and Reporting}
 \label{sec:experiments:protocol:rollout}
@@ -129,16 +142,22 @@ the eyes, so every eye counts once, whatever its number of visits.
 
 The checkpoint kept as the best one is the epoch with the highest
 change-region Dice at the anchor. The reported numbers, however, are not
-best-epoch values. With 12 to 20 validation eyes per fold, the metric
-fluctuates from epoch to epoch with a standard deviation of 0.02 to 0.10,
-so a best-epoch value would mostly reflect noise. Every reported number is
-instead a late-epoch mean: the mean over epochs 10 to 29 of one run.
+best-epoch values, for two reasons. First, the metric is noisy: with 12 to
+20 validation eyes per fold, it fluctuates from epoch to epoch with a
+standard deviation of 0.02 to 0.10, so the highest epoch is mostly the
+luckiest one. Second, the highest epoch is chosen on the same validation
+eyes on which it would be reported. There is no separate test split
+(\S\ref{sec:data:splits}), so a best-epoch value is biased upwards, and the
+more so the noisier the metric. Every reported number is instead a
+late-epoch mean: the mean of the metric over epochs 10 to 29 of one run.
+The window is fixed in advance and the same for every arm, so no choice is
+made on the validation data, and averaging twenty epochs damps the
+epoch-to-epoch noise. The window starts at epoch 10 because by then the
+learning rate has been reduced once, after epoch 5
+(\S\ref{sec:method:training}), and the fast early phase of training is
+over.
 
-Runs are compared only when they were trained with the same version of the
-pipeline. Several fixes during development changed what a run computes,
-and results from before such a fix are not comparable with results after
-it. Every number in this chapter comes from the final version of the
-pipeline, so all of them are comparable with one another. All experiments
+All experiments
 use the patient-level five-fold cross-validation of~\S\ref{sec:data:splits},
 which has no test split; every result is a validation result.
 
@@ -198,8 +217,7 @@ seed-pooled.
 Every architecture in the survey is a peer arm; none is a baseline to be
 beaten. Only two entries fix the scale: persistence, which scores 0 by
 construction, and the per-pixel floor. Table~\ref{tab:experiments:arms}
-lists every arm on the headline metric. The moving-mesh arms are reported
-in Appendix~\ref{app:mm-pde}.
+lists every arm on the headline metric.
 
 \begin{table}[t]
   \centering
@@ -207,48 +225,48 @@ in Appendix~\ref{app:mm-pde}.
     All arms on the change-region Dice at the one-year anchor, seed 42.
     Each fold value is the late-epoch mean (epochs 10 to 29) of one run;
     the table gives the mean $\pm$ sd over the five folds and the highest of
-    the five fold values (best fold). Persistence scores 0 by construction.
+    the five fold values (best fold), with the index of that fold in
+    brackets. Persistence scores 0 by construction.
     The ratio is the parameter count divided by that of the canonical
     dilated-stencil graph network (67\,147). Cost is the minimum epoch time
     in seconds over the five folds; it supports order-of-magnitude
     statements only (\S\ref{sec:experiments:cost}). The arms are ordered by
     mean, with the two locality floors and persistence at the bottom;
     adjacent arms mostly differ by less than the noise floor.
-    $^\dagger$The T-FEN is not a valid free-running integrator as trained
-    (\S\ref{sec:experiments:validity}); its Dice values stand, but it is
-    not a stable forecasting model.}
+    The T-FEN uses the energy-conserving form of its transport operator
+    (\S\ref{sec:experiments:validity:tfen}).}
   \label{tab:experiments:arms}
   \small
-  \begin{tabular}{p{0.34\textwidth} r r c c r}
+  \begin{tabular}{p{0.28\textwidth} r r c c r}
     \toprule
     Arm & Params & Ratio & Mean $\pm$ sd & Best fold & s/epoch \\
     \midrule
-    T-FEN$^\dagger$ (\S\ref{sec:method:family:fen}) & 68\,503 & 1.02 &
-      $0.5337 \pm 0.0453$ & 0.6011 & 364 \\
+    T-FEN (\S\ref{sec:method:family:fen}) & 68\,503 & 1.02 &
+      $0.5428 \pm 0.0401$ & 0.6047 [2] & 367 \\
     Graph network, dilated stencil (\S\ref{sec:method:graph}) & 67\,147 &
-      1.00 & $0.5258 \pm 0.0497$ & 0.6060 & 91 \\
+      1.00 & $0.5258 \pm 0.0497$ & 0.6060 [2] & 91 \\
     Graph network, dilated stencil, RK4
       (\S\ref{sec:method:family:rk}) & 67\,147 & 1.00 &
-      $0.5139 \pm 0.0497$ & 0.5907 & 439 \\
+      $0.5139 \pm 0.0497$ & 0.5907 [2] & 439 \\
     U-Net, width 5 (\S\ref{sec:method:family:dense}) & 83\,081 & 1.24 &
-      $0.5046 \pm 0.0632$ & 0.5918 & 21 \\
+      $0.5046 \pm 0.0632$ & 0.5918 [2] & 21 \\
     FNO with $3 \times 3$ local path (\S\ref{sec:method:family:dense}) &
-      79\,960 & 1.19 & $0.4984 \pm 0.0398$ & 0.5509 & 29 \\
+      79\,960 & 1.19 & $0.4984 \pm 0.0398$ & 0.5509 [2] & 29 \\
     FNO, RK4 (\S\ref{sec:method:family:rk}) & 79\,160 & 1.18 &
-      $0.4893 \pm 0.0398$ & 0.5276 & 45 \\
+      $0.4893 \pm 0.0398$ & 0.5276 [4] & 45 \\
     FNO (\S\ref{sec:method:family:dense}) & 79\,160 & 1.18 &
-      $0.4831 \pm 0.0477$ & 0.5391 & 23 \\
+      $0.4831 \pm 0.0477$ & 0.5391 [4] & 23 \\
     FEN, free-form only (\S\ref{sec:method:family:fen}) & 34\,785 & 0.52 &
-      $0.4810 \pm 0.0348$ & 0.5323 & 180 \\
-    Graph network, $k$-NN, $k = 20$ (\S\ref{sec:method:graph}) & 75\,339 &
-      1.12 & $0.4519 \pm 0.0436$ & 0.5223 & 108 \\
-    Graph network, $k$-NN, $k = 12$ (\S\ref{sec:method:graph}) & 75\,339 &
-      1.12 & $0.4515 \pm 0.0429$ & 0.5178 & 75 \\
+      $0.4810 \pm 0.0348$ & 0.5323 [2] & 180 \\
+    Graph network, $k$-NN, $k = 12$ (\S\ref{sec:method:graph}) & 67\,147 &
+      1.00 & $0.4623 \pm 0.0361$ & 0.5153 [2] & 76 \\
+    Graph network, $k$-NN, $k = 20$ (\S\ref{sec:method:graph}) & 67\,147 &
+      1.00 & $0.4519 \pm 0.0436$ & 0.5223 [2] & 108 \\
     \midrule
-    One-hop floor (\S\ref{sec:method:family:floors}) & 45\,067 & 0.67 &
-      $0.4529 \pm 0.0403$ & 0.5092 & 59 \\
+    One-hop floor (\S\ref{sec:method:family:floors}) & 40\,971 & 0.61 &
+      $0.4515 \pm 0.0243$ & 0.4856 [2] & 37 \\
     Per-pixel floor (\S\ref{sec:method:family:floors}) & 14\,795 & 0.22 &
-      $0.0000 \pm 0.0000$ & 0.0000 & 28 \\
+      $0.0000 \pm 0.0000$ & 0.0000 & 16 \\
     Persistence & 0 & --- & 0 & 0 & --- \\
     \bottomrule
   \end{tabular}
@@ -257,6 +275,16 @@ in Appendix~\ref{app:mm-pde}.
 % 2026-09-28 from masterthesis-docker/.../solver_results.csv (final era,
 % max over folds of late_change_region_dice_360d_mean; min of
 % curve_sec_per_epoch_min). U-Net width 32 row removed 2026-09-28.
+% 2026-09-29: the k = 12 row is now the mean-aggregation arm
+% MPPDE_final_aggrmean (was the mean+max arm MPPDE_final_dts: 75 339 params,
+% 0.4515 +/- 0.0429, best 0.5178, 75 s); the k = 20 arm was always mean
+% aggregation, so its parameter count was corrected to 67 147.
+% 2026-10-01: the one-hop and per-pixel rows are now the mean-aggregation
+% runs MPPDE_final_l1mean (40 971 params, 37 s f0) and MPPDE_final_pxmean
+% (16 s f0); were MPPDE_final_l1 (45 067, 0.4529 +/- 0.0403, best 0.5092,
+% 59 s) and MPPDE_final_px (28 s).
+% TODO: verify every number changed on 2026-09-29 and 2026-10-01 (see
+% NOTES.md, review v4 #4).
 
 % TODO: produce Figure fig:experiments:rollout. Rollout strip for one
 % representative validation eye: rows = ground truth, dilated-stencil graph
@@ -282,30 +310,28 @@ in Appendix~\ref{app:mm-pde}.
   \label{fig:experiments:rollout}
 \end{figure}
 
-The three highest arms are statistically indistinguishable, and they come
-from three unrelated architecture classes: a graph network, a U-Net and a
-finite-element network. The dilated-stencil graph network against the U-Net
-gives $\Delta = +0.021 \pm 0.017$~SE at seed 42 and only
-$+0.008 \pm 0.008$ at seed 7, both under the mixed floor of 0.020. At
-seed 7, the graph network reads $0.5279 \pm 0.0419$ and the U-Net 0.5199.
-The T-FEN against the dilated-stencil graph network gives
-$\Delta = +0.0079 \pm 0.0077$~SE (3/5) and per eye $+0.0050$ (43/75,
-$t = 0.79$), seed-pooled about $+0.005$: a null. The T-FEN against the
-U-Net gives, seed-pooled, $\Delta = +0.0199 \pm 0.0085$ (8/10 fold-seed
-pairs) and per eye $+0.0218 \pm 0.0053$ (97/150). The fold-paired value
-sits at the mixed floor, and its minimum when one fold is left out falls
-below it, so this pair is also read as indistinguishable. No ordering
-among the three is quotable.
+The three highest arms come from three unrelated architecture classes: a
+finite-element network, a graph network and a U-Net. The T-FEN against the
+dilated-stencil graph network gives $\Delta = +0.0170 \pm 0.0085$~SE (4/5)
+and per eye $+0.0136 \pm 0.0062$ (46/75, $t = 2.2$): at the floor on one
+instrument and under it on the other, a tie. The dilated-stencil graph
+network against the U-Net gives $\Delta = +0.021 \pm 0.017$~SE at seed 42
+and only $+0.008 \pm 0.008$ at seed 7, both under the mixed floor of 0.020.
+At seed 7, the graph network reads $0.5279 \pm 0.0419$ and the U-Net
+0.5199. The T-FEN against the U-Net gives $\Delta = +0.0383 \pm 0.0134$~SE
+(5/5) and per eye $+0.0383 \pm 0.0075$ (51/75, $t = 5.1$), above the mixed
+floor at seed 42. For the earlier form of the T-FEN, a seed-42 lead over the
+U-Net of this kind halved at seed 7, so this one is not read as established
+before its seed-7 replication.
+% TODO: seed-7 skew-form T-FEN (FEN_final_w96ftp7rk4d45skews7, queued
+% 2026-10-01): decide whether T-FEN > U-Net is established or the three
+% highest arms remain indistinguishable; update this paragraph, Section 5.3.5
+% and the headline wording accordingly.
 
-The T-FEN has the highest mean in the table, but it should not be read as
-the best model. As trained, it is not a valid free-running integrator: its
-free-running rollout is unstable on seven of its ten runs (five folds, two
-seeds), and nine of its ten final checkpoints exceed the stability bound of
-the explicit scheme on at least one channel
-(\S\ref{sec:experiments:validity}). Its Dice values at the anchor are
-unaffected and stand, but it is not a stable forecasting model in its
-current form, and its learned velocity field is not interpreted anywhere
-in this thesis.
+The T-FEN reported here uses the energy-conserving form of its transport
+operator (\S\ref{sec:method:family:fen}). Its first version, with the
+Galerkin form, is not stable beyond the training horizon; the two forms are
+compared in~\S\ref{sec:experiments:validity:tfen}.
 
 The per-pixel floor reads exactly 0.0000 on all five folds, identical to
 persistence; its collapse counter flags every validation eye as unchanged
@@ -314,7 +340,7 @@ This licenses reading every point of change-region Dice in the table as
 coming from spatial context.
 
 The fold is a large source of variance. For the $k$-nearest-neighbour graph
-network, the fold values range from about 0.41 to 0.52. The standard
+network, the fold values range from about 0.43 to 0.52. The standard
 deviations in the table are between-fold deviations and are much larger
 than the replicate floor, which is why differences are always read
 fold-paired. Adjacent rows mostly lie within the floor of each other, so
@@ -323,9 +349,9 @@ components of an operator move the metric, which
 \S\ref{sec:experiments:ingredients} examines one at a time.
 
 The best-fold column shows how far a single fold can lie above the mean.
-For every arm except the FNO and the FNO with the Runge--Kutta wrapper,
-the best fold is fold 2, so the column mostly reflects the spread between
-folds rather than a separate result. The Runge--Kutta arms are nulls against their single-step
+For every arm except the two FNO arms without a local path, the best fold
+is fold 2, so the column mostly reflects the spread between folds rather
+than a separate result. The Runge--Kutta arms are nulls against their single-step
 counterparts and are taken up in~\S\ref{sec:experiments:ablations}. The
 cost column is discussed in~\S\ref{sec:experiments:cost}.
 
@@ -347,14 +373,16 @@ The locality ladder uses the graph network on the index-space
 $k$-nearest-neighbour graph with zero, one and two message-passing rounds
 (\S\ref{sec:method:family:floors}). With zero rounds, the per-pixel floor
 reads 0.0000 on every fold, identical to persistence. With one round, the
-one-hop floor reads $0.4529 \pm 0.0403$. With two rounds, the $k$-NN arm
-reads $0.4515 \pm 0.0429$. One round against two is a null on the per-eye
-instrument (39/75 eyes).
+one-hop floor reads $0.4515 \pm 0.0243$. With two rounds, the $k$-NN arm
+reads $0.4623 \pm 0.0361$. One round against two gives
+$\Delta = -0.0108 \pm 0.0061$~SE (1/5), under the paired floor, and per eye
+$-0.0122 \pm 0.0051$ (33/75, $t = -2.4$). The second round thus adds about
+0.01, consistently in direction but not established.
 
-A single ring of neighbours therefore buys everything the graph network on
-this graph achieves, and the second ring buys nothing measurable. Every
+A single ring of neighbours therefore buys almost everything the graph
+network on this graph achieves, and the second ring adds little. Every
 point of change-region Dice comes from spatial context. One possible reason
-why the second ring adds nothing is where its extra reach lies: on the
+why the second ring adds so little is where its extra reach lies: on the
 index-space graph it extends mostly across rows, and only about 0.01\,mm
 along them (\S\ref{sec:method:graph}). This motivates the
 next comparison, which changes where the neighbours lie.
@@ -364,18 +392,17 @@ next comparison, which changes where the neighbours lie.
 
 This comparison keeps the graph network, the loss and the data, and changes
 only the edge set, from the index-space $k$-nearest-neighbour graph to the
-dilated stencil (\S\ref{sec:method:graph}). With the same aggregation (mean
-and maximum) on both graphs, and therefore the same number of parameters,
-the difference is $\Delta = +0.0691 \pm 0.0116$~SE (5/5). The canonical
-configuration, the dilated stencil with mean aggregation (67\,147
-parameters), against the $k$-NN arm (75\,339 parameters, so at 0.89 times
-the parameters) gives $\Delta = +0.0743 \pm 0.0083$~SE (5/5) and per eye
-$+0.0752 \pm 0.0054$ (74/75, $t = 13.9$). The pre-committed replication at
-seed 7 gives $\Delta = +0.0736 \pm 0.0162$~SE (5/5), and seed-pooled per
-eye $+0.0736 \pm 0.0044$ (144/150 eye-seed pairs). This is the largest
-effect in the project. It was obtained by changing only the edge set, with
-fewer parameters, and it is the reason the dilated stencil is the
-canonical configuration.
+dilated stencil (\S\ref{sec:method:graph}, Figure~\ref{fig:method:stencils}).
+Both networks use mean
+aggregation and have the same 67\,147 parameters. The dilated stencil
+against the $k$-NN arm gives $\Delta = +0.0635 \pm 0.0106$~SE (5/5) and per
+eye $+0.0647 \pm 0.0062$ (70/75, $t = 10.4$). The pre-committed
+replication at seed 7 gives $\Delta = +0.0629 \pm 0.0131$~SE (5/5) and per
+eye $+0.0620 \pm 0.0071$ (66/75, $t = 8.7$); pooled over both seeds, the
+per-eye difference is $+0.0633 \pm 0.0047$ (136/150 eye-seed pairs). This
+is the largest effect in the project. It was obtained by changing only
+the edge set, at the same parameter count, and it is the reason the dilated
+stencil is the canonical configuration.
 
 Table~\ref{tab:experiments:reach} compares other stencil geometries with the
 default. Both a shorter (up to $\pm 12$ columns) and a longer (up to
@@ -414,17 +441,20 @@ stencil across rows, to $\pm 2$ rows, costs the most of all geometries.
 
 A higher degree at the same reach buys nothing. The index-space
 $k$-nearest-neighbour graph with $k = 20$ reaches as far as with $k = 12$
-but has more neighbours. Against the $k = 12$ arm with mean aggregation, it
-reads $-0.010 \pm 0.005$ (1/5); against the $k = 12$ arm with mean and
-maximum aggregation, $+0.000 \pm 0.005$ (3/5) and per eye $-0.001$ (36/75).
-What matters is where the neighbours are placed, not how many there are.
+but has more neighbours. Against the same network with $k = 12$, it reads
+$-0.010 \pm 0.005$~SE (1/5), under the paired floor, and per eye
+$-0.011 \pm 0.003$ (20/75, $t = -4.1$). The two instruments do not agree,
+so the difference is not established, but neither points to a gain from
+the extra neighbours. What matters is where the neighbours are placed, not
+how many there are.
 
 This also explains an earlier result. Before the dilated stencil, the
 parameter-matched U-Net was higher than the $k$-NN graph network:
-$\Delta = +0.0531 \pm 0.0226$~SE (4/5), per eye $+0.0504 \pm 0.0094$
-(55/75, $t = 5.36$), and at seed 7, with the same seed on both sides,
-$+0.0655 \pm 0.0209$ fold-paired and $+0.0618 \pm 0.0103$ per eye (60/75).
-Fold 3 reads $-0.022$, so the effect is fold-heterogeneous. With the
+$\Delta = +0.0423 \pm 0.0246$~SE (4/5) and per eye $+0.0399 \pm 0.0102$
+(53/75, $t = 3.93$), and at seed 7, with the same seed on both sides,
+$+0.0548 \pm 0.0181$ fold-paired (5/5) and $+0.0517 \pm 0.0109$ per eye
+(59/75). At seed 42, fold 3 reads $-0.042$, so the effect is
+fold-heterogeneous. With the
 dilated stencil, the graph network is indistinguishable from the U-Net
 (\S\ref{sec:experiments:main-results}). The deficit of the graph network
 was therefore located in its graph --- in where its neighbours lie
@@ -438,20 +468,28 @@ The Fourier Neural Operator has global spectral support but no local path
 $3 \times 3$ local path to the same operator, at a cost of 800 parameters.
 
 The FNO against the $k$-NN graph network gives
-$\Delta = +0.0316 \pm 0.0259$~SE (3/5) and per eye $+0.0225 \pm 0.0142$
-(40/75). Fold 4 carries about 77\,\% of it, and it does not survive leaving
-one fold out on either instrument, so this difference is not established.
+$\Delta = +0.0208 \pm 0.0258$~SE (3/5) and per eye $+0.0120 \pm 0.0135$
+(41/75). Fold 4 carries all of it: without fold 4 the fold-paired
+difference is $-0.001$, and on both instruments it does not survive leaving
+one fold out, so this difference is not established.
 The FNO against the U-Net gives $\Delta = -0.0215 \pm 0.0139$~SE (1/5) and
 per eye $-0.0279 \pm 0.0111$ (30/75). That the FNO lies below the U-Net at
-the one-year anchor is established. At horizons beyond one year, the order
-of the two is reported to differ.
-% TODO: insert the per-horizon growth-region Dice of the FNO and the U-Net
-% (bins beyond one year), from SOLVER_FINAL_RUNS.md in the code repo.
+the one-year anchor is established. Beyond one year the order changes. In
+the growth-region Dice by horizon, the FNO reads 0.546, 0.583 and 0.594 for
+one to two, two to three and more than three years, and the U-Net 0.563,
+0.581 and 0.555: the FNO trails the U-Net in the second year, ties it in
+the third and lies above it beyond three years. Global spectral support
+may therefore matter more at long horizons than at the one-year anchor;
+the horizon values are descriptive and were not tested for significance.
+% Source: SOLVER_FINAL_RUNS section 9.20 (thesis_numbers.py, 2026-10-01);
+% pooled over every late-epoch rollout step in each bin, seed 42. FNO + 3x3:
+% 0.553 / 0.571 / 0.553. Section 9.8a's per-eye-bin means for the same arms
+% use a different aggregation and must not be mixed with these.
 
 The hybrid against the $k$-NN graph network gives
-$\Delta = +0.0470 \pm 0.0160$~SE (5/5) and per eye $+0.0414 \pm 0.0115$
-(47/75). It is the only arm that is higher than the $k$-NN graph network on
-every fold. The effect of the local path itself is the hybrid against the
+$\Delta = +0.0361 \pm 0.0166$~SE (4/5) and per eye $+0.0310 \pm 0.0111$
+(49/75, $t = 2.79$). Both instruments agree and the difference survives
+leaving any one fold out. The effect of the local path itself is the hybrid against the
 FNO: $\Delta = +0.0153 \pm 0.0110$~SE, which is under the paired floor,
 but per eye $+0.0190 \pm 0.0070$ (48/75), which graduates on that
 instrument. The two instruments disagree here, which is why both are
@@ -472,34 +510,63 @@ This comparison pairs the T-FEN with the same finite-element network
 without its transport head, at the same width
 (\S\ref{sec:method:family:fen}). The ablation is purely additive: both
 heads are zero-initialised, so both arms start as the same function. The
-difference is $\Delta = +0.0527 \pm 0.0065$~SE (5/5) at seed 42 and
-$+0.0495 \pm 0.0081$~SE (5/5) at seed 7, and per eye
-$+0.0555 \pm 0.0057$ (65/75, $t = 9.68$). The effect is established on
-both instruments at both seeds.
+difference is $\Delta = +0.0618 \pm 0.0040$~SE (5/5) and per eye
+$+0.0640 \pm 0.0058$ (68/75, $t = 11.0$). The effect is established on
+both instruments. With the earlier Galerkin form of the transport operator
+the difference was about the same, $+0.0527 \pm 0.0065$~SE (5/5) at seed
+42 and $+0.0495 \pm 0.0081$~SE (5/5) at seed 7, so the effect does not
+depend on the form of the operator.
+% TODO: seed-7 value for the energy-conserving form once
+% FEN_final_w96ftp7rk4d45skews7 is in.
 
-This is, however, the only architecture comparison in the survey that is
-not parameter-matched: the T-FEN has 68\,503 parameters and the free-form
-control 34\,785, a factor of 1.97. A matched free-form control was not run.
-Part of the gain may therefore come from the extra parameters. One
-observation argues, indirectly, against reading all of it that way: the
-effect is concentrated in the near-term growth bin, horizons up to one
-year, where it brings the T-FEN to the level of the dilated stencil,
-rather than being spread over all horizons as a generic gain from capacity
-would be. Settling the question needs the matched control.
-% TODO: capacity experiments (author, 2026-09-28) -- the earlier capacity
-% argument (width-32 U-Net, GNN depth/width, encoder widths) was removed; a
-% matched free-form FEN control (width ~139) belongs to that plan.
-% TODO: insert the near-term (0-1 y) growth-region Dice of the free-form
-% FEN, the T-FEN, the one-hop floor and the dilated stencil, from
-% SOLVER_FINAL_RUNS.md in the code repo.
+This control, however, is not parameter-matched: the T-FEN has
+68\,503 parameters and the free-form control 34\,785, a factor of 1.97.
+Part of the gain could therefore come from the extra parameters. A second
+control closes this gap. It widens the free-form network to a width of
+139, which gives 68\,282 parameters, level with the T-FEN
+(\S\ref{sec:method:family:params}). On fold 4 this control does not train:
+its training error rises from the first epoch instead of falling, and it
+reads 0.047 at the anchor, in two separate attempts, while the width-96
+control trains normally on the same fold (0.501). Fold 4 is therefore
+excluded from this comparison. On folds 0 to 3, the T-FEN against the
+matched control gives $\Delta = +0.0716 \pm 0.0094$~SE (4/4) and per eye
+$+0.0737 \pm 0.0063$ (59/63, $t = 11.7$). This reproduces the unmatched
+difference on the same folds ($+0.0631$), and the extra width bought the
+free-form network nothing there ($-0.0084 \pm 0.0053$~SE, 0/4). The
+transport effect is therefore not a matter of parameter count. Including
+the failed fold, the difference would read $+0.159$, which only reflects the
+failure.
+% TODO (author review v4 #32, 2026-10-01): a seed-7 run of the matched
+% control (FEN_final_w139Frk4d45s7, all five folds) is queued to test whether
+% the fold-4 failure is seed-specific. If fold 4 trains at seed 7, add the
+% seed-7 comparison against the seed-7 T-FEN (FEN_final_w96ftp7rk4d45s7) and
+% revise the fold-4 sentence. Numbers above verified 2026-10-01 against
+% solver_results.csv (superseded fold-4 attempt skipped) and SOLVER_FINAL_RUNS
+% section 9.18.
 
-The T-FEN and the dilated stencil tie at the anchor, but their profiles
-over the horizon differ.
-% TODO: insert the horizon profiles of the T-FEN and the dilated stencil.
-The velocity field learned by the T-FEN is not interpreted here: the arm is
-not a valid free-running integrator (\S\ref{sec:experiments:validity}),
-which leaves its Dice results unaffected but makes the field itself
-unquotable.
+Where the transport term acts can be seen in the first year. In the
+growth-region Dice between baseline and one year, the free-form FEN reads
+0.388, close to the one-hop floor (0.395) and the $k$-NN graph network
+(0.393), the operators whose reach falls short of the per-visit front
+advance (\S\ref{sec:method:graph}). The transport term lifts the T-FEN to
+0.519, level with the dilated stencil (0.503), whose single hop was
+designed to match that advance. The two constructions close the same
+near-term gap.
+% Source: SOLVER_FINAL_RUNS section 9.20 (thesis_numbers.py, 2026-10-01),
+% growth-region Dice in the (0, 1] y bin, pooled over every late-epoch
+% rollout step, seed 42; T-FEN in the energy-conserving form.
+
+The T-FEN and the dilated stencil tie at the anchor, and their profiles
+over the horizon are close as well. In the growth-region Dice by horizon,
+the T-FEN reads 0.519, 0.602 and 0.633 in the first three years and the
+dilated stencil 0.503, 0.600 and 0.634; only beyond three years does the
+stencil lie higher (0.655 against 0.611). The velocity field learned by the
+T-FEN is not interpreted here, because whether its velocities stay within
+the stability limit of RK4 has not been read back
+(\S\ref{sec:experiments:validity:tfen}).
+% Horizon values: late-epoch growth-region Dice per horizon bin, seed 42,
+% SOLVER_FINAL_RUNS section 9.19a (2026-10-01); verified against the per-step
+% records in section 9.20.
 
 \subsection{Two Routes to One Deficit}
 \label{sec:experiments:ingredients:convergence}
@@ -512,9 +579,11 @@ between two visits.
 
 Two unrelated constructions correct this deficit. The first is physical
 reach: the dilated stencil, whose single hop spans 21 columns. The second
-is an explicit transport term: the T-FEN, with the caveat of its 1.97-fold
-parameter gap. Each is established against its own control, and the two
-end up indistinguishable from each other and from the U-Net. The central
+is an explicit transport term: the T-FEN, established against a
+parameter-matched control on four of the five folds. Each is established
+against its own control, and the two end up indistinguishable from each
+other; their relation to the U-Net is set out
+in~\S\ref{sec:experiments:main-results}. The central
 architectural result of the survey is this coincidence --- two independent
 routes to the same deficit --- rather than the score of any single arm. It
 is suggestive rather than a proof of mechanism.
@@ -532,138 +601,240 @@ floor of the instruments defined in~\S\ref{sec:experiments:protocol:stats}.
 It is a null at the available precision. It does not show that the tested
 alternative is equivalent, or that the mechanism behind it has no effect,
 and each finding is scoped to the backbone, the folds and the seed on which
-it was measured. This section reports two groups of such results: the time
-handling of the update (\S\ref{sec:experiments:ablations:time}) and the
-composition of the training objective (\S\ref{sec:experiments:ablations:loss}).
+it was measured. This section reports three groups of such results: the
+time handling of the update (\S\ref{sec:experiments:ablations:time}), the
+composition of the training objective (\S\ref{sec:experiments:ablations:loss})
+and the capacity of the operators
+(\S\ref{sec:experiments:ablations:capacity}).
 
 \subsection{Time Handling}
 \label{sec:experiments:ablations:time}
 
-The residual update of~\S\ref{sec:method:dt-residual} multiplies the output
-of the operator by the interval,
-$u_{t+\Delta t} = u_t + \Delta t \cdot f_\theta(u_t, \Delta t, z)$. In the
-ablation, this outer multiplication was removed, so the update became
-$u_t + f_\theta$, while $\Delta t$ was kept as an input feature of the
-operator. The comparison was run on the index-space $k$-nearest-neighbour
-graph network (\S\ref{sec:method:graph}) over five folds at seed 42.
-Removing the scaling gives $\Delta = +0.0134 \pm 0.0059$~SE (4/5) against
-the canonical update.
-% TODO: insert the per-eye instrument for the Delta t-scaling ablation, if
-% it was computed.
-This is under the five-fold paired floor of 0.016, so by the pre-registered
-rule the change does not graduate, and the canonical update keeps the
-multiplication.
+The framework handles time in a deliberately simple way
+(\S\ref{sec:method:dt-residual}): the operator makes one step over the
+whole interval to the next visit, and $\Delta t$ enters twice, as an input
+of the operator and as a multiplier of its output,
+$u_{t+\Delta t} = u_t + \Delta t \cdot f_\theta(u_t, \Delta t, z)$. This
+design is part of the framework that every operator shares, so it matters
+whether its details carry any of the accuracy. Two tests ask this, both on
+the canonical dilated-stencil network.
 
-The scaling could be removed without a measurable loss because, on the mask
-channel, it is a reparameterisation rather than an inductive bias. The mask
-is binary, and in normalised units its two values differ by a fixed gap: 0
-maps to $-0.602$ and 1 to $+1.660$ (\S\ref{sec:data:normalization}). At a
-pixel that changes between two visits, the target of the scaled form,
-$(y - u)/\Delta t$, is therefore exactly plus or minus that gap divided by
-$\Delta t$, at every interval length. The operator has to produce an
-internal division by $\Delta t$, which the outer multiplication then
-cancels. The operator is thus a one-step map conditioned on $\Delta t$, not
-a rate that can be queried. Because $\Delta t$ remains an input, the
-operator receives the same time information with or without the
-multiplication, which is why dropping it loses nothing measurable. The
-multiplication is kept because it is the form MP-PDE defines
-\citep{Brandstetter2022} and because it gives the $\Delta t \to 0$ limit in
-which the prediction reduces to persistence (\S\ref{sec:method:dt-residual}).
-A reading of the operator as a learned rate is not supported by this
-result; \S\ref{sec:experiments:validity:swap} tests it directly.
+\paragraph{Is the multiplication by $\Delta t$ needed?}
+In the first test, the multiplication was removed, so the update became
+$u_t + f_\theta(u_t, \Delta t, z)$, while $\Delta t$ remained an input of
+the operator.
+% TODO: insert the result on the canonical dilated-stencil network here
+% (ANISOGNN_final_dilmean_nodts against ANISOGNN_final_dilmean, queued
+% 2026-10-01): "The change-region Dice does not change (...)". If it is not
+% a null, rewrite this paragraph and the conclusion of the subsection. The
+% text below assumes a null. (The k-NN run of this ablation is deliberately
+% not reported, author 2026-10-01.)
+The reason lies in the mask channel. Its two values are a fixed distance
+apart in normalised units, $-0.602$ and $+1.660$
+(\S\ref{sec:data:normalization}). At a pixel that changes between two
+visits, the scaled update therefore has to produce exactly that distance
+divided by $\Delta t$, whatever the interval, and the operator simply
+learns to divide by $\Delta t$ internally. The multiplication is a change
+of parameterisation, not additional knowledge. It is kept because it makes
+the prediction fall back to the current state as $\Delta t$ approaches zero
+(\S\ref{sec:method:dt-residual}), and because it is the form MP-PDE uses
+\citep{Brandstetter2022}. It also means that $f_\theta$ is not a growth
+rate that could be read off; whether the operator can be read as a
+continuous-time model at all is tested
+in~\S\ref{sec:experiments:validity:swap}.
 
-The integration order is the second test of the time handling. The
-Runge--Kutta wrapper (\S\ref{sec:method:family:rk}) was placed around the
-canonical dilated-stencil graph network in its autonomous setting, in which
-the $\Delta t$ input is set to zero and $\Delta t$ only sets the
-integration horizon, and compared with a single Euler step of the same
-network. The difference is $\Delta = -0.0119 \pm 0.0037$~SE (1/5), and per
-eye $-0.0132 \pm 0.0055$ (28/75): a null, in the direction of the single
-step. Over the FNO, the wrapper against the plain FNO gives
-$\Delta = +0.0062 \pm 0.0056$~SE (4/5), and per eye $+0.0064 \pm 0.0069$
-(43/75), also a null. Raising the integration order therefore gives no
-detectable benefit over either a local graph operator or a global spectral
-one.
+\paragraph{Does the time-stepping scheme matter?}
+In the second test, the single step was replaced by a classical
+fourth-order Runge--Kutta step (\S\ref{sec:method:family:rk}), which
+evaluates the operator four times within the interval and combines the
+results. In this setting the operator does not receive $\Delta t$ as an
+input; time enters only through the integrator, which steps over the
+interval. Over the dilated-stencil network, the change-region Dice is 0.012
+lower than with the single step, on 4 of 5 folds; over the FNO it is 0.006
+higher. Both differences lie within the noise level, and the Runge--Kutta
+step costs about 4.8 times the training time (\S\ref{sec:experiments:cost}).
+% Values: ANISOGNN_final_oderk4n1 - ANISOGNN_final_dilmean -0.0119 +/-
+% 0.0037 SE (1/5 higher), per eye -0.0132 +/- 0.0055 (28/75);
+% FNO_final_w5rk4 - FNO_final_w5 +0.0062 +/- 0.0056 SE (4/5), per eye
+% +0.0064 +/- 0.0069 (43/75). The fold-2 decomposition (wrapper offset,
+% Delta t input removed, order) was dropped, author review v4 #33.
 
-A single-fold decomposition on fold 2 shows where the five-fold difference
-comes from. Every step is under the single-fold floor of 0.036, so it is
-indicative only. The wrapper at one Euler step reproduces the canonical
-operator to $-0.010$; removing the $\Delta t$ input feature, as in the
-autonomous setting, costs a further $-0.005$; and raising the order from
-Euler to RK4 costs $-0.0002$. Most of the five-fold difference is thus the
-wrapper's own offset at the scale of the replicate noise, not the
-integration order.
-
-The higher order is expensive. The minimum epoch time is 439\,s for RK4 over
-the stencil network against 91\,s for one Euler step, about $4.8\times$
-(Table~\ref{tab:experiments:arms}), and 45\,s against 23\,s for the FNO. The
-factor of $4.8$ holds where the forward pass of the backbone dominates the
-epoch. Finally, the change-region Dice at the anchor is thresholded and
-blind to the trajectory between visits, so these nulls license no statement
-about continuous-time behaviour; \S\ref{sec:experiments:validity:swap}
-addresses that question.
+\paragraph{What this means.}
+Neither the multiplication by $\Delta t$ nor the integration scheme changes
+the result. What the update needs is that the length of the interval
+reaches the operator at all, either as an input to a single step or through
+an integrator that steps over the interval; how it arrives makes no
+measurable difference. The simple update of the framework is therefore
+sufficient, and the accuracy is decided by the spatial operator
+(\S\ref{sec:experiments:ingredients}), not by the way time is stepped.
+% Note: no model without any time information was trained; "needs the
+% interval at all" is argued (a 3-month and a 2-year gap must give different
+% predictions), not measured.
 
 \subsection{The Objective}
 \label{sec:experiments:ablations:loss}
 
-The monotonic-growth penalty discourages a decrease of the mask where the
-previous state is atrophic (\S\ref{sec:method:training:loss}). It was
-measured on fold 2 at seed 42, as an epoch-paired comparison over the 20
-late epochs. The run with the penalty at weight 2.0 minus the run without
-it reads $-0.0032 \pm 0.0033$~SE, and the penalised run is higher on only 7
-of the 20 paired epochs. This is an order of magnitude under the
-single-fold floor of 0.036, so the simpler objective was kept, and the
-weight is zero in every reported run. Two limits apply. The comparison ran
-with the loss configuration used at the time, which did not multiply the
-output by $\Delta t$, and the penalty was not re-tested with the final
-update. And epoch-paired standard errors are optimistic, because successive
-epochs of one run are correlated.
+Every operator is trained with the same objective
+(\S\ref{sec:method:training:loss}): a mean squared error in which the mask
+channel is weighted five times more than each layer channel, plus a
+soft-Dice term on the mask channel, with no monotonic-growth penalty. Like
+the time handling, this objective is part of the shared framework, so it
+matters which of its parts carry the result. Three runs on the canonical
+dilated-stencil network, each with one part changed, ask this.
 
-A separate mechanism argues against the penalty under the pushforward
-curriculum (\S\ref{sec:method:training:curriculum}). On unrolled steps, the
-previous state the penalty refers to is the model's own earlier
-prediction, so the penalty locks in the model's own false positives: a
-pixel wrongly marked as atrophic can no longer be corrected toward the
-healthy ground truth without paying the penalty. On such a pixel, the
-gradient of the penalty was measured at 31.8 times the gradient of the data
-terms. The penalty would therefore enforce two different priors on
-teacher-forced and on unrolled steps. In addition, GA is not constrained to
-grow monotonically in this thesis, because the reference segmentations
-themselves shrink locally between some visits (\S\ref{sec:method:dt-residual}).
+\paragraph{Is the weighting of the mask channel needed?}
+Almost every pixel of the mask stays the same between two visits. With an
+unweighted mean squared error, a model can therefore reach a low loss by
+copying its input, which predicts no change at all and scores 0 on the
+change-region Dice. The collapse counter of~\S\ref{sec:experiments:protocol:metrics}
+detects this.
+% TODO: insert the result of ANISOGNN_final_dilmean_plainmse (mask weight 1,
+% no soft-Dice) against ANISOGNN_final_dilmean (queued 2026-10-01): late-epoch
+% change-region Dice, both instruments, the collapse counter per epoch and
+% the epoch at which the run leaves the collapse (if it does).
 
-The loss ladder separates the channel weighting from the soft-Dice term. All
-of its runs are single runs on fold 2 at seed 42, so the single-fold floor
-of 0.036 applies. On the late-epoch change-region Dice, plain unweighted
-MSE reads 0.0318: it escapes the collapse in which the model copies its
-input only at epoch 26 and does not recover. MSE with the mask channel
-weighted by 5 and no soft-Dice term reads 0.4885, and the canonical
-objective, which adds the soft-Dice term, reads 0.4963. The last two are
-equal within noise. It is therefore the channel weighting, not the
-soft-Dice term, that escapes the collapse. What the soft-Dice term adds is
-an immediate escape, from epoch 0, and roughly half the epoch-to-epoch
-standard deviation of the metric (0.049 to 0.025), not a higher final
-score.
+\paragraph{What does the soft-Dice term add?}
+% TODO: insert the result of ANISOGNN_final_dilmean_nodice (mask weight 5,
+% no soft-Dice) against ANISOGNN_final_dilmean (queued 2026-10-01): late-epoch
+% change-region Dice (both instruments), the epoch of escape from the
+% collapse, the epoch-to-epoch standard deviation of the metric, and the raw
+% mask RMSE (calibration stretch of the soft-Dice term, see 4.5.1; raw values
+% only within this comparison). Expected reading, to be confirmed or
+% replaced: the weighting, not the soft-Dice term, avoids the collapse, and
+% the soft-Dice term buys an earlier escape and a steadier metric rather
+% than a higher score.
 
-The epoch of escape follows the strength of the mask-channel gradient:
-epoch 0 at soft-Dice sharpness 2, epoch 2 at sharpness 4, epoch 5 at
-sharpness 6, epoch 9 with mask weight 5 and no soft-Dice, and epoch 26 with
-plain MSE. Sharpness 2 is kept for its immediate escape and its lowest
-epoch-to-epoch variance, not for a higher score. It has a calibration cost.
-The raw mask RMSE rises to 0.880 at sharpness 2, against 0.336 without the
-soft-Dice term and 0.362 at sharpness 6. These raw values are quoted only
-to show the stretch described in~\S\ref{sec:method:training:loss}; it does
-not change any thresholded metric. Excluding the padded positions from the
-loss was tested on the same ladder, and the single-fold difference was
-under the floor.
+\paragraph{Would a monotonic-growth penalty help?}
+Atrophic tissue does not regenerate, so a penalty on any decrease of the
+mask where the previous state is atrophic is a natural prior. It is
+implemented (\S\ref{sec:method:training:loss}) but switched off.
+% TODO: insert the result of ANISOGNN_final_dilmean_mono2 (penalty weight 2.0)
+% against ANISOGNN_final_dilmean (queued 2026-10-01), both instruments.
+Two arguments speak against the penalty independently of its effect on the
+score. Under the pushforward curriculum
+(\S\ref{sec:method:training:curriculum}), the previous state on an unrolled
+step is the model's own earlier prediction, so the penalty locks in the
+model's own false positives: a pixel wrongly marked as atrophic can no
+longer be corrected toward the ground truth without paying the penalty. On
+such a pixel, the gradient of the penalty was measured at 31.8 times the
+gradient of the data terms. The penalty therefore enforces different
+priors on teacher-forced and on unrolled steps. In addition, the reference
+segmentations themselves shrink locally between some visits
+(\S\ref{sec:method:dt-residual}), which a strict growth constraint would
+contradict.
+% TODO: check that the 31.8x gradient ratio (F2 audit) holds for the final
+% pipeline, or state the setting in which it was measured.
 
-An intermediate-time-point regulariser was also evaluated. It queried the
-model at random intermediate times $\alpha\,\Delta t$, with $\alpha$ drawn
-uniformly between 0.1 and 0.9, and penalised the prediction against the
-linear interpolation between the two observed visits. At weights 1, 3 and
-10, the runs without it matched or beat the regularised runs on
-change-region Dice, and it was removed. These runs predate the final
-version of the pipeline, so by the rule of~\S\ref{sec:experiments:protocol:rollout}
-no number is quoted.
+% Removed 2026-10-01 (author review v4 #35/#36): the fold-2 loss ladder,
+% the sharpness sweep (escape epochs 0/2/5/9/26, raw RMSE 0.880/0.336/0.362),
+% the fold-2 monotonic-penalty comparison (-0.0032, old loss setting), the
+% pad-exclusion leg, and the intermediate-time-point regulariser paragraph.
+% The regulariser point is kept as a Section 6.1 TODO.
+
+\subsection{Capacity}
+\label{sec:experiments:ablations:capacity}
+
+Every architecture arm of Table~\ref{tab:experiments:arms} runs at 67 to 83
+thousand parameters (\S\ref{sec:method:family:params}). Whether the
+comparisons of~\S\ref{sec:experiments:main-results}
+and~\S\ref{sec:experiments:ingredients} depend on that size was tested
+separately. Each architecture class was scaled while everything else was
+held fixed: the same loss, curriculum, epoch budget and five folds, seed 42.
+Each run changes one size setting only. Width is the setting compared
+across classes, because it adds parameters without changing how far one
+step reaches. Depth does change the reach of the graph network, so it is
+read for each class on its own; the U-Net and the FNO have no depth
+setting. The design and a decision rule were fixed before the first run: a
+width step that clears the floor on both instruments earns a further step
+up, and a width step without a gain earns a step down instead, to about a
+quarter of the original size.
+
+\begin{table}[t]
+  \centering
+  \caption[The capacity study.]{%
+    The capacity study. Change-region Dice at the one-year anchor, five
+    folds, seed 42; the mean is over the five fold values. The ratio is the
+    parameter count against the arm's own original size (1). The differences are against that original size,
+    fold-paired (mean $\pm$ SE, folds on which the scaled arm is higher) and
+    per eye (mean $\pm$ SE, eyes on which it is higher). The paired floor is
+    0.016, or 0.020 for the U-Net. $^\ast$All T-FEN points use the Galerkin
+    form of the transport operator
+    (\S\ref{sec:experiments:validity:tfen}).}
+  \label{tab:experiments:capacity}
+  \footnotesize
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabular}{l l r r c c c}
+    \toprule
+    Arm & Setting & Params & Ratio & Mean & $\Delta$ fold-paired
+      & $\Delta$ per eye \\
+    \midrule
+    Stencil GNN & width 32 & 18\,219 & 0.27 & 0.521 &
+      $-0.005 \pm 0.006$ (1/5) & $-0.005 \pm 0.003$ (30/75) \\
+     & width 64 & 67\,147 & 1 & 0.526 & --- & --- \\
+     & width 128 & 257\,163 & 3.83 & 0.518 &
+      $-0.008 \pm 0.006$ (2/5) & $-0.009 \pm 0.004$ (22/75) \\
+     & 4 rounds & 119\,499 & 1.78 & 0.517 &
+      $-0.009 \pm 0.002$ (0/5) & $-0.010 \pm 0.004$ (20/75) \\
+    \midrule
+    U-Net & width 2 & 13\,637 & 0.16 & 0.488 &
+      $-0.016 \pm 0.029$ (3/5) & $-0.019 \pm 0.016$ (40/75) \\
+     & width 5 & 83\,081 & 1 & 0.505 & --- & --- \\
+     & width 9 & 267\,149 & 3.22 & 0.508 &
+      $+0.004 \pm 0.013$ (1/5) & $+0.004 \pm 0.008$ (38/75) \\
+     & width 32 & 3\,354\,347 & 40.4 & 0.457 &
+      $-0.048 \pm 0.030$ (1/5) & $-0.045 \pm 0.011$ (17/75) \\
+    \midrule
+    FNO + $3{\times}3$ & width 2 & 13\,189 & 0.16 & 0.479 &
+      $-0.019 \pm 0.018$ (2/5) & $-0.021 \pm 0.010$ (30/75) \\
+     & width 5 & 79\,960 & 1 & 0.498 & --- & --- \\
+     & width 9 & 257\,804 & 3.22 & 0.481 &
+      $-0.018 \pm 0.008$ (1/5) & $-0.021 \pm 0.007$ (26/75) \\
+    \midrule
+    T-FEN$^\ast$ & width 48 & 20\,455 & 0.30 & 0.538 &
+      $+0.005 \pm 0.004$ (3/5) & $+0.004 \pm 0.004$ (40/75) \\
+     & width 96 & 68\,503 & 1 & 0.534 & --- & --- \\
+     & width 192 & 247\,543 & 3.61 & 0.443 &
+      $-0.091 \pm 0.059$ (3/5) & $-0.070 \pm 0.014$ (30/75) \\
+     & MLP depth 8 & 142\,999 & 2.09 & 0.329 &
+      $-0.204 \pm 0.067$ (0/5) & $-0.220 \pm 0.021$ (6/75) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+% TODO (queued 2026-10-01): replace the four T-FEN rows by the
+% energy-conserving form -- FEN_final_w48ftp7rk4d45skew, w192...skew,
+% w96d8...skew against the skew 1x twin FEN_final_w96ftp7rk4d45skew (0.5428)
+% -- and drop the Galerkin footnote and the Galerkin sentence below. If the
+% width-192 or depth-8 skew runs still fail to train, say so.
+% Source: masterthesis-docker SOLVER_FINAL_RUNS section 9.18 (capacity study,
+% 2026-09-30); every value re-computed 2026-10-01 from solver_results.csv and
+% the per-eye records. One deviation: the width-32 U-Net per eye reads
+% -0.0453 +/- 0.0113 here against -0.0469 +/- 0.0090 in section 9.18.
+
+Table~\ref{tab:experiments:capacity} gives the result. No width step raises
+any class above the floor on either instrument. The dilated-stencil graph
+network is flat from a quarter to four times its size (0.521, 0.526,
+0.518). The U-Net and the FNO with a local path do best at or near their
+original size. The widest U-Net, at about forty times the parameters, falls
+below its original size on both instruments ($-0.045$ per eye, 17/75).
+Scaling down costs little: the graph network at 18\,219 parameters stays
+within 0.005 of the canonical configuration, and the T-FEN at width 48 is
+level with width 96.
+
+Depth does not help where it was tested. Four message-passing rounds
+instead of two, which also double the reach of the dilated stencil, lower
+the graph network on every fold ($-0.009 \pm 0.002$~SE, 0/5), a small
+difference under the floor. The T-FEN with an eight-layer free-form network
+does not train on any fold: its training error barely falls. At width 192,
+the T-FEN diverges during training on folds 1 and 4 and ties width 96 on the
+other three.
+
+Capacity is therefore not a lever on this task in any of the four classes,
+and the comparisons at matched size in~\S\ref{sec:experiments:main-results}
+and~\S\ref{sec:experiments:ingredients} are not an artefact of the size at
+which they were made. The finding is scoped to one seed. The T-FEN points
+were run with the Galerkin form of the transport operator, before the
+energy-conserving form existed, and the divergence at width 192 is the
+defect at the crop edge described in~\S\ref{sec:experiments:validity:tfen}.
 
 % Subsections "Patient Covariates and the Layer Encoder" and "Settings Inside
 % the Graph Network" commented out 2026-09-28 (author: covariate result carried
@@ -743,104 +914,146 @@ settings of the message function did not, at this precision.
 The two diagnostics of this section are not accuracy numbers. They decide
 which statements about the operators are licensed. The first tests whether
 a trained operator can be read as a continuous-time system; the second
-tests whether the T-FEN, whose Dice scores are among the highest, is a
-numerically valid free-running model.
+shows why the first version of the T-FEN was not a stable free-running
+model, and how the energy-conserving form fixes it.
 
 \subsection{The Solver-Swap Test}
 \label{sec:experiments:validity:swap}
 
-The solver-swap test asks whether a trained network represents a
-continuous-time system. A trained checkpoint is rebuilt from its own
-configuration and re-evaluated with the unmodified evaluation code under
-several integration schemes and step counts. The wrapper adds no
-parameters (\S\ref{sec:method:family:rk}), so every setting applies the
-same weights with a different quadrature. As a control, the canonical model
-evaluated at one Euler step through the wrapper reproduces its own recorded
-epoch-29 change-region Dice exactly (0.596418). Following \citet{Ott2021}
-and \citet{Krishnapriyan2023}, a model that represents a continuous-time
-system should give nearly the same predictions under schemes of equal or
-smaller discretisation error. The test was run after training, on fold 2,
-with one seed per model and no retraining.
+\paragraph{What is tested.}
+The update of the framework, $u_t + \Delta t \cdot f_\theta$, has the form
+of one explicit Euler step (\S\ref{sec:method:dt-residual}), and the
+Runge--Kutta wrapper and the Finite Element Network go further and
+integrate $f_\theta$ over several sub-steps
+(\S\ref{sec:method:family:rk}, \S\ref{sec:method:family:fen}). This
+invites reading $f_\theta$ as the right-hand side of an ordinary
+differential equation $\mathrm{d}u/\mathrm{d}t = g(u)$, in the sense of a
+Neural ODE \citep{Chen2018}: a vector field that states how the state
+changes at every moment. Under that reading, a model would define the state
+at any time, its predictions for different intervals would be consistent
+with one another, and $f_\theta$ could be interpreted as a rate of growth.
+A network trained with one fixed discretisation need not have this
+property. It can fit the observed data while its output depends on the
+discretisation it was trained with \citep{Ott2021, Krishnapriyan2023}. The
+solver-swap test determines which of the trained models have the property,
+and therefore for which models statements about continuous-time behaviour
+are admissible.
 
-The first model is the canonical dilated-stencil network, trained with one
-Euler step and with the real $\Delta t$ as an input.
-Table~\ref{tab:experiments:swap} gives its change-region Dice at the
-anchor, the difference to the trained setting, and the raw mask RMSE, which
-is used only to follow the trajectory within one model and never to compare
-models. The Dice spreads by 0.0856 across the five settings, 2.4 times the
-single-fold floor of 0.036 and 6.7 times the replicate standard deviation of
-0.0127. It does not converge: successive Euler refinements change the
-result by $-0.0162$ and then by a further $-0.0596$, so the change grows by
-a factor of 3.7 when the step is halved again, and the order of the schemes
-is not monotone (RK4 with one step lies above the trained setting, RK4 with
-two steps below it). The canonical model fails the test. It is a
-$\Delta t$-conditioned one-step map, not a discretisation of a
-continuous-time system. For a step-conditioned model the test cannot be
-posed cleanly, because changing the number of steps changes the $\Delta t$
-the operator is conditioned on, so the failure mixes refinement of the
-integration with conditioning outside the training range. That is itself
-the point of the test: an operator whose update depends on the step it is
-about to take does not define a continuous system to refine.
+\paragraph{Principle and criteria.}
+If a model defines an ordinary differential equation
+$\mathrm{d}u/\mathrm{d}t = g(u)$, every convergent integration scheme
+applied to $g$ approximates the same solution, with an error that shrinks
+as the step $h$ shrinks, in proportion to $h^p$ for a scheme of order $p$
+\citep{Hairer1993}. The same trained weights, integrated with a smaller
+step or a scheme of higher order, must therefore approach one prediction.
+Two criteria make this operational:
+\begin{itemize}
+  \item \textbf{C1, convergence:} when the step is refined, the change in
+    the prediction becomes smaller;
+  \item \textbf{C2, agreement:} all settings at least as fine as the one
+    used in training, by step or by order, agree to within the run-to-run
+    noise, the standard deviation of 0.0127 between repeated runs of one
+    configuration (\S\ref{sec:experiments:protocol:stats}).
+\end{itemize}
+A model is read as a continuous-time model only if it satisfies both.
 
-The second model is the network trained inside the autonomous RK4 wrapper,
-with one RK4 step and the $\Delta t$ input always zero, so that only the
-integrator carries time. It is the one checkpoint for which the test is
-properly posed. Its four refined settings (Euler with two and four steps,
-RK4 with two and four steps) agree to within 0.0044, below the replicate
-standard deviation. The Euler sequence converges, with successive
-differences of $+0.0179$ and then $+0.0044$, a ratio of 4.05, and the mask
-RMSE falls monotonically and flattens, so the trajectory converges as well
-as the endpoint. The only outlier is Euler with one step, the crudest
-scheme over the full interval, which lies 0.020 low, as a first-order step
-is expected to. This model passes the test: its field is
-solver-independent. The two models' fold-2 Dice values (0.5964 and 0.5667)
-are not a comparison between them, since the first belongs to one
-quadrature and the second is the value the model converges to. Two
-variants were not run: the canonical model with its $\Delta t$ input set to
-zero, which would be far outside its training distribution, and a
-five-fold version of the test.
+\paragraph{Setup.}
+The test requires no retraining. A trained checkpoint is rebuilt from its
+own configuration and evaluated with the unmodified evaluation code, with
+only the integration scheme or the step changed. The integration wrapper
+has no parameters (\S\ref{sec:method:family:rk}), so every setting uses the
+same weights. As a control, the setting a model was trained with reproduces
+exactly the change-region Dice recorded at the end of its training. Three
+models were tested: the canonical dilated-stencil network, trained with one
+Euler step and with $\Delta t$ as an input of the operator; the same
+network trained inside the autonomous Runge--Kutta wrapper, with one RK4
+step and without a $\Delta t$ input; and the T-FEN in its energy-conserving
+form, trained with RK4 in steps of 45 days and without a $\Delta t$ input.
+The two graph networks were tested on fold 2 and the T-FEN on fold 0, each
+with one seed. The T-FEN was integrated with RK4 only, because an explicit
+Euler step is unstable for its transport operator at any step
+(\S\ref{sec:method:family:fen}).
 
-Together, the two results restrict the vocabulary. No statement about
-continuous-time behaviour, ordinary differential equations, rate fields or
-learned dynamics is licensed for the canonical model or for any headline
-result. A continuous-time reading is licensed for the RK4-trained arm only,
-on fold 2 and one seed, and that arm is a five-fold null in accuracy against
-the canonical model ($-0.0119 \pm 0.0037$~SE,
-\S\ref{sec:experiments:ablations:time}) at about $4.8\times$ the training
-cost. On this task the continuous-time property is real and obtainable,
-and it buys nothing in accuracy; the difficulty lies in spatial reach
-(\S\ref{sec:experiments:ingredients:reach}), not in the time formulation.
+\paragraph{Results.}
+Table~\ref{tab:experiments:swap} lists the results. The canonical
+network fails both criteria. Refining its Euler step from one to two to four
+sub-steps changes the Dice first by $-0.016$ and then by a further
+$-0.060$: the change grows instead of shrinking (C1). Across the five
+settings the Dice spans 0.086, almost seven times the run-to-run noise
+(C2). The reason is structural. The operator receives $\Delta t$ as an
+input, so a smaller step also changes the input on which the operator is
+conditioned. There is no single vector field $g(u)$ to converge to: the
+canonical network is a one-step map conditioned on the length of the step.
+
+The network trained inside the Runge--Kutta wrapper passes both criteria.
+Its Euler refinements change the Dice by $+0.018$ and then by $+0.004$
+(C1), and every setting except the single Euler step, the crudest one,
+lies within 0.0044 of the others; the three RK4 settings agree to within
+0.0005 (C2). The T-FEN passes as well. Refining its step from 45 days,
+the training step, to 30, 22.5 and 15 days changes the Dice by at most
+0.0003 (C1, C2). Only the coarser step of 90 days departs, and by no more
+than 0.0015.
+
+\paragraph{What follows.}
+The canonical network, and with it every headline result, may not be
+described as a continuous-time model: no statement about an ordinary
+differential equation, a learned rate of growth or learned dynamics is
+made for it. For the network trained inside the Runge--Kutta wrapper and
+for the energy-conserving T-FEN, a continuous-time reading is admissible,
+within the scope of one fold and one seed. Neither of them is more accurate
+than the canonical network at the one-year anchor
+(\S\ref{sec:experiments:ablations:time}, \S\ref{sec:experiments:main-results}).
+The continuous-time property can therefore be obtained on this task, but it
+does not decide the accuracy.
+% Sources: SOLVER_FINAL_RUNS section 9.17 (graph networks, fold 2,
+% 2026-09-17) and section 9.19b (skew T-FEN, fold 0, 2026-10-01). The
+% criteria C1/C2 make explicit the reading used there (solver-independence
+% against the 0.0127 replicate sd); they were not fixed as numbers before
+% section 9.17 was run.
+% TODO: optional -- repeat the T-FEN swap on fold 2 so all three models share
+% a fold, and on the seed-7 skew T-FEN once it is in.
 
 \begin{table}[t]
   \centering
   \caption[The solver-swap test.]{%
-    The solver-swap test on fold 2. Each trained model is re-evaluated
-    without retraining under several integration schemes and step counts;
-    the values are the change-region Dice at the one-year anchor, its
-    difference to the setting the model was trained with, and the raw mask
-    RMSE, which follows the trajectory within one model and is not
-    comparable between models. The canonical model does not converge under
-    refinement; the model trained inside the autonomous RK4 wrapper does.}
+    The solver-swap test. Each trained model is re-evaluated, without
+    retraining, with the integration scheme and step changed; the values
+    are the change-region Dice at the one-year anchor and its difference to
+    the setting the model was trained with. A model that defines an
+    ordinary differential equation converges as the step is refined (C1)
+    and gives the same result, within the run-to-run noise of 0.0127, for
+    all settings at least as fine as its training setting (C2). The graph
+    networks were tested on fold 2, the T-FEN on fold 0.}
   \label{tab:experiments:swap}
   \small
-  \begin{tabular}{l r r r}
+  \begin{tabular}{l r r}
     \toprule
-    Scheme / steps & Dice & $\Delta$ vs.\ trained & Mask RMSE \\
+    Scheme / steps & Dice & $\Delta$ vs.\ trained \\
     \midrule
-    \multicolumn{4}{l}{\emph{Canonical dilated-stencil network (trained: Euler / 1)}} \\
-    Euler / 1 (trained) & 0.596418 & $+0.0000$ & 1.1106 \\
-    Euler / 2 & 0.580195 & $-0.0162$ & 1.2294 \\
-    Euler / 4 & 0.520589 & $-0.0758$ & 1.4346 \\
-    RK4 / 1 & 0.606155 & $+0.0097$ & 0.9568 \\
-    RK4 / 2 & 0.579796 & $-0.0166$ & 1.1657 \\
+    \multicolumn{3}{l}{\emph{Canonical dilated-stencil network (trained:
+      Euler, 1 step): fails C1 and C2}} \\
+    Euler, 1 step (trained) & 0.5964 & $+0.0000$ \\
+    Euler, 2 steps & 0.5802 & $-0.0162$ \\
+    Euler, 4 steps & 0.5206 & $-0.0758$ \\
+    RK4, 1 step & 0.6062 & $+0.0097$ \\
+    RK4, 2 steps & 0.5798 & $-0.0166$ \\
     \midrule
-    \multicolumn{4}{l}{\emph{Autonomous RK4 wrapper (trained: RK4 / 1)}} \\
-    Euler / 1 & 0.546568 & $-0.0201$ & 1.2830 \\
-    Euler / 2 & 0.564468 & $-0.0022$ & 0.9660 \\
-    Euler / 4 & 0.568892 & $+0.0022$ & 0.9092 \\
-    RK4 / 1 (trained) & 0.566656 & $+0.0000$ & 0.8942 \\
-    RK4 / 2 & 0.567121 & $+0.0005$ & 0.8831 \\
-    RK4 / 4 & 0.566857 & $+0.0002$ & 0.8804 \\
+    \multicolumn{3}{l}{\emph{Network trained in the RK4 wrapper (trained:
+      RK4, 1 step): passes}} \\
+    Euler, 1 step & 0.5466 & $-0.0201$ \\
+    Euler, 2 steps & 0.5645 & $-0.0022$ \\
+    Euler, 4 steps & 0.5689 & $+0.0022$ \\
+    RK4, 1 step (trained) & 0.5667 & $+0.0000$ \\
+    RK4, 2 steps & 0.5671 & $+0.0005$ \\
+    RK4, 4 steps & 0.5669 & $+0.0002$ \\
+    \midrule
+    \multicolumn{3}{l}{\emph{T-FEN, energy-conserving form (trained: RK4,
+      45-day steps): passes}} \\
+    RK4, 90-day steps & 0.5470 & $-0.0015$ \\
+    RK4, 45-day steps (trained) & 0.5485 & $+0.0000$ \\
+    RK4, 30-day steps & 0.5488 & $+0.0003$ \\
+    RK4, 22.5-day steps & 0.5486 & $+0.0001$ \\
+    RK4, 15-day steps & 0.5486 & $+0.0001$ \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -848,117 +1061,188 @@ and it buys nothing in accuracy; the difficulty lies in spatial reach
 \subsection{Numerical Stability of the T-FEN}
 \label{sec:experiments:validity:tfen}
 
-The stability of the T-FEN (\S\ref{sec:method:family:fen}) was assessed on
-its ten runs, five folds at two seeds. A run counts as stable if both its
-raw mask RMSE and its raw layer RMSE in the free-running validation rollout
-stay at or below 5 on at least 19 of its 20 late epochs. RMSE is used here
-only to detect divergence within one arm. The criterion was fixed for
-follow-up runs and is applied to these runs retrospectively.
-Table~\ref{tab:experiments:courant} lists the runs. Seven of the ten fail
-the criterion and three pass. Four of the seven diverge heavily on the mask
-channel, on 19, 15, 14 and 8 of the 20 late epochs; the other three fail
-mainly through the layer channels. The largest late-epoch mask RMSE reaches
-24\,418.
+\paragraph{The first version.}
+The T-FEN was first trained with the Galerkin form of its transport
+operator (\S\ref{sec:method:family:fen}). Seven of its ten runs, five folds
+at two seeds, are unstable in the sense defined there, whereas the
+free-form FEN, which lacks only the transport term, is stable on every
+fold. Tracing the rollouts step by step showed where the divergence comes
+from. It starts at the edge of the crop, in a layer channel, driven by the
+transport term, and only after about 1.6 to 2 years: later than the
+one-year anchor and later than the 360 days that training unrolls. A
+smaller step did not help, and the velocities at the onset were within the
+stability limit of RK4, so the step size was not the cause. The cause was
+the defect of the Galerkin operator at the domain edge described
+in~\S\ref{sec:method:family:fen}. Because the divergence starts after the
+anchor and away from the lesion, it did not affect the change-region Dice
+of the Galerkin T-FEN at one year.
+% Details (SOLVER_FINAL_RUNS 9.19, three runs traced): onset within 7 columns
+% of the left/right crop edge in 79-93 % of eyes, often next to the padded
+% rows, never inside the lesion; layer channel in 33 of 34 onsets; transport
+% term 13-290x the free-form term at the onset (median per run); median onset
+% sub-step 13-16 (day ~585-720); growth x1.3 per sub-step; Courant number at
+% onset 1.9-2.3 < ~2.4; a 30-day step (fold 0) still diverges; largest
+% late-epoch mask RMSE 24 418. Possible appendix material.
 
-The instability comes from the transport term: the free-form FEN, which
-differs only by its absence, never exceeds a mask RMSE of 1.43, and neither
-it nor the dilated-stencil network has a late epoch above the threshold on
-any fold. It builds up over the rollout. The teacher-forced one-step error
-of every T-FEN run lies within $\pm 0.02$ of the free-form FEN on the same
-fold, while the validation rollout reaches about 44 RK4 sub-steps at 45
-days, against about 8 within the 360-day training curriculum
-(\S\ref{sec:method:training:curriculum}). The thresholded metrics do not see
-it. On the heavily diverging runs, the predicted lesion area stays at 0.64
-to 1.00 of the true area (median per horizon bin), and the change-region
-Dice at the anchor is about the same on diverging and clean epochs of one
-run (0.529 against 0.513 in one example). Every Dice number
-in~\S\ref{sec:experiments:main-results} and~\S\ref{sec:experiments:ingredients}
-therefore stands.
+\paragraph{The energy-conserving form.}
+The T-FEN was retrained with the energy-conserving form of the transport
+operator (Equation~\ref{eq:method:fen-skew}), identical in every other
+respect, at seed 42 on all five folds. It passes the stability criterion on
+every fold, with a largest late-epoch error of 2.32 on the mask channel and
+1.13 on the layer channels (Table~\ref{tab:experiments:tfen-stability}).
+Its accuracy is at least as good: $0.5428 \pm 0.0401$ against
+$0.5337 \pm 0.0453$ for the Galerkin form, higher on all five folds, by
+$+0.009$, which is under the noise level. The gain sits where the defect
+was: on lesions that touch the crop border the change-region Dice rises
+from 0.516 to 0.544, while interior lesions are unchanged (0.535 and
+0.536), and the growth-region Dice beyond three years rises from 0.537 to
+0.611. The energy-conserving T-FEN is therefore the one reported
+in~\S\ref{sec:experiments:main-results}
+and~\S\ref{sec:experiments:ingredients}.
 
-A Courant read-back points to the learned velocities. The runs were judged
-against a bound of 2.8, the stability limit $2\sqrt{2}$ of RK4 on the
-imaginary axis, in the sense of the stability condition of
-\citet{Courant1928}. The combined column and row Courant number was read per
-channel on all ten final checkpoints. Nine of the ten exceed 2.8 on at
-least one channel, with values from 3.16 to 5.71, while nine of the ten
-best checkpoints do not; the velocities grow past the stable region as
-training continues. Exceedance on a layer channel coincides with
-divergence on all six runs where it occurs, and the one run that stays
-under the bound on every channel is stable. A plausible reading, not
-tested, is that the near-binary mask is flat away from the lesion edge, so
-a fast mask velocity mostly acts on a zero gradient, whereas the layer
-channels have texture everywhere.
-
-The bound of 2.8 is itself too loose. The assembled transport stencil has a
-spectral radius of about 1.17 times the velocity in grid units, so the
-correct bound is about 2.4; against it, three further mask-channel
-readings in Table~\ref{tab:experiments:courant} fall on the wrong side. This
-settles the open value in~\S\ref{sec:method:family:fen}. An earlier check,
-made before the five-fold runs, used one fold and the mask channel only and
-did not detect the problem; a stability check for a multi-channel transport
-operator has to cover every advected channel, both velocity components, the
-final as well as the best checkpoint, and more than one fold and seed. A
-smaller step does not fix it either. At a 30-day step on fold 0, every
-channel falls back under the bound of 2.8 used during the runs (maximum
-2.42), and the free-running rollout still diverges, so the Courant
-condition is necessary but not sufficient. The principled remedy, a
-velocity head whose parameterisation bounds the speed, was deliberately not
-implemented; the instability is reported as a finding.
-
-Four consequences follow. The T-FEN as trained is not a numerically valid
-long-horizon integrator. Its learned velocity field and its raw fields are
-not quotable. Its Dice results at the anchor and its transport effect
-(\S\ref{sec:experiments:ingredients:transport}) stand, because they are
-measured on thresholded metrics that the divergence does not reach. And a
-learned advection velocity is a usable solver component only if its
-parameterisation respects the stability bound on every advected channel.
-Separately, the FEN family shows a long-horizon deficit that is not caused
-by the instability: the free-form FEN, which never diverges, also
-under-predicts long-horizon lesion area and lies 0.134 below the
-dilated-stencil network in the late growth-region Dice beyond three years
-(0.507 against 0.641).
+A small residual remains, and it has a different cause. Reading back the
+Courant number over every sub-step of the free-running rollout on fold 0,
+the layer channels stay at or below 1.36, inside the RK4 limit of about
+2.4, but the mask channel lies slightly above it at the 45-day training
+step (median 2.64, maximum 2.85). In 9 of the 20 validation eyes a few
+mask values on the top or bottom row of the grid eventually leave the
+plausible range, at most 26 values per eye and at most 36 in normalised
+units, starting around day 1\,260 and growing by a factor of about 1.04
+per sub-step. This is the step-size limit of RK4, now a minor effect
+compared with the defect of the Galerkin form, which produced growth by a
+factor of about 1.3 per sub-step from around day 585. It does not affect
+the stability criterion, which the run passes, and an evaluation step of
+30 days, at which the Courant number of the mask channel falls to about
+1.8, removes it without changing the Dice
+(\S\ref{sec:experiments:validity:swap}).
+% Source: SOLVER_FINAL_RUNS section 9.19b (fold 0, 2026-10-01). Consequence
+% recorded there: the learned velocity map may be quoted if the rollout is
+% evaluated at a 30-day step; the thesis does not interpret it.
+% TODO: seed-7 run of the skew-form T-FEN (FEN_final_w96ftp7rk4d45skews7,
+% queued 2026-10-01); the stability result above is seed 42 only.
 
 \begin{table}[t]
   \centering
-  \caption[Stability of the ten T-FEN runs.]{%
-    Stability of the ten T-FEN runs (five folds, two seeds). ``Epochs
-    $> 5$'' counts late epochs (10 to 29) with a free-running mask RMSE
-    above 5. The two right-hand columns give the highest combined Courant
-    number on the final checkpoint, for the mask channel and over the layer
-    channels, against the bound of 2.8 used during the runs (the correct
-    bound is about 2.4). A run is stable if both its mask and its layer
-    RMSE stay at or below 5 on at least 19 late epochs; seed 42, folds 2
-    and 4, therefore fail through the layer channels despite few mask
-    exceedances, and seed 7, folds 1 and 3, pass despite a mask-channel
-    Courant number above the bound.}
-  \label{tab:experiments:courant}
+  \caption[Stability of the T-FEN in both operator forms.]{%
+    Stability of the T-FEN in the Galerkin and the energy-conserving form
+    of its transport operator, seed 42. For each fold: the number of late
+    epochs (10 to 29) on which the free-running mask and layer errors stay
+    at or below 5, and the largest late-epoch mask and layer error, in
+    normalised units. A run is stable if both counts are at least 19.}
+  \label{tab:experiments:tfen-stability}
   \small
-  \begin{tabular}{l c c c}
+  \begin{tabular}{c c c c c}
     \toprule
-    Run & Epochs $> 5$ & Courant, mask & Courant, layers (max) \\
+     & \multicolumn{2}{c}{Galerkin form} &
+       \multicolumn{2}{c}{Energy-conserving form} \\
+    Fold & Epochs $\le 5$ & Largest error & Epochs $\le 5$ & Largest error \\
+     & mask / layers & mask / layers & mask / layers & mask / layers \\
     \midrule
-    Seed 42, fold 0 & 19/20 & 2.37 & 3.16 \\
-    Seed 7, fold 4 & 15/20 & 5.65 & 2.06 \\
-    Seed 7, fold 0 & 14/20 & 2.75 & 3.86 \\
-    Seed 42, fold 1 & 8/20 & 2.46 & 3.22 \\
-    Seed 7, fold 2 & 4/20 & 2.28 & 3.79 \\
-    Seed 42, fold 2 & 2/20 & 2.68 & 3.39 \\
-    Seed 42, fold 4 & 1/20 & 3.05 & 3.70 \\
-    Seed 7, fold 1 & 0/20 & 5.71 & 2.15 \\
-    Seed 7, fold 3 & 0/20 & 5.32 & 1.16 \\
-    Seed 42, fold 3 & 0/20 & 2.08 & 2.16 \\
+    0 & 1 / 2 & 24\,418 / 456 & 20 / 20 & 2.00 / 1.13 \\
+    1 & 12 / 19 & 196 / 14.9 & 20 / 20 & 2.32 / 0.89 \\
+    2 & 18 / 19 & 6.97 / 33.5 & 20 / 20 & 1.82 / 1.08 \\
+    3 & 20 / 20 & 1.49 / 3.33 & 20 / 20 & 1.73 / 0.82 \\
+    4 & 19 / 6 & 11.9 / 174 & 20 / 20 & 2.00 / 0.99 \\
     \bottomrule
   \end{tabular}
 \end{table}
-
+% Source: SOLVER_FINAL_RUNS section 9.19a (2026-10-01). The Galerkin form
+% fails on 4 of 5 folds at seed 42 (folds 0, 1, 2, 4; the table above) and on
+% 3 of 5 at seed 7 (7 of 10 runs, section 9.15). Section 9.19a's text says
+% "failed on 3/5 under Galerkin" at seed 42, which its own table contradicts.
+% The earlier Courant table (final-checkpoint Courant numbers against a bound
+% of 2.8) was removed 2026-10-01: its step-size reading is superseded by the
+% diagnosis in section 9.19.
 
 \section{Qualitative Analysis and Clinical Comparison}
 \label{sec:experiments:qualitative}
 
 % TODO: per-eye rollouts, success cases and failure modes (atypical
 % progression, sparse schedules, short vs long Delta t, border-censored
-% lesions). Comparison with Mai et al. (2024) on the same cohort, with the
-% mandatory caveat: this model consumes pre-segmented masks, Mai raw OCT.
+% lesions).
+
+\subsection{Comparison with Mai et al. (2024)}
+\label{sec:experiments:qualitative:mai}
+
+\citet{Mai2024} predict GA growth on the same MUW cohort from a single
+baseline OCT volume, with a Neural ODE integrated by RK4. Besides Dice
+scores, their evaluation uses two eye-level measures of growth speed,
+which the Dice scores do not capture. Both are computed here in the same
+way.
+
+The growth rate of an eye is the change of the square root of its lesion
+area per year, $(\sqrt{A_{\text{last}}} - \sqrt{A_{\text{base}}}) / T$,
+where $T$ is the time from the baseline visit to the eye's last visit.
+Taking the square root of the area removes the dependence of the growth
+rate on the baseline lesion size \citep{Feuer2013}. The rate is computed
+once from the ground truth and once from the model's rollout, over the
+eye's whole follow-up as in \citet{Mai2024}, not at the one-year anchor.
+Two measures compare the two rates over the cohort. The Pearson
+correlation $r$ asks whether the model orders and scales the growth speeds
+of the eyes correctly: $r = 1$ is a perfect linear relation and $r = 0$ no
+relation. The fast-progressor area under the receiver operating
+characteristic curve (AUC) asks whether the predicted rate separates the
+fastest-growing eyes, the top 10, 15 or 20\,\% of true growth rates, from
+the rest: 0.5 is chance and 1 is perfect separation.
+
+Both measures are computed for the canonical model. Each eye's predicted
+rate is averaged over the late epochs, the 75 validation eyes of the five
+folds are pooled, and 95\,\% intervals come from a bootstrap over eyes.
+Table~\ref{tab:experiments:mai} lists the result.
+
+\begin{table}[t]
+  \centering
+  \caption[Growth-speed measures against Mai et al. (2024).]{%
+    Eye-level growth-speed measures of the canonical model against the
+    values reported by \citet{Mai2024}. Growth rates are computed over each
+    eye's whole follow-up with the square-root transform; the canonical
+    model is pooled over the 75 validation eyes of the five folds, with
+    95\,\% bootstrap intervals and, for the AUC, the number of eyes above
+    the cut-off. The two studies differ in cohort size, input and field of
+    view (see text), so the values are an anchor, not a head-to-head
+    comparison.}
+  \label{tab:experiments:mai}
+  \small
+  \begin{tabular}{l c c}
+    \toprule
+    Measure & \citet{Mai2024} & This thesis \\
+    \midrule
+    Pearson $r$ of growth rates & 0.61 & 0.40 [0.22, 0.56] \\
+    AUC, top 10\,\% & 0.81 & 0.74 [0.52, 0.91] (8 eyes) \\
+    AUC, top 15\,\% & 0.79 & 0.70 [0.53, 0.86] (11 eyes) \\
+    AUC, top 20\,\% & 0.77 & 0.70 [0.53, 0.84] (15 eyes) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+% Values computed 2026-10-01 from the per-eye records (mai/epoch_*.json,
+% epochs 10-29) of ANISOGNN_final_dilmean_f0..f4; bootstrap 2000 resamples,
+% seed 0. Mai et al. values from PMC11000109 (Results, "Correlation between
+% Ground Truth and Prediction" and "Identification of Fast Progressors").
+
+The canonical model captures growth-speed information: its correlation is
+clearly above zero, whereas the baseline lesion size alone is not
+correlated with the growth rate in this cohort ($r = -0.10$). It is,
+however, weaker than the model of \citet{Mai2024} on both measures. The
+AUCs rest on 8 to 15 positive eyes, and their intervals reach down to
+values close to chance. The other arms of the survey do not differ from the
+canonical model on these measures ($r$ between 0.33 and 0.47, with
+overlapping intervals), so the gap belongs to the approach, not to one
+operator.
+% TODO: consider a short appendix table with r and the AUCs for all arms
+% (computed 2026-10-01, see NOTES.md).
+
+The comparison is an anchor, not a head-to-head result. \citet{Mai2024}
+evaluate 184 eyes of 100 patients with a mean follow-up of 32 months; this
+thesis uses 75 eyes of 51 patients, with a mean follow-up of 3.3 years.
+\citet{Mai2024} start from the raw OCT volume, whereas this thesis starts
+from segmented masks and layer depths. Their areas cover the full
+registered annotation, whereas the areas here are measured inside the
+$49 \times 1024$ crop, which censors growth at its border
+(\S\ref{sec:data:spatial}). The paper does not state whether its growth
+rate is a difference between two visits or a fit over all visits.
+% TODO: compare the growth-region Dice per horizon bin with Table 2 of Mai
+% et al. (0.25 / 0.38 / 0.38 / 0.37 for 0-1 / 1-2 / 2-3 / >3 years); the
+% earlier note that this thesis scores higher has not been re-checked.
 
 
 \section{Computational Cost}
@@ -967,6 +1251,17 @@ dilated-stencil network in the late growth-region Dice beyond three years
 % TODO: training time (minimum epoch time, fold named), inference time per
 % rollout step, memory; estimator-independent ratios (RK4/Euler ~4.8x,
 % T-FEN/stencil ~4x).
+% TODO (cost convention, moved from Section 4.6, author review v4 #17,
+% 2026-09-30): cost = minimum epoch time over the five folds of an arm; the
+% mean is not used because a run's epoch times carry a near-constant additive
+% overhead that would penalise cheap operators; 280-320 optimiser steps per
+% epoch depending on the fold, so cost figures are order-of-magnitude only.
+% Table 5.1's caption points here.
+% TODO (moved from 5.4.1, author review v4 #34, 2026-10-01): RK4 cost --
+% minimum epoch time 439 s for RK4 over the stencil network against 91 s for
+% one Euler step (about 4.8x); 45 s against 23 s over the FNO (about 2x). The
+% factor of ~4.8 holds where the backbone's forward pass dominates the epoch.
+% 5.4.1 cites "about 4.8 times" and points here.
 
 
 %%
