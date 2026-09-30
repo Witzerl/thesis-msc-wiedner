@@ -1,0 +1,48 @@
+%% thesis-colors.sty -- colour tokens for the thesis, identical to style/palette.py
+%% and to the poster tokens (masterthesis-docker/poster/tokens.css).
+%% Load in main-thesis.tex after jkureport:  \usepackage{style/thesis-colors}
+%% Prefix "ga" avoids clashes with jkureport's jkuBlue, jkuCyan, ... definitions.
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{style/thesis-colors}[2026/09/30 GA thesis colour tokens]
+\RequirePackage{xcolor}
+
+% ---- base tokens ----
+\definecolor{gaPrimary}{HTML}{0082BA}      % JKU IML blue
+\definecolor{gaPrimaryDark}{HTML}{00628C}  % primary-700
+\definecolor{gaPrimaryLight}{HTML}{6FC0DF} % primary-300
+\definecolor{gaPrimaryTint}{HTML}{E6F3F9}  % panel / figure tint
+\definecolor{gaSecondary}{HTML}{0C3C52}    % deep petrol
+\definecolor{gaAccent}{HTML}{E8852B}       % warm orange
+\definecolor{gaAccentTint}{HTML}{FCEBD8}   % highlight fill
+\definecolor{gaInk}{HTML}{15242B}          % body text
+\definecolor{gaInkMuted}{HTML}{56676E}     % captions, secondary text
+\definecolor{gaBgSoft}{HTML}{F2F7FA}
+\definecolor{gaLine}{HTML}{D5E1E8}         % hairlines, table rules
+\definecolor{gaGood}{HTML}{0E7C86}         % teal
+\definecolor{gaMuted}{HTML}{8AA0A9}
+
+% ---- operator arms (same as palette.py ARM) ----
+\definecolor{armStencil}{HTML}{0072B2}     % dilated-stencil GNN (locked model)
+\definecolor{armKnn}{HTML}{56B4E9}         % k-NN GNN
+\definecolor{armOnehop}{HTML}{A9D6F0}      % one-hop floor
+\definecolor{armUnet}{HTML}{E8852B}        % U-Net
+\definecolor{armFno}{HTML}{7CCBB1}         % FNO
+\definecolor{armFnoLocal}{HTML}{009E73}    % FNO + 3x3 local bypass
+\definecolor{armFen}{HTML}{E3B5CF}         % FEN, free-form
+\definecolor{armTfen}{HTML}{CC79A7}        % T-FEN (transport)
+\definecolor{armPersistence}{HTML}{8A9BA3}
+\definecolor{armPixel}{HTML}{56676E}       % per-pixel floor
+\definecolor{armMai}{HTML}{15242B}         % Mai et al. (2024), external
+
+% ---- mask overlays ----
+\definecolor{maskGT}{HTML}{0C3C52}
+\definecolor{maskPred}{HTML}{0082BA}
+\definecolor{maskTP}{HTML}{0072B2}
+\definecolor{maskFP}{HTML}{E8852B}
+\definecolor{maskFN}{HTML}{CC79A7}
+
+% ---- helpers ----
+% \armkey{armStencil} -> small colour square for use in captions / tables
+\newcommand{\armkey}[1]{\textcolor{#1}{\rule{0.7em}{0.7em}}}
+
+\endinput
