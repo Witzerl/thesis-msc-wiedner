@@ -863,6 +863,38 @@ Being worked through one item at a time.
   as of commit 7f93ab9; pending runs (seed-7 skew T-FEN, Δt-multiplication and objective
   ablations on the stencil, T-FEN capacity in skew form, seed-7 matched transport control)
   are to be left as `% TODO`. Audit the returned draft line by line before splicing.
+- [x] 2026-09-30: external draft of §5.6, Ch. 6, Ch. 7 and both abstracts returned, audited
+  line by line against the prompt's fact sheet and rules, rewritten where needed, spliced in;
+  builds clean. Corrections made:
+  - **Wrong:** "31.1 % of these cropped *visits*" (it is 31.1 % of cropped *lesions*); the
+    transport effect given as "+0.062 over a matched control on four folds" (+0.062 is against
+    the same-width control on 5 folds; the matched control is +0.072 on folds 0-3); "the 4.8x
+    factor holds generally ... as seen with the FNO" (the FNO, ~2x, is the counterexample);
+    "none buy accuracy beyond the noise floor of 0.0127, except the T-FEN, which ties"
+    (self-contradictory; the paired floor is 0.016); "the FNO + local path bridged the gap to
+    the strongest models" (it ties the U-Net); Mai et al. called a "clinical baseline" /
+    "competing model trained on the same cohort".
+  - **Unsupported, removed or turned into hypotheses:** "the objective's details did not yield
+    measurable benefits" and "the Delta t multiplication is a reparameterisation" stated as
+    results (runs pending); "reach and transport yield equivalent improvements" (different
+    controls; now "each established against its own control, indistinguishable from each
+    other"); "without an eye-level descriptor the operators struggle to capture speed" (now an
+    untested contributor); "learning from raw OCT is required to close the gap to Mai";
+    "the models reliably locate areas of change"; "segmented masks limit the available
+    context"; "a detailed qualitative analysis is outlined in §5.5" (unwritten, TODO).
+  - **Missing, added:** the between-visit paragraph (regulariser vs RK4 arm, author TODO);
+    what could fill the theta_PDE slot; the full crop census and trade-off; the PINN reason;
+    Mai caveats beyond the input (cohort size, crop); CFL cited to Courant1928 and framed as
+    "consistent with", not proof; moving-mesh null scoped and pointed to Appendix G.
+  - Banned words removed ("strictly"); placeholder `% TODO: cite <ProposedKey>` for UQ removed
+    (no claim needs it); banners restored; abstract no longer says "best canonical model".
+- [ ] TODO (Ch. 6/7/abstract): revise once the queued runs are in -- seed-7 skew T-FEN
+  (headline wording, §6.3 "Unfinished replications"), Delta t-multiplication ablation (§6.1
+  inline TODO), objective ablations, T-FEN capacity in skew form, seed-7 matched control.
+- [ ] TODO (§6.2 inline): literature check for a clinically meaningful threshold for spatial
+  GA progression forecasts.
+- [ ] TODO (§6.2 inline): link to the failure cases once §5.5 qualitative is written.
+- [ ] Author to review §5.6, Ch. 6, Ch. 7 and both abstracts (German text in particular).
 
 ### Assets that now exist and should be reused
 

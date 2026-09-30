@@ -4,10 +4,83 @@
 \chapter{Conclusion}
 \label{ch:conclusion}
 
-% TODO: restate contributions, summarize empirical findings, articulate the
-% take-away: neural PDE solvers are a viable framework for longitudinal
-% medical imaging prediction, with specific adaptations needed for the
-% clinical setting ($\Delta t$, multi-channel state, patient covariates).
+% Drafted 2026-09-30 by an external LLM from prompts/PROMPT_final_chapters.md
+% and audited line by line against that fact sheet (see NOTES.md).
+
+This thesis set out to answer one question: \emph{What is needed to
+forecast the progression of Geographic Atrophy from longitudinal OCT?} It
+was split into two parts: (1) What kind of framework does the forecast
+need? (2) What kind of operator does that framework need?
+
+\paragraph{The framework.}
+The forecast needs a setup that absorbs the irregularity of clinical data
+and treats every candidate model the same way. The framework built in
+Chapter~\ref{ch:method} does this with a residual update conditioned on
+the elapsed time $\Delta t$, a zero-initialised output so that every model
+starts from persistence, a training curriculum measured in elapsed days,
+and one loss and one evaluation for all models. Held fixed, it served
+operators from unrelated literatures without change, and every operator
+with spatial context learned to predict change far above persistence.
+How time enters the update mattered less than that it enters: a
+higher-order Runge--Kutta step bought nothing over a single Euler step.
+
+\paragraph{The operator.}
+The architecture class does not decide the outcome. The three strongest
+operators come from three unrelated classes --- a finite-element network,
+a graph network and a U-Net --- and lie close together, at a
+change-region Dice of about 0.50 to 0.54 at one year, against zero for
+persistence. What separates operators are a few properties that were
+measured one at a time.
+\begin{itemize}
+  \item \textbf{Spatial context.} Without it, a model predicts no change at
+    all; one ring of neighbours raises the change-region Dice from 0 to
+    about 0.45.
+  \item \textbf{Physical reach at the scale of the lesion front.}
+    Changing only where the neighbours of a graph network lie, so that one
+    step reaches as far as the front moves between visits, raised the
+    change-region Dice by 0.064 at an unchanged parameter count. It is the
+    largest effect in the project.
+  \item \textbf{An explicit transport term.} Adding a learned transport
+    term to a Finite Element Network raised it by 0.062 over the same
+    network without it, and by 0.072 over a parameter-matched control on
+    the four folds on which that control trained.
+  \item \textbf{Global and local context together.} A purely global
+    operator lies below the U-Net at one year; a local path of 800
+    parameters brings it level.
+\end{itemize}
+Reach and transport are two unrelated ways to correct the same deficit:
+a single update that cannot see as far as the disease moves between two
+visits. That two independent routes lead to the same level is the central
+architectural result of this thesis, more informative than the score of
+any single model.
+
+\paragraph{What did not matter.}
+The negative results are part of the answer. Larger models did not help in
+any of the four classes tested, and the widest U-Net became worse. A
+higher-order time integration did not help. The moving-mesh extension,
+reported in Appendix~\ref{app:mm-pde}, did not improve accuracy, because
+its correction branch never engaged. The validity diagnostics also limit
+what may be said: the canonical model is a one-step map conditioned on
+the length of the step, not a continuous-time model. Models that do
+behave as continuous-time models can be trained, but they are not more
+accurate.
+
+\paragraph{Clinical position.}
+The operators predict where the lesion changes better than how fast an
+individual eye grows. On growth speed, the canonical model reaches a
+correlation of 0.40 with the true growth rates, against 0.61 for the
+model of \citet{Mai2024} on the same cohort, which starts from the raw OCT
+volume where this thesis starts from segmented masks. The two results are
+not directly comparable, but the gap shows where the approach is weakest.
+The small cohort, the censoring of the fixed crop and the missing memory
+of past visits bound every conclusion drawn here.
+
+\paragraph{Take-away.}
+For forecasts from longitudinal medical imaging in a low-data clinical
+setting, what matters is the framework around the model and the
+properties of the operator placed in it --- above all, whether one update
+can see as far as the disease moves between two visits --- rather than
+the choice of operator family.
 
 
 %%

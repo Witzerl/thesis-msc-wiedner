@@ -3,14 +3,48 @@
 %% Abstract of the thesis in default document language
 %%
 
+% Drafted 2026-09-30 by an external LLM from prompts/PROMPT_final_chapters.md,
+% audited and revised (see NOTES.md). Numbers: Table 5.1, Sections 5.3, 5.5.1.
+% TODO: revisit the headline sentence once the seed-7 T-FEN run is in.
+
 \cleardoubleoddpage%  Make sure to start abstract on a new odd page
 \begin{abstract*}
-% TODO: write English abstract — one paragraph each on:
-%   (1) problem: GA progression prediction from longitudinal OCT,
-%   (2) approach: adaptation of MP-PDE and MM-PDE to clinical imaging,
-%   (3) key contributions: $\Delta t$-conditioning, multi-channel state,
-%       patient covariates, surrogate layer encoder,
-%   (4) headline results.
+Geographic Atrophy (GA) is the advanced atrophic form of age-related
+macular degeneration: a lesion of lost retinal tissue that grows slowly
+and irreversibly. Forecasting how the lesion of an individual eye will
+change is difficult because clinical visits are irregularly spaced and
+longitudinal datasets are small.
+
+This thesis asks what such a forecast needs, first in terms of the
+framework around the model and then in terms of the model itself. A fixed
+framework was built for longitudinal optical coherence tomography (OCT):
+a residual update conditioned on the elapsed time between visits, an
+initialisation at which every model predicts no change, a training
+curriculum measured in elapsed days, and one loss and one evaluation for
+all models. The only part that varies is the operator that maps one visit
+to the next. Operators from unrelated literatures --- graph networks, a
+U-Net, Fourier Neural Operators and Finite Element Networks --- were
+compared in this slot at matched parameter counts, with five-fold
+cross-validation on 75 eyes of 51 patients from the Medical University of
+Vienna.
+
+The framework transferred across all of them, and the architecture class
+did not decide the outcome. The three strongest operators come from three
+unrelated classes and reach a change-region Dice of 0.50 to 0.54 at one
+year, against zero for a model that predicts no change. What separates
+operators are a few measurable properties. The largest effect is physical
+reach: letting one update see as far as the lesion front moves between
+visits. An explicit transport term corrects the same deficit by a
+different route, and global context helps only together with local
+detail. Larger models, a higher-order time integration and a moving-mesh
+extension did not improve accuracy.
+
+The models predict where the lesion changes better than how fast an
+individual eye grows: the correlation with the true growth rates is 0.40,
+against 0.61 for a published model on the same cohort, which, unlike the
+models here, starts from the raw OCT volume rather than from segmented
+masks. For forecasts in a low-data clinical setting, the framework and the
+properties of the operator matter more than the choice of architecture.
 \end{abstract*}
 
 %%
@@ -25,7 +59,48 @@
 \cleardoubleoddpage%  Make sure to start abstract on a new odd page
 \begin{otherlanguage}{ngerman}
 \begin{abstract*}
-% TODO: deutsche Kurzfassung schreiben (Übersetzung der englischen Fassung).
+Die Geographische Atrophie (GA) ist die fortgeschrittene atrophe Form der
+altersabhängigen Makuladegeneration: eine Läsion abgestorbenen
+Netzhautgewebes, die langsam und unumkehrbar wächst. Vorherzusagen, wie
+sich die Läsion eines einzelnen Auges verändern wird, ist schwierig, weil
+klinische Kontrollen in unregelmäßigen Abständen stattfinden und
+longitudinale Datensätze klein sind.
+
+Diese Arbeit untersucht, was eine solche Vorhersage benötigt: zuerst im
+Hinblick auf den Rahmen um das Modell, dann im Hinblick auf das Modell
+selbst. Für die longitudinale optische Kohärenztomographie (OCT) wurde ein
+fester Rahmen aufgebaut: ein residuales Update, das von der zwischen zwei
+Kontrollen verstrichenen Zeit abhängt, eine Initialisierung, bei der jedes
+Modell keine Veränderung vorhersagt, ein in verstrichenen Tagen bemessenes
+Trainings-Curriculum sowie eine gemeinsame Verlustfunktion und Evaluierung
+für alle Modelle. Variiert wird nur der Operator, der eine Kontrolle auf
+die nächste abbildet. Operatoren aus voneinander unabhängigen
+Forschungsrichtungen --- Graph-Netzwerke, ein U-Net, Fourier Neural
+Operators und Finite-Elemente-Netzwerke --- wurden in diesem Platzhalter
+bei abgeglichener Parameterzahl verglichen, mit fünffacher
+Kreuzvalidierung an 75 Augen von 51 Patienten der Medizinischen
+Universität Wien.
+
+Der Rahmen ließ sich auf alle Operatoren übertragen, und die
+Architekturklasse entschied nicht über das Ergebnis. Die drei stärksten
+Operatoren stammen aus drei unabhängigen Klassen und erreichen nach einem
+Jahr einen Change-Region-Dice von 0,50 bis 0,54, gegenüber null für ein
+Modell, das keine Veränderung vorhersagt. Was die Operatoren
+unterscheidet, sind wenige messbare Eigenschaften. Den größten Effekt hat
+die physikalische Reichweite: dass ein einzelnes Update so weit sieht, wie
+sich die Läsionsgrenze zwischen zwei Kontrollen bewegt. Ein expliziter
+Transportterm behebt dasselbe Defizit auf einem anderen Weg, und globaler
+Kontext hilft nur zusammen mit lokalem Detail. Größere Modelle, eine
+Zeitintegration höherer Ordnung und eine Erweiterung mit bewegtem Gitter
+verbesserten die Genauigkeit nicht.
+
+Die Modelle sagen besser vorher, wo sich die Läsion verändert, als wie
+schnell ein einzelnes Auge wächst: Die Korrelation mit den tatsächlichen
+Wachstumsraten beträgt 0,40, gegenüber 0,61 für ein publiziertes Modell
+auf derselben Kohorte, das im Unterschied zu den hier untersuchten
+Modellen vom rohen OCT-Volumen statt von segmentierten Masken ausgeht. Für
+Vorhersagen mit wenigen klinischen Daten sind der Rahmen und die
+Eigenschaften des Operators wichtiger als die Wahl der Architektur.
 \end{abstract*}
 \end{otherlanguage}
 

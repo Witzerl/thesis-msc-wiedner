@@ -1248,20 +1248,49 @@ rate is a difference between two visits or a fit over all visits.
 \section{Computational Cost}
 \label{sec:experiments:cost}
 
-% TODO: training time (minimum epoch time, fold named), inference time per
-% rollout step, memory; estimator-independent ratios (RK4/Euler ~4.8x,
-% T-FEN/stencil ~4x).
-% TODO (cost convention, moved from Section 4.6, author review v4 #17,
-% 2026-09-30): cost = minimum epoch time over the five folds of an arm; the
-% mean is not used because a run's epoch times carry a near-constant additive
-% overhead that would penalise cheap operators; 280-320 optimiser steps per
-% epoch depending on the fold, so cost figures are order-of-magnitude only.
-% Table 5.1's caption points here.
-% TODO (moved from 5.4.1, author review v4 #34, 2026-10-01): RK4 cost --
-% minimum epoch time 439 s for RK4 over the stencil network against 91 s for
-% one Euler step (about 4.8x); 45 s against 23 s over the FNO (about 2x). The
-% factor of ~4.8 holds where the backbone's forward pass dominates the epoch.
-% 5.4.1 cites "about 4.8 times" and points here.
+The cost of an arm is reported as its minimum epoch time over the five
+folds. The mean is not used. The epoch times of a run carry a nearly
+constant additive overhead of 17 to 64~s, which would penalise cheap
+operators far more than expensive ones. The spread between folds has two
+measured causes. The first is this overhead. The second is that the work
+per epoch differs between folds: an epoch is twenty passes over the
+fold's training eyes in batches of four, which gives 280, 320, 300, 300
+and 320 optimiser steps for folds 0 to 4. Normalised by the number of
+steps, the minimum epoch times of the five folds agree to about 3\,\%. An
+earlier explanation of the spread by several runs sharing one GPU was
+checked and does not hold: no two runs ever shared a GPU. All runs used
+one NVIDIA RTX A6000 GPU and 30 epochs. The cost figures support
+order-of-magnitude statements only.
+
+On this scale, the U-Net is the cheapest spatial operator at 21~s per
+epoch, about $0.23\times$ the 91~s of the canonical dilated-stencil graph
+network. The FNO takes 23~s and the FNO with a $3 \times 3$ local path
+29~s. The graph networks on the index-space graph take 76~s ($k = 12$)
+and 108~s ($k = 20$), and the one-hop floor 37~s. The Finite Element
+Networks are the most expensive single-step family: 180~s for the
+free-form network and 367~s for the T-FEN
+(Table~\ref{tab:experiments:arms}).
+
+Three ratios do not depend on the fine details of the timing. The
+Runge--Kutta wrapper evaluates the operator four times per step. Over the
+dilated-stencil network, where the forward pass of the operator dominates
+the epoch, it raises the epoch time from 91 to 439~s, about $4.8\times$.
+Over the FNO, whose forward pass is cheap, it raises it only from 23 to
+45~s, about $2\times$, because the fixed part of the epoch weighs more.
+The T-FEN costs about $4\times$ the dilated-stencil network. The
+dual-branch moving-mesh extension costs about $10\times$ its
+single-branch counterpart (Appendix~\ref{app:mm-pde}).
+
+Set against the results of this chapter, most of the extra cost bought
+nothing measurable. The Runge--Kutta wrappers are nulls against their
+single-step counterparts (\S\ref{sec:experiments:ablations:time}), wider
+operators did not improve on their original sizes
+(\S\ref{sec:experiments:ablations:capacity}), and the dual branch is a
+null (Appendix~\ref{app:mm-pde}). The T-FEN is the one expensive arm with
+an established effect, its transport term, but at the anchor it ties the
+dilated-stencil network, which reaches the same level at about a quarter
+of the cost. Inference time per rollout step and memory footprint were
+not measured.
 
 
 %%

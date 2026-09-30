@@ -4,96 +4,337 @@
 \chapter{Discussion}
 \label{ch:discussion}
 
+% Drafted 2026-09-30 by an external LLM from prompts/PROMPT_final_chapters.md
+% and audited line by line against that fact sheet (see NOTES.md).
+
 
 \section{Interpretation of Results}
 \label{sec:discussion:interpretation}
 
-% TODO: broaden back out from the technical results. Which components
-% contributed most? Did the moving mesh help on slowly evolving pathology,
-% or was uniform mesh enough? Did the surrogate encoder improve
-% generalization across patients?
+This thesis asked what is needed to forecast the progression of GA from
+longitudinal OCT, split into a question about the framework and a question
+about the operator (\S\ref{par:introduction:research-question}). The
+results answer the two parts differently. The framework transferred: one
+setup served operators from unrelated literatures without change. The
+operator class did not decide the outcome; a small number of properties of
+the operator did.
 
-% TODO (must be included, author review v4 #3, 2026-09-29): the equation
-% feature vector theta_PDE (PDE coefficients, boundary-condition ids) is a
-% key ingredient of MP-PDE -- it is what lets one trained solver generalise
-% across a family of equations. GA has no governing equation, so there is
-% no counterpart; Delta t and the covariates fill the slot (Section 4.3.2).
-% The stand-ins tried here did not help: the covariates are a null and the
-% learned layer encoder (a surrogate for theta_PDE) is a null at every
-% width. Discuss what is lost without it and what could fill the slot
-% (e.g. patient- or lesion-level descriptors that vary across eyes).
+\paragraph{The framework.}
+The framework fixes everything except the operator: the
+$\Delta t$-conditioned residual update, the zero-initialised head that
+starts every operator at persistence, the curriculum measured in elapsed
+days, the loss, and one evaluation for all arms
+(\S\ref{sec:method:framework}). Under these conditions, every operator
+with any spatial context learned, and every one of them lies far above
+persistence, which scores zero on the headline metric
+(Table~\ref{tab:experiments:arms}). This is what made the comparison of
+Chapter~\ref{ch:experiments} possible at all, and it is the answer to the
+first part of the question.
+
+How time enters the update turned out to matter less than that it enters.
+A fourth-order Runge--Kutta step in place of one Euler step changed
+nothing measurable, over a local and over a global operator
+(\S\ref{sec:experiments:ablations:time}). The multiplication of the
+operator output by $\Delta t$ is, on the mask channel, a change of
+parameterisation rather than additional knowledge.
+% TODO: state the result of the Delta t-multiplication ablation on the
+% canonical network (ANISOGNN_final_dilmean_nodts, queued 2026-10-01) here
+% and in 5.4.1; the sentence above is the argument, not the measurement.
+What the framework needs, in short, is that the length of the interval
+reaches the operator and that everything else is held fixed.
+
+\paragraph{The operator: ingredients, not classes.}
+The three highest arms come from three unrelated classes --- a
+finite-element network, a graph network and a U-Net --- and lie close
+together (\S\ref{sec:experiments:main-results}). If the class decided the
+outcome, such a result would be unlikely. What separates operators is
+instead a set of properties that can be switched on and off one at a
+time (\S\ref{sec:experiments:ingredients}): spatial context at all,
+physical reach at the scale of the lesion front, global and local context
+together, and an explicit transport term.
+
+The most informative of these is the pair of reach and transport. The GA
+front moves about 10 to 25 columns between two visits, while one hop on
+the index-space graph reaches about two columns along a row. Two unrelated
+constructions close this gap: the dilated stencil, which lets one hop
+reach 21 columns, and the transport term of the T-FEN, which moves the
+state along a learned velocity. Each is established against its own
+control, and the two end up indistinguishable from each other. Both point
+to the same deficit: a mismatch between how far one update can see and
+how far the disease moves between two observations. This is the
+situation that the stability condition of \citet{Courant1928} describes
+for explicit schemes, whose stencil must cover the region the solution
+depends on within one step (\S\ref{sec:background:pde-solvers:time}).
+Chapter~\ref{ch:background} stated this as an expectation for GA; the
+survey is consistent with it. The coincidence of two routes is suggestive
+rather than a proof of mechanism, but it is a more specific statement
+than any ranking of architectures.
+
+Global and local context behave as separable ingredients. The FNO, which
+sees the whole grid in every layer but has no local path, lies below the
+U-Net at the one-year anchor, and a $3 \times 3$ local path of 800
+parameters brings it level (\S\ref{sec:experiments:ingredients:global}).
+Beyond one year the plain FNO catches up with the U-Net and lies above it
+after three years. These horizon values are descriptive and were not
+tested, but they suggest that global support matters more for long
+forecasts than for the one-year anchor.
+
+\paragraph{Capacity.}
+Capacity was not a lever in any of the four classes tested
+(\S\ref{sec:experiments:ablations:capacity}). The dilated-stencil network
+is flat from about a quarter to about four times its size, and the widest
+U-Net, at about forty times its original parameter count, falls below the
+original. With 75 eyes, this is what the low-data argument of
+Chapter~\ref{ch:introduction} leads one to expect: the assumptions built
+into an operator weigh more than its size. The capacity study shows that
+size did not help; that the built-in assumptions are the reason is an
+interpretation, supported by the ingredient study.
+
+\paragraph{A missing counterpart to the equation features.}
+In MP-PDE, a vector of equation features $\theta_{\text{PDE}}$ --- the
+coefficients and boundary conditions of the equation being solved --- is
+passed to every layer, and it is what lets one trained solver handle a
+whole family of equations \citep{Brandstetter2022}. GA has no governing
+equation, and so no such vector exists. In this thesis the slot is filled
+by $\Delta t$ and the two patient covariates (\S\ref{sec:method:covariates}).
+The covariates are two numbers per visit, shared by every grid position
+and nearly constant along a trajectory, so they can shift a prediction as
+a whole but cannot say anything about a particular eye's lesion. The
+learned stand-in that the code provides, a layer encoder that summarises
+the retinal structure into one vector, was tested in an earlier
+configuration and in one design only, without a detectable benefit.
+
+What is lost is an eye-specific description of how this eye progresses.
+Two eyes with the same lesion shape but different speeds receive the same
+conditioning, and the operator can only infer the speed from the current
+state. This is a plausible contributor to the growth-speed gap discussed
+in \S\ref{sec:discussion:clinical}, but it was not tested. Candidates for
+the slot are descriptors that do vary between eyes: lesion-level
+quantities such as size, shape or focality, a learned summary of the
+observed layers, or --- with trajectory memory --- the eye's own past
+growth.
+
+\paragraph{Predictions between visits.}
+Two attempts were made to make the model meaningful between visits. An
+intermediate-time-point regulariser, which penalised predictions at times
+inside an interval against the linear interpolation between the two
+visits, brought no benefit and was removed early in the project. The
+network trained inside the Runge--Kutta wrapper, and the T-FEN in its
+energy-conserving form, pass the solver-swap test and can therefore be
+read as continuous-time models (\S\ref{sec:experiments:validity:swap}).
+Neither is more accurate than the canonical network at the anchor, and the
+wrapper costs about $4.8\times$ the training time. If predictions between
+visits are needed clinically, these two are the principled choice. Their
+predictions between visits remain unverified, however, because no ground
+truth exists between two observations.
+
+\paragraph{Where modelling effort pays.}
+Taken together, the positive results and the nulls indicate where effort
+paid off in this survey. Changing where an operator looks --- its reach
+along the direction in which the front moves --- or adding a mechanism
+that transports the state produced the largest effects. Larger models, a
+higher integration order and the moving-mesh extension of
+Appendix~\ref{app:mm-pde}, whose correction branch never engaged, did not
+improve accuracy at the available precision. An earlier ablation on an
+older configuration of the graph network found the same for the settings
+of its message function (normalisation, aggregation and direction
+features). For a new disease-forecasting task of this kind, the first
+question to ask of an operator is therefore how far one update reaches
+compared with how far the disease moves between visits.
 
 
 \section{Clinical Implications}
 \label{sec:discussion:clinical}
 
-% TODO (author review v4 #20, 2026-10-01): "good at where, weaker at how
-% fast". The survey optimises where the lesion changes (change-region Dice at
-% one year), but per-eye growth speed over the whole follow-up is only
-% moderately captured (r = 0.40 vs 0.61 for Mai et al. 2024; fast-progressor
-% AUC 0.70-0.74 vs 0.77-0.81), for every arm alike -- even though the model
-% starts from segmented masks. Discuss what this means for clinical use
-% (triage of fast progressors needs growth speed) and possible reasons
-% (drift of local models over multi-year rollouts, crop censoring, no
-% trajectory memory).
+\paragraph{Good at where, weaker at how fast.}
+The survey was designed around the change-region Dice at one year, which
+measures whether a model predicts change where change actually happens. On
+this measure the operators are well above persistence. The speed of
+growth of an individual eye over its whole follow-up is captured less
+well. The correlation between predicted and true growth rates is 0.40 for
+the canonical model, against 0.61 reported by \citet{Mai2024} on the same
+cohort, and the fast-progressor AUCs are 0.70 to 0.74 against 0.77 to
+0.81 (\S\ref{sec:experiments:qualitative:mai}). The other arms do not
+differ from the canonical model on these measures, so the gap belongs to
+the approach rather than to one operator.
 
-% TODO: which prediction horizon is reliable? What RMSE/Dice level would be
-% clinically useful? Where does the model fail, and would those failures
-% matter in practice?
+The comparison is not like-for-like. \citet{Mai2024} start from the raw
+OCT volume, whereas every model here starts from segmented masks and layer
+depths; they evaluate 184 eyes with the full annotated lesion area,
+whereas this thesis evaluates 75 eyes inside a crop that censors growth at
+its border. It is still notable that a model given the segmented lesion
+as input is weaker on growth speed than one that must find the lesion
+itself.
+
+Several explanations are possible, and none was tested. A local model
+applied autoregressively over several years can drift, and the growth
+rate is taken at the last visit, often three or more years after
+baseline. Large, fast-growing lesions are the ones most often cut by the
+crop, which lowers their measured growth. The operators see one visit and
+have no memory of how fast the eye has grown so far. And, as argued in
+\S\ref{sec:discussion:interpretation}, nothing in the conditioning tells
+the operator how fast this particular eye progresses.
+
+The distinction matters clinically. Complement inhibitors slow GA growth
+but do not stop it (\S\ref{sec:introduction:motivation}), so the eyes
+that grow fastest are the ones for which treatment is most worth its
+burden. That decision depends on growth speed, which is the weaker of the
+two capabilities. A forecast of where the lesion will expand is useful in
+a different way, for example to judge whether growth is heading towards
+the fovea, but that use was not evaluated here.
+
+\paragraph{Reliable horizon.}
+All comparisons in this thesis are made at the one-year anchor. Beyond
+one year, the growth-region Dice of the canonical model does not fall; it
+lies at about 0.60 to 0.66 in the second, third and later years
+(\S\ref{sec:experiments:ingredients:transport}). These values are
+descriptive and pooled over rollout steps. Whether any of these levels is
+clinically sufficient cannot be judged from the data: no clinically
+established Dice threshold for GA progression forecasts is known to the
+author.
+% TODO: check the literature for a clinically meaningful threshold for
+% spatial GA progression forecasts; cite it here if one exists.
+
+\paragraph{Position in a clinical pipeline.}
+Because every model starts from segmented masks and layer depths, a
+clinical use would place it behind a segmentation model. Errors of that
+segmentation would pass into the forecast, and this thesis does not model
+them. Failures would matter most where the method is known to be weak:
+lesions that touch the border of the crop, where growth is censored; fast
+progressors; and eyes with sparse visit schedules, where each step must
+bridge a long interval.
+% TODO: link to the failure cases of Section 5.5 once that section is
+% written.
 
 
 \section{Limitations}
 \label{sec:discussion:limitations}
 
-% TODO: data quantity (sample size, missing visits); normalization of the
-% binary mask channel; monitor function chosen by heuristic rather than
-% derived for vector-valued states; fixed-grid assumption discards
-% peripheral retina; encoder sees predicted (not observed) layers during
-% pushforward unrolling.
-% TODO: every operator sees one visit and has no memory of the trajectory
-% so far (\S4.2). Discuss what this excludes (e.g. an individual eye's
-% growth rate estimated from its own past visits) and whether a model
-% with history -- several past visits as input, or a recurrent state --
-% would be worth testing given 5-13 visits per eye (author review #11,
-% 2026-09-27).
-% TODO: the patient covariates (age, sex) are enabled in every operator, but
-% whether they carry useful information about progression is not settled:
-% the ablation that removed them (k-NN graph network, mean+max era; no
-% detectable benefit, residual pointing against them, neither instrument
-% graduating) is not reported in Chapter 5. Two graph-level scalars broadcast
-% to every node cannot localise anything. State this as an open limitation
-% (author review v4 #12, 2026-09-30).
-% TODO: crop censoring (Section 3.3 now points here): the fixed 49 x 1024
-% window cuts real lesion area in 27.3 % of visits and 31.1 % of cropped
-% lesions touch the border, so growth across it is censored in the training
-% targets and in the reported metrics. The evaluation variants that would
-% quantify this (border vs interior split) are not reported (author review
-% v4 #19, 2026-09-30); if they stay out, say so here.
+\paragraph{Data and labels.}
+The cohort is small: 75 eyes of 51 patients, with 12 to 20 validation
+eyes per fold. Every result is a validation result of a five-fold
+cross-validation; there is no held-out test split
+(\S\ref{sec:data:splits}). Twenty-four patients contribute both eyes, and
+fellow eyes are not independent, so the per-eye statistics are somewhat
+optimistic.
+
+The fixed $49 \times 1024$ window is a deliberate trade-off with a
+measured cost (\S\ref{sec:data:spatial}). It cuts real lesion area in
+27.3\,\% of the visits, more than 5\,\% of the lesion in 6.0\,\%, and up
+to 25.7\,\% in the worst case. Of the cropped lesions, 31.1\,\% touch the
+crop border, so their growth across it is censored, in the training
+targets and in the metrics, without any flag. Larger windows would trade
+this for up to 35\,\% zero padding and about $1.9\times$ as many grid
+positions, and about 19\,\% of lesions would touch the border anyway
+because they reach the edge of the scan itself. A split of the headline
+metric into border-touching and interior lesions was computed but is not
+reported; the ranking of the arms does not change on the interior
+lesions.
+
+Every area in mm$^2$ rests on a pixel spacing that is treated as constant
+across the cohort. It was checked only against the cohort's own
+transform files, to about 2\,\%, and not against the original DICOM
+spacing fields. The GA reference was most likely annotated on fundus
+autofluorescence and registered onto the OCT grid, as described
+by~\citet{Mai2024} for this cohort; the provenance of the layer
+segmentation and the anatomical names of the ten boundaries are not
+recorded. The reference masks also shrink locally between some visits.
+Whether this reflects segmentation and registration noise or a real
+change has not been quantified, and it is one reason why no
+monotonic-growth constraint was imposed.
+% TODO: quantify the local shrinkage of the reference masks between visits
+% (fraction of visit pairs, area) before the thesis is submitted.
+
+\paragraph{Evaluation.}
+The one-year anchor is the first rollout step at or beyond 360 days and
+has no upper bound, so a few eyes are scored later, where more change has
+accumulated. The change-region Dice was logged only as a cohort mean per
+run, so the per-eye instrument uses the growth-region Dice instead
+(\S\ref{sec:experiments:protocol:stats}). Several findings rest on one
+seed, and the solver-swap test on one fold per model.
+
+\paragraph{Model scope.}
+Every operator sees one visit and has no memory of the trajectory so far,
+although each eye has 5 to 13 visits. An eye's own past growth, the most
+direct evidence of its speed, is therefore never used. The patient
+covariates are enabled in every operator, but whether they carry useful
+information is not settled: an ablation on an earlier configuration found
+no detectable benefit, and two numbers shared by every grid position
+cannot localise anything. The pipeline starts from segmented masks, so
+it neither benefits from nor accounts for the information in the raw OCT
+volume.
+
+The survey leaves out two classes that would complete it: a plain
+recurrent network and a transformer. Physics-informed neural networks
+were deliberately not run, because the governing equation is unknown and
+the residual would have to be taken on a binary mask. The moving-mesh
+null of Appendix~\ref{app:mm-pde} is scoped to its implementation: the
+gated correction branch did not engage, with or without the moving mesh,
+which is not a statement about mesh adaptation for GA in general.
+
+\paragraph{Unfinished replications.}
+Several runs were still pending when this chapter was written: a second
+seed of the T-FEN in its energy-conserving form, which decides whether its
+lead over the U-Net is established; a second seed of the parameter-matched
+transport control, which has so far been compared on four folds only;
+the ablations of the $\Delta t$ multiplication and of the loss terms on the
+canonical network; and the capacity points of the T-FEN in its
+energy-conserving form.
+% TODO: update this paragraph (and remove what is done) once the queued
+% runs of 2026-10-01 are read out.
 
 
 \section{Future Work}
 \label{sec:discussion:future}
 
-% TODO: incorporating surrogate models of the next state into DMM's monitor
-% function (the future-state problem from MM-PDE's conclusion); extending
-% to 3D volumetric OCT; multi-task joint training across multiple retinal
-% pathologies; uncertainty quantification for clinical deployment.
-% TODO: find a better cropping / spatial pre-processing than the fixed
-% 49 x 1024 centre crop, which censors lesion growth at the window border
-% in 31.1 % of cropped lesions and cuts real lesion area in 27.3 % of
-% visits (see \S3.3; author review #33, 2026-09-26).
-% TODO: a learned summary of the retinal structure as a stand-in for the
-% equation features theta_PDE (moved here from Section 4.4, author review v4
-% #13, 2026-09-30). The code has a first version, a layer encoder (four 3x3
-% convolutions with group normalisation and ReLU, strides reducing rows x4
-% and columns x8, adaptive average pooling, linear layer) that compresses the
-% ten layer channels into one global embedding appended to the graph
-% network's conditioning vector. It was off in every reported arm; only its
-% width (32-256) was varied, on one backbone (k-NN graph network), with no
-% detectable effect. Future work: a design that sees observed rather than
-% predicted layers during rollout, corrects the grid anisotropy (the strides
-% correct only ~2x of ~21:1), or conditions locally rather than globally.
-% Link to the theta_PDE point in Section 6.1 (review v4 #3).
+\paragraph{Spatial pre-processing.}
+The fixed centre crop censors growth for about a third of the cropped
+lesions. A larger or adaptive window with a mask for padded positions, or
+a crop that follows the registration to the fundus image, would reduce
+this censoring and make areas comparable with whole-field studies.
+
+\paragraph{Trajectory memory.}
+Giving the operator several past visits, or a recurrent state carried
+along the rollout, would let it use the eye's own growth history. This
+addresses the growth-speed gap of \S\ref{sec:discussion:clinical}
+directly, and it would also bring in the two classes the survey is
+missing, a recurrent network and a transformer.
+
+\paragraph{An eye-level descriptor.}
+A learned descriptor could take the place of the missing equation
+features (\S\ref{sec:discussion:interpretation}). The one design tried
+here saw predicted rather than observed layers during the rollout,
+corrected only about $2\times$ of the grid's 21:1 anisotropy, and
+conditioned the operator globally. A next design should see the observed
+layers of the input visit, respect the physical spacing, and be able to
+condition locally.
+
+\paragraph{A valid transport model.}
+The transport term is established, but the velocity field of the T-FEN
+is not interpreted in this thesis. A velocity parameterisation that is
+bounded by construction, starting from the energy-conserving form, would
+give a model that stays numerically valid over multi-year horizons and
+whose velocity field could be read as a direction and speed of growth.
+
+\paragraph{From raw OCT, in 3-D.}
+One way to address the gap to \citet{Mai2024} is to learn from the raw
+OCT volume, either end to end or jointly with the segmentation. A further
+step is to work on the volumetric OCT rather than on en-face maps.
+
+\paragraph{Clinical use.}
+A forecast used for treatment decisions needs a measure of its own
+uncertainty, which none of the operators provides. Joint training across
+several retinal diseases could also ease the data limitation.
+
+\paragraph{The moving mesh.}
+For the moving-mesh extension, the monitor that guides the mesh is
+computed from the current state, whereas the change happens in the next
+one. A monitor built on a surrogate of the next state, the open problem
+named by \citet{Hu2024}, is the natural continuation
+(Appendix~\ref{app:mm-pde}).
+
+% TODO (author review #33, 2026-09-26): the better-cropping item above
+% replaces the earlier TODO; check that it says what is intended.
 
 
 %%
