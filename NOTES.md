@@ -857,6 +857,13 @@ Being worked through one item at a time.
   Table 5.2 "0/5" for negative means). Fix the definition in §5.1.4 (and the Table 5.2
   caption) to match the usage, or recount everything.
 
+- [ ] 2026-09-30: external-LLM prompt for the remaining parts written:
+  `prompts/PROMPT_final_chapters.md` (§5.6 Computational Cost, Ch. 6 Discussion, Ch. 7
+  Conclusion, English abstract + Kurzfassung). Fact sheet taken from the audited Chapters 3-5
+  as of commit 7f93ab9; pending runs (seed-7 skew T-FEN, Δt-multiplication and objective
+  ablations on the stencil, T-FEN capacity in skew form, seed-7 matched transport control)
+  are to be left as `% TODO`. Audit the returned draft line by line before splicing.
+
 ### Assets that now exist and should be reused
 
 - **The Practical Work report** (`masterthesis-docker/practical/`) was handed in
