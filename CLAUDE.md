@@ -84,7 +84,18 @@ The JKU template requires XeLaTeX (not pdflatex) for full font support. Always u
 - **Knowledge base is a resource, not a constraint.** The `literature/` folder and `references.bib` are the *primary* source of citations, but they are NOT exhaustive. (a) The presence of a note in `literature/` does NOT obligate citing it if the section does not benefit from it — only cite what genuinely strengthens the argument. (b) The absence of a reference from `references.bib` does NOT forbid using it: if an external work would fill a real gap (a foundational method, a canonical clinical citation, an institutional precedent), use it inline with a placeholder author-year mention AND leave a `% TODO: cite <ProposedKey> (short bibliographic hint) once added to references.bib` immediately above the affected sentence. Mirror every such marker in @NOTES.md under the "Pending external citations" section so it is collected when the bibliography is expanded.
 - **DO NOT paraphrase long passages:** Summarize, cite, move on. The author remains responsible for all originality.
 - **DO NOT invent data:** WHEN results or citations are missing, leave a `% TODO:` and log it in @NOTES.md.
-- **DO NOT generate figures:** Leave `\includegraphics` placeholders with descriptive filenames and full captions.
+- **DO NOT generate figures unasked:** while drafting text, leave `\includegraphics` placeholders with descriptive filenames and full captions. Make a figure only when the user explicitly asks for one, and then follow "Figures and colours" below.
+
+## Figures and colours
+
+Every figure, plot, diagram or coloured table follows `style/` (derived from the poster palette in `masterthesis-docker/poster/tokens.css`). Read `style/README.md` before making one.
+
+- **Python/matplotlib:** `sys.path.insert(0, r"D:\Schule\MasterThesis\thesis\style")`, then `from palette import register_fonts, apply_thesis_style, ARM, ARM_LABEL, MASK, PAL, SEQ, DIV, fig_size`; call `register_fonts(); apply_thesis_style()`. Take every colour from `ARM` / `MASK` / `PAL` (never ad-hoc hex, never the default cycle), size with `fig_size(frac, aspect)` and include at the same `\textwidth` fraction.
+- **LaTeX/TikZ:** colours from `style/thesis-colors.sty` (`gaPrimary`, `armStencil`, `maskFP`, ...), already loaded in `main-thesis.tex`.
+- **Outputs:** plots as PDF, images as PNG at 300 dpi, into `images/`; the generating script next to it (`images/scripts/`), so the figure can be rebuilt. Numbers in a figure obey the same rule as text: only from THESIS_FRAMEWORK.md, NOTES.md or the named run records.
+- Obey the README rules (one colour per arm everywhere, no red+green, greys only as dashed reference lines, light family variants never distinguished by colour alone).
+- A new arm or element without a colour: add it to both `palette.py` and `thesis-colors.sty` in the same change.
+- Figure code in `masterthesis-docker` (e.g. `practical/scripts/`) uses older palettes and stays read-only; port what is needed into `images/scripts/` instead.
 - **DO NOT restructure chapters** without explicit instruction.
 
 ## Per Request Execution
