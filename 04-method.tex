@@ -8,13 +8,14 @@
 \section{Overview}
 \label{sec:method:overview}
 
-The work began as an adaptation of two graph-based neural PDE solvers,
-MP-PDE and MM-PDE, which the clinical partner had suggested; the case for
-their local inductive bias was built and tested only afterwards. What the
-adaptation produced is the setup described in this chapter. It separates
-the experimental framework from the spatial operators evaluated inside
-it. The aim is to find out which
-properties a model needs in order to predict GA progression. Answering
+% Author review v6 #11 (2026-10-02): the provenance sentence (MP-PDE and
+% MM-PDE suggested by the clinical partner) was removed -- "we can
+% absolutely not write this".
+This chapter answers the first part of the research question: what kind
+of framework the forecast needs. The framework separates the training and
+evaluation setup from the spatial operators evaluated inside it. The aim
+is to find out which properties a model needs in order to predict GA
+progression. Answering
 that question requires a controlled comparison. If every candidate
 architecture came with its own training pipeline, differences in data
 handling, time representation or optimisation would be confounded with

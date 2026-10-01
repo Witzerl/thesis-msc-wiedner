@@ -1228,8 +1228,11 @@ worked through one item at a time.
 - [x] #10 §3.7 empty test split -- "no test because lack of data". Done 2026-10-02: the split-file
   mechanics replaced by the reason (75 eyes / 51 patients: a held-out test set would leave too few
   eyes for training and for a reliable test; every eye is a validation eye in exactly one fold).
-- [ ] #11 §4.1 provenance sentence (MP-PDE/MM-PDE suggested by the clinical partner) -- "we can
-  absolutely not write this".
+- [x] #11 §4.1 provenance sentence (MP-PDE/MM-PDE suggested by the clinical partner) -- "we can
+  absolutely not write this". Done 2026-10-02: removed; Chapter 4 now opens "This chapter answers
+  the first part of the research question: what kind of framework the forecast needs." (also
+  closes the editorial point that Ch. 4 never names sub-question 1). THESIS_STRUCTURE.md §1.3
+  updated so the note does not come back.
 - [ ] #12 Fig. 4.2 -- "here I was thinking more like this" + sketch, "just the stencil" (the
   two neighbourhoods in grid indices, like the inset).
 - [ ] #13 Ch. 5 opener -- "Behaviour beyond 1 year analysis / yearly bins → when we do this →
