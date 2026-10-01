@@ -481,7 +481,7 @@ be longer, since it supplies two arms and the floors).
     removed ("strictly", "massive", "inadvertently", "rigorous", "pivotal", "monolithic").
 - [ ] TODO (§4.5.1 inline): decide whether the pad-masked loss ablation (fold 2, L5nopad leg) is
   reported in Chapter 5; if not, the text stays "off in every reported run".
-- [ ] TODO (§4.5.2 inline): confirm in the code that the feasible-window restriction applies only
+- [x] (confirmed 2026-10-01, utils/utils.py _rebuild_valid_t0s) TODO (§4.5.2 inline): confirm in the code that the feasible-window restriction applies only
   for B > 0 (for B = 0 the first-interval condition could never hold).
 - [ ] TODO (§4.6 inline): record the PyTorch Geometric version of the container.
 - [x] (added to references.bib and cited 2026-10-01) Pending external citations from §4.5-§4.6: **Milletari2016**, **Loshchilov2019**,

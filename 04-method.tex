@@ -1102,8 +1102,8 @@ For a given budget, only start windows that can realise it are sampled.
 The chain of consecutive visits from such a window must reach at least $B$
 days in total, and its first interval must not exceed $B$. If an eye has no
 such window, sampling for that eye falls back to all of its windows.
-% TODO: confirm that the feasibility restriction is applied only for B > 0
-% (for B = 0 the first-interval condition could never hold).
+% Checked 2026-10-01 in utils/utils.py (_rebuild_valid_t0s): the restriction
+% applies only for B > 0; at B = 0 any window is drawn.
 The number of unrolled steps for each eye then follows an undershoot rule:
 it is the largest $n$ for which the $n$ rolled intervals and the final,
 supervised interval together stay within $B$. The chain never overshoots

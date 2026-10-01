@@ -340,7 +340,7 @@ tab:appendix:border-interior, Huang1991 in the bib); build clean:
     visits (6.3)", with its own inline TODO (04-method l. ~152). When the number exists,
     check that 4.2.1 still holds and delete that TODO too. Run 7875537 (mono2) feeds the
     same paragraph.
-[ ] [s27] 4.5.2: confirm in the code that the feasible-start-window restriction applies
+[x] (confirmed 2026-10-01: utils/utils.py _rebuild_valid_t0s, b <= 0 -> no restriction; TODO removed) [s27] 4.5.2: confirm in the code that the feasible-start-window restriction applies
     only for a budget B > 0 (for B = 0 the first-interval condition could never hold);
     inline TODO 04-method l. ~1111. Code reading only (utils/utils.py,
     compute_time_table / min_budget_days).
@@ -535,7 +535,7 @@ No run needed:
   [ ] Appendix G content: G.2 DMM + dual branch, G.3 mesh quality, result + cost (section 2)
   [ ] Figure 4.1 pipeline (section 2); Figure 4.2 stencils and Figure 5.1 rollout strip are
       already listed in section 2
-  [ ] 4.5.2: B > 0 feasibility restriction -- code check (section 3)
+  [x] 4.5.2: B > 0 feasibility restriction -- code check (section 3)
   [ ] 4.6: PyTorch Geometric version (section 3)
   [ ] THESIS_STRUCTURE.md + CLAUDE.md out of date against the text (section 2)
   [ ] Mirror corrections to carry into the next re-mirror (section 4)
