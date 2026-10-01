@@ -20,6 +20,12 @@ b075de7). Those items are marked [s26]; section 10 is the overview of what is le
 Merged 2026-10-01 with the open items of the session of 2026-09-25 (rework of 2.2 at the
 author's request, three passes; commits 3ef6e9a, c4edae7, 74e8b1b). Those items are marked
 [s25]; section 11 is the overview of what is left from it.
+Merged 2026-10-01 with the open items of the author review of Chapters 1-2.1 (tablet
+review v1 of pp. 1-14, build of 2026-09-22; commits 4078ddd ... ae2e5cf, 2026-09-25: new
+research question, 1.2/1.3/1.5 rewritten, 2.1.3-2.1.6 corrected, Mai et al. fact check,
+MM-PDE moved to Appendix G in the plan). Those items are marked [r25]; section 12 is the
+overview of what is left from it. ([r25] and [s25] are different chat sessions of the same
+day: [s25] reworked 2.2.)
 
 
 1. RUNS ON THE CLUSTER -> WHERE THEIR RESULT GOES
@@ -206,6 +212,46 @@ skew capacity points -> FEN_final_w96ftp7rk4d45skew (0.5428).
 [ ] [s25] THESIS_STRUCTURE.md 2.2 entry stale (method of lines, no FEM) -- together with the
     [s27] THESIS_STRUCTURE/CLAUDE.md update above.
 
+[ ] [r25] 1.3 second paragraph still sets up the moving mesh: "both local and spatially
+    adaptive character -- two inductive biases that classical ... PDE solvers exploit
+    explicitly through local stencils and adaptive meshes" (01-introduction l. ~134-139).
+    Mesh adaptation is Appendix G now; reword around locality / reach (or point to
+    Appendix G). Raised 2026-09-25, author said "I can remember"; not done.
+[ ] [r25] 3.1: state where the GA mask comes from, as a plain dataset fact (author
+    decision 2026-09-25: in 3.1, NOT in the Background): GA outlined manually on FAF by
+    certified graders of the Vienna Reading Center ("well-demarcated areas with a
+    significantly decreased or extinguished degree of autofluorescence"), registered
+    automatically to the near-infrared image aligned with the OCT, giving the en-face OCT
+    annotation (Mai et al. 2024, PMC11000109, Methods). The repo agrees: mask_oct equals
+    the SLO/FAF-frame mask_global sampled through T_mask (IoU ~1.0 on all 553 visits).
+    03-data.tex 3.1 currently only lists the FAF image among the files (l. ~44).
+[ ] [r25] 2.1.2 still ties channel 0 to cRORA: "The thesis state tensor encodes only the
+    cRORA endpoint, as channel~0; iRORA is implicit in the surrounding layer channels ..."
+    (02-background l. ~215). Same definition mismatch already fixed in 1.2 ("captures the
+    GA lesion") and 2.1.5 (neutral mask definition): the mask is a FAF-defined GA
+    annotation, not an OCT cRORA segmentation. Reword, e.g. "Channel 0 of the state tensor
+    marks the GA lesion; iRORA is not represented as a separate label". Found while
+    merging this list (2026-10-01).
+[ ] [r25] 2.1.5 TODO comment "confirm with supervisor the exact provenance of channel 0
+    ... and of channels 1-10" (02-background l. ~410): channel 0 is answered by Mai et al.
+    (2024); the layer provenance (algorithm, boundary list, post-processing) is still
+    unknown -- Mai is silent on it. Shrink the comment to the layer part; same question as
+    the NOTES item "confirm with supervisor the exact provenance ...".
+[ ] [r25] Provenance sentence ("the work began as an adaptation of two graph solvers,
+    suggested by the clinical partner; the locality case was built and tested afterwards")
+    was deliberately left out of 1.3 (THESIS_STRUCTURE 1.3). Not placed anywhere yet
+    (no hit for "clinical partner" in any .tex). Put it in 1.4 if 1.4 stays, otherwise at
+    the start of Ch. 4 (4.1 or the MP-PDE paragraph of 4.3.2).
+[ ] [r25] 1.4 Contributions: the "(TODO: maybe remove)" marker was set in this session;
+    the decision is the [ce6] item above (one item, two tags).
+[ ] [r25] Shortening pass on Ch. 1-2: on 2026-09-25 the author said the chapters feel long
+    but asked for NO cuts during the review; the cuts the author approved explicitly
+    (2.1.3 platforms, 2.1.4 projection strategies, 2.1.5 caveats) were applied, none are
+    pending. A dedicated shortening pass is still to come.
+[ ] [r25] SECURITY: the git remote 'origin' still has a GitHub personal access token in its
+    URL (.git/config, plain text). Revoke the token on GitHub, use Git Credential Manager,
+    then:  git remote set-url origin https://github.com/Witzerl/thesis-msc-wiedner.git
+
 
 3. VERIFICATION (open)
 ----------------------
@@ -238,6 +284,10 @@ skew capacity points -> FEN_final_w96ftp7rk4d45skew (0.5428).
     in the sources checked 2026-09-26). Fill them from the paper's title page once the PDF
     is archived. (Sadda2018, Lam2023, Battaglia2018 list the first authors + "others" on
     purpose.)
+
+[ ] [r25] The FAF origin of the mask is an inference: consistent with Mai et al. (2024) and
+    with the data (IoU ~1.0), but not recorded in the data. Confirm with Bogunovic /
+    Lachinov together with the layer provenance and the device model (NOTES 3.1 items).
 
 
 4. CODE-SIDE (masterthesis-docker; not editable from the thesis session)
@@ -285,6 +335,13 @@ skew capacity points -> FEN_final_w96ftp7rk4d45skew (0.5428).
     sentence in review v3 and now points to 4.3).
     [s25] Add 2.2.3-2.2.5 (strengths and limits, neural solvers that keep the mechanisms,
     why this structure suits GA), written 2026-09-25 and not touched by review v2.
+
+[ ] [r25] Read back Ch. 1 and 2.1 as rewritten on 2026-09-25 (all in the PDF):
+    research question + follow-up paragraph (1.3), the two general solver paragraphs
+    (1.3), the framework paragraph that replaced the U-Net argument (1.2), the covariate
+    sentence (1.2) -- applied on an "okay" that may only have meant "commit", so check it
+    is wanted --, the outline (1.5), and the 2.1.3-2.1.6 edits (OCT vs FAF, en-face defined
+    in place, imaging input, neutral mask definition, device sourced to Mai).
 
 
 6. RESOLVED (for the record)
@@ -335,6 +392,23 @@ skew capacity points -> FEN_final_w96ftp7rk4d45skew (0.5428).
     them; six broken \ref in the 1.5 outline repaired. Vogl2021 in the 1.2 conversion
     sentence: kept (author, 2026-09-26: "it's fine"). Thesis PDF rebuilt and checked
     2026-09-27 (69 pages then, no undefined citations or references).
+
+[x] [r25] Resolved in the Ch. 1-2.1 review itself (2026-09-25): research question (two
+    sub-questions); 1.3 solver paragraphs without MP-PDE/MM-PDE focus; 1.1 opening sentence
+    split, avoidable-cause sentence rebuilt (checked against the Flaxman PDF), GA-burden
+    sentence split; 1.2 framing sentence, U-Net argument replaced by the framework argument,
+    "captures the GA lesion" (not cRORA), covariates as an open question; 1.5 outline;
+    2.1.3 platforms dropped / OCT-vs-FAF reworded, "works on the OCT en-face grid"; 2.1.4
+    projection strategies shortened, en-face defined in place, imaging input stated,
+    "models" instead of "GNN architectures"; 2.1.5 caveats cut, neutral mask and layer
+    sentences; 2.1.6 device sourced to Mai et al.; THESIS_STRUCTURE / CLAUDE.md / README
+    updated for the new question and Appendix G.
+[x] [r25] Resolved later by other sessions: Mai2024 bib entry ([s26]); the six broken \ref
+    in the 1.5 outline written by this session's scripted edit (1280281), repaired in
+    b075de7 ([s26]); the actual move of the MM-PDE text to Appendix G ([s26] #22 for 2.5,
+    [s27] for 4.4 and 5.5).
+[x] [r25] No action needed: the Flaxman2020 key prints "2017" -- references.bib documents
+    it (note field: key kept, publication year 2017).
 
 
 7. OVERVIEW: WHAT IS LEFT FROM THE CH. 6/7/ABSTRACT SESSION ONLY  [ce6]
@@ -502,3 +576,30 @@ Resolved since:
 
 Order: the 2.3 repeat and the THESIS_STRUCTURE entry any time (small edits); the figure
 only on request; the read-back with the [s26] read-back.
+
+
+12. OVERVIEW: WHAT IS LEFT FROM THE AUTHOR REVIEW OF CH. 1-2.1 ONLY  [r25]
+--------------------------------------------------------------------------
+(tablet review v1 of thesis pp. 1-14, build of 2026-09-22, 16 marks; commits 4078ddd ...
+ae2e5cf, 2026-09-25)
+
+Cluster runs from this session: none. It edited Ch. 1, 2.1, NOTES.md, THESIS_STRUCTURE.md,
+CLAUDE.md and README.md only, so no open item here waits for a run and no job ID belongs
+to it. (The Mai et al. fact check was a literature check, not a run.)
+
+Still open (checked against the current .tex on 2026-10-01):
+  [ ] 2.1.2 "cRORA endpoint, as channel 0" -- factual, small reword (section 2)
+  [ ] 3.1 FAF origin of the mask as a dataset fact (section 2)
+  [ ] 2.1.5 provenance TODO comment: keep only the layer part (section 2)
+  [ ] 1.3 "spatially adaptive ... adaptive meshes" (section 2)
+  [ ] Provenance sentence (clinical partner) -> 1.4 or start of Ch. 4 (section 2)
+  [ ] 1.4 Contributions keep / rewrite / remove (= [ce6] item, section 2)
+  [ ] Shortening pass on Ch. 1-2 (section 2)
+  [ ] Confirm the FAF origin + layer provenance with the supervisors (section 3)
+  [ ] Author read-back of the rewritten Ch. 1 / 2.1 text, incl. the covariate sentence
+      (section 5)
+  [ ] SECURITY: token in the git remote URL (section 2) -- do this first
+
+Order: the token now; the three factual items (2.1.2, 3.1, 2.1.5 comment) together in one
+small pass, since they are the same fact; 1.3 wording any time; the provenance sentence
+together with the 1.4 decision; the shortening pass last, after the author read-back.
