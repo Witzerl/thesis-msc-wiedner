@@ -802,9 +802,9 @@ operators learn a continuous map
 $M: [0, T] \times \mathcal{F} \to \mathcal{F}$ such that
 $M(t, u_0) = u(t)$, thereby predicting the solution at any arbitrary
 time directly from the initial condition. By contrast, autoregressive
-solvers learn a local update operator
-$u(t + \Delta t) = A(\Delta t, u(t))$ and are applied iteratively to
-unroll a trajectory. Note that when the step size $\Delta t$ is fixed
+solvers learn the update operator $\mathcal{A}$ of
+\eqref{eq:bg:update-operator} and apply it repeatedly to unroll a
+trajectory. Note that when the step size $\Delta t$ is fixed
 by the dataset, the explicit dependence on it is usually suppressed in
 the notation. This thesis cannot suppress it because clinical
 observation intervals are fundamentally irregular.

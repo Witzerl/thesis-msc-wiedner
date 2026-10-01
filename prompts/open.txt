@@ -275,7 +275,7 @@ tab:appendix:border-interior, Huang1991 in the bib); build clean:
 [x] (done 2026-10-01, decisions a-g) [s26] 2.1.6 still states the ~2 % constant-spacing check (02-background l. ~475). The
     same paragraph was removed from 3.1 in review #27, and 6.3 now carries it
     (06-discussion l. ~234). Decide whether 2.1.6 keeps it or points to 6.3.
-[ ] [s25] 2.3 opening repeats the update-operator definition of 2.2.2 with a different
+[x] (done 2026-10-01: points back to \mathcal{A} of eq:bg:update-operator) [s25] 2.3 opening repeats the update-operator definition of 2.2.2 with a different
     symbol (A vs \mathcal{A}); remove or point back (section 11).
 [ ] [s25] Figure fig:bg:solver-path (2.2.2) still a placeholder (section 11).
 [ ] [s25] THESIS_STRUCTURE.md 2.2 entry stale (method of lines, no FEM) -- together with the
@@ -619,7 +619,7 @@ Still open (checked against the current .tex on 2026-10-01):
       (one cell + neighbours, giving the rate f_i) -> time step (Euler) -> next state, loop
       arrow "rollout". A TikZ diagram is enough (colours from style/thesis-colors.sty);
       only on the author's request (CLAUDE.md figure rule).
-  [ ] [s25] 2.3 still opens by defining the autoregressive update again, now as plain
+  [x] [s25] 2.3 still opens by defining the autoregressive update again, now as plain
       "A(Delta t, u(t))" (02-background l. ~815), although 2.2.2 already introduces it as
       \mathcal{A} (Eq. eq:bg:update-operator). Remove the repeat or point back to 2.2.2,
       and use one symbol for both.

@@ -1184,7 +1184,7 @@ Pulled from the code repository (`masterthesis-docker/NOTES.md` + `PROJECT_CONTE
   it -- the split that the swappable slot, the RK4 arm (§4.4.5) and the solver-swap
   diagnostic (§5.6) rely on. The Schiesser2012 pending citation is therefore obsolete.
   **Author to review §2.2 on 2026-09-26.** (Done: tablet review v2, 2026-09-26, marks #1-#14.)
-- [ ] TODO (from the 2026-09-25 §2.2 rework, still open 2026-10-01): §2.3 opens by defining
+- [x] (2.3 repeat fixed 2026-10-01; THESIS_STRUCTURE part still open) TODO (from the 2026-09-25 §2.2 rework, still open 2026-10-01): §2.3 opens by defining
   the autoregressive update again as plain $A(\Delta t, u(t))$, although §2.2.2 introduces it
   as $\mathcal{A}$ (`eq:bg:update-operator`); remove the repeat or point back, one symbol.
   Also: THESIS_STRUCTURE.md §2.2 entry still names the method of lines and omits the FEM
