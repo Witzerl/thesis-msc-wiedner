@@ -967,9 +967,10 @@ between about a sixth and a third of the original size.
     is against that original size, as the mean over the five folds of the
     per-fold difference; the counts give the folds and the eyes on which
     the scaled arm is higher. Standard errors are given in
-    Appendix~\ref{app:full-results:seeds}. $^\ast$All T-FEN points use the
-    Galerkin form of the transport operator
-    (\S\ref{sec:experiments:validity:tfen}).}
+    Appendix~\ref{app:full-results:seeds}. All T-FEN points use the
+    energy-conserving form of the transport operator
+    (\S\ref{sec:experiments:validity:tfen}). $^\dagger$Diverged in training on
+    folds 1 and 4; the values cover folds 0, 2 and 3 (51 eyes).}
   \label{tab:experiments:capacity}
   \footnotesize
   \setlength{\tabcolsep}{4pt}
@@ -993,23 +994,20 @@ between about a sixth and a third of the original size.
      & width 5 & 79\,960 & 1 & 0.498 & --- & --- & --- \\
      & width 9 & 257\,804 & 3.22 & 0.481 & $-0.018$ & 1/5 & 26/75 \\
     \midrule
-    T-FEN$^\ast$ & width 48 & 20\,455 & 0.30 & 0.538 & $+0.005$ & 3/5 & 40/75 \\
-     & width 96 & 68\,503 & 1 & 0.534 & --- & --- & --- \\
-     & width 192 & 247\,543 & 3.61 & 0.443 & $-0.090$ & 3/5 & 30/75 \\
-     & MLP depth 8 & 142\,999 & 2.09 & 0.329 & $-0.204$ & 0/5 & 6/75 \\
+    T-FEN & width 48 & 20\,455 & 0.30 & 0.543 & $+0.001$ & 3/5 & 37/75 \\
+     & width 96 & 68\,503 & 1 & 0.543 & --- & --- & --- \\
+     & width 192$^\dagger$ & 247\,543 & 3.61 & 0.552 & $+0.001$ & 2/3 & 25/51 \\
+     & MLP depth 8 & 142\,999 & 2.09 & 0.257 & $-0.285$ & 0/5 & 2/75 \\
     \bottomrule
   \end{tabular}
 \end{table}
-% TODO (queued 2026-10-01): replace the four T-FEN rows by the
-% energy-conserving form -- FEN_final_w48ftp7rk4d45skew, w192...skew,
-% w96d8...skew against the skew 1x twin FEN_final_w96ftp7rk4d45skew (0.5428)
-% -- and drop the Galerkin footnote and the Galerkin sentence below. If the
-% width-192 or depth-8 skew runs still fail to train, say so.
-% Status 2026-10-01: w48 skew in -- 0.5434 +/- 0.0363, vs skew w96 +0.0006
-% +/- 0.0026 SE (3/5), per eye -0.0003 +/- 0.0020 (37/75), stable 5/5
-% (params 20,455, ratio 0.30). w192 skew (folds 3-4 at 29/30 epochs) and
-% depth-8 skew (folds 2-4 running) not complete; replace all four rows
-% together once both are in.
+% T-FEN rows in the energy-conserving form since 2026-10-02 (author OK):
+% FEN_final_{w48,w192,w96d8}ftp7rk4d45skew against FEN_final_w96ftp7rk4d45skew
+% (0.5428), masterthesis-docker SOLVER_FINAL_RUNS section 9.23 (thesis_numbers.py
+% pair --latex). Width 192 over all five folds: 0.3475, -0.195 +/- 0.121 (2/5),
+% per eye -0.177 +/- 0.031 (25/75) -- not quotable as accuracy (training
+% failures averaged with working folds). Galerkin rows were 0.538 / 0.534 /
+% 0.443 / 0.329.
 % Source: masterthesis-docker SOLVER_FINAL_RUNS section 9.18 (capacity study,
 % 2026-09-30); every value re-computed 2026-10-01 from solver_results.csv and
 % the per-eye records. One deviation: the width-32 U-Net per eye reads
@@ -1038,9 +1036,9 @@ between about a sixth and a third of the original size.
     ($\pm 0.016$, or $\pm 0.020$ for the U-Net;
     Appendix~\ref{app:full-results:criteria}). Two T-FEN points lie below the
     plotted range and are drawn at its lower edge with their value: width
-    192, which diverged during training on two folds, and the eight-layer
-    network, which trained poorly. All T-FEN points use the Galerkin form of
-    the transport operator.}
+    192 over all five folds, including the two on which it diverged during
+    training, and the eight-layer network, which did not train. All T-FEN
+    points use the energy-conserving form of the transport operator.}
   \label{fig:experiments:capacity}
 \end{figure}
 
@@ -1057,25 +1055,21 @@ Depth does not help where it was tested. Four message-passing rounds
 instead of two, which also double the reach of the dilated stencil, lower
 the graph network on every fold, by 0.009 on average, a small difference
 within the noise level. The T-FEN with an eight-layer free-form network
-trains poorly on every fold: its training error barely falls. At width 192,
+does not train on any fold: its training error barely falls. At width 192,
 the T-FEN diverges during training on folds 1 and 4 and ties width 96 on the
 other three.
 
 Capacity is therefore not a lever on this task in any of the four classes,
 and the comparisons at matched size in~\S\ref{sec:experiments:main-results}
 and~\S\ref{sec:experiments:ingredients} are not an artefact of the size at
-which they were made. The finding is scoped to one seed. The T-FEN points
-were run with the Galerkin form of the transport operator, before the
-energy-conserving form existed. Whether the divergence at width 192 comes
-from the defect at the crop edge described
-in~\S\ref{sec:experiments:validity:tfen} is open: in the runs with the
-energy-conserving form completed so far, width 192 fails on the same two
-folds, which points to an instability of the larger network in training
-rather than to the form of the transport operator.
-% 2026-10-01: FEN_final_w192ftp7rk4d45skew late Dice f0-f4 0.527 / 0.054 /
-% 0.610 / 0.518 (29 of 30 epochs) / 0.028 (29 of 30), training loss NaN at
-% the last epoch on folds 1 and 4; Galerkin twin 0.532 / 0.256 / 0.606 /
-% 0.507 / 0.314. Revisit when the skew rows replace the Galerkin rows.
+which they were made. The finding is scoped to one seed. In both forms of
+the transport operator, width 192 diverges on the same two folds, and the
+eight-layer network fails to train in both; the failures therefore lie in
+training the larger network, not in the form of the operator. Their cause
+was not tested.
+% Skew w192 per fold 0.527 / 0.054 (NaN from epoch 3) / 0.610 / 0.518 / 0.028
+% (NaN from epoch 2); Galerkin w192 0.532 / 0.256 / 0.606 / 0.507 / 0.314
+% (SOLVER_FINAL_RUNS 9.18, 9.23).
 
 % Subsections "Patient Covariates and the Layer Encoder" and "Settings Inside
 % the Graph Network" commented out 2026-09-28 (author: covariate result carried

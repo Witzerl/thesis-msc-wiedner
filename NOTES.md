@@ -456,7 +456,7 @@ be longer, since it supplies two arms and the floors).
   Floors → 4.3.6 FEN → 4.3.7 RK → 4.3.8 Parameter Matching. Removed labels:
   `sec:background:mp-pde`, `sec:method:mppde:arch`, `sec:method:mppde:diff` (no references
   left). "member of the family" / "countermodel" wording replaced by "operator".
-- [ ] Author to review Chapter 4 after this restructure (planned).
+- [x] (read back in tablet review v6, 2026-10-02) Author to review Chapter 4 after this restructure (planned).
 - [x] 2026-09-27: moving-mesh section (former §4.4, placeholders only) moved to Appendix G as
   G.2 "The Moving-Mesh Extension for GA" with G.2.1 DMM (`app:mm-pde:dmm`) and G.2.2 Dual-Branch
   Composition (`app:mm-pde:dual`). Removed from Chapter 4: the dashed mesh path in the pipeline
@@ -720,7 +720,7 @@ Being worked through one item at a time.
   limit, minor vs the Galerkin defect (×1.3 from ~day 585); criterion still passes; a 30-day
   evaluation step (mask Courant ≈ 1.8) removes it at unchanged Dice. Velocity map quotable at a
   30-day evaluation step (not interpreted in the thesis).
-- [ ] TODO (pending, T-FEN capacity in skew form queued 2026-10-01): replace the four Galerkin
+- [x] (done 2026-10-02: skew rows from SOLVER_FINAL_RUNS 9.23; w192 quoted on folds 0, 2, 3) TODO (pending, T-FEN capacity in skew form queued 2026-10-01): replace the four Galerkin
   T-FEN rows of Table `tab:experiments:capacity` by `w48…skew`, `w192…skew`, `w96d8…skew`
   against the skew 1× (0.5428); drop the Galerkin footnote/sentence (inline TODO).
 - [x] 2026-10-01 filled from SOLVER_FINAL_RUNS §9.20 (`thesis_numbers.py`, self-checked against
@@ -775,7 +775,7 @@ Being worked through one item at a time.
   local ingredient does not replicate at seed 7 -- it is named in 5.3 intro, 5.3.5, 6.1, Ch. 7,
   abstracts (and possibly 1.4); (c) the soft-Dice term raises the score and plain MSE never
   learns change -- 6.1 "Where modelling effort pays" / Ch. 7 are silent on the objective.
-- [ ] Still running: `FEN_final_w192ftp7rk4d45skew` (f3, f4 at 29/30), `FEN_final_w96d8ftp7rk4d45skew`
+- [x] (in 2026-10-02, SOLVER_FINAL_RUNS 9.23) Still running: `FEN_final_w192ftp7rk4d45skew` (f3, f4 at 29/30), `FEN_final_w96d8ftp7rk4d45skew`
   (f2-f4) -> capacity table T-FEN rows (all four together).
 - [x] Code-side request "SOLVER_FINAL_RUNS readout for the four mean twins" done there (§9.21).
 - [ ] TODO (code repo, not editable from here): add a SOLVER_FINAL_RUNS.md readout for the
@@ -968,7 +968,7 @@ Being worked through one item at a time.
 - [x] (2026-10-01: none found; Salvi2025 inter-grader growth-region Dice 0.71-0.73 added as orientation) TODO (§6.2 inline): literature check for a clinically meaningful threshold for spatial
   GA progression forecasts.
 - [ ] TODO (§6.2 inline): link to the failure cases once §5.5 qualitative is written.
-- [ ] Author to review §5.6, Ch. 6, Ch. 7 and both abstracts (German text in particular).
+- [x] (read back in tablet review v6, 2026-10-02) Author to review §5.6, Ch. 6, Ch. 7 and both abstracts (German text in particular).
 
 ### Author's tablet review of the abstract, Ch. 6 and Ch. 7 (2026-10-01)
 
@@ -1158,7 +1158,7 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
   referencing sentence, every plotted value checked against the text: `fig:experiments:curves`
   (§5.1.3 + §5.4.2), `:arms-folds` (§5.2), `:reach` (§5.3.2), `:horizon` (§5.3.3/§5.3.4, with
   Mai), `:capacity` (§5.4.3), `:swap` and `:tfen-stability` (§5.5), `:growth-rate` (§5.6.1).
-- [ ] TODO: switch `fig_experiments_capacity.py` to `TFEN_FORM = 'skew'` together with the
+- [x] (done 2026-10-02; figure still disabled) TODO: switch `fig_experiments_capacity.py` to `TFEN_FORM = 'skew'` together with the
   table rows once width-192 and depth-8 skew are complete.
 
 Text corrections made while building the figures (2026-10-01), each verified against the run

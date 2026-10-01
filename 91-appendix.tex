@@ -431,11 +431,11 @@ are those of~\S\ref{app:full-results:criteria}.
     U-Net, width 9 & $+0.0036 \pm 0.0126$ (1/5) & $+0.0041 \pm 0.0082$ (38/75, 0.5) \\
     FNO $+ 3{\times}3$, width 2 & $-0.0192 \pm 0.0175$ (2/5) & $-0.0205 \pm 0.0101$ (30/75, $-2.0$) \\
     FNO $+ 3{\times}3$, width 9 & $-0.0177 \pm 0.0075$ (1/5) & $-0.0207 \pm 0.0070$ (26/75, $-2.9$) \\
-    T-FEN, width 48$^\ast$ & $+0.0046 \pm 0.0044$ (3/5) & $+0.0042 \pm 0.0038$ (40/75, 1.1) \\
-    T-FEN, width 192$^\ast$ & $-0.0905 \pm 0.0586$ (3/5) & $-0.0699 \pm 0.0142$ (30/75, $-4.9$) \\
-    T-FEN, MLP depth 8$^\ast$ & $-0.2042 \pm 0.0674$ (0/5) & $-0.2199 \pm 0.0212$ (6/75, $-10.4$) \\
+    T-FEN, width 48 & $+0.0006 \pm 0.0026$ (3/5) & $-0.0003 \pm 0.0020$ (37/75, $-0.2$) \\
+    T-FEN, width 192$^\ast$ & $+0.0014 \pm 0.0040$ (2/3) & $+0.0002 \pm 0.0035$ (25/51, 0.1) \\
+    T-FEN, MLP depth 8 & $-0.2854 \pm 0.0656$ (0/5) & $-0.2886 \pm 0.0192$ (2/75, $-15.1$) \\
     \bottomrule
-    \multicolumn{3}{l}{$^\ast$Galerkin form of the transport operator.}
+    \multicolumn{3}{l}{T-FEN in the energy-conserving form. $^\ast$Folds 0, 2 and 3; diverged on 1 and 4.}
   \end{tabular}
 \end{table}
 % All values: thesis_numbers.py pair (code repo), recomputed 2026-10-02 for
@@ -445,8 +445,8 @@ are those of~\S\ref{app:full-results:criteria}.
 % ANISOGNN_final_dilmean_nodts, ANISOGNN_final_oderk4n1, FNO_final_w5rk4;
 % objective ANISOGNN_final_dilmean_{plainmse,nodice,mono2}; capacity
 % ANISOGNN_final_dilmean_{h32,h128,l4}, UNET_final_w{2,9}, FNO_final_w{2,9}k3,
-% FEN_final_w48ftp7rk4d45, FEN_final_w192ftp7rk4d45, FEN_final_w96d8ftp7rk4d45
-% against their 1x twins (T-FEN Galerkin twin FEN_final_w96ftp7rk4d45).
+% FEN_final_{w48,w192,w96d8}ftp7rk4d45skew against their 1x twins (T-FEN twin
+% FEN_final_w96ftp7rk4d45skew; SOLVER_FINAL_RUNS 9.23, 2026-10-02).
 
 
 \cleardoubleoddpage

@@ -22,7 +22,7 @@ from matplotlib.lines import Line2D
 
 from _common import setup, save, thesis_numbers, FLOOR_PAIRED
 
-TFEN_FORM = "galerkin"            # 'galerkin' (current table) or 'skew'
+TFEN_FORM = "skew"                # 'skew' (current table, since 2026-10-02) or 'galerkin'
 
 FRAC, ASPECT = 0.8, 0.68
 FOLDS = list(range(5))
@@ -72,6 +72,12 @@ TABLE = {
     "FEN_final_w96ftp7rk4d45": (1, 0.534, None, None),
     "FEN_final_w192ftp7rk4d45": (3.61, 0.443, (-0.091, 0.059, 3), (-0.070, 0.014, 30)),
     "FEN_final_w96d8ftp7rk4d45": (2.09, 0.329, (-0.204, 0.067, 0), (-0.220, 0.021, 6)),
+    # energy-conserving ('skew') rows, SOLVER_FINAL_RUNS 9.23. Width 192 is checked over all
+    # five folds here (the table quotes folds 0, 2, 3: 0.552, +0.001 (2/3), +0.000 (25/51)).
+    "FEN_final_w48ftp7rk4d45skew": (0.30, 0.543, (+0.001, 0.003, 3), (-0.000, 0.002, 37)),
+    "FEN_final_w96ftp7rk4d45skew": (1, 0.543, None, None),
+    "FEN_final_w192ftp7rk4d45skew": (3.61, 0.347, (-0.195, 0.121, 2), (-0.177, 0.031, 25)),
+    "FEN_final_w96d8ftp7rk4d45skew": (2.09, 0.257, (-0.285, 0.066, 0), (-0.289, 0.019, 2)),
 }
 
 

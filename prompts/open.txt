@@ -37,8 +37,8 @@ code repo, not committed there; NOTES.md "Batch readout"):
                                     -> 5.2, 5.3.4, 5.5.2 filled; HEADLINE DECISION OPEN (sec. 2)
   [x] 7875528  w48 skew         IN  0.5434 = w96 skew (+0.0006); stable 5/5 -> capacity row
                                     waits for 7875529/30 (all four T-FEN rows replaced together)
-  [ ] 7875529  w192 skew        RUNNING (f3, f4 at 29/30 epochs)
-  [ ] 7875530  depth-8 skew     RUNNING (f2-f4)
+  [x] 7875529  w192 skew        IN  diverges on f1, f4 (as Galerkin); ties w96 on f0, f2, f3 -> 5.4.3
+  [x] 7875530  depth-8 skew     IN  does not train (-0.285, 0/5) -> 5.4.3 (SOLVER_FINAL_RUNS 9.23)
   [x] 7875532  free-form s7     IN  transport s7 vs same-seed control +0.090 (skew), +0.076
                                     (Galerkin; replaces the mixed-seed +0.0495) -> 5.3.4 filled
   [x] 7875533  FNO s7           IN  FNO - U-Net -0.014 (2/5) -> 5.3.3 filled
@@ -384,12 +384,15 @@ tab:appendix:border-interior, Huang1991 in the bib); build clean:
 
 5. FOR THE AUTHOR TO REVIEW
 ---------------------------
-[ ] 5.4.3 Capacity (written directly, not via external draft + audit).
-[ ] The Chapter 5 reporting scheme (section 2, first item).
-[ ] Chapter 4 as a whole after the restructure.
-[ ] The rewritten 5.4.1 (time handling), 5.4.2 (objective), 5.5.1 (solver-swap, criteria
+ALL ITEMS BELOW: read back by the author in tablet review v6 (build of 2026-10-01 23:57,
+whole thesis incl. Appendix G); its 21 marks applied 2026-10-02 (NOTES "Author's tablet review
+of the whole thesis"). Pages without a mark count as accepted.
+[x] 5.4.3 Capacity (written directly, not via external draft + audit).
+[x] The Chapter 5 reporting scheme (section 2, first item).
+[x] Chapter 4 as a whole after the restructure.
+[x] The rewritten 5.4.1 (time handling), 5.4.2 (objective), 5.5.1 (solver-swap, criteria
     C1/C2), 5.5.2 (T-FEN, two operator forms) and the 4.3.6 definition of "unstable".
-[ ] [ce6] 5.6 Computational Cost, Chapter 6, Chapter 7, English abstract, German
+[x] [ce6] 5.6 Computational Cost, Chapter 6, Chapter 7, English abstract, German
     Kurzfassung (externally drafted, audited and partly rewritten; list of corrections in
     NOTES.md). Points worth a look:
     - 6.1 links the reach/transport result to the CFL condition (Courant1928) as
@@ -401,7 +404,7 @@ tab:appendix:border-interior, Huang1991 in the bib); build clean:
     - Ch. 7 uses one bullet list (the four ingredients); the rest is prose.
     - Kurzfassung: new translation of the revised English text (decimal commas,
       "Rahmen" for framework, "Change-Region-Dice").
-[ ] [s26] The text written in the 2.2-3.4 review has not been read back by the author (review
+[x] [s26] The text written in the 2.2-3.4 review has not been read back by the author (review
     v3 started at 3.4): the new 2.2 opening (option C), the 2.2 locality sentence (#4), the
     "Finite elements." paragraph (#9), the rewritten "splitter field" sentence (#14), and the
     method-origin paragraph at the end of Related Work (2.4, #23; it lost its graph U-Net
@@ -409,7 +412,7 @@ tab:appendix:border-interior, Huang1991 in the bib); build clean:
     [s25] Add 2.2.3-2.2.5 (strengths and limits, neural solvers that keep the mechanisms,
     why this structure suits GA), written 2026-09-25 and not touched by review v2.
 
-[ ] [r25] Read back Ch. 1 and 2.1 as rewritten on 2026-09-25 (all in the PDF):
+[x] [r25] Read back Ch. 1 and 2.1 as rewritten on 2026-09-25 (all in the PDF):
     research question + follow-up paragraph (1.3), the two general solver paragraphs
     (1.3), the framework paragraph that replaced the U-Net argument (1.2), the covariate
     sentence (1.2) -- applied on an "okay" that may only have meant "commit", so check it
