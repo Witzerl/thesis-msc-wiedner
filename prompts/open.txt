@@ -17,6 +17,9 @@ commits). Those items are marked [rev]; section 9 is the overview of what is lef
 Merged 2026-10-01 with the open items of the session of 2026-09-26/27 (tablet review v2 of
 2.2-3.4, 33 marks, commits 44f1cfa ... 2e2c42b; bibliography passes fb5755d, ef9c5ca,
 b075de7). Those items are marked [s26]; section 10 is the overview of what is left from it.
+Merged 2026-10-01 with the open items of the session of 2026-09-25 (rework of 2.2 at the
+author's request, three passes; commits 3ef6e9a, c4edae7, 74e8b1b). Those items are marked
+[s25]; section 11 is the overview of what is left from it.
 
 
 1. RUNS ON THE CLUSTER -> WHERE THEIR RESULT GOES
@@ -197,6 +200,11 @@ skew capacity points -> FEN_final_w96ftp7rk4d45skew (0.5428).
 [ ] [s26] 2.1.6 still states the ~2 % constant-spacing check (02-background l. ~475). The
     same paragraph was removed from 3.1 in review #27, and 6.3 now carries it
     (06-discussion l. ~234). Decide whether 2.1.6 keeps it or points to 6.3.
+[ ] [s25] 2.3 opening repeats the update-operator definition of 2.2.2 with a different
+    symbol (A vs \mathcal{A}); remove or point back (section 11).
+[ ] [s25] Figure fig:bg:solver-path (2.2.2) still a placeholder (section 11).
+[ ] [s25] THESIS_STRUCTURE.md 2.2 entry stale (method of lines, no FEM) -- together with the
+    [s27] THESIS_STRUCTURE/CLAUDE.md update above.
 
 
 3. VERIFICATION (open)
@@ -275,6 +283,8 @@ skew capacity points -> FEN_final_w96ftp7rk4d45skew (0.5428).
     "Finite elements." paragraph (#9), the rewritten "splitter field" sentence (#14), and the
     method-origin paragraph at the end of Related Work (2.4, #23; it lost its graph U-Net
     sentence in review v3 and now points to 4.3).
+    [s25] Add 2.2.3-2.2.5 (strengths and limits, neural solvers that keep the mechanisms,
+    why this structure suits GA), written 2026-09-25 and not touched by review v2.
 
 
 6. RESOLVED (for the record)
@@ -446,3 +456,49 @@ No run needed:
 Order: bib fixes and the two small decisions any time; the archive once approved (the
 four [s27] references first added to the bib, so they are downloaded in the same pass);
 Salvi's first names from the archived PDF.
+
+
+11. OVERVIEW: WHAT IS LEFT FROM THE 2026-09-25 SESSION ONLY  [s25]
+------------------------------------------------------------------
+(rework of 2.2 "Partial Differential Equations and Numerical Solvers" in three passes:
+MP-PDE-style structure, then conservation form dropped, then the method-of-lines name
+dropped; commits 3ef6e9a, c4edae7, 74e8b1b; plus a PDF rebuild and a page estimate)
+
+Cluster runs from this session: none. It edited 2.2, NOTES.md and THESIS_STRUCTURE.md
+only, so no open item here waits for a run and no job ID belongs to it.
+
+Still open (checked against the current .tex on 2026-10-01):
+  [ ] [s25] Figure 2.x fig:bg:solver-path (2.2.2) is still an \fbox placeholder (TODO at
+      02-background l. ~683): pipeline continuous field -> grid of cell values -> stencil
+      (one cell + neighbours, giving the rate f_i) -> time step (Euler) -> next state, loop
+      arrow "rollout". A TikZ diagram is enough (colours from style/thesis-colors.sty);
+      only on the author's request (CLAUDE.md figure rule).
+  [ ] [s25] 2.3 still opens by defining the autoregressive update again, now as plain
+      "A(Delta t, u(t))" (02-background l. ~815), although 2.2.2 already introduces it as
+      \mathcal{A} (Eq. eq:bg:update-operator). Remove the repeat or point back to 2.2.2,
+      and use one symbol for both.
+  [ ] [s25] THESIS_STRUCTURE.md 2.2 is stale against the text: the first line still lists
+      "the method of lines ... mesh-based discretization", and the "Reworked 2026-09-25"
+      note still names the method of lines and does not mention the finite-elements
+      paragraph added in review v2 (#9). Rewrite the 2.2 entry once (fits the
+      THESIS_STRUCTURE/CLAUDE.md update listed under [s27] in section 2).
+  [ ] [s25] Author read-back of the 2.2 subsections written in this session that review
+      v2 did not touch: 2.2.3 "Strengths and limits", 2.2.4 "Neural solvers that keep the
+      mechanisms" (now points to 4.3.2 for MP-PDE) and 2.2.5 "Why this structure suits GA
+      progression" (four bullets + the CFL/reach paragraph). Check in particular that 2.2.5
+      motivates without previewing results. Part of the [s26] read-back item in section 5.
+
+Resolved since:
+  [x] All citations introduced in this session (LeVeque2002, BarSinai2019, Kochkov2021,
+      SanchezGonzalez2020, Pfaff2021, Lam2023, Butcher1987, Hairer1993, Courant1928) are in
+      references.bib and cited with \citep/\citet ([s26] bibliography passes); the
+      Schiesser2012 marker went with the method-of-lines sentence.
+  [x] The "conservation form" phrase left dangling in the old 2.4 (MP-PDE): 2.4 was removed
+      in the [s27] restructure; no "conservation" remains in any .tex file.
+  [x] Author review of 2.2 (planned for 2026-09-26): done as tablet review v2 ([s26], marks
+      #1-#14), which also replaced most Brandstetter citations and added the FEM paragraph.
+  [x] Page estimate given (main text ~80-85 pp., ~110-120 pp. with bibliography and
+      appendices; as of 2026-09-25, before Ch. 5-7 were drafted).
+
+Order: the 2.3 repeat and the THESIS_STRUCTURE entry any time (small edits); the figure
+only on request; the read-back with the [s26] read-back.
