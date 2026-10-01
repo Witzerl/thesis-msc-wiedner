@@ -819,56 +819,77 @@ of 139, which gives 68\,282 parameters, level with the T-FEN; its comparison
 is reported in~\S\ref{sec:experiments:ingredients:transport}.
 
 \subsection{Fixed-Step Runge--Kutta Integration}
-% TODO (author, 2026-09-30): the whole RK4 setting must be explained much
-% more plainly here, in 5.4.1 and in 5.5.1 -- the author did not understand it
-% from reading. Cover: (1) Euler = one rate x step; RK4 = four evaluations per
-% step averaged, optionally several sub-steps; (2) "autonomous" = the Delta t
-% input is set to zero, only the integrator carries time (the update itself
-% is not zero); (3) why the wrapper exists: the FEN needs it (it outputs a
-% rate, and its reach grows with the number of evaluations), the
-% integration-order test (null, ~4.8x cost), and the continuous-time question;
-% (4) jump model vs continuous-time model (splitting the interval must not
-% change the answer), which is what the solver-swap test checks.
 \label{sec:method:family:rk}
 
-The Runge--Kutta wrapper is not a backbone. It takes the residual $f_\theta$
-of any backbone and integrates it over each graph's own interval with an
-explicit Runge--Kutta scheme, stored as a Butcher tableau. It adds no
-parameters. All reported runs use classical fourth-order Runge--Kutta
-(RK4).
-The schemes follow the standard definitions \citep{Butcher1987, Hairer1993}.
+The Runge--Kutta wrapper is not a backbone. It is placed around any
+backbone and changes only how the backbone's output is turned into the next
+state. It adds no parameters.
 
-The step is set per graph. It is either the interval divided by a number of
-sub-steps, $h = \Delta t / n$, or it follows from a physical step length in
-days, with the number of sub-steps rounded up from the ratio of the interval
-to that length. An eye is therefore integrated with the same step whether it
-is batched with others or evaluated alone. Graphs with shorter intervals
-finish early and then take zero-length steps until the longest interval in
-the batch is complete.
+\paragraph{Euler and RK4.}
+The canonical update of Equation~\eqref{eq:method:residual-update} is one
+explicit Euler step: the operator is evaluated once, at the current state,
+and its output is applied over the whole interval $\Delta t$. A Runge--Kutta
+scheme evaluates the operator several times within the interval, at
+intermediate states, and combines the results. The classical fourth-order
+scheme (RK4), used in every reported run, evaluates it four times per step
+and takes a weighted average \citep{Butcher1987, Hairer1993}. The interval
+can also be split into several sub-steps, each of which is one RK4 step.
+The wrapper stores each scheme as a Butcher tableau. The sub-step length is
+set per graph, either as $h = \Delta t / n$ or from a physical step length
+in days, with the number of sub-steps rounded up from the ratio of the
+interval to that length. An eye is therefore integrated with the same steps
+whether it is batched with others or evaluated alone; graphs with shorter
+intervals take zero-length steps until the longest interval in the batch is
+complete. As a unit check, the observed convergence orders on the test
+problem $\mathrm{d}u / \mathrm{d}t = -\lambda u$ are 0.99, 2.04, 2.04 and
+4.35 for the Euler, midpoint, Heun and RK4 schemes, close to their nominal
+orders of one, two, two and four.
 
-By default the wrapper integrates an autonomous field. The $\Delta t$ entry
-of the conditioning vector is set to zero inside the wrapper, so $f_\theta$
-becomes a right-hand side that does not depend on the interval, and
-$\Delta t$ only sets the integration horizon. The positions, the graph edges
-and the covariates of a graph stay fixed across the stages of one step.
-This is the reading under which the wrapped model is a Neural ODE in the
-sense of \citet{Chen2018}. If the sub-step length is fed in place of zero,
-the wrapper instead acts as a learned Runge--Kutta integrator, which reduces
-to the canonical operator for a single Euler step. The wrapper requires the $\Delta t$-multiplied residual
-form of Equation~\eqref{eq:method:residual-update}. As a unit check, the
-observed convergence orders on the test problem $\mathrm{d}u / \mathrm{d}t =
--\lambda u$ are 0.99, 2.04, 2.04 and 4.35 for the Euler, midpoint, Heun and
-RK4 schemes, close to their nominal orders of one, two, two and four.
+\paragraph{The autonomous field.}
+Inside the wrapper, the $\Delta t$ entry of the operator's conditioning
+vector is set to zero. The operator then no longer knows how long the
+interval is. Its output only states how fast the state is changing at the
+current moment, and the integrator alone decides how long this rate is
+applied. The update itself is not zero: the state still changes by the
+integrated rate. In this reading the wrapped model is a Neural ODE in the
+sense of \citet{Chen2018}. Positions, graph edges and covariates stay fixed
+across the stages of one step. The wrapper requires the $\Delta t$-multiplied
+residual form of Equation~\eqref{eq:method:residual-update}. If the
+sub-step length is fed to the operator in place of zero, the wrapper acts
+instead as a learned Runge--Kutta integrator, which reduces to the
+canonical operator for a single Euler step.
 
-Because any trained backbone can be integrated with different schemes and
-step counts after training, the wrapper also enables a solver-invariance
-test. \citet{Ott2021} show that a model trained with an overly coarse step
-can reach high accuracy and still lose its interpretation as an ODE; they
-test this by evaluating the trained model with solvers of equal or smaller
+\paragraph{Why the wrapper exists.}
+It has three uses. First, the finite-element network outputs a rate and
+needs an integrator (\S\ref{sec:method:family:fen}); since one evaluation
+couples only nodes that share a triangle, its spatial reach grows with the
+number of evaluations. Second, it allows the integration order to be tested
+on its own: the same backbone trained with one Euler step and with RK4
+(\S\ref{sec:experiments:ablations:time}). Third, it allows the question of
+whether a model describes a continuous process to be tested.
+
+\paragraph{Jump and continuous time.}
+The canonical model is trained as a single jump: it learns which state
+follows after an interval of length $\Delta t$, in one step. Nothing
+requires that two jumps of length $\Delta t / 2$ lead to the same state as
+one jump of length $\Delta t$. A continuous-time model must satisfy exactly
+this: splitting the interval into more or finer steps must not change the
+answer. \citet{Ott2021} show that a model trained with an overly coarse step
+can reach high accuracy and still lose this property, and they test it by
+evaluating the trained model with solvers of equal or smaller
 discretisation error and checking whether its predictions stay the same.
 \citet{Krishnapriyan2023} make the same point for learned models of
-physical systems. The test and its outcome are reported in
-Chapter~\ref{ch:experiments}.
+physical systems. Because any trained backbone can be integrated with
+different schemes and step counts after training, the wrapper makes this
+solver-swap test possible. Its outcome is reported
+in~\S\ref{sec:experiments:validity:swap}: the canonical model fails it,
+whereas the same network trained under the RK4 wrapper passes it, as does
+the finite-element network. A continuous-time model can therefore be
+obtained by training with the integrator, but in this survey it is not
+more accurate than the single jump (\S\ref{sec:experiments:ablations:time}).
+% Rewritten 2026-10-01 at the author's request (TODO of 2026-09-30: explain
+% the RK4 setting plainly). Solver-swap: canonical span 0.086, RK4-trained
+% stencil within 0.0044, skew T-FEN within 0.0003 (5.5.1).
 
 \subsection{Parameter Matching}
 \label{sec:method:family:params}
