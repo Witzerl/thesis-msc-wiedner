@@ -1171,6 +1171,47 @@ records and documented in a LaTeX comment at the place:
   ±35 per eye is t = -2.8 (19/75), "under the floor" holds for the fold-paired instrument only.
 - Pre-existing, not from this work: "Float too large for page by 79.7pt" in Appendix E.
 
+### Author's tablet review of the whole thesis (2026-10-02)
+
+Sixth handwritten review (build of 2026-10-01), decoded from
+`main-thesis_v6_261001_235732.sdocx`: 21 marks on 18 pages (title page, abstract, Ch. 1-5, 7,
+App. D). Blue = rewrite, red = wrong/remove. Overlay PDF in the session scratchpad only. Being
+worked through one item at a time.
+
+- [x] Author decision (2026-10-02, not from a mark): **all 14 generated figures are disabled**
+  (Fig. 4.2, 5.1-5.9, A.1, A.2, D.1, G.1): each `\includegraphics` line is commented out with a
+  `% TODO: figure not final (2026-10-02); restore the line above when ready.` marker and replaced
+  by a placeholder box; captions and labels unchanged. Scripts and image files are untouched.
+- [ ] TODO (14 inline markers above): restore each figure once it is final.
+- [x] #1 title page keywords: MP-PDE, MM-PDE and moving mesh removed, U-Net added
+  (2026-10-02). Now: Geographic Atrophy, OCT, neural PDE solvers, graph neural networks, U-Net,
+  medical imaging, longitudinal prediction.
+- [ ] #2-#4 abstract: "Only the operator f_θ varies … matched parameter counts" marked
+  "different"; bar along the results paragraph; "This whole thing reads terribly ?!".
+- [ ] #5 §1.2 "and is tested in this thesis" (covariates) -- "is it though".
+- [ ] #6 §1.3 "organised around a single question" -- "a single" circled, "?".
+- [ ] #7 §2.2.2 "which holds the rate constant over the step" -- "is this not why we have a
+  linear line, [?] speed?" (reading uncertain).
+- [ ] #8 end of §2.2.3 -- "few sentences! what does understanding these yield / is this
+  already somewhere?" (§2.2.5 may cover it).
+- [ ] #9 §3.4 "a hard step at the lesion edge" -- "future: the continuous distance from lesion
+  experiment" (§6.4).
+- [ ] #10 §3.7 empty test split -- "no test because lack of data".
+- [ ] #11 §4.1 provenance sentence (MP-PDE/MM-PDE suggested by the clinical partner) -- "we can
+  absolutely not write this".
+- [ ] #12 Fig. 4.2 -- "here I was thinking more like this" + sketch, "just the stencil" (the
+  two neighbourhoods in grid indices, like the inset).
+- [ ] #13 Ch. 5 opener -- "Behaviour beyond 1 year analysis / yearly bins → when we do this →
+  show that TFEN becomes really bad after some time, therefore the graph canonical". Check
+  against Table 5.7 first (T-FEN = stencil over 0-3 y, 0.611 vs 0.655 beyond 3 y, descriptive).
+- [ ] #14 §5.1.4/§5.2 -- "I thought it was agreed only to report one seed and have the second
+  in appendix E" (= the reporting-scheme pass #23/#25/#31 above).
+- [ ] #15 §5.4.2 heading "Is the weighting of the mask channel needed?", #16 §5.5.2 "The
+  energy-conserving form.", #18/#19 "Figure 5.7:" / "Figure 5.8:", #20 Ch. 7 "The framework."
+  -- highlighted without comment; ask the author.
+- [ ] #17 §5.7 GPU-sharing sentence -- red, "remove".
+- [ ] #21 Fig. D.1 panel (b) "Lowest Dice" -- red cross, "absolutely not".
+
 ### Assets that now exist and should be reused
 
 - **The Practical Work report** (`masterthesis-docker/practical/`) was handed in
