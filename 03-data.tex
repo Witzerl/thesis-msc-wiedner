@@ -396,12 +396,12 @@ training windows and 100 validation windows.
   \end{tabular}
 \end{table}
 
-The test split is structurally empty. An eye whose patient appeared in
-neither the training nor the validation list would be assigned to a test
-partition. However, every patient with scans is assigned to training or
-validation in every fold. No test partition is therefore ever produced.
-The protocol is 5-fold train/validation cross-validation, and every
-result reported in this thesis is a validation result.
+No separate test set is held out. With 75 eyes from 51 patients, a
+held-out test set would leave too few eyes both for training and for a
+reliable test. Instead, every eye serves as a validation eye in exactly
+one of the five folds. The protocol is therefore 5-fold train/validation
+cross-validation, and every result reported in this thesis is a
+validation result.
 % TODO: ensure that no chapter describes the cross-validation results as
 % test-set performance; the test split is structurally empty.
 

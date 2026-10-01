@@ -154,7 +154,6 @@ compared with how far the disease moves between visits.
 \section{Clinical Implications}
 \label{sec:discussion:clinical}
 
-\paragraph{Good at where, weaker at how fast.}
 The survey was designed around the change-region Dice at one year, which
 measures whether a model predicts change where change actually happens. On
 this measure the operators are well above persistence. The speed of
@@ -191,7 +190,7 @@ two capabilities. A forecast of where the lesion will expand is useful in
 a different way, for example to judge whether growth is heading towards
 the fovea, but that use was not evaluated here.
 
-\paragraph{Reliable horizon.}
+A second clinical question is how far ahead the forecast remains useful.
 All comparisons in this thesis are made at the one-year anchor. Beyond
 one year, the growth-region Dice of the canonical model does not fall; it
 lies at about 0.60 to 0.66 in the second, third and later years
@@ -220,9 +219,8 @@ predicting a future one.
 % 0.72 +/- 0.14 (validation), 0.73 +/- 0.10 (test); their best model 0.70 +/-
 % 0.09. Whole-lesion inter-grader values (0.88-0.94) measure something else.
 
-\paragraph{Position in a clinical pipeline.}
-Because every model starts from segmented masks and layer depths, a
-clinical use would place it behind a segmentation model. Errors of that
+Finally, because every model starts from segmented masks and layer
+depths, a clinical use would place it behind a segmentation model. Errors of that
 segmentation would pass into the forecast, and this thesis does not model
 them. Failures would matter most where the method is known to be weak:
 lesions that touch the border of the crop, where growth is censored; fast
@@ -235,7 +233,6 @@ bridge a long interval.
 \section{Limitations}
 \label{sec:discussion:limitations}
 
-\paragraph{Data and labels.}
 The cohort is small: 75 eyes of 51 patients, with 12 to 20 validation
 eyes per fold. Every result is a validation result of a five-fold
 cross-validation; there is no held-out test split
@@ -275,16 +272,16 @@ is one reason why no monotonic-growth constraint was imposed.
 % decrease in 24 pairs (15 eyes), max -14 %; local loss > 5 % of the lesion
 % in 21 %, > 10 % in 5 % of pairs; lost / gained area over all pairs 22 %.
 
-\paragraph{Evaluation.}
-The one-year anchor is the first rollout step at or beyond 360 days and
+The evaluation has limits of its own. The one-year anchor is the first
+rollout step at or beyond 360 days and
 has no upper bound, so a few eyes are scored later, where more change has
 accumulated. The change-region Dice was logged only as a cohort mean per
 run, so the per-eye instrument uses the growth-region Dice instead
 (\S\ref{sec:experiments:protocol:stats}). Several findings rest on one
 seed, and the solver-swap test on one fold per model.
 
-\paragraph{Model scope.}
-Every operator sees one visit and has no memory of the trajectory so far,
+The scope of the models is limited as well. Every operator sees one visit
+and has no memory of the trajectory so far,
 although each eye has 5 to 13 visits. An eye's own past growth, the most
 direct evidence of its speed, is therefore never used. The patient
 covariates are enabled in every operator, but whether they carry useful
@@ -311,8 +308,8 @@ about mesh adaptation is drawn from it.
 \label{sec:discussion:future}
 
 \paragraph{Spatial pre-processing.}
-The fixed centre crop censors growth for about a third of the cropped
-lesions. A larger or adaptive window with a mask for padded positions, or
+The fixed centre crop censors growth in almost a third of the visits
+(\S\ref{sec:data:spatial}). A larger or adaptive window with a mask for padded positions, or
 a crop that follows the registration to the fundus image, would reduce
 this censoring and make areas comparable with whole-field studies.
 

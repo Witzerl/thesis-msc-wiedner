@@ -12,25 +12,25 @@ forecast the progression of Geographic Atrophy from longitudinal OCT?} It
 was split into two parts: (1) What kind of framework does the forecast
 need? (2) What kind of operator does that framework need?
 
-\paragraph{The framework.}
-The forecast needs a setup that absorbs the irregularity of clinical data
-and treats every candidate model the same way. The framework built in
+For the first part, the forecast needs a setup that absorbs the
+irregularity of clinical data and treats every candidate model the same
+way. The framework built in
 Chapter~\ref{ch:method} does this with a residual update conditioned on
 the elapsed time $\Delta t$, a zero-initialised output so that every model
 starts from persistence, a training curriculum measured in elapsed days,
 and one loss and one evaluation for all models. Held fixed, it served
 operators from unrelated literatures without change, and every operator
 with spatial context learned to predict change far above persistence.
-This required a loss that puts weight on the lesion mask: without the
-weighting the canonical operator learned no change at all, and a soft-Dice
-term added about 0.05.
+This required a loss that puts weight on the lesion mask: trained with a
+plain mean squared error, the canonical operator learned no change at all,
+and a soft-Dice term added about 0.05.
 How time enters the update mattered less than that it enters: a
 higher-order Runge--Kutta step bought nothing over a single Euler step.
 
-\paragraph{The operator.}
 % Author decisions (a) and (b), 2026-10-01: headline scoped; global + local
 % moved from the list to a sentence after it.
-The architecture class is not what decides the outcome. The three
+For the second part, the architecture class is not what decides the
+outcome. The three
 strongest operators come from three unrelated classes --- a
 finite-element network, a graph network and a U-Net --- and lie within
 about 0.04 of each other, at a change-region Dice of about 0.50 to 0.54 at
@@ -46,8 +46,7 @@ that were measured one at a time.
   \item \textbf{Physical reach at the scale of the lesion front.}
     Changing only where the neighbours of a graph network lie, so that one
     step reaches as far as the front moves between visits, raised the
-    change-region Dice by 0.064 at an unchanged parameter count. It is the
-    largest effect in the project.
+    change-region Dice by 0.064 at an unchanged parameter count.
   \item \textbf{An explicit transport term.} Adding a learned transport
     term to a Finite Element Network raised it by 0.062 over the same
     network without it, and by 0.072 over a parameter-matched control on
@@ -63,7 +62,6 @@ visits. That two independent routes lead to the same level is the central
 architectural result of this thesis, more informative than the score of
 any single model.
 
-\paragraph{What did not matter.}
 The negative results are part of the answer. Larger models did not help in
 any of the four classes tested. A
 higher-order time integration did not help, and neither did a penalty
@@ -75,9 +73,8 @@ the length of the step, not a continuous-time model. Models that do
 behave as continuous-time models can be trained, but they are not more
 accurate.
 
-\paragraph{Clinical position.}
-The operators predict where the lesion changes better than how fast an
-individual eye grows. On growth speed, the canonical model reaches a
+Clinically, the operators predict where the lesion changes better than
+how fast an individual eye grows. On growth speed, the canonical model reaches a
 correlation of 0.40 with the true growth rates, against 0.61 for the
 model of \citet{Mai2024} on a larger cohort from the same clinic, which starts
 from the raw OCT
@@ -86,9 +83,8 @@ not directly comparable, but the gap shows where the approach is weakest.
 The small cohort, the censoring of the fixed crop and the missing memory
 of past visits bound every conclusion drawn here.
 
-\paragraph{Take-away.}
-For forecasts from longitudinal medical imaging in a low-data clinical
-setting, what matters is the framework around the model and the
+In short, for forecasts from longitudinal medical imaging in a low-data
+clinical setting, what matters is the framework around the model and the
 properties of the operator placed in it --- above all, whether one update
 can see as far as the disease moves between two visits --- rather than
 the choice of operator family.

@@ -1225,7 +1225,9 @@ worked through one item at a time.
 - [x] #9 §3.4 "a hard step at the lesion edge" -- "future: the continuous distance from lesion
   experiment". Done 2026-10-02: new §6.4 paragraph "A continuous representation of the lesion"
   (signed distance to the boundary instead of the binary step; untested).
-- [ ] #10 §3.7 empty test split -- "no test because lack of data".
+- [x] #10 §3.7 empty test split -- "no test because lack of data". Done 2026-10-02: the split-file
+  mechanics replaced by the reason (75 eyes / 51 patients: a held-out test set would leave too few
+  eyes for training and for a reliable test; every eye is a validation eye in exactly one fold).
 - [ ] #11 §4.1 provenance sentence (MP-PDE/MM-PDE suggested by the clinical partner) -- "we can
   absolutely not write this".
 - [ ] #12 Fig. 4.2 -- "here I was thinking more like this" + sketch, "just the stencil" (the
@@ -1235,9 +1237,20 @@ worked through one item at a time.
   against Table 5.7 first (T-FEN = stencil over 0-3 y, 0.611 vs 0.655 beyond 3 y, descriptive).
 - [ ] #14 §5.1.4/§5.2 -- "I thought it was agreed only to report one seed and have the second
   in appendix E" (= the reporting-scheme pass #23/#25/#31 above).
-- [ ] #15 §5.4.2 heading "Is the weighting of the mask channel needed?", #16 §5.5.2 "The
-  energy-conserving form.", #18/#19 "Figure 5.7:" / "Figure 5.8:", #20 Ch. 7 "The framework."
-  -- highlighted without comment; ask the author.
+- [x] #15 §5.4.2 heading "Is the weighting of the mask channel needed?", #16 §5.5.2 "The
+  energy-conserving form.", #20 Ch. 7 "The framework." -- the author dislikes the run-in
+  paragraph headings. Done 2026-10-02 (author: remove them in §5.4, §5.5, §6.2, §6.3, Ch. 7 and
+  smooth the transitions): all 24 `\paragraph{}` headings there removed; each paragraph now opens
+  with a sentence that carries the topic ("The first test asks whether …", "For the first part,
+  …", "The evaluation has limits of its own.", …). Fixed on the way: §5.4.2 intro no longer says
+  each run changes one part (the first removes weighting and soft-Dice; editorial 5c.11); §5.5.2
+  "Its accuracy" now explicitly the energy-conserving form at seed 42 (editorial 5d.16); Ch. 7
+  "without the weighting" -> "trained with a plain mean squared error", and "It is the largest
+  effect in the project" removed from the reach bullet (the transport bullet below gives +0.072);
+  §6.4 "about a third of the cropped lesions" -> "almost a third of the visits" (31.1 % of visits,
+  correction of 2026-10-01 missed there). §6.1 and §6.4 keep their headings (not on the list).
+- [ ] #18/#19 "Figure 5.7:" / "Figure 5.8:" -- highlighted without comment; both figures are
+  disabled for now (placeholders). Ask the author when the figures come back.
 - [ ] #17 §5.7 GPU-sharing sentence -- red, "remove".
 - [ ] #21 Fig. D.1 panel (b) "Lowest Dice" -- red cross, "absolutely not".
 

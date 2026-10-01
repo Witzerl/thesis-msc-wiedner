@@ -823,8 +823,8 @@ design is part of the framework that every operator shares, so it matters
 whether its details carry any of the accuracy. Two tests ask this, both on
 the canonical dilated-stencil network.
 
-\paragraph{Is the multiplication by $\Delta t$ needed?}
-In the first test, the multiplication was removed, so the update became
+The first test asks whether the multiplication by $\Delta t$ is needed.
+The multiplication was removed, so the update became
 $u_t + f_\theta(u_t, \Delta t, z)$, while $\Delta t$ remained an input of
 the operator. The change-region Dice does not change: $-0.0006$ on average
 ($\pm 0.0061$~SE, higher on 2 of 5 folds) and per eye $-0.0028 \pm 0.0037$
@@ -846,8 +846,8 @@ rate that could be read off; whether the operator can be read as a
 continuous-time model at all is tested
 in~\S\ref{sec:experiments:validity:swap}.
 
-\paragraph{Does the time-stepping scheme matter?}
-In the second test, the single step was replaced by a classical
+The second test asks whether the time-stepping scheme matters. The single
+step was replaced by a classical
 fourth-order Runge--Kutta step (\S\ref{sec:method:family:rk}), which
 evaluates the operator four times within the interval and combines the
 results. In this setting the operator does not receive $\Delta t$ as an
@@ -863,9 +863,8 @@ step costs about 4.8 times the training time (\S\ref{sec:experiments:cost}).
 % +0.0064 +/- 0.0069 (43/75). The fold-2 decomposition (wrapper offset,
 % Delta t input removed, order) was dropped, author review v4 #33.
 
-\paragraph{What this means.}
-Neither the multiplication by $\Delta t$ nor the integration scheme changes
-the result. What the update needs is that the length of the interval
+Together, the two tests show that neither the multiplication by
+$\Delta t$ nor the integration scheme changes the result. What the update needs is that the length of the interval
 reaches the operator at all, either as an input to a single step or through
 an integrator that steps over the interval; how it arrives makes no
 measurable difference. The simple update of the framework is therefore
@@ -884,10 +883,12 @@ channel is weighted five times more than each layer channel, plus a
 soft-Dice term on the mask channel, with no monotonic-growth penalty. Like
 the time handling, this objective is part of the shared framework, so it
 matters which of its parts carry the result. Three runs on the canonical
-dilated-stencil network, each with one part changed, ask this.
+dilated-stencil network ask this: one without any emphasis on the mask,
+one without the soft-Dice term, and one with a monotonic-growth penalty
+added.
 
-\paragraph{Is the weighting of the mask channel needed?}
-Almost every pixel of the mask stays the same between two visits. With an
+The first run tests whether the mask needs any emphasis at all. Almost
+every pixel of the mask stays the same between two visits. With an
 unweighted mean squared error, a model can therefore reach a low loss by
 copying its input, which predicts no change at all and scores 0 on the
 change-region Dice. The collapse counter of~\S\ref{sec:experiments:protocol:metrics}
@@ -898,9 +899,8 @@ every epoch, and at the last epoch 74 of the 75 validation eyes have a
 prediction identical to their baseline mask. The objective, not the
 operator, decides whether the model learns any change at all.
 
-\paragraph{What does the soft-Dice term add?}
-With the mask weighting kept and only the soft-Dice term removed, the
-network does leave the collapse, but late: on the five folds, its
+The second run keeps the mask weighting and removes only the soft-Dice
+term. The network then does leave the collapse, but late: on the five folds, its
 change-region Dice first rises above 0 at epochs 2, 8, 3, 7 and 12, against
 epoch 0 with the full objective (Figure~\ref{fig:experiments:curves}b).
 It also ends lower, by $-0.050$ on average ($\pm 0.017$~SE, lower on all
@@ -928,11 +928,11 @@ rollout is about twice as large with the term as without it (1.10 against
 % arm 0.4762 +/- 0.0631 vs 0.5258. These replace the older fold-2 loss
 % ladder, which read the soft-Dice term as not raising the score.
 
-\paragraph{Would a monotonic-growth penalty help?}
-Atrophic tissue does not regenerate, so a penalty on any decrease of the
-mask where the previous state is atrophic is a natural prior. It is
-implemented (\S\ref{sec:method:training:loss}) but switched off. With the
-penalty at weight 2.0, the change-region Dice is $-0.0036$ on average
+The third run adds a monotonic-growth penalty. Atrophic tissue does not
+regenerate, so a penalty on any decrease of the mask where the previous
+state is atrophic is a natural prior. It is implemented
+(\S\ref{sec:method:training:loss}) but switched off in every other run.
+With the penalty at weight 2.0, the change-region Dice is $-0.0036$ on average
 ($\pm 0.0037$~SE, higher on 2 of 5 folds) and per eye $-0.0042 \pm 0.0034$
 (34/75): no measurable effect, so the simpler objective is kept.
 % Values: thesis_numbers.py pair ANISOGNN_final_dilmean_mono2
@@ -1191,7 +1191,6 @@ model, and how the energy-conserving form fixes it.
 \subsection{The Solver-Swap Test}
 \label{sec:experiments:validity:swap}
 
-\paragraph{What is tested.}
 The update of the framework, $u_t + \Delta t \cdot f_\theta$, has the form
 of one explicit Euler step (\S\ref{sec:method:dt-residual}), and the
 Runge--Kutta wrapper and the Finite Element Network go further and
@@ -1210,8 +1209,8 @@ solver-swap test determines which of the trained models have the property,
 and therefore for which models statements about continuous-time behaviour
 are admissible.
 
-\paragraph{Principle and criteria.}
-If a model defines an ordinary differential equation
+The test rests on a basic property of numerical integration. If a model
+defines an ordinary differential equation
 $\mathrm{d}u/\mathrm{d}t = g(u)$, every convergent integration scheme
 applied to $g$ approximates the same solution, with an error that shrinks
 as the step $h$ shrinks, in proportion to $h^p$ for a scheme of order $p$
@@ -1228,7 +1227,6 @@ Two criteria make this operational:
 \end{itemize}
 A model is read as a continuous-time model only if it satisfies both.
 
-\paragraph{Setup.}
 The test requires no retraining. A trained checkpoint is rebuilt from its
 own configuration and evaluated with the unmodified evaluation code, with
 only the integration scheme or the step changed. The integration wrapper
@@ -1245,7 +1243,6 @@ with one seed. The T-FEN was integrated with RK4 only, because an explicit
 Euler step is unstable for its transport operator at any step
 (\S\ref{sec:method:family:fen}).
 
-\paragraph{Results.}
 Table~\ref{tab:experiments:swap} lists the results, and
 Figure~\ref{fig:experiments:swap} shows them against the step size. The
 canonical network fails both criteria. Refining its Euler step from one to two to four
@@ -1267,9 +1264,8 @@ the training step, to 30, 22.5 and 15 days changes the Dice by at most
 0.0003 (C1, C2). Only the coarser step of 90 days departs, and by no more
 than 0.0015.
 
-\paragraph{What follows.}
-The canonical network, and with it every headline result, may not be
-described as a continuous-time model: no statement about an ordinary
+It follows that the canonical network, and with it every headline
+result, may not be described as a continuous-time model: no statement about an ordinary
 differential equation, a learned rate of growth or learned dynamics is
 made for it. For the network trained inside the Runge--Kutta wrapper and
 for the energy-conserving T-FEN, a continuous-time reading is admissible,
@@ -1364,7 +1360,6 @@ does not decide the accuracy.
 \subsection{Numerical Stability of the T-FEN}
 \label{sec:experiments:validity:tfen}
 
-\paragraph{The first version.}
 The T-FEN was first trained with the Galerkin form of its transport
 operator (\S\ref{sec:method:family:fen}). Seven of its ten runs, five folds
 at two seeds, are unstable in the sense defined there, whereas the
@@ -1387,17 +1382,17 @@ of the Galerkin T-FEN at one year.
 % onset 1.9-2.3 < ~2.4; a 30-day step (fold 0) still diverges; largest
 % late-epoch mask RMSE 24 418. Possible appendix material.
 
-\paragraph{The energy-conserving form.}
-The T-FEN was retrained with the energy-conserving form of the transport
-operator (Equation~\ref{eq:method:fen-skew}), identical in every other
-respect, at seed 42 on all five folds. It passes the stability criterion on
+To remove the defect at the domain edge, the T-FEN was retrained with the energy-conserving
+form of the transport operator (Equation~\ref{eq:method:fen-skew}),
+identical in every other respect, at seed 42 on all five folds. It passes the stability criterion on
 every fold, with a largest late-epoch error of 2.32 on the mask channel and
 1.13 on the layer channels (Table~\ref{tab:experiments:tfen-stability},
 Figure~\ref{fig:experiments:tfen-stability}).
 The replication at seed 7 passes on every fold as well, with a largest
-error of 2.63 on the mask channel and 1.11 on the layer channels. Its
-accuracy is at least as good: $0.5428 \pm 0.0401$ against
-$0.5337 \pm 0.0453$ for the Galerkin form, higher on all five folds, by
+error of 2.63 on the mask channel and 1.11 on the layer channels. The
+energy-conserving form is also at least as accurate as the Galerkin form:
+at seed 42, $0.5428 \pm 0.0401$ against $0.5337 \pm 0.0453$, higher on all
+five folds, by
 $+0.009$, which is under the noise level. The gain sits where the defect
 was: on lesions that touch the crop border the change-region Dice rises
 from 0.516 to 0.544, while interior lesions are unchanged (0.535 and
