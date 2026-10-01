@@ -532,32 +532,31 @@ parameters.
 
 % Figure: images/scripts/fig_method_stencils.py (geometry only: the grid
 % pitch, the k = 12 index-space neighbourhood and the stencil offsets of
-% baselines/anisognn.py; front-advance quantiles as stated above).
+% baselines/anisognn.py).
+% TODO (author review v6 #12, 2026-10-02): redraw before re-enabling. The
+% current PDF (millimetre axes, two-round markers, front-advance lines,
+% inset) is not wanted; the author's sketch asks for "just the stencil": two
+% plain schematic panels in grid indices, one square per grid position --
+% left the k = 12 diamond (two rows, two columns), right the dilated stencil
+% (rows -1/0/+1 x columns 0, +-7, +-14, +-21). No mm axes; the mm reach stays
+% in the caption and the text.
 \begin{figure}[t]
   \centering
   % \includegraphics[width=\textwidth]{images/fig_method_stencils.pdf}
   % TODO: figure not final (2026-10-02); restore the line above when ready.
   \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering\itshape Placeholder
-    for Figure~\ref{fig:method:stencils}: the two graph neighbourhoods on the anisotropic grid.}}
-  \caption[The two graph neighbourhoods on the anisotropic grid.]{%
-    The two graph neighbourhoods of the graph network, drawn in millimetres
-    at the physical aspect ratio of the grid. One row step (0.121\,mm) is
-    about 21 times longer than one column step (0.0057\,mm); the nodes
-    along a row lie so close together that each row appears as a line.
-    \emph{Left:} the index-space $k$-nearest-neighbour graph ($k = 12$). In
-    grid indices (inset) its neighbourhood is a diamond reaching two rows
-    and two columns; in millimetres it is a narrow strip that reaches
-    $\pm 0.24$\,mm across rows but only $\pm 0.011$\,mm along a row.
+    for Figure~\ref{fig:method:stencils}: the two graph neighbourhoods in grid indices.}}
+  \caption[The two graph neighbourhoods in grid indices.]{%
+    The two graph neighbourhoods of the graph network in grid indices;
+    each square is one grid position, rows are B-scans and columns
+    A-scans. \emph{Left:} the index-space $k$-nearest-neighbour graph
+    ($k = 12$), a diamond reaching two rows and two columns.
     \emph{Right:} the dilated stencil, with 20 neighbours at rows
-    $\{-1, 0, +1\}$ and columns $\{0, \pm 7, \pm 14, \pm 21\}$, reaching
-    about 0.12\,mm on both axes.
-    Filled markers are reached in one message-passing round, open markers
-    in two, the number of rounds of the canonical configuration: about
-    $\pm 4$ columns ($\pm 0.023$\,mm) along a row with the $k$-NN graph,
-    against $\pm 42$ columns ($\pm 0.24$\,mm) with the dilated stencil. The
-    vertical lines mark the median (12 columns) and the 90th percentile
-    (23 columns) of the advance of the GA front between two visits 180 days
-    apart.}
+    $\{-1, 0, +1\}$ and columns $\{0, \pm 7, \pm 14, \pm 21\}$. Because one
+    row step (0.121\,mm) is about 21 times longer than one column step
+    (0.0057\,mm), the $k$-NN graph reaches $\pm 0.24$\,mm across rows but
+    only $\pm 0.011$\,mm along a row, whereas the dilated stencil reaches
+    about 0.12\,mm on both axes.}
   \label{fig:method:stencils}
 \end{figure}
 

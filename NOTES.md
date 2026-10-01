@@ -1233,8 +1233,11 @@ worked through one item at a time.
   the first part of the research question: what kind of framework the forecast needs." (also
   closes the editorial point that Ch. 4 never names sub-question 1). THESIS_STRUCTURE.md §1.3
   updated so the note does not come back.
-- [ ] #12 Fig. 4.2 -- "here I was thinking more like this" + sketch, "just the stencil" (the
-  two neighbourhoods in grid indices, like the inset).
+- [x] #12 Fig. 4.2 -- "here I was thinking more like this" + sketch, "just the stencil" (the
+  two neighbourhoods in grid indices, like the inset). Done 2026-10-02 (author: caption only, the
+  figure is not displayed): caption rewritten for two plain grid-index panels (k = 12 diamond;
+  dilated stencil rows -1/0/+1 x columns 0, ±7, ±14, ±21; mm reach in the caption); the redraw
+  spec is a TODO above the figure. The existing PDF must be redrawn before re-enabling.
 - [ ] #13 Ch. 5 opener -- "Behaviour beyond 1 year analysis / yearly bins → when we do this →
   show that TFEN becomes really bad after some time, therefore the graph canonical". Check
   against Table 5.7 first (T-FEN = stencil over 0-3 y, 0.611 vs 0.655 beyond 3 y, descriptive).
@@ -1607,9 +1610,9 @@ Pulled from the code repository (`masterthesis-docker/NOTES.md` + `PROJECT_CONTE
   TODO, and the §4.3.3 table states only "K steps".
 - [ ] TODO: produce Figure `fig:method:pipeline` (§4.1) -- the shared pipeline with the
   operator slot as the one varying box and the moving-mesh branch dashed.
-- [ ] TODO: produce Figure `fig:method:stencils` (§4.3.2) -- index-space diamond vs dilated
-  stencil at physical aspect ratio, 0.1 mm scale bar, median (12 col) and p90 (23 col)
-  per-visit front advance marked.
+- [ ] TODO: redraw Figure `fig:method:stencils` (§4.3.3) per author review v6 #12 (2026-10-02):
+  two plain schematic panels in grid indices -- k = 12 diamond and dilated stencil -- no mm axes,
+  no two-round markers, no front-advance lines (supersedes the physical-aspect-ratio spec).
 - [ ] TODO (code repo, not editable from here): `THESIS_FRAMEWORK.md` §4.5 still justifies
   the persistence prior with "GA evolves ... monotonically (dead tissue does not heal)".
   That contradicts the locked-off monotonic penalty and the observed local shrinkage.
