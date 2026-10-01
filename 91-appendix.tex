@@ -475,7 +475,7 @@ $L_{\text{bound}}$ enforces the boundary condition, and
 $L_{\text{convex}}$ penalises violations of convexity. The convexity
 term is critical; a non-convex potential inevitably yields a tangled
 and useless mesh, regardless of how small the equation residual
-becomes. Training uses the Adam optimiser followed by L-BFGS
+becomes. Training uses the Adam optimiser followed by BFGS
 fine-tuning applied exclusively to the last layer. The DMM is
 pretrained and subsequently frozen during solver training. This
 decouples a well-posed geometric problem from the main solver objective
@@ -501,15 +501,13 @@ branch, destabilising the system.
 
 The classical background for adaptive moving meshes on which this
 framework builds is covered extensively by \citet{HuangRussell2011}.
-\citet{Hu2024} reported several architectural ablations that confirm
-the dual-branch necessity. Removing the moved branch degrades
-performance entirely to the uniform-mesh baseline. Removing the uniform
-branch degrades performance even further, because the moved mesh
-inherently under-covers smooth regions. Replacing the DMM-generated
-mesh with a random mesh isolates and degrades the performance of the
-moved branch specifically. Finally, removing the interpolation
-pretraining severely harms overall training stability, even if it does
-not permanently cap the final accuracy.
+\citet{Hu2024} reported several architectural ablations of the
+dual-branch solver. Removing the uniform-mesh branch, replacing the moved
+branch by a second branch on the original mesh, removing the residual-cut
+network of the original model (not used in this thesis), or replacing the
+DMM mesh by the uniform mesh each increases the error. They conclude that
+the branch on the original mesh, the residual cut and a well-defined moving
+mesh are all needed to keep accuracy.
 
 Whether mesh adaptation provides a measurable benefit for slowly
 evolving clinical data is the question this appendix tests.
@@ -599,7 +597,7 @@ boundary nodes stay on the boundary. The third penalises negative diagonal
 entries of the Hessian of $\phi$, an early sign of folding. This term
 stays close to zero throughout training; validity is enforced instead when
 a checkpoint is selected, by requiring zero folded cells. The last-layer
-L-BFGS refinement of \citet{Hu2024} was not used.
+BFGS refinement of \citet{Hu2024} was not used.
 
 Each iteration samples 5 masks and 1000 points per mask, 90\,\% of them in
 proportion to the monitor and 10\,\% uniformly. The mesh mover was trained

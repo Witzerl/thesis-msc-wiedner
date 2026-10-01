@@ -990,6 +990,51 @@ through one item at a time.
   `% TODO` comment there (runs in progress, results expected within hours).
 - All 12 items of review v5 worked through.
 
+### Citation recheck and corrections (2026-10-01)
+
+Second, independent pass over all 176 entries of `literature/_ledger.md`: 11 agents
+re-judged every citation against the PDF text without seeing the earlier verdicts, plus
+one pass over the 16 citations that were new or reworded after the ledger was built.
+Per-citation evidence: `literature/_recheck_2026-10-01.md` (git-ignored). 138 of the 163
+re-judged entries agree with the ledger. The 13 citations of books without a local copy
+(LeVeque 2002/2007, Gottlieb & Orszag, Trefethen, Bartels, Hairer, Butcher, Scarselli,
+Huang & Russell) were judged from general knowledge only; the Bartels "splitter"
+attribution was checked through the MP-PDE text.
+
+- [x] Corrections applied step by step with the author, each as the smallest change to
+  wording or citation: §1.1 (AMD numbers: 288 million is 2040 not 2050, cited to Wong;
+  bilateral GA, trial results, treatment timing, Vallino wording), §1.2/§1.3 (no "deep
+  learning" for Schmidt-Erfurth/Vogl, Yehoshua "found" not "demonstrated", Singh
+  pegcetacoplan clause, prior-work claim), §2.1 (cRORA is not restricted to eyes without
+  MNV, iRORA 93 % is one study, Chu rim wording, Pilotto ICC 0.97-0.98 and sections, en-face
+  list, Ebneter/Vallino numbers, Pilotto 99 % clause deleted, bilateral GA), §2.2-§2.4
+  (Yehoshua margin growth, FEN transport variant, related work: Schmidt-Erfurth,
+  Bogunovic, Vogl, Lad/Singh sentence deleted, Vallino, Mai, Salvi, MP-PDE credit), §3.1/§3.6
+  and §5.1.3 (Mai cohort and anchor wording, Feuer/Yehoshua), §4 (Ott only for the
+  consistency caution, MP-PDE limitations, "main departures", Gupta, Courant, table row
+  "State"), §5.6.1/§6.2/Ch. 7 (Mai: larger cohort of the same clinic, no cropping reported,
+  growth-rate definition, gap 0.18 to 0.29), Appendix G (BFGS not L-BFGS, Hu et al.
+  ablations as in their Table 9).
+- [x] `references.bib`: Yehoshua2011 given name Manuel (not Maria) Falcao; Singh2025
+  Quilantan is Jaclyn; middle initials of Dorairaj (K.) and Worrall (E.).
+- Left unchanged on purpose (a gloss or origin citation the source does not contradict):
+  Boyer2017/Boopathiraj2024 "outer segments", the three-signature list (union of
+  Vallino/Yehoshua/Boopathiraj), en-face definition, Courant1943, Runge1895, Kutta1901,
+  Paszke2019/Fey2019 version numbers, SanchezGonzalez2020/Pfaff2021 (cloth rests on Pfaff).
+- [ ] TODO (inline in `02-background.tex` §2.4): confirm with the supervisor how the 75-eye
+  cohort relates to the 184-eye cohort of Mai et al. (2024); the thesis now says "a larger
+  cohort of the same clinic" everywhere. The device and mask provenance TODOs in 03-data.tex
+  stay open.
+- [ ] TODO: second verification pass over the ~75 reworded sentences (agents V1-V4) was
+  running when this entry was written; record the result here and fix what it finds.
+- [ ] TODO: `python literature/_tools/update_ledger.py --apply` once the verification is
+  done, so that ledger ids, lines and hub notes follow the new text.
+- [ ] Optional primary sources, not in `references.bib`, that now stand behind a secondary
+  statement: Corradetti et al. 2021 (iRORA 93 %), Zhang et al. 2022 (RPE-BM distance plus
+  ORL thickness, 62 %), Vogl et al. 2023 Ophthalmol Retina 7:4-13 (topographic GA
+  progression), Lindner et al. 2015 (faster growth towards the periphery), Bui et al. 2022
+  (description of the Mai cohort).
+
 ### Figure plan (2026-10-01)
 
 Author: work the figures back to front (appendix and Chapter 5 first, medical illustrations

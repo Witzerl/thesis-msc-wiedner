@@ -162,7 +162,7 @@ differs from window to window. It is the same for every operator placed in
 the slot. This resemblance to a numerical integrator needs a caution.
 The Euler form does not by itself make $f_\theta$ a time derivative or a
 rate of change. A network trained with this update need not be a consistent
-discretisation of any continuous-time system \citep{Chen2018, Ott2021}. This thesis therefore does not assume such a reading. Instead, it is tested
+discretisation of any continuous-time system \citep{Ott2021}. This thesis therefore does not assume such a reading. Instead, it is tested
 directly with a solver-swap diagnostic, reported
 in~\S\ref{sec:experiments:validity}: a trained model is re-evaluated, without
 retraining, under several integration schemes and step counts. A model that
@@ -316,11 +316,12 @@ temporal bundling and the pushforward trick
 million parameters and a hidden size of the order of 128, and they are
 trained with AdamW.
 
-The original paper names three limitations: it needs high-quality
-numerical ground truth for training, it has no formal accuracy guarantees,
-and a uniform mesh is wasteful in smooth regions and under-resolved at
-sharp gradients. The last one motivates the moving-mesh extension of
-\citet{Hu2024} (Appendix~\ref{app:mm-pde}).
+The original paper names two limitations: it needs high-quality
+numerical ground truth for training, and it has no formal accuracy
+guarantees. A further one, not named by its authors, is that a uniform mesh
+is wasteful in smooth regions and under-resolved at sharp gradients; it
+motivates the moving-mesh extension of \citet{Hu2024}
+(Appendix~\ref{app:mm-pde}).
 
 \paragraph{The architecture used here.}
 The forward pass consists of an encoder, a number of message-passing
@@ -408,7 +409,7 @@ which yields the persistence start of~\S\ref{sec:method:dt-residual}.
 % Correction-branch exception (no zero-init there) moved to Appendix G.
 
 \paragraph{Differences from the original.}
-Table~\ref{tab:method:mppde-diff} lists every departure from the original
+Table~\ref{tab:method:mppde-diff} lists the main departures from the original
 MP-PDE \citep{Brandstetter2022}. The original entries refer to the
 published paper; the original was evaluated mainly on one-dimensional
 equations, with additional two-dimensional smoke-inflow experiments, and
@@ -430,7 +431,7 @@ used different settings for the two.
     \toprule
     Aspect & Original MP-PDE & This thesis \\
     \midrule
-    State & Scalar field of a PDE & Eleven-channel clinical state on a
+    State & PDE solution (mostly scalar-valued) & Eleven-channel clinical state on a
       2-D grid \\
     Temporal bundling & $K$ future steps per forward pass & Removed;
       one step per pass ($K = 1$) \\
@@ -569,7 +570,7 @@ channels with an up-convolution, concatenates the correspondingly cropped
 feature map from the contracting path, and applies two further $3 \times 3$
 convolutions. A final $1 \times 1$ convolution maps to the output classes.
 \citet{Gupta2023} study modernised U-Nets as PDE surrogates and
-attribute their strength to handling local and global information through
+describe them as handling local and global information through
 the down- and up-sampling paths.
 In the GA domain, \citet{Salvi2025} predict future lesion growth with a
 two-dimensional U-Net on fundus autofluorescence images.
@@ -761,8 +762,8 @@ lattice, the assembled transport operator has a purely imaginary spectrum:
 an explicit Euler step would amplify every mode for any non-zero velocity,
 whereas RK4 has a stability interval on the imaginary axis. It remains
 stable only while the velocity times the step, the Courant number in the
-sense of~\citet{Courant1928}, stays below a limit of about 2.4 for this
-stencil.
+sense of the stability condition of~\citet{Courant1928}, stays below a limit
+of about 2.4 for this stencil.
 
 \paragraph{Two forms of the transport operator.}
 Two forms of the assembled transport operator were trained. The first is

@@ -9,17 +9,18 @@
 \label{sec:introduction:motivation}
 
 Age-related macular degeneration (AMD) is the leading cause of irreversible
-central vision loss in older adults in industrialised countries \citep{Wong2014}. Worldwide,
+central vision loss in older adults in industrialised countries \citep{Boopathiraj2024}. Worldwide,
 it ranks as the third most frequent cause of moderate-to-severe vision
 impairment and the fourth most frequent cause of blindness
-\citep{Flaxman2020}. Roughly 200~million people are
-estimated to live with some form of AMD today, with projections reaching
-288~million by 2050 \citep{Boopathiraj2024,Trincao2024}. Among these, the
-late dry stage --- termed \emph{Geographic Atrophy} (GA) --- is the dominant
-cause of severe visual decline in the absence of choroidal neovascularisation
-\citep{Vallino2024}. Approximately one million people in the United States and
-five million worldwide are affected by GA, with around 160{,}000 new diagnoses
-per year in the United States alone \citep{Singh2025,Vallino2024}. Unlike
+\citep{Flaxman2020}. An estimated 196~million people lived with some form of
+AMD in 2020, with projections reaching 288~million by 2040
+\citep{Wong2014}. Among these, the late non-neovascular stage --- termed
+\emph{Geographic Atrophy} (GA) --- is an advanced, irreversible and
+progressive atrophy of the macula that causes a marked loss of visual acuity
+once the fovea is involved \citep{Vallino2024}. Approximately one million
+people in the United States and five million worldwide are affected by GA
+\citep{Singh2025}, with around 160{,}000 new diagnoses per year in the United
+States alone \citep{Vallino2024}. Unlike
 other eye diseases that cause vision loss, such as cataract, glaucoma or
 diabetic retinopathy, AMD is not counted among the avoidable causes of vision
 loss, defined as those that known, cost-effective means can prevent or treat
@@ -28,37 +29,44 @@ progression of the disease once it has appeared.
 
 The disease burden is concentrated in the older population. Prevalence of GA
 rises by roughly a factor of four per decade after age fifty
-\citep{Singh2025}, and population-based screening data show overall AMD
+\citep{Singh2025}, and a South Korean national survey reports overall AMD
 prevalence increasing from 3.6\,\% in the fifth decade of life to 34.0\,\%
-above the age of eighty \citep{Song2025}. GA is bilateral in approximately
-39\,\% to 50\,\% of patients at the time of initial diagnosis, with strong
-inter-eye correlation \citep{Yehoshua2011,Boyer2017}. An ageing
+at the age of eighty and above \citep{Song2025}. GA often affects both eyes:
+bilateral GA was present in 39\,\% of the patients of one OCT cohort
+\citep{Yehoshua2011}, and in the AREDS cohort the cumulative probability of
+bilateral GA rose from 7\,\% at first GA development to 62\,\% at ten years
+\citep{Boyer2017}. The two eyes of a patient also show a high degree of
+concordance in the incidence, progression and area of GA
+\citep{Boyer2017}. An ageing
 population, frequent involvement of both eyes and eventual spread to the
 fovea make GA a long-term disease that progresses differently in every
 patient. The clinically relevant question is therefore not \emph{whether} a
 patient will deteriorate, but \emph{how fast} and \emph{where} in the
 macula the lesion will grow.
 
-For decades, the therapeutic landscape for GA was empty: a series of phase
-1--3 trials targeting neuroprotection, the visual cycle, antiamyloid pathways,
-and cell replacement consistently failed to slow lesion growth
-\citep{Lad2023}. This changed in 2023 with the U.S. Food and Drug
+Until 2023, the therapeutic landscape for GA was empty: no treatment was
+approved, and numerous phase 1--3 trials of GA and intermediate AMD,
+addressing mechanisms such as neuroprotection, visual cycle modulation,
+antiamyloid pathways and cell replacement, had failed during the preceding
+decade \citep{Lad2023}. This changed in 2023 with the U.S. Food and Drug
 Administration's approval of two complement-pathway inhibitors,
 pegcetacoplan (anti-C3) and avacincaptad pegol (anti-C5)
-\citep{Lad2023,Singh2025,Trincao2024}. Both drugs reduce the rate of GA
-enlargement by roughly 14\,\% to 27\,\% over twelve to twenty-four months but
-neither arrests nor reverses the underlying atrophy, and best-corrected
-visual acuity remains unchanged at the trial endpoints
-\citep{Lad2023,Trincao2024}. The clinical implication is twofold. First,
+\citep{Singh2025,Trincao2024}. In the phase 3 trials, both drugs reduced the
+rate of GA enlargement by roughly 14\,\% to 27\,\% over twelve to
+twenty-four months, but the lesions continued to grow and best-corrected
+visual acuity did not differ significantly from sham at the trial endpoints
+\citep{Lad2023}. The clinical implication is twofold. First,
 treatment timing now matters: an intervention that only slows progression is
-most valuable when administered before foveal involvement
+most valuable when administered before foveal involvement, because central
+vision is largely preserved until the atrophy reaches the fovea
 \citep{Boyer2017,Vallino2024}. Second, intravitreal injections carry both
 patient burden and procedural risk, so identifying which eyes will progress
 rapidly enough to justify therapy is the critical decision support task. As
-\citet{Vallino2024} explicitly note in their conclusions, the integration of
-artificial intelligence with structural OCT biomarkers offers the most
-promising avenue toward predictive probabilities of GA development over time.
-This thesis pursues that avenue.
+\citet{Vallino2024} note in their conclusions, the integration of artificial
+intelligence with structural OCT biomarkers holds significant promise, and
+artificial intelligence applied to OCT has the potential to provide
+predictive probabilities of GA development over time. This thesis pursues
+that avenue.
 
 
 \section{Problem Statement}
@@ -71,8 +79,8 @@ a sequence of macula-centred grids on which the lesion outline and the
 underlying retinal layer geometry are traced; given the most recent observed
 state and a target horizon $\Delta t$, the goal is to predict the full
 spatial configuration of the lesion at the future visit. This differs from
-earlier deep-learning work on AMD, which predicts when an eye will convert to
-a later disease stage \citep{SchmidtErfurth2018, Vogl2021}. The output here is not a single risk
+earlier work on AMD, which predicts or characterises the conversion of an eye
+to a later disease stage \citep{SchmidtErfurth2018, Vogl2021}. The output here is not a single risk
 score but a complete map of the lesion at the next visit.
 
 The clinical reality of OCT follow-up imposes three properties on the data
@@ -83,11 +91,11 @@ is no shared temporal origin across eyes, which rules out methods that
 assume a fixed sampling rate or a common $t = 0$. Second, the underlying
 disease state is naturally \emph{multi-channel}: the binary lesion mask
 captures the GA lesion itself, while the surrounding ten retinal layer
-boundaries encode the structural cascade in which the atrophy is embedded
-\citep{Chu2022,Vallino2024}. Both information sources are required because
-prognostic biomarkers documented in the clinical literature, such as
-RPE--Bruch's-membrane thickening and outer nuclear layer thinning, are not
-contained in the lesion mask alone. Third, every patient carries \emph{covariates}, in particular age and
+boundaries describe the retinal structure in which the atrophy is embedded.
+Both information sources are relevant because prognostic biomarkers
+documented in the clinical literature, such as RPE--Bruch's-membrane
+thickening \citep{Chu2022} and thinning of the outer retinal layers
+\citep{Vallino2024}, are not contained in the lesion mask alone. Third, every patient carries \emph{covariates}, in particular age and
 sex. Age is strongly associated with the risk of developing the disease
 (\S\ref{sec:introduction:motivation}), and the evidence on sex is mixed;
 whether either also helps to forecast where and how fast a lesion grows is
@@ -108,18 +116,20 @@ inside it is a separate question.
 \label{sec:introduction:why-pde}
 
 GA expansion is, to a first approximation, a process of \emph{local boundary
-dynamics}. \citet{Yehoshua2011} demonstrated empirically that the radius of
-a GA lesion grows at a roughly constant rate while its enclosed area scales
-quadratically: writing $A(t)$ for the lesion area and $r(t)$ for an
-effective radius,
+dynamics}. \citet{Yehoshua2011} found that the enlargement rate of the square
+root of the lesion area does not depend on the baseline lesion size, which is
+what is expected if the radius of a GA lesion grows at a roughly constant rate
+while its enclosed area scales quadratically: writing $A(t)$ for the lesion
+area and $r(t)$ for an effective radius,
 \begin{equation}
   \frac{\mathrm{d}r}{\mathrm{d}t} \approx \mathrm{const.}
   \quad\Longleftrightarrow\quad
   \sqrt{A(t)/\pi} \;=\; r_0 + v\, t,
   \label{eq:intro:boundary-growth}
 \end{equation}
-which holds within the clinical follow-up horizon of six months to slightly
-over two years and has been re-used in subsequent biomarker work
+which is consistent with the data within a clinical follow-up horizon of six
+months to slightly over two years \citep{Yehoshua2011}; the square-root
+enlargement rate has been re-used in subsequent biomarker work
 \citep{Chu2022}. The interior of the lesion is already atrophic and the
 exterior is healthy; both are quasi-static, and all dynamics are
 concentrated at the active boundary. This is the structural fingerprint of
@@ -130,8 +140,9 @@ The same boundary, however, does not advance uniformly in all directions.
 GA growth is \emph{anisotropic}: lesions progress faster towards the retinal
 periphery than towards the fovea, peak progression rate occurs at
 approximately one millimetre from the foveal centre when the lesion grows
-foveally, and complement inhibition has a spatially asymmetric treatment
-effect \citep{Singh2025}. The forward operator that maps the present state
+foveally, and in eyes treated monthly with pegcetacoplan progression towards
+the fovea was slowed more than progression towards the periphery
+\citep{Singh2025}. The forward operator that maps the present state
 to the future state is therefore \emph{local}, but its reach must match
 the distance the front moves between two visits, which differs between
 directions --- properties that classical solvers build in explicitly
@@ -154,10 +165,13 @@ its operator, its size, or the setup around it. This thesis therefore
 separates the two. The setup --- how elapsed time enters the prediction,
 how models are trained and how they are evaluated --- is fixed once, and
 the operator is the only part that changes. Architectures from different
-families can then be compared on equal terms. Unlike prior work, which has
-remained anchored in cohort-level statistical atlases and time-to-conversion
-survival models \citep{Vogl2021,Vallino2024}, every model in this comparison
-forecasts the lesion of an individual eye directly on the imaging state.
+families can then be compared on equal terms. In contrast to earlier clinical
+work, which has largely relied on cohort-level statistical atlases and
+time-to-conversion survival models \citep{Vogl2021} and on biomarker-based
+risk analyses \citep{Vallino2024}, every model in this comparison forecasts
+the lesion of an individual eye directly on the imaging state; the closest
+forecasts of this kind are discussed in
+Section~\ref{sec:background:related-work}.
 
 \paragraph{Research question.}
 \label{par:introduction:research-question}

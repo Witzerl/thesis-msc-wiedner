@@ -144,8 +144,9 @@ visit schedule, with the actual $\Delta t$ of each window.
 
 The one-year anchor is taken at the first step whose cumulative time
 reaches it (\S\ref{sec:data:temporal}). For a few eyes this step lies
-beyond one year, where the true change region is larger; this is accepted
-for comparability with \citet{Mai2024}. Persistence is computed inside every
+beyond one year, where the true change region is larger; this is accepted,
+as \citet{Mai2024} also score every follow-up visit by its time since
+baseline rather than at a fixed horizon. Persistence is computed inside every
 rollout by the same code; for the anchor metrics it is the baseline mask
 held constant. Per-step metrics are averaged per eye first and then over
 the eyes, so every eye counts once, whatever its number of visits.
@@ -736,7 +737,8 @@ stability is examined in~\S\ref{sec:experiments:validity:tfen}.
     \emph{(a)}~Profile over the four horizon bins for the dilated-stencil
     graph network, the T-FEN, the U-Net (width 5) and the FNO; the bins
     hold 149, 149, 109 and 71 follow-up visits. The dashed line gives the
-    values reported by \citet{Mai2024} on the same cohort; inputs, field of
+    values reported by \citet{Mai2024} on a larger cohort of the same clinic;
+    inputs, field of
     view and evaluated visits differ, so the line is a reference, not a
     head-to-head comparison (\S\ref{sec:experiments:qualitative:mai}).
     \emph{(b)}~The first-year bin alone, on the same scale: the three
@@ -1463,7 +1465,7 @@ the stability criterion, which the run passes, and an evaluation step of
 \subsection{Comparison with Mai et al. (2024)}
 \label{sec:experiments:qualitative:mai}
 
-\citet{Mai2024} predict GA growth on the same MUW cohort from a single
+\citet{Mai2024} predict GA growth on a larger MUW cohort from a single
 baseline OCT volume, with a Neural ODE integrated by RK4. Besides Dice
 scores, their evaluation uses two eye-level measures of growth speed,
 which the Dice scores do not capture. Both are computed here in the same
@@ -1559,18 +1561,19 @@ The comparison is an anchor, not a head-to-head result. \citet{Mai2024}
 evaluate 184 eyes of 100 patients with a mean follow-up of 32 months; this
 thesis uses 75 eyes of 51 patients, with a mean follow-up of 3.3 years.
 \citet{Mai2024} start from the raw OCT volume, whereas this thesis starts
-from segmented masks and layer depths. Their areas cover the full
-registered annotation, whereas the areas here are measured inside the
+from segmented masks and layer depths. Their paper reports no cropping of
+the areas, whereas the areas here are measured inside the
 $49 \times 1024$ crop, which censors growth at its border
-(\S\ref{sec:data:spatial}). The paper does not state whether its growth
-rate is a difference between two visits or a fit over all visits.
+(\S\ref{sec:data:spatial}). The paper defines the growth rate as the
+difference between the square roots of the baseline and the respective
+follow-up area.
 
 \citet{Mai2024} also report the growth-region Dice by time since baseline:
 the Dice of the newly atrophic region, follow-up lesion minus baseline
 lesion, averaged over the follow-up visits in each bin. The same quantity
 is computed here for the follow-up visits of the rollouts, averaged over
 the late epochs (Table~\ref{tab:experiments:mai-bins}). All three operators
-lie above the values of \citet{Mai2024} in every bin, by 0.2 to 0.3. This
+lie above the values of \citet{Mai2024} in every bin, by 0.18 to 0.29. This
 gap is not evidence that one approach predicts better. The models of this
 thesis receive the segmented baseline lesion as input, so its outline is
 given exactly, whereas \citet{Mai2024} must first find the lesion in the

@@ -23,8 +23,8 @@ three years.
 The acquisition setting recorded in the data is the same for all 553
 visits. The vendor is logged as Heidelberg Engineering and the protocol
 as a volume scan in ART mode.
-\citet{Mai2024}, who describe the same MUW cohort, report that it was
-acquired on a Spectralis device.
+\citet{Mai2024}, who describe a larger GA cohort from the same MUW clinic,
+report that it was acquired on a Spectralis device.
 % TODO: confirm the device model (Heidelberg Spectralis) with the MUW
 % data provider; it is currently an inference from Mai et al. (2024).
 
@@ -48,7 +48,8 @@ is included if at least two of its visits carry both, which guarantees
 at least one transition. All 75 eyes meet this condition.
 
 The GA mask was not segmented on the OCT.
-\citet{Mai2024}, who describe the same cohort, report that GA was
+\citet{Mai2024}, who describe a larger GA cohort from the same clinic,
+report that GA was
 outlined manually on the fundus-autofluorescence image by certified
 graders of the Vienna Reading Center, as well-demarcated areas of
 markedly decreased or absent autofluorescence. The outline was then
@@ -79,8 +80,8 @@ physical extent of each native grid, differ between eyes.
 % constant, and the ~2 % check belongs in the Limitations, §6.3.)
 
 Lesion growth is summarised on the square-root area scale.
-This transform is standard for GA, because it removes the dependence of
-growth rates on baseline lesion size \citep{Feuer2013}. Over the 75
+This transform is used for GA, because it removes the dependence of
+growth rates on baseline lesion size \citep{Yehoshua2011,Feuer2013}. Over the 75
 eyes, the median square-root-area growth rate is 0.234\,mm per year. The
 interquartile range spans 0.153 to 0.340\,mm per year, and the 90th
 percentile is 0.473\,mm per year. The baseline lesion area on the
@@ -352,7 +353,8 @@ upper bound: the metric is taken at the first rollout step whose
 cumulative time reaches about 347 days. For 68 of the 75 eyes, this is
 exactly 360 days. The remaining 7 eyes (9.3\,\%) are scored at 450 to
 720 days, where the true change region is 1.3 to 1.7 times larger.
-This is accepted on purpose, for comparability with \citet{Mai2024}.
+This is accepted on purpose; \citet{Mai2024} likewise score every follow-up
+visit by its time since baseline, in yearly bins, and not at a fixed horizon.
 The evaluation protocol is defined in~\S\ref{sec:experiments:protocol}.
 
 
