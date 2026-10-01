@@ -558,7 +558,7 @@ Being worked through one item at a time.
     k = 20 − k = 12 (mean twin, unchanged −0.010 ± 0.005, 1/5) now also per eye **−0.011 ±
     0.003 (20/75, t −4.1)** — instruments disagree, not established;
     k-NN fold range 0.41–0.52 → 0.43–0.52.
-- [ ] TODO (verify, author 2026-09-29): **re-check every number changed on 2026-09-29 for
+- [x] (done 2026-10-01: all recomputed with thesis_numbers.py and matched; only x.xxx5 rounding differences) TODO (verify, author 2026-09-29): **re-check every number changed on 2026-09-29 for
   #4/#7/#29** (listed above) against `solver_results.csv` and the per-eye records, including
   that the CSV row used per fold is the right run where a fold has two rows (e.g. `dts` f2
   has two; the table values match the later row).

@@ -325,7 +325,7 @@ tab:appendix:border-interior, Huang1991 in the bib); build clean:
 
 3. VERIFICATION (open)
 ----------------------
-[ ] Re-check every number changed on 2026-09-29 and 2026-10-01 (k-NN arms switched to
+[x] (done 2026-10-01: 37 paired comparisons, Table 5.1, seed-7 arm values, seed-pooled reach and the capacity table recomputed with thesis_numbers.py; all match, the only differences are x.xxx5 rounding in 4 capacity cells) Re-check every number changed on 2026-09-29 and 2026-10-01 (k-NN arms switched to
     mean aggregation; one-hop / per-pixel / Delta t / seed-7 values; T-FEN skew numbers).
     List of old -> new values in NOTES.md.
 [x] (moot 2026-10-01: width-32 U-Net removed everywhere in cc2c864) Width-32 U-Net per eye: -0.0453 +/- 0.0113 (this session) vs -0.0469 +/- 0.0090
@@ -347,7 +347,7 @@ tab:appendix:border-interior, Huang1991 in the bib); build clean:
     compute_time_table / min_budget_days).
 [x] (done 2026-10-01: 2.6.1, read from the container) [s27] 4.6: record the PyTorch Geometric version of the container (inline TODO
     04-method l. ~1202).
-[ ] [ce6] 6.2 quotes the canonical model's growth-region Dice beyond one year as "about
+[x] (covered by the 2026-10-01 re-check) [ce6] 6.2 quotes the canonical model's growth-region Dice beyond one year as "about
     0.60 to 0.66" (= 0.600 / 0.634 / 0.655 from 5.3.4, SOLVER_FINAL_RUNS 9.19a); covered
     by the general re-check above, listed here because it is a new place the numbers appear.
 [ ] [s26] Salvi2025 bib entry carries initials only ("Salvi, A." ...; first names not found
