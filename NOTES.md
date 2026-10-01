@@ -1007,14 +1007,27 @@ figures need regenerated rollouts.
 Planned in the text (9 placeholders + 2 appendix chapters), in working order:
 - [x] App. G `fig:appendix:moved-mesh` -- done 2026-10-01 (`fig_appendix_moved_mesh.py`; eyes =
   lower quartile / median / upper quartile of baseline area among fold-2 validation eyes).
-- [ ] App. D additional rollouts incl. failure cases -- Python, autonomous once the rollout
-  pipeline below exists; failure cases chosen by a stated rule.
+- [x] App. D additional rollouts incl. failure cases -- done 2026-10-01 (`fig:appendix:rollouts`,
+  canonical model, folds 0-2; rules: highest / lowest per-eye Dice 0.775 / 0.246, most border
+  pixels (833), fastest true growth 0.594 mm/yr). Short intro paragraph added. The failure-mode
+  discussion for §5.6 (qualitative) is still open.
 - [x] App. A cohort plots -- done 2026-10-01: `fig:appendix:cohort` (visits, intervals, baseline
   area, growth rate) and `fig:appendix:crop` (native grids, lesion area lost); every cohort
   number of Ch. 3 reproduced. Appendix A now has two short sections around them.
-- [ ] §5.2 `fig:experiments:rollout` -- Python, autonomous: regenerate fold-2 rollouts from
-  `last.pt`, check that they reproduce the logged per-eye Dice, choose the eye by a stated rule.
-  (Running 2026-10-01; per-pixel floor row to be replaced by the k-NN graph network.)
+- [x] §5.2 `fig:experiments:rollout` -- done 2026-10-01. Rollouts regenerated from the epoch-29
+  `last.pt` with the unmodified `train.test_rollout_losses` (`rollouts_regen.py`, cache in the
+  git-ignored `images/data/rollouts/`); every arm reproduces its logged epoch-29 change-region
+  Dice (U-Net +1.1e-5, all others exact; per-pixel floor identical to baseline at every step).
+  Rows: ground truth, stencil, U-Net, T-FEN, FNO, k-NN (per-pixel floor dropped). Eye: fold-2
+  index 8, median rule; the two middle eyes tie, the lower was taken (the other has a lesion of
+  ~0.36 mm^2 and is barely visible) -- author may want to confirm. 5 of 8 follow-ups shown.
+  - Finding: what the code calls "pad nodes" (all 11 channels at the normalised value of 0) is
+    not only the crop's zero padding. Example eye: native grid 54 x 1356 at every visit, but
+    20k-35k of 73k positions have all-zero layers, varying by visit (triangular areas). The
+    figure therefore hatches "no data at this visit". Worth one sentence in §3.3 or §6.3: the
+    "pad-aware" border definition and `--exclude_pad_nodes` act on these positions too.
+  - Rollouts ran on the CPU: the GPU path ran out of host memory while another process held
+    most of the RAM.
 - [x] §4.3.3 `fig:method:stencils` -- done 2026-10-01 (`fig_method_stencils.py`).
 - [ ] §4.1 `fig:method:pipeline` -- schematic (TikZ draft), needs author review.
 - [ ] §3.1 `fig:data:example-state` -- Python from raw data; needs the author's decision whether

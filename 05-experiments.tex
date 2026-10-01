@@ -331,27 +331,35 @@ lists every arm on the headline metric.
 % Numbers changed on 2026-09-29 and 2026-10-01 re-checked 2026-10-01
 % (thesis_numbers.py): all match.
 
-% TODO: produce Figure fig:experiments:rollout. Rollout strip for one
-% representative validation eye: rows = ground truth, dilated-stencil graph
-% network, U-Net (width 5), T-FEN, FNO, per-pixel floor; columns = the eye's
-% visits in order, with cumulative days; each panel the thresholded mask at
-% physical aspect ratio, with the baseline mask outline and the true and
-% predicted change regions colour-coded. Can be generated from the
-% final-epoch rollout exports with the practical-work figure script
-% (masterthesis-docker/practical/scripts/fig_rollout.py).
+% Figure: images/scripts/fig_experiments_rollout.py, from rollouts regenerated
+% by images/scripts/rollouts_regen.py (epoch-29 weights, fold 2, unmodified
+% train.test_rollout_losses; every arm reproduces its logged epoch-29
+% change-region Dice). The per-pixel floor row of the original plan was
+% replaced by the k-NN graph network: the floor is identical to the baseline
+% at every step. Eye: fold-2 validation index 8 (median rule, lower of the two
+% middle eyes; the other one has a lesion of about 0.36 mm^2).
 \begin{figure}[t]
   \centering
-  \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering\itshape Placeholder
-    for Figure~\ref{fig:experiments:rollout}. See accompanying
-    \texttt{\% TODO} for the intended content.}}
-  \caption[Rollouts of several arms for one eye.]{%
-    Rollouts of several arms for one representative validation eye. Rows:
-    ground truth, the dilated-stencil graph network, the U-Net (width 5),
-    the T-FEN, the FNO and the per-pixel floor. Columns: the eye's visits in
-    order, with the cumulative time in days. Each panel shows the
-    thresholded mask at the physical aspect ratio, the outline of the
-    baseline mask, and the true and predicted change regions. The figure
-    illustrates a single eye and is not evidence for any comparison.}
+  \includegraphics[width=\textwidth]{images/fig_experiments_rollout.png}
+  \caption[Rollouts of five operators for one validation eye.]{%
+    Rollouts of five operators for one validation eye of fold~2, computed
+    with the weights after the last training epoch. Rows: ground truth, the
+    dilated-stencil graph network, the U-Net (width 5), the T-FEN, the FNO
+    and the index-space $k$-NN graph network ($k = 12$). Columns: the
+    baseline visit and the first five of the eye's eight follow-up visits,
+    headed by the time since baseline in days; the one-year anchor is set
+    in bold. Each panel shows the $49 \times 1024$ grid at its physical
+    aspect ratio, with the baseline lesion outlined; hatched positions have
+    no data at that visit. Ground-truth panels fill the true lesion. Model
+    panels show in light grey the predicted lesion that coincides with the
+    baseline lesion and code the change against the baseline: predicted and
+    true in blue, predicted only in orange, true only (missed) in purple; in
+    the baseline column they show the input mask. The eye was selected by a
+    fixed rule: the one whose per-eye growth-region Dice of the canonical
+    model at the anchor is closest to the median of the 16 validation eyes
+    of the fold (of the two middle eyes, the lower). The figure illustrates
+    a single eye and is not evidence for any comparison between
+    operators.}
   \label{fig:experiments:rollout}
 \end{figure}
 
@@ -435,7 +443,15 @@ components of an operator move the metric, which
 The best-fold column shows how far a single fold can lie above the mean.
 For every arm except the two FNO arms without a local path, the best fold
 is fold 2, so the column mostly reflects the spread between folds rather
-than a separate result. The Runge--Kutta arms are nulls against their single-step
+than a separate result.
+
+Figure~\ref{fig:experiments:rollout} shows the rollouts of five operators
+for one validation eye. It illustrates what the change-region Dice scores:
+most of every prediction is the unchanged baseline lesion, and the
+operators differ in the narrow band of change along its border. Further
+eyes, including failure cases, are shown in Appendix~\ref{app:rollouts}.
+
+The Runge--Kutta arms are nulls against their single-step
 counterparts and are taken up in~\S\ref{sec:experiments:ablations}. The
 cost column is discussed in~\S\ref{sec:experiments:cost}.
 
