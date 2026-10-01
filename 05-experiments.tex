@@ -1184,9 +1184,9 @@ Two criteria make this operational:
 \begin{itemize}
   \item \textbf{C1, convergence:} when the step is refined, the change in
     the prediction becomes smaller;
-  \item \textbf{C2, agreement:} all settings at least as fine as the one
-    used in training, by step or by order, agree to within the run-to-run
-    noise, the standard deviation of 0.0127 between repeated runs of one
+  \item \textbf{C2, agreement:} all settings that are at least as fine as
+    the one used in training in both step and order agree to within the
+    run-to-run noise, the standard deviation of 0.0127 between repeated runs of one
     configuration (Appendix~\ref{app:full-results:criteria}).
 \end{itemize}
 A model is read as a continuous-time model only if it satisfies both.
@@ -1257,7 +1257,8 @@ does not decide the accuracy.
     the setting the model was trained with. A model that defines an
     ordinary differential equation converges as the step is refined (C1)
     and gives the same result, within the run-to-run noise of 0.0127, for
-    all settings at least as fine as its training setting (C2). The graph
+    all settings at least as fine as its training setting in both step and
+    order (C2). The graph
     networks were tested on fold 2, the T-FEN on fold 0.}
   \label{tab:experiments:swap}
   \small
@@ -1465,9 +1466,10 @@ rate on the baseline lesion size \citep{Feuer2013}. The rate is computed
 once from the ground truth and once from the model's rollout, over the
 eye's whole follow-up as in \citet{Mai2024}, not at the one-year anchor.
 Two measures compare the two rates over the cohort. The Pearson
-correlation $r$ asks whether the model orders and scales the growth speeds
-of the eyes correctly: $r = 1$ is a perfect linear relation and $r = 0$ no
-relation. The fast-progressor area under the receiver operating
+correlation $r$ measures how closely the predicted rates follow a linear
+relation with the true rates across eyes: $r = 1$ is a perfect linear
+relation and $r = 0$ no linear relation. It does not require the two to
+agree in scale. The fast-progressor area under the receiver operating
 characteristic curve (AUC) asks whether the predicted rate separates the
 fastest-growing eyes, the top 10, 15 or 20\,\% of true growth rates, from
 the rest: 0.5 is chance and 1 is perfect separation.

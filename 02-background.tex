@@ -119,14 +119,11 @@ layers, the inner nuclear and outer plexiform layers, the outer
 nuclear layer, the photoreceptor inner- and outer-segment bands, the
 retinal pigment epithelium (RPE), and Bruch's membrane;
 Figure~\ref{fig:bg:retinal-anatomy} (left) gives a labelled schematic.
-The terminology in this list takes some getting used to, but for the
-purposes of this thesis it is sufficient to remember the structural
-fact that the retina is layered, that GA destroys a specific
-\emph{outer}-retinal stack of three of those layers
-(\S\ref{sec:background:ga-oct:disease}), and that the surrounding
-layer geometry --- ten boundary depth maps in total --- is what feeds
-the model alongside the lesion mask
-(\S\ref{sec:background:ga-oct:state-rep}).
+For the purposes of this thesis, it suffices to note that the retina is
+layered, that GA destroys a specific \emph{outer}-retinal stack of three
+layers (\S\ref{sec:background:ga-oct:disease}), and that the surrounding
+layer geometry, given as ten boundary depth maps, is passed to the model
+together with the lesion mask (\S\ref{sec:background:ga-oct:state-rep}).
 
 The remaining subsections build on this vocabulary. \S\ref{sec:background:ga-oct:disease}
 describes how GA appears on OCT; \S\ref{sec:background:ga-oct:oct}
@@ -237,10 +234,9 @@ than tissue further from the lesion --- and is thought to reflect, at
 least in part, basal-laminar deposits accumulated in the diseased tissue;
 the thickness of this rim correlates significantly with the eye's subsequent
 annual square-root lesion enlargement rate \citep{Chu2022}.
-The first two signatures define the lesion mask used as channel~0 of
-the state tensor; the third is a boundary-localised predictive
-biomarker that motivates encoding the surrounding layer geometry
-rather than the mask alone.
+The first two signatures delineate the lesion itself. The third is a
+predictive biomarker located at the lesion boundary and motivates
+encoding the surrounding layer geometry in addition to the lesion mask.
 
 \subsection{Optical Coherence Tomography of the Macula}
 \label{sec:background:ga-oct:oct}
@@ -883,13 +879,13 @@ Finite Element Networks \citep{Lienen2022} adopt a different
 numerical perspective, building the neural update directly from a
 finite-element discretisation with learned dynamics and, in their transport
 variant, carrying an explicit transport (advection) term.
-Finally, because a residual step resembles one explicit Euler step, a
-Neural-ODE reading is sometimes applied \citep{Chen2018}. Under
-this interpretation, a higher-order integrator such as a Runge--Kutta
-scheme can in principle replace the residual step. It must be stated
-plainly that this reading is only legitimate if the trained model is
-nearly invariant to the solver used at inference. This property must
-be tested empirically rather than assumed, as classical solver
+Finally, because a residual step resembles one explicit Euler step, the
+network is sometimes read as the right-hand side of an ordinary
+differential equation, the Neural-ODE reading \citep{Chen2018}. A
+higher-order integrator such as a Runge--Kutta scheme can then in
+principle replace the residual step. This reading is only legitimate if
+the trained model is nearly invariant to the solver used at inference.
+The property has to be tested empirically, because classical solver
 guarantees do not automatically transfer to neural parameterisations
 \citep{Ott2021, Krishnapriyan2023}.
 
@@ -935,12 +931,11 @@ As a precedent for dense convolutional architectures on this task,
 U-Net on fundus autofluorescence images, a multi-scale spatial approach
 on an alternative modality.
 
-The prevailing formulation in the clinical literature rests on
-cohort-level, categorical, time-to-conversion prediction. By contrast,
-the formulation used here dictates a per-eye, per-time-step prediction
-of the full spatial next state. Consequently, this thesis sits at the
-intersection of applied medical-imaging deep learning and PDE-solver
-inductive biases.
+Most of the clinical literature formulates prediction at cohort level,
+as a categorical time-to-conversion problem. The formulation used here
+instead requires a per-eye, per-time-step prediction of the full spatial
+next state. The thesis therefore combines applied medical-imaging deep
+learning with the inductive biases of PDE solvers.
 % TODO: check the literature for any prior application of neural PDE
 % solvers to biomedical disease progression or organ modelling. Add a
 % citation if one exists; otherwise note the absence explicitly.

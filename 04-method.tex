@@ -742,7 +742,8 @@ reading it as a physical advection speed rests on an assumption the model
 does not enforce globally. The gradient coefficients are assembled in grid
 units, so the 21:1 axis imbalance never reaches the MLPs; only the velocity
 conversion uses millimetres. The transport term runs on its own coarser mesh,
-built on every seventh column (97\,632 triangles), while the free-form term
+made of seven interleaved triangulations, each of which connects every
+seventh column (97\,632 triangles in total), while the free-form term
 uses the full-resolution mesh. This coarser mesh is the finite-element
 counterpart of the dilated stencil of~\S\ref{sec:method:graph}.
 

@@ -1083,6 +1083,20 @@ English abstract, Ch. 1-7 and App. A-G were reviewed; the German Kurzfassung was
   `05-experiments.tex:903` (§5.4.2, the cost of the soft-Dice term). Review items 5a.19, 5c.17.
   Fixed 2026-10-01 by a line break after each comment (wording unchanged), verified in the PDF
   text. Review line numbers in `05-experiments.tex` after l. 163 are now +1, after l. 904 +2.
+- [x] 2026-10-02: **all 15 high-severity review items closed.** Six were already resolved by the
+  review-v6 pass and the Chapter 5 reporting pass (1.8 abstract rewritten, 1.27 covariate claim
+  removed, 5c.11 objective opener now "without any emphasis on the mask", 5d.16 "Its accuracy"
+  now explicit) or by the comment fix (5a.19, 5c.17). The other nine fixed by wording only:
+  1.41 §1.3 "the same deficit" glossed in place (Ch. 7 wording), em-dash list removed; 2a.7 §2.1.1
+  "takes some getting used to" and "three of those layers" removed; 2a.17 §2.1.2 the OCT
+  signatures now "delineate the lesion itself" (no claim that they define channel 0); 2b.37 §2.3
+  "It must be stated plainly" removed, Neural-ODE reading explained; 2b.44 §2.4 "sits at the
+  intersection of" paragraph rewritten; 3.25 §3.5 "transition window, a pair of consecutive
+  visits" at first use; 4b.25 §4.3.6 transport mesh "seven interleaved triangulations" (checked
+  against `fen.py` `_lattice_triangulation`, offsets 0-6, 2*48*1017 = 97,632); 5d.4 §5.5.1 C2 and
+  the Table 5.4 caption "in both step and order" (with "by step or by order" the RK4 network's
+  Euler one-step setting, -0.020, would fail it); 5d.23 §5.6.1 Pearson r no longer said to check
+  scale. Build clean, all nine passages verified in the PDF text.
 - [ ] Contradictions and dead pointers found (review S4, S5, S9, S22): §1.2 promises the
   covariates are "tested in this thesis" (the test is commented out, §6.3 says unsettled);
   layer channels "not auxiliary" (§2.1.5) vs "auxiliary targets" (§3.2, §4.2.2, §4.5.1); the Fig.
