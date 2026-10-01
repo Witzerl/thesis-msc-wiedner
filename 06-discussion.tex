@@ -200,8 +200,25 @@ descriptive and pooled over rollout steps. Whether any of these levels is
 clinically sufficient cannot be judged from the data: no clinically
 established Dice threshold for GA progression forecasts is known to the
 author.
-% TODO: check the literature for a clinically meaningful threshold for
-% spatial GA progression forecasts; cite it here if one exists.
+
+A scale for these values comes from the reference outlines themselves.
+When two trained graders outline the same fundus autofluorescence images,
+their outlines of the region that became atrophic within one year agree
+with a Dice of only about 0.71 to 0.73 \citep{Salvi2025}. The outlines
+that serve as ground truth therefore carry considerable uncertainty of
+their own, and a Dice of 1 is not reachable in practice. A forecast with a
+growth-region Dice of about 0.5 in the first year, as here
+(Table~\ref{tab:experiments:mai-bins}), is accordingly less far from what
+is attainable than it would appear on a scale from 0 to 1. The grader
+value is an orientation point, not a target or an upper limit for the
+models of this thesis: it was measured on a different imaging modality and
+a different cohort, and the graders outlined existing images rather than
+predicting a future one.
+% Literature check 2026-10-01: no clinical Dice threshold for spatial GA
+% forecasts found. Salvi et al. 2025 (PMC11699103), Results / Table 6:
+% inter-grader DSC for the 1-year region of growth 0.71 +/- 0.12 (training),
+% 0.72 +/- 0.14 (validation), 0.73 +/- 0.10 (test); their best model 0.70 +/-
+% 0.09. Whole-lesion inter-grader values (0.88-0.94) measure something else.
 
 \paragraph{Position in a clinical pipeline.}
 Because every model starts from segmented masks and layer depths, a

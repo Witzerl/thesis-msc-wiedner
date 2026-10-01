@@ -203,7 +203,7 @@ tab:appendix:border-interior, Huang1991 in the bib); build clean:
 [x] (done 2026-10-01, decisions a-g) [ce6] 1.4 Contributions: still the stale pre-survey list ("TODO: maybe remove" in the
     heading). Decide keep/rewrite/remove; if rewritten, align it with Ch. 7 and the abstract
     (ingredients, the framework, the nulls). Not covered by the final-chapters prompt.
-[ ] [ce6] 6.2 "Reliable horizon": literature check for a clinically meaningful threshold for
+[x] (done 2026-10-01: no threshold found; inter-grader growth-region Dice 0.71-0.73, Salvi2025, added as orientation) [ce6] 6.2 "Reliable horizon": literature check for a clinically meaningful threshold for
     spatial GA progression forecasts (inline TODO l. ~195); currently "no established
     threshold is known to the author".
 [ ] [ce6] After the runs of section 1: one pass over 6.1 / 6.3 / Ch. 7 / both abstracts
@@ -506,7 +506,7 @@ Waiting for a run (all already queued, see section 1 for the full "Fills" column
 No run needed:
   [ ] 5.5 Qualitative Analysis + Figure 5.1 (rollout strip); then the 6.2 link (TODO l. ~206)
   [x] (done 2026-10-01, decisions a-g) 1.4 Contributions: keep / rewrite / remove
-  [ ] 6.2 literature check: clinical Dice threshold (TODO l. ~195)
+  [x] 6.2 literature check: clinical Dice threshold (TODO l. ~195)
   [x] 6.3 quantify ground-truth shrinkage (TODO l. ~245; mask analysis only)
   [ ] Author review: 5.6, Ch. 6, Ch. 7, abstract, Kurzfassung (points in section 5)
 

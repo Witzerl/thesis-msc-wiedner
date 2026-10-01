@@ -928,7 +928,7 @@ Being worked through one item at a time.
 - [ ] TODO (Ch. 6/7/abstract): revise once the queued runs are in -- seed-7 skew T-FEN
   (headline wording, §6.3 "Unfinished replications"), Delta t-multiplication ablation (§6.1
   inline TODO), objective ablations, T-FEN capacity in skew form, seed-7 matched control.
-- [ ] TODO (§6.2 inline): literature check for a clinically meaningful threshold for spatial
+- [x] (2026-10-01: none found; Salvi2025 inter-grader growth-region Dice 0.71-0.73 added as orientation) TODO (§6.2 inline): literature check for a clinically meaningful threshold for spatial
   GA progression forecasts.
 - [ ] TODO (§6.2 inline): link to the failure cases once §5.5 qualitative is written.
 - [ ] Author to review §5.6, Ch. 6, Ch. 7 and both abstracts (German text in particular).
