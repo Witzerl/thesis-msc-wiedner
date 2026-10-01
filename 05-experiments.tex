@@ -533,9 +533,9 @@ eye $+0.0647 \pm 0.0062$ (70/75, $t = 10.4$). The pre-committed
 replication at seed 7 gives $\Delta = +0.0629 \pm 0.0131$~SE (5/5) and per
 eye $+0.0620 \pm 0.0071$ (66/75, $t = 8.7$); pooled over both seeds, the
 per-eye difference is $+0.0633 \pm 0.0047$ (136/150 eye-seed pairs). This
-is the largest effect in the project. It was obtained by changing only
-the edge set, at the same parameter count, and it is the reason the dilated
-stencil is the canonical configuration.
+gain was obtained by changing only the edge set, at the same parameter
+count, and it is the reason the dilated stencil is the canonical
+configuration.
 
 Table~\ref{tab:experiments:reach} compares other stencil geometries with the
 default. Both a shorter (up to $\pm 12$ columns) and a longer (up to
@@ -1671,9 +1671,8 @@ measured causes. The first is this overhead. The second is that the work
 per epoch differs between folds: an epoch is twenty passes over the
 fold's training eyes in batches of four, which gives 280, 320, 300, 300
 and 320 optimiser steps for folds 0 to 4. Normalised by the number of
-steps, the minimum epoch times of the five folds agree to about 3\,\%. An
-earlier explanation of the spread by several runs sharing one GPU was
-checked and does not hold: no two runs ever shared a GPU. All runs used
+steps, the minimum epoch times of the five folds agree to about 3\,\%. All
+runs used
 one NVIDIA RTX A6000 GPU and 30 epochs. The cost figures support
 order-of-magnitude statements only.
 

@@ -1,6 +1,6 @@
 """Figure fig_appendix_rollouts (Appendix D): additional rollouts of the canonical model
 (dilated-stencil graph network, epoch-29 weights), ground truth and prediction per eye,
-for four eyes chosen by stated rules from the regenerated validation eyes of folds 0, 1, 2.
+for three eyes chosen by stated rules from the regenerated validation eyes of folds 0, 1, 2.
 
 Data: images/data/rollouts/ANISOGNN_final_dilmean_f{0,1,2}.npz, written and self-checked by
 rollouts_regen.py (each reproduces its run's logged epoch-29 change-region Dice@360d).
@@ -9,11 +9,11 @@ Selection rules (over the 48 regenerated eyes; each rule skips eyes already chos
 eye shown in fig_experiments_rollout):
   (a) highest per-eye growth-region Dice at the one-year anchor (late-epoch mean,
       thesis_numbers.eye_late),
-  (b) lowest per-eye growth-region Dice at the anchor (same instrument),
-  (c) border-censored: most true-lesion pixels on the crop border at the anchor (outermost
+  (b) border-censored: most true-lesion pixels on the crop border at the anchor (outermost
       pixel ring of the window or 4-adjacent to zero padding -- train.py's border definition),
-  (d) fastest true progression: largest square-root-area growth rate of the true lesion over
+  (c) fastest true progression: largest square-root-area growth rate of the true lesion over
       the eye's whole follow-up, (sqrt(A_last) - sqrt(A_baseline)) / years.
+The former "lowest Dice" panel was removed (author review v6 #21, 2026-10-02).
 Every follow-up visit is drawn (no truncation); shorter schedules leave cells empty.
 
 Run from images/scripts/:  python fig_appendix_rollouts.py
@@ -71,9 +71,8 @@ def main():
 
     taken = {MAIN_FIG_EYE}
     rules = [("(a) Highest Dice", lambda e: -e["late"]),
-             ("(b) Lowest Dice", lambda e: e["late"]),
-             ("(c) Border lesion", lambda e: -e["border_px"]),
-             ("(d) Fastest growth", lambda e: -e["rate"])]
+             ("(b) Border lesion", lambda e: -e["border_px"]),
+             ("(c) Fastest growth", lambda e: -e["rate"])]
     picks = []
     for title, key in rules:
         k = min((k for k in eyes if k not in taken), key=lambda k: key(eyes[k]))

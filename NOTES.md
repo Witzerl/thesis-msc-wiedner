@@ -1266,8 +1266,17 @@ worked through one item at a time.
   correction of 2026-10-01 missed there). §6.1 and §6.4 keep their headings (not on the list).
 - [ ] #18/#19 "Figure 5.7:" / "Figure 5.8:" -- highlighted without comment; both figures are
   disabled for now (placeholders). Ask the author when the figures come back.
-- [ ] #17 §5.7 GPU-sharing sentence -- red, "remove".
-- [ ] #21 Fig. D.1 panel (b) "Lowest Dice" -- red cross, "absolutely not".
+- [x] #17 §5.7 GPU-sharing sentence -- red, "remove". Removed 2026-10-02.
+- [x] #21 Fig. D.1 panel (b) "Lowest Dice" -- red cross, "absolutely not". Done 2026-10-02:
+  rule removed from `images/scripts/fig_appendix_rollouts.py` (three eyes now; the other picks
+  are unchanged: fold 0 eyes 10, 19, 14), PNG re-rendered in the MPPDE env (figure still
+  disabled), Appendix D text and caption updated ("three further eyes"; the failure-pattern
+  sentence now describes the fastest-growing eye only). The legend still lists "No data at this
+  visit", which no remaining panel shows -- drop it when the figure is re-enabled.
+- [x] 2026-10-02 (author): "the largest effect in the project" removed from §5.3.2 as well (abstract
+  and Ch. 7 already); the transport term against its matched control (+0.072) is larger. §6.1
+  "the weighting of the mask channel decided" -> "whether the loss emphasised the mask decided"
+  (the plain-MSE run removed weighting and soft-Dice).
 
 ### Assets that now exist and should be reused
 
