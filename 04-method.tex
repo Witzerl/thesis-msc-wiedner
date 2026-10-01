@@ -98,9 +98,6 @@ itself. Every operator receives exactly one visit and predicts the state at
 the next visit. It sees the current state, the interval to the next visit
 and the patient covariates, but no earlier visits. It has no memory of the
 trajectory so far.
-% TODO: discuss the missing trajectory memory in Chapter 6 (limitation /
-% future work; see the matching TODO in 06-discussion.tex; author review
-% #11, 2026-09-27).
 
 Two reasons support this design. First, the clinical sequences are short,
 with five to thirteen visits per eye (\S\ref{sec:data:dataset}). Using
@@ -302,10 +299,6 @@ translational symmetry into the network. The solution difference
 $u_i - u_j$ lets each message act as a learned local difference operator,
 a flexible learned stencil.
 
-% TODO: discuss in Chapter 6 that the theta_PDE conditioning is a key
-% ingredient of MP-PDE and that GA has no counterpart; the stand-ins tried
-% here (covariates, layer encoder) did not help. See the matching TODO in
-% 06-discussion.tex (author review v4 #3, 2026-09-29).
 The equation feature vector $\theta_{\text{PDE}}$ holds the PDE
 coefficients and the boundary-condition identifiers. It is injected at the
 encoder and at every message-passing layer. This persistent injection is
@@ -1221,8 +1214,8 @@ is read.
 % convolutional operators run at TF32, the graph network's linear layers at
 % standard FP32; the arms are not precision-matched.
 % Run-identity and results-table paragraphs removed (author review v4 #16,
-% #17, 2026-09-30); run identity -> TODO in Appendix F, cost convention ->
-% TODO in Section 5.7.
+% #17, 2026-09-30); run identity -> Appendix F, cost convention -> Section
+% 5.6 (Computational Cost).
 
 
 %%

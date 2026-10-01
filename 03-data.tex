@@ -198,13 +198,10 @@ not see raw values. Cropping and padding run before the normalisation
 statistics are computed (\S\ref{sec:data:normalization}), so the padded
 zeros enter the per-channel mean and standard deviation. After
 normalisation, the zero fill of the layer channels sits between $-2.35$
-and $-2.94$ standard deviations, which is an extreme value. Unless the
-pad positions are excluded from the loss (\S\ref{sec:method:training}),
-the models are trained to reproduce this value at full weight.
-% TODO: make sure \S4.5 (Training) actually describes the optional
-% pad-position loss masking (--exclude_pad_nodes) and whether any
-% reported run uses it (author review #32, 2026-09-26). Zero also cannot serve as a
-sentinel that marks padding, because real layer values range from $-14$
+and $-2.94$ standard deviations, which is an extreme value. No reported
+run excludes the pad positions from the loss (\S\ref{sec:method:training}),
+so the models are trained to reproduce this value at full weight. Zero
+also cannot serve as a sentinel that marks padding, because real layer values range from $-14$
 to $499$ and so include zero.
 
 The crop also has a measured cost for the pathology itself. A census

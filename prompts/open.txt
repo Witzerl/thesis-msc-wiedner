@@ -211,7 +211,7 @@ tab:appendix:border-interior, Huang1991 in the bib); build clean:
     Chapter 5 reporting pass, so the wording ("higher by ... on k of 5 folds") matches.
 [x] (done 2026-10-01, decisions a-g) [ce6] If the border/interior split (item above) is dropped for good, 6.3 must still say
     it was computed and not reported -- it currently does; if it is reported, change 6.3.
-[ ] 04-method.tex: stale TODO comments to clean up -- l. ~301 (theta_PDE, now in 6.1),
+[x] (done 2026-10-01; also fixed a 3.3 sentence half inside a comment and the "Unless ... excluded" wording) 04-method.tex: stale TODO comments to clean up -- l. ~301 (theta_PDE, now in 6.1),
     l. ~1230 ("cost convention -> TODO in Section 5.7", now in 5.6), l. ~97 (trajectory
     memory, now in 6.3/6.4). [rev] the l. ~97 TODO was added in review #11; 6.3 now
     has the paragraph (06-discussion l. ~257), so the comment can simply go.
@@ -566,7 +566,7 @@ Indirectly waiting for a run:
 No run needed:
   [ ] 4.2.1 / 6.3: quantify reference-mask shrinkage; then delete the TODOs at 04-method
       l. ~152 and 06-discussion l. ~245 (section 3)
-  [ ] 04-method l. ~97: delete the stale trajectory-memory TODO (section 2)
+  [x] 04-method l. ~97: delete the stale trajectory-memory TODO (section 2)
   [ ] Appendix G: two TODOs moved there by this review -- why the moving mesh forces
       one-step prediction (#13, 91-appendix l. ~242) and which channels the mesh mover and
       the moved branch use (#19, l. ~246); part of the Appendix G item in section 2
