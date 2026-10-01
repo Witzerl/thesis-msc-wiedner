@@ -1238,9 +1238,18 @@ worked through one item at a time.
   figure is not displayed): caption rewritten for two plain grid-index panels (k = 12 diamond;
   dilated stencil rows -1/0/+1 x columns 0, ±7, ±14, ±21; mm reach in the caption); the redraw
   spec is a TODO above the figure. The existing PDF must be redrawn before re-enabling.
-- [ ] #13 Ch. 5 opener -- "Behaviour beyond 1 year analysis / yearly bins → when we do this →
-  show that TFEN becomes really bad after some time, therefore the graph canonical". Check
-  against Table 5.7 first (T-FEN = stencil over 0-3 y, 0.611 vs 0.655 beyond 3 y, descriptive).
+- [x] #13 Ch. 5 opener -- "Behaviour beyond 1 year analysis / yearly bins → when we do this →
+  show that TFEN becomes really bad after some time, therefore the graph canonical". The data
+  show a milder picture (T-FEN = stencil over 0-3 y, 0.611 vs 0.655 beyond 3 y, descriptive;
+  energy-conserving T-FEN stable 10/10 with a small mask residual from ~day 1 260). Done
+  2026-10-02 (option A): new §5.2 paragraph giving three reasons why the stencil network is the
+  canonical model despite the T-FEN's higher anchor score -- small lead (+0.017 at both seeds)
+  that does not persist beyond three years; ~4x training time (367 vs 91 s); long free-running
+  rollouts numerically delicate. Author: the chronology (stencil fixed before the T-FEN existed)
+  must NOT be given as a reason.
+- [ ] Optional (from #13, option B, not chosen for now): a subsection "Behaviour beyond one year"
+  with yearly bins for every main operator (hybrid, k-NN, free-form FEN still to compute from the
+  mai/ records) and a per-eye test of the > 3 y difference.
 - [ ] #14 §5.1.4/§5.2 -- "I thought it was agreed only to report one seed and have the second
   in appendix E" (= the reporting-scheme pass #23/#25/#31 above).
 - [x] #15 §5.4.2 heading "Is the weighting of the mask channel needed?", #16 §5.5.2 "The

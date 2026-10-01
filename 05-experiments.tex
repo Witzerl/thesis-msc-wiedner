@@ -413,6 +413,26 @@ operator (\S\ref{sec:method:family:fen}). Its first version, with the
 Galerkin form, is not stable beyond the training horizon; the two forms are
 compared in~\S\ref{sec:experiments:validity:tfen}.
 
+Although the T-FEN scores highest at the anchor, the dilated-stencil graph
+network is the canonical model of this thesis, for three reasons. First,
+the lead of the T-FEN is small, about 0.017 at both seeds, and it does not
+persist over longer horizons: in the growth-region Dice by year since
+baseline the two are level for three years, and beyond three years the
+graph network lies higher (0.655 against 0.611, a descriptive value that
+was not tested; \S\ref{sec:experiments:ingredients:transport}). Second,
+the T-FEN needs about four times the training time, 367 against 91\,s per
+epoch (\S\ref{sec:experiments:cost}). Third, its transport term makes long
+free-running rollouts numerically delicate: the first version became
+unstable, and the energy-conserving form still lets a few mask values at
+the edge of the grid leave the plausible range after about three and a
+half years (\S\ref{sec:experiments:validity:tfen}).
+% Author review v6 #13 (2026-10-02): reasons for the canonical choice; the
+% author ruled out the chronology (the stencil network was fixed before the
+% T-FEN existed) as a reason. Values: T-FEN - stencil +0.0170 (seed 42) /
+% +0.0165 (seed 7); growth-region Dice per year, Table tab:experiments:mai-bins
+% and Section 5.3.4 (seed 42, pooled per step); cost Table 5.1; residual from
+% about day 1 260 in 9 of 20 eyes on fold 0, Section 5.5.2.
+
 The per-pixel floor reads exactly 0.0000 on all five folds, identical to
 persistence; its collapse counter flags every validation eye as unchanged
 from baseline. A model without spatial context predicts no change at all.
