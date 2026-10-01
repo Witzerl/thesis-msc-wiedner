@@ -501,10 +501,14 @@ in~\S\ref{sec:data:splits}.
 
 The approach of this thesis treats GA progression the way a numerical
 solver treats a partial differential equation (PDE): the state is held
-on a grid and advanced step by step by a local update rule.
-Understanding the framework of Chapter~\ref{ch:method} and the models of
-Chapter~\ref{ch:experiments} therefore requires only a few solver
-mechanisms, and this section introduces exactly those. It covers how
+on a grid and advanced step by step by a local update rule. The later
+chapters therefore use the vocabulary of numerical solvers throughout.
+The update of the framework is one explicit Euler step in residual form
+(Chapter~\ref{ch:method}). The operators placed in it are learned
+stencils, global spectral methods and finite elements. The experiments
+ask how far one update reaches, whether a higher-order time integrator
+helps, and when a step becomes unstable (Chapter~\ref{ch:experiments}).
+This section introduces these mechanisms and no more. It covers how
 space is discretised (\S\ref{sec:background:pde-solvers:stencils}), how
 the state is stepped in time (\S\ref{sec:background:pde-solvers:time}),
 the strengths and limits of this design

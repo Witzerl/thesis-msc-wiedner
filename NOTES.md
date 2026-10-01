@@ -1210,10 +1210,18 @@ worked through one item at a time.
 - [x] #6 §1.3 "organised around a single question" -- "a single" circled, "?". Now "This thesis
   addresses one question, divided into two parts:" (2026-10-02, author chose option A; matches
   Ch. 7 "It was split into two parts").
-- [ ] #7 §2.2.2 "which holds the rate constant over the step" -- "is this not why we have a
-  linear line, [?] speed?" (reading uncertain).
-- [ ] #8 end of §2.2.3 -- "few sentences! what does understanding these yield / is this
-  already somewhere?" (§2.2.5 may cover it).
+- [x] #7 §2.2.2 "which holds the rate constant over the step" -- "is this not why we have a
+  linear line, [?] speed?" Author's question: could the constant rate of one Euler step explain
+  the weak growth-speed prediction? Answered 2026-10-02, no change: the operator also receives
+  Δt (removing the ×Δt multiplication changed nothing, §5.4.1), and the RK4-integrated arms,
+  which do not hold the rate constant, reach r 0.30 / 0.31 against 0.40 (Appendix E, Table
+  tab:appendix:growth-speed). Author: fine, move on.
+- [x] #8 end of §2.2.3 -- "few sentences! what does understanding these yield / is this
+  already somewhere?" Author: meant for §2.2 as a whole -- the reader should be told why they
+  need the numerical-solver section. Done 2026-10-02: the §2.2 opening now names where the
+  mechanisms are used (Euler step in residual form = the framework's update; learned stencils,
+  global spectral methods and finite elements = the operators; reach, higher-order integrator
+  and stability = what Chapter 5 asks), without previewing results.
 - [ ] #9 §3.4 "a hard step at the lesion edge" -- "future: the continuous distance from lesion
   experiment" (§6.4).
 - [ ] #10 §3.7 empty test split -- "no test because lack of data".
