@@ -113,6 +113,16 @@ the prediction degrades as the forecast reaches further than the one-year
 anchor, and they are the bins in which \citet{Mai2024} report the same
 metric.
 
+For the split reported in~\S\ref{sec:experiments:main-results}, an eye
+counts as border-touching when its true lesion at the anchor touches the
+edge of the imaged field: the outermost ring of the crop or, for padded
+visits, the edge of the zero padding, because there the true edge of the
+field lies inside the crop (\S\ref{sec:data:spatial}). Of the 75 eyes, 21
+touch it.
+% Author decision (e), 2026-10-01; definition from the commented-out
+% crop-variant paragraph above (pad-aware boundary). The pad-masked variant
+% stays unreported.
+
 Finally, a collapse counter records how many eyes have a thresholded
 prediction at the anchor that is identical, pixel for pixel, to their
 baseline mask. It detects a model that has learned to copy its input,

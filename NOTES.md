@@ -840,7 +840,7 @@ Being worked through one item at a time.
 - [x] (done 2026-10-01: all three arms above Mai in every bin by 0.2-0.3; stated as not head-to-head) TODO (from #20): §5.5.1 — compare growth-region Dice per horizon bin with Mai Table 2
   (inline TODO); optional appendix table of r/AUC for all arms.
 - [ ] TODO (from #20): §6.2 — "good at where, weaker at how fast" (inline TODO).
-- [ ] TODO (from #20, author 2026-10-01): **every metric mentioned anywhere must have a plain
+- [x] (checked 2026-10-01: Ch. 5-7 all defined; border-touching definition added to §5.1.2) TODO (from #20, author 2026-10-01): **every metric mentioned anywhere must have a plain
   description** of what it measures — check Chapters 5–6 for metrics used without one.
 - [x] #22 §5.1.3 "Runs are compared only when … same version of the pipeline" removed
   (2026-10-01).
