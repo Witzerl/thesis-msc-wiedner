@@ -326,12 +326,26 @@ every fold at both, so the T-FEN lies above the U-Net. Against the
 dilated-stencil network, the T-FEN is higher by $+0.0165 \pm 0.0021$~SE
 (5/5) and per eye $+0.0152 \pm 0.0048$ (49/75, $t = 3.1$) at seed 7, close
 to its seed-42 value: a small but consistent lead, at the noise level.
-% TODO (author decision, 2026-10-01): the seed-7 skew T-FEN replicates the
-% lead over the U-Net (seed 42 +0.038, seed 7 +0.025) and shows a consistent
-% +0.016 to +0.017 over the stencil at both seeds (seed 7: 5/5 folds, per-eye
-% t 3.1). Decide how this changes the headline "the strongest arms of
-% different classes are indistinguishable" in 5.2/5.3.5, 6.1, Ch. 7 and both
-% abstracts. The sentence above is the factual minimum.
+
+The three highest arms thus lie within about 0.04 of each other. The
+T-FEN is highest and lies above the U-Net; the dilated-stencil network and
+the U-Net cannot be told apart. The two highest arms are the two that
+carry a remedy for the reach deficit taken up
+in~\S\ref{sec:experiments:ingredients:convergence}: the transport term and
+the dilated stencil. What separates the arms is therefore not their class
+but the ingredients they carry.
+% Author decision (a), 2026-10-01: headline scoped instead of "the
+% strongest arms of different classes are indistinguishable".
+
+The fixed crop censors growth across the window edge
+(\S\ref{sec:data:spatial}). Of the 75 eyes, 21 have a lesion that touches
+the crop border at the one-year anchor and 54 do not. On the 54 interior
+eyes the arms keep the order of Table~\ref{tab:experiments:arms}; the
+values for both groups are given in
+Table~\ref{tab:appendix:border-interior}.
+% Author decision (e), 2026-10-01. Source: solver_results.csv,
+% late_change_region_dice_360d_{border,interior}_mean, seed 42; eye counts
+% final_n_{border,interior}_eyes_360d (21 / 54).
 
 The T-FEN reported here uses the energy-conserving form of its transport
 operator (\S\ref{sec:method:family:fen}). Its first version, with the
@@ -364,9 +378,9 @@ cost column is discussed in~\S\ref{sec:experiments:cost}.
 \section{The Ingredient Study}
 \label{sec:experiments:ingredients}
 
-The strongest arms of different classes are indistinguishable, so
-comparing whole architectures says little about what makes an operator
-work. This section therefore compares operators that differ in one
+The strongest arms of different classes lie within about 0.04 of each
+other, so comparing whole architectures says little about what makes an
+operator work. This section therefore compares operators that differ in one
 property only, with the rest of the framework held fixed. Each comparison
 measures one ingredient. All comparisons are fold-paired over the same five
 folds.
@@ -517,11 +531,9 @@ What holds at both seeds is therefore that global spectral support alone
 does not reach the U-Net at the one-year anchor. That a minimal local path
 closes this gap rests on seed 42 alone; at seed 7 it does not, and the
 claim is not established.
-% TODO (author decision, 2026-10-01): the seed-7 FNO / hybrid runs do not
-% replicate "global context and local detail are separable and both needed"
-% (the hybrid ties the U-Net only at seed 42). This ingredient is named in
-% 5.3 intro, 5.3.5, 6.1, Ch. 7, both abstracts (and possibly 1.4). Decide how
-% to restate it there. Values: thesis_numbers.py pair, 2026-10-01.
+% Author decision (b), 2026-10-01: global + local is reported as an
+% observation, not as an established ingredient (5.3.5, 6.1, Ch. 7,
+% abstracts). Values: thesis_numbers.py pair, 2026-10-01.
 
 \subsection{An Explicit Transport Term}
 \label{sec:experiments:ingredients:transport}
@@ -602,16 +614,21 @@ between two visits.
 Two unrelated constructions correct this deficit. The first is physical
 reach: the dilated stencil, whose single hop spans 21 columns. The second
 is an explicit transport term: the T-FEN, established against a
-parameter-matched control on four of the five folds. Each is established
-against its own control, and the two end up indistinguishable from each
-other; their relation to the U-Net is set out
-in~\S\ref{sec:experiments:main-results}. The central
+parameter-matched control at both seeds (on the four folds on which that
+control trained at seed 42, and on all five at seed 7). Each is
+established against its own control, and the two end up within about
+0.017 of each other, at the noise level; they are the two highest arms of
+Table~\ref{tab:experiments:arms}
+(\S\ref{sec:experiments:main-results}). The central
 architectural result of the survey is this coincidence --- two independent
 routes to the same deficit --- rather than the score of any single arm. It
 is suggestive rather than a proof of mechanism.
 
-The architecture class therefore does not decide the outcome; the
-ingredients it carries do. \S\ref{sec:experiments:ablations} reports what
+The architecture class therefore is not what separates the strongest
+operators; the ingredients they carry are. A third candidate, global and
+local context together, was seen at one seed only
+(\S\ref{sec:experiments:ingredients:global}) and is not counted among
+them. \S\ref{sec:experiments:ablations} reports what
 was measured and did not matter.
 
 

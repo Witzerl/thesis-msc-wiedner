@@ -188,7 +188,7 @@ wrong / to change". The author asked for no shortening yet; cuts wait for a late
   by the results. Revisit.
 - [x] §1.3: "Two recent neural PDE solver families…" — too much focus on MP-PDE/MM-PDE.
   Rewritten 2026-09-25.
-- [ ] §1.4 Contributions — "might remove"; decide between rewriting and removing.
+- [x] (2026-10-01: merged into §1.3) §1.4 Contributions — "might remove"; decide between rewriting and removing.
   2026-09-25: headline now reads "Contributions (TODO: maybe remove)" as a visible marker;
   the bullets themselves are still the stale pre-survey list.
 - [x] §1.5 Outline — "the two specific architectures (MP-PDE, MM-PDE)" marked; rewrite.
@@ -752,7 +752,8 @@ Being worked through one item at a time.
 - [x] (decided 2026-10-01, later session: (a) scope the headline, (b) demote global+local to an
   observation, (c) objective into 6.1 + Ch. 7; also 1.4 merged into 1.3, border split reported,
   Huang1991 cited, spacing check in 6.3 only, Gao2019 kept -- full wording in prompts/open.txt
-  section 2; NOT YET APPLIED to the text) **Author decisions from the batch (2026-10-01)** -- inline TODOs in 5.2, 5.3.3, 6.1, Ch. 7,
+  section 2; APPLIED 2026-10-01: abstracts, 5.2, 5.3, 6.1, 6.3, Ch. 7, 1.3 (1.4 merged), 4.1
+  provenance sentence, 2.1.3 Huang1991, 2.1.6 spacing -> 6.3, App. E border/interior table) **Author decisions from the batch (2026-10-01)** -- inline TODOs in 5.2, 5.3.3, 6.1, Ch. 7,
   abstract: (a) the skew T-FEN lies above the U-Net at both seeds and +0.016/+0.017 above the
   stencil at both -- "the strongest arms of different classes are indistinguishable" / "lie close
   together" / "architecture class does not decide" need rewording or scoping; (b) the global +
@@ -1734,7 +1735,7 @@ External references introduced inline in the LaTeX drafts that still need to be 
 - [x] (added to references.bib 2026-09-26, details checked) TODO: cite **SanchezGonzalez2020** -- Sanchez-Gonzalez et al., *ICML* 2020, "Learning to simulate complex physics with graph networks." Used in `01-introduction.tex` §1.3 alongside Battaglia2018 for the encode--process--decode pattern. (2026-09-25: that §1.3 sentence was removed; still relevant for §2.4.)
 - [x] (Li2021 and Lu2021 added to references.bib 2026-09-26) TODO: cite **Li2021** (FNO) and **Lu2021** (DeepONet) -- needed for `02-background.tex` §2.3 (autoregressive vs operator-style neural solvers). (2026-09-25: the conditional §1.3 acknowledgement is moot; §1.3 names no architecture.)
 - [x] (added to references.bib 2026-09-26, details checked) TODO: cite **Sadda2018** -- Sadda et al., *Ophthalmology* 2018, "Consensus Definition for Atrophy Associated with Age-Related Macular Degeneration on OCT: Classification of Atrophy Report 3." Used in `02-background.tex` §2.1.1 as the primary source for the cRORA criteria currently attributed only to Vallino2024.
-- [ ] (2026-09-26: not cited anywhere in the text; the marker in §2.1.3 stays until the author decides whether the OCT section should cite the origin of the modality) TODO: cite **Huang1991** -- Huang et al., *Science* 254:1178-1181, "Optical Coherence Tomography." Used in `02-background.tex` §2.1.2 to anchor the introduction of OCT as the canonical methodological-origin reference for the modality.
+- [x] (2026-10-01: cited in §2.1.3, bib entry added) (2026-09-26: not cited anywhere in the text; the marker in §2.1.3 stays until the author decides whether the OCT section should cite the origin of the modality) TODO: cite **Huang1991** -- Huang et al., *Science* 254:1178-1181, "Optical Coherence Tomography." Used in `02-background.tex` §2.1.2 to anchor the introduction of OCT as the canonical methodological-origin reference for the modality.
 - [x] (obsolete 2026-09-26: the SD-OCT description it supported was cut on 2026-09-25; marker removed) TODO: cite an SD-OCT principle reference (e.g. **Wojtkowski2002** or **Drexler2008**) once added to `references.bib`. Used in `02-background.tex` §2.1.2 to support the spectral-domain OCT principle behind the SD-OCT acquisition platform.
 - [x] (LeVeque2002 added to references.bib 2026-09-26; now used for FVM and convergence, not the SWE) TODO: cite a canonical SWE textbook (e.g. **LeVeque2002**, "Finite Volume Methods for Hyperbolic Problems", Cambridge University Press, Chapter 13; or **Vreugdenhil1994**, "Numerical Methods for Shallow-Water Flow", Springer) once added to `references.bib`. Used in `02-background.tex` §2.2.1 where the shallow-water equations are introduced as the running example for the section.
 

@@ -130,7 +130,9 @@ skew capacity points -> FEN_final_w96ftp7rk4d45skew (0.5428).
 
 2. WRITING (open)
 -----------------
-AUTHOR DECISIONS TAKEN 2026-10-01 (later session) -- to be APPLIED in one pass:
+AUTHOR DECISIONS TAKEN 2026-10-01 (later session) -- (a)-(g) APPLIED 2026-10-01 (abstracts EN+DE,
+5.2, 5.3 intro, 5.3.3 comment, 5.3.5, 6.1, 6.3, Ch. 7, 1.3, 4.1, 2.1.3, 2.1.6, App. E table
+tab:appendix:border-interior, Huang1991 in the bib); build clean:
   (a) Headline: SCOPE it. "Three strongest operators from three unrelated classes lie
       within 0.04 (0.50-0.54). The T-FEN is highest: above the U-Net at both seeds and on
       every fold, slightly above the stencil (~0.017 at both seeds, at the noise level).
@@ -156,9 +158,12 @@ AUTHOR DECISIONS TAKEN 2026-10-01 (later session) -- to be APPLIED in one pass:
   (g) ~2 % spacing check: 6.3 ONLY; 2.1.6 keeps "treated as constant" + pointer to 6.3.
   (h) Gao2019: KEEP the bib entry (uncited, harmless); no PDF / hub note needed.
   (i) Knowledge base: author wants a local PDF of EVERY cited reference and every citation
-      in the thesis traceable to its source passage (see section 13).
+      in the thesis traceable to its source passage (see section 13). Outsourced to a Sonnet
+      session: prompts/PROMPT_knowledge_base.md. Local only -- NO git backup (author).
+  (j) Optional solver-swap on the T-FEN at fold 2: SKIPPED (author asked; it would only put
+      the three rows on one fold; T-FEN spread on fold 0 is ~15x under the pass threshold).
 
-[ ] AUTHOR DECISIONS from the 2026-10-01 batch (inline TODOs in 5.2, 5.3.3, 6.1, Ch. 7,
+[x] (done 2026-10-01, decisions a-g) AUTHOR DECISIONS from the 2026-10-01 batch (inline TODOs in 5.2, 5.3.3, 6.1, Ch. 7,
     abstract): (a) skew T-FEN above the U-Net at both seeds (+0.038 / +0.025, 5/5 each)
     and +0.016/+0.017 above the stencil at both -- reword or scope "the strongest arms of
     different classes are indistinguishable" / "lie close together" / "architecture class
@@ -184,9 +189,9 @@ AUTHOR DECISIONS TAKEN 2026-10-01 (later session) -- to be APPLIED in one pass:
 [ ] Appendix F: run identity (moved from 4.6; inline TODO).
 [ ] Figure 4.2 (stencils, index-space diamond vs dilated stencil), spec extended with the
     two-round reach (+/-4 vs +/-42 columns); render by script from grid spacing + offsets.
-[ ] Border vs interior split (5.1.2 variants commented out): report once (5.2 sentence or
+[x] (done 2026-10-01, decisions a-g) Border vs interior split (5.1.2 variants commented out): report once (5.2 sentence or
     Appendix E) or leave out for good. 6.3 currently says it was computed but not reported.
-[ ] Optional: solver-swap on the skew T-FEN at fold 2 (common fold with the graph
+[x] (done 2026-10-01, decisions a-g) Optional: solver-swap on the skew T-FEN at fold 2 (common fold with the graph
     networks) and on the seed-7 skew T-FEN.
 [ ] [ce6] 5.5 Qualitative Analysis: the section intro (per-eye rollouts, success cases,
     failure modes: atypical progression, sparse schedules, short vs long Delta t,
@@ -194,7 +199,7 @@ AUTHOR DECISIONS TAKEN 2026-10-01 (later session) -- to be APPLIED in one pass:
     rollout) is a placeholder. 6.2 points to the failure cases (inline TODO l. ~206).
     Needs the final-epoch rollout exports (practical/scripts/fig_rollout.py, port to
     images/scripts/ per style/README.md). No new run needed.
-[ ] [ce6] 1.4 Contributions: still the stale pre-survey list ("TODO: maybe remove" in the
+[x] (done 2026-10-01, decisions a-g) [ce6] 1.4 Contributions: still the stale pre-survey list ("TODO: maybe remove" in the
     heading). Decide keep/rewrite/remove; if rewritten, align it with Ch. 7 and the abstract
     (ingredients, the framework, the nulls). Not covered by the final-chapters prompt.
 [ ] [ce6] 6.2 "Reliable horizon": literature check for a clinically meaningful threshold for
@@ -204,7 +209,7 @@ AUTHOR DECISIONS TAKEN 2026-10-01 (later session) -- to be APPLIED in one pass:
     (inline TODOs 06-discussion l. ~283, 00-abstract l. 8; l. ~40 done 2026-10-01: Delta t
     null filled in). Do it together with the
     Chapter 5 reporting pass, so the wording ("higher by ... on k of 5 folds") matches.
-[ ] [ce6] If the border/interior split (item above) is dropped for good, 6.3 must still say
+[x] (done 2026-10-01, decisions a-g) [ce6] If the border/interior split (item above) is dropped for good, 6.3 must still say
     it was computed and not reported -- it currently does; if it is reported, change 6.3.
 [ ] 04-method.tex: stale TODO comments to clean up -- l. ~301 (theta_PDE, now in 6.1),
     l. ~1230 ("cost convention -> TODO in Section 5.7", now in 5.6), l. ~97 (trajectory
@@ -264,10 +269,10 @@ AUTHOR DECISIONS TAKEN 2026-10-01 (later session) -- to be APPLIED in one pass:
     ("journal = arXiv preprint ..."), but both are ICLR papers (2022 and 2024), and Hu2024
     carries year = 2023, so Appendix G.1 prints "Hu et al. (2023)". Fix both entries
     (NOTES "Bibliography" has the year item since 2026-09-26; never done).
-[ ] [s26] Huang1991 (origin of OCT, Science 254:1178-1181): the only reference with a
+[x] (done 2026-10-01, decisions a-g) [s26] Huang1991 (origin of OCT, Science 254:1178-1181): the only reference with a
     "% TODO: cite" marker that is not cited anywhere (02-background l. ~249, 2.1.3).
     Decide: cite it in the first OCT sentence (add bib entry) or delete the marker.
-[ ] [s26] 2.1.6 still states the ~2 % constant-spacing check (02-background l. ~475). The
+[x] (done 2026-10-01, decisions a-g) [s26] 2.1.6 still states the ~2 % constant-spacing check (02-background l. ~475). The
     same paragraph was removed from 3.1 in review #27, and 6.3 now carries it
     (06-discussion l. ~234). Decide whether 2.1.6 keeps it or points to 6.3.
 [ ] [s25] 2.3 opening repeats the update-operator definition of 2.2.2 with a different
@@ -301,12 +306,12 @@ AUTHOR DECISIONS TAKEN 2026-10-01 (later session) -- to be APPLIED in one pass:
     (2024); the layer provenance (algorithm, boundary list, post-processing) is still
     unknown -- Mai is silent on it. Shrink the comment to the layer part; same question as
     the NOTES item "confirm with supervisor the exact provenance ...".
-[ ] [r25] Provenance sentence ("the work began as an adaptation of two graph solvers,
+[x] (done 2026-10-01, decisions a-g) [r25] Provenance sentence ("the work began as an adaptation of two graph solvers,
     suggested by the clinical partner; the locality case was built and tested afterwards")
     was deliberately left out of 1.3 (THESIS_STRUCTURE 1.3). Not placed anywhere yet
     (no hit for "clinical partner" in any .tex). Put it in 1.4 if 1.4 stays, otherwise at
     the start of Ch. 4 (4.1 or the MP-PDE paragraph of 4.3.2).
-[ ] [r25] 1.4 Contributions: the "(TODO: maybe remove)" marker was set in this session;
+[x] (done 2026-10-01, decisions a-g) [r25] 1.4 Contributions: the "(TODO: maybe remove)" marker was set in this session;
     the decision is the [ce6] item above (one item, two tags).
 [ ] [r25] Shortening pass on Ch. 1-2: on 2026-09-25 the author said the chapters feel long
     but asked for NO cuts during the review; the cuts the author approved explicitly
@@ -499,7 +504,7 @@ Waiting for a run (all already queued, see section 1 for the full "Fills" column
 
 No run needed:
   [ ] 5.5 Qualitative Analysis + Figure 5.1 (rollout strip); then the 6.2 link (TODO l. ~206)
-  [ ] 1.4 Contributions: keep / rewrite / remove
+  [x] (done 2026-10-01, decisions a-g) 1.4 Contributions: keep / rewrite / remove
   [ ] 6.2 literature check: clinical Dice threshold (TODO l. ~195)
   [ ] 6.3 quantify ground-truth shrinkage (TODO l. ~245; mask analysis only)
   [ ] Author review: 5.6, Ch. 6, Ch. 7, abstract, Kurzfassung (points in section 5)
@@ -589,8 +594,8 @@ No run needed:
       waiting for the author's go-ahead (section 2)
   [ ] references.bib: Brandstetter2022 / Hu2024 as ICLR papers, Hu2024 year 2023 -> 2024
       (section 2)
-  [ ] Huang1991: cite in 2.1.3 or delete the marker (section 2)
-  [ ] 2.1.6 vs 6.3: the ~2 % spacing check stated twice (section 2)
+  [x] (done 2026-10-01, decisions a-g) Huang1991: cite in 2.1.3 or delete the marker (section 2)
+  [x] (done 2026-10-01, decisions a-g) 2.1.6 vs 6.3: the ~2 % spacing check stated twice (section 2)
   [ ] Salvi2025: full first names (section 3)
   [ ] Author read-back of the new 2.2 / 2.4 text (section 5)
 
@@ -659,8 +664,8 @@ Still open (checked against the current .tex on 2026-10-01):
   [x] 3.1 FAF origin of the mask as a dataset fact (section 2)
   [x] 2.1.5 provenance TODO comment: keep only the layer part (section 2)
   [ ] 1.3 "spatially adaptive ... adaptive meshes" (section 2)
-  [ ] Provenance sentence (clinical partner) -> 1.4 or start of Ch. 4 (section 2)
-  [ ] 1.4 Contributions keep / rewrite / remove (= [ce6] item, section 2)
+  [x] (done 2026-10-01, decisions a-g) Provenance sentence (clinical partner) -> 1.4 or start of Ch. 4 (section 2)
+  [x] (done 2026-10-01, decisions a-g) 1.4 Contributions keep / rewrite / remove (= [ce6] item, section 2)
   [ ] Shortening pass on Ch. 1-2 (section 2)
   [ ] Confirm the FAF origin + layer provenance with the supervisors (section 3)
   [ ] Author read-back of the rewritten Ch. 1 / 2.1 text, incl. the covariate sentence
@@ -677,10 +682,10 @@ together with the 1.4 decision; the shortening pass last, after the author read-
   59 keys cited (+4 to add: Milletari2016, Loshchilov2019, Paszke2019, Fey2019; +Huang1991).
   Hub notes: 15 (13 GA papers of the April ingest + Brandstetter2022, Hu2024). PDFs: 15.
   literature/, pdfs/, INBOX/ are in .gitignore -> NO BACKUP.
-  Plan (agreed in principle, details to confirm):
+  Plan -- outsourced 2026-10-01 to prompts/PROMPT_knowledge_base.md (Sonnet session):
   [ ] Local copy pdfs/<Key>.pdf for every cited key + extracted <Key>.txt (searchable);
       download list with sources to the author before downloading; ~11 via JKU library.
   [ ] Citation ledger: each hub note gets "## Cited in thesis" -- per use: file + section,
       the claim, source page, short verbatim supporting passage.
   [ ] Hub + concept notes for the 44 missing references (/ingest workflow).
-  [ ] Backup: track literature/ in git (PDFs: author's call).
+  [x] Backup: NOT wanted (author 2026-10-01) -- the knowledge base stays local only.

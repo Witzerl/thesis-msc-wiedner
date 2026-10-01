@@ -37,6 +37,44 @@
 
 % TODO: full tables for every ablation sweep, not just the headline numbers.
 
+\section{Border-Touching and Interior Eyes}
+\label{app:full-results:border}
+
+\begin{table}[h]
+  \centering
+  \caption[Change-region Dice on border-touching and interior eyes.]{%
+    Change-region Dice at the one-year anchor, seed 42, split by whether the
+    eye's lesion touches the border of the fixed crop
+    (\S\ref{sec:data:spatial}). Of the 75 validation eyes, 21 touch the
+    border and 54 do not; per fold the border group holds 1 to 6 eyes.
+    Each value is the mean over the five folds of the late-epoch mean
+    within that group. Because the folds are weighted equally rather than
+    by their number of eyes, the column for all eyes need not lie between
+    the two group columns. The values are descriptive; the groups were not
+    tested against each other.}
+  \label{tab:appendix:border-interior}
+  \small
+  \begin{tabular}{l c c c}
+    \toprule
+    Arm & All eyes & Border (21) & Interior (54) \\
+    \midrule
+    T-FEN                            & 0.543 & 0.544 & 0.536 \\
+    Dilated-stencil GNN              & 0.526 & 0.516 & 0.522 \\
+    U-Net (width 5)                  & 0.505 & 0.483 & 0.511 \\
+    FNO + $3 \times 3$ local path    & 0.498 & 0.479 & 0.506 \\
+    FNO                              & 0.483 & 0.452 & 0.495 \\
+    FEN, free-form only              & 0.481 & 0.466 & 0.480 \\
+    $k$-NN GNN                       & 0.462 & 0.464 & 0.455 \\
+    One-hop floor                    & 0.452 & 0.464 & 0.440 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+% Source: solver_results.csv (code repo), late_change_region_dice_360d_
+% {mean,border_mean,interior_mean}, experiments FEN_final_w96ftp7rk4d45skew,
+% ANISOGNN_final_dilmean, UNET_final_w5, FNO_final_w5k3, FNO_final_w5,
+% FEN_final_w96Frk4d45, MPPDE_final_aggrmean, MPPDE_final_l1mean; one row per
+% fold, none superseded; computed 2026-10-01.
+
 
 \cleardoubleoddpage
 \chapter{Code Structure}

@@ -21,21 +21,24 @@ starts from persistence, a training curriculum measured in elapsed days,
 and one loss and one evaluation for all models. Held fixed, it served
 operators from unrelated literatures without change, and every operator
 with spatial context learned to predict change far above persistence.
+This required a loss that puts weight on the lesion mask: without the
+weighting the canonical operator learned no change at all, and a soft-Dice
+term added about 0.05.
 How time enters the update mattered less than that it enters: a
 higher-order Runge--Kutta step bought nothing over a single Euler step.
 
 \paragraph{The operator.}
-% TODO (author decision, 2026-10-01): seed 7 replicates the skew T-FEN's
-% lead over the U-Net (+0.038 seed 42, +0.025 seed 7, 5/5 folds at both) and
-% shows +0.016/+0.017 over the stencil at both seeds; "lie close together"
-% and "architecture class does not decide" need a decision. The global + local
-% bullet below is not replicated at seed 7 (see 5.3.3).
-The architecture class does not decide the outcome. The three strongest
-operators come from three unrelated classes --- a finite-element network,
-a graph network and a U-Net --- and lie close together, at a
-change-region Dice of about 0.50 to 0.54 at one year, against zero for
-persistence. What separates operators are a few properties that were
-measured one at a time.
+% Author decisions (a) and (b), 2026-10-01: headline scoped; global + local
+% moved from the list to a sentence after it.
+The architecture class is not what decides the outcome. The three
+strongest operators come from three unrelated classes --- a
+finite-element network, a graph network and a U-Net --- and lie within
+about 0.04 of each other, at a change-region Dice of about 0.50 to 0.54 at
+one year, against zero for persistence. The finite-element network is
+highest, above the U-Net at both seeds and slightly above the graph
+network; these two highest operators are the two that carry the reach and
+transport properties below. What separates operators are a few properties
+that were measured one at a time.
 \begin{itemize}
   \item \textbf{Spatial context.} Without it, a model predicts no change at
     all; one ring of neighbours raises the change-region Dice from 0 to
@@ -48,11 +51,12 @@ measured one at a time.
   \item \textbf{An explicit transport term.} Adding a learned transport
     term to a Finite Element Network raised it by 0.062 over the same
     network without it, and by 0.072 over a parameter-matched control on
-    the four folds on which that control trained.
-  \item \textbf{Global and local context together.} A purely global
-    operator lies below the U-Net at one year; a local path of 800
-    parameters brings it level.
+    the four folds on which that control trained; at a second seed the
+    control trained on all five folds, and the margin was 0.076.
 \end{itemize}
+A purely global operator, the FNO, lies below the U-Net at one year at
+both seeds. A small local path brought it level at one seed but not at the
+second, so whether local detail is the missing part is not established.
 Reach and transport are two unrelated ways to correct the same deficit:
 a single update that cannot see as far as the disease moves between two
 visits. That two independent routes lead to the same level is the central
@@ -62,7 +66,8 @@ any single model.
 \paragraph{What did not matter.}
 The negative results are part of the answer. Larger models did not help in
 any of the four classes tested. A
-higher-order time integration did not help. The moving-mesh extension,
+higher-order time integration did not help, and neither did a penalty
+against lesion shrinkage. The moving-mesh extension,
 reported in Appendix~\ref{app:mm-pde}, did not improve accuracy, because
 its correction branch never engaged. The validity diagnostics also limit
 what may be said: the canonical model is a one-step map conditioned on

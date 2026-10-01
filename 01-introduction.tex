@@ -181,62 +181,18 @@ develops a framework that answers the first part and leaves the operator
 as its only free component. Chapter~\ref{ch:experiments} then answers the
 second by comparing different operators within that framework.
 
-
-\section{Contributions (TODO: maybe remove)}
-\label{sec:introduction:contributions}
-
-The work presented in this thesis makes the following contributions:
-
-\begin{itemize}
-  \item \textbf{First application of moving-mesh neural PDE solvers to
-    medical imaging.} The MM-PDE framework of \citet{Hu2024} is
-    transferred from synthetic physical benchmarks to longitudinal OCT
-    imaging of Geographic Atrophy, and is adapted to the constraints of
-    a clinical cohort drawn from the Medical University of Vienna.
-
-  \item \textbf{$\Delta t$-conditioned residual formulation for irregular
-    visit schedules.} The fixed-step rollout of the original MP-PDE and
-    MM-PDE architectures is replaced with a per-window
-    $\Delta t$-conditioned Euler residual,
-    \begin{equation}
-      u_{t+\Delta t} \;=\; u_t \;+\; \Delta t \cdot f_{\theta}(u_t, \Delta t),
-      \label{eq:intro:dt-residual}
-    \end{equation}
-    which removes the assumption of a shared temporal origin across
-    patients and supports inference at clinically arbitrary horizons.
-
-  % NOTE (2026-07-26, see NOTES.md "Code-side sync"): the final DMM trains on a
-  % single-channel SLO mask (scalar monitor), so this "multi-channel Frobenius-norm
-  % monitor" contribution is stale — it was a superseded workaround, now removed.
-  % Reframe the DMM contribution (SLO-mask train/inference-grid decoupling) before final.
-  \item \textbf{Multi-channel generalisation of the MM-PDE pipeline.}
-    The moving-mesh and interpolation components of MM-PDE are extended
-    from a scalar field to the eleven-channel disease state (binary
-    lesion mask plus ten retinal layer boundaries) by reformulating the
-    monitor function in terms of the Frobenius norm of the per-channel
-    spatial gradient.
-
-  \item \textbf{Patient covariate conditioning.} Age and sex are
-    incorporated as graph-level attributes that are broadcast per node
-    into both the embedding and every message-passing layer, so that
-    patient context modulates the dynamics on equal footing with the
-    learned per-step solver state.
-
-  \item \textbf{Surrogate equation encoder.} A lightweight convolutional
-    encoder compresses the ten retinal layer maps into a compact global
-    embedding that is concatenated to the per-node feature vector; this
-    embedding plays the role of the equation-feature vector
-    $\theta_{\mathrm{PDE}}$ used in MP-PDE \citep{Brandstetter2022} and
-    provides the GNN with a learned surrogate for the otherwise unknown
-    PDE coefficients of GA dynamics.
-
-  \item \textbf{Empirical validation on a clinical longitudinal OCT
-    cohort.} A persistence baseline, a single-branch GNN (MP-PDE style),
-    and the dual-branch MM-PDE adaptation are compared head-to-head with
-    matched parameter budgets on per-pixel error, on lesion-mask Dice
-    and IoU at a clinically meaningful horizon, and on a battery of
-    component ablations covering each of the contributions above.
-\end{itemize}
+What the thesis delivers follows from this design. It provides a
+$\Delta t$-conditioned framework for irregular visit schedules in which
+operators from unrelated literatures can be compared on equal terms, and
+a controlled comparison of several operator classes on longitudinal OCT
+for GA. It identifies physical reach at the scale of the lesion front and
+an explicit transport term as two independent routes to the same deficit,
+and it reports what did not help --- larger models, a higher integration
+order, a monotonic-growth penalty and a moving-mesh extension --- as
+results in their own right.
+% Author decision (d), 2026-10-01: Section 1.4 "Contributions" merged into
+% this paragraph; its stale pre-survey bullets were deleted (nothing
+% referenced sec:introduction:contributions or eq:intro:dt-residual).
 
 
 \section{Thesis Outline}

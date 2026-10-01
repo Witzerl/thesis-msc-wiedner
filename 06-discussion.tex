@@ -37,18 +37,29 @@ nothing measurable, over a local and over a global operator
 operator output by $\Delta t$ is, on the mask channel, a change of
 parameterisation rather than additional knowledge, and removing it does
 not change the result.
-What the framework needs, in short, is that the length of the interval
-reaches the operator and that everything else is held fixed.
+The objective is part of the framework, and two of its parts are needed
+(\S\ref{sec:experiments:ablations:loss}). Without the weighting of the
+mask channel, the canonical operator learned no change at all: with plain
+MSE every eye stayed at its baseline. The soft-Dice term raised the
+change-region Dice by about 0.05 and made training steadier. A penalty
+against lesion shrinkage added nothing. These ablations were run on the
+canonical operator only.
+What the framework needs, in short, is a loss that puts weight on the
+lesion mask, an interval length that reaches the operator, and everything
+else held fixed.
 
 \paragraph{The operator: ingredients, not classes.}
 The three highest arms come from three unrelated classes --- a
-finite-element network, a graph network and a U-Net --- and lie close
-together (\S\ref{sec:experiments:main-results}). If the class decided the
-outcome, such a result would be unlikely. What separates operators is
-instead a set of properties that can be switched on and off one at a
-time (\S\ref{sec:experiments:ingredients}): spatial context at all,
-physical reach at the scale of the lesion front, global and local context
-together, and an explicit transport term.
+finite-element network, a graph network and a U-Net --- and lie within
+about 0.04 of each other (\S\ref{sec:experiments:main-results}). The
+finite-element network is highest: it lies above the U-Net at both seeds
+and only slightly above the graph network. The two highest are the two
+that carry a remedy for the reach deficit discussed below. If the class
+decided the outcome, such a result would be unlikely. What separates
+operators is instead a set of properties that can be switched on and off
+one at a time (\S\ref{sec:experiments:ingredients}): spatial context at
+all, physical reach at the scale of the lesion front, and an explicit
+transport term.
 
 The most informative of these is the pair of reach and transport. The GA
 front moves about 10 to 25 columns between two visits, while one hop on
@@ -67,15 +78,13 @@ survey is consistent with it. The coincidence of two routes is suggestive
 rather than a proof of mechanism, but it is a more specific statement
 than any ranking of architectures.
 
-% TODO (author decision, 2026-10-01): the seed-7 FNO / hybrid runs do NOT
-% replicate this paragraph -- at seed 7 the 3x3 local path adds nothing to the
-% FNO (-0.006) and the hybrid lies below the U-Net (-0.019, 0/5 folds). What
-% holds at both seeds: the FNO alone does not reach the U-Net at the anchor.
-% Rewrite once decided (see 5.3.3).
-Global and local context behave as separable ingredients. The FNO, which
-sees the whole grid in every layer but has no local path, lies below the
-U-Net at the one-year anchor, and a $3 \times 3$ local path of 800
-parameters brings it level (\S\ref{sec:experiments:ingredients:global}).
+% Author decision (b), 2026-10-01: global + local demoted to an observation.
+Whether global and local context are separate ingredients remains open.
+The FNO, which sees the whole grid in every layer but has no local path,
+lies below the U-Net at the one-year anchor at both seeds. A
+$3 \times 3$ local path of 800 parameters brought it level at one seed but
+not at the second (\S\ref{sec:experiments:ingredients:global}), so whether
+local detail is what the FNO lacks is not established.
 Beyond one year the plain FNO catches up with the U-Net and lies above it
 after three years. These horizon values are descriptive and were not
 tested, but they suggest that global support matters more for long
@@ -133,9 +142,11 @@ Taken together, the positive results and the nulls indicate where effort
 paid off in this survey. Changing where an operator looks --- its reach
 along the direction in which the front moves --- or adding a mechanism
 that transports the state produced the largest effects. Larger models, a
-higher integration order and the moving-mesh extension of
-Appendix~\ref{app:mm-pde}, whose correction branch never engaged, did not
-improve accuracy at the available precision. For a new disease-forecasting task of this kind, the first
+higher integration order, a penalty against lesion shrinkage and the
+moving-mesh extension of Appendix~\ref{app:mm-pde}, whose correction
+branch never engaged, did not improve accuracy at the available precision.
+The objective, by contrast, did matter: the weighting of the mask channel
+decided whether anything was learned at all. For a new disease-forecasting task of this kind, the first
 question to ask of an operator is therefore how far one update reaches
 compared with how far the disease moves between visits.
 
@@ -223,10 +234,9 @@ crop border, so their growth across it is censored, in the training
 targets and in the metrics, without any flag. Larger windows would trade
 this for up to 35\,\% zero padding and about $1.9\times$ as many grid
 positions, and about 19\,\% of lesions would touch the border anyway
-because they reach the edge of the scan itself. A split of the headline
-metric into border-touching and interior lesions was computed but is not
-reported; the ranking of the arms does not change on the interior
-lesions.
+because they reach the edge of the scan itself. On the 54 eyes whose
+lesion does not touch the crop border, the arms keep the order of
+Table~\ref{tab:experiments:arms} (\S\ref{sec:experiments:main-results}).
 
 Every area in mm$^2$ rests on a pixel spacing that is treated as constant
 across the cohort. It was checked only against the cohort's own
@@ -275,11 +285,9 @@ about mesh adaptation is drawn from it.
 % seed-7 matched transport control, Delta t-multiplication and loss-term
 % ablations on the canonical network, T-FEN capacity points in skew form.
 % Fill Chapter 5 and revise Sections 6.1 and 6.3 once they are read out.
-% 2026-10-01: all in except w192 / depth-8 skew; Chapter 5 filled. Open for
-% 6.1/6.3 (author decision): T-FEN > U-Net replicated; global + local not
-% replicated at seed 7; the soft-Dice term raises the score (-0.050 without
-% it) and plain MSE never leaves the copy-input collapse -- 6.1 "Where
-% modelling effort pays" is currently silent on the objective.
+% 2026-10-01: all in except w192 / depth-8 skew; Chapter 5 filled. Author
+% decisions (a)-(c) applied to 6.1 the same day (headline scoped, global +
+% local demoted, objective added).
 
 
 \section{Future Work}

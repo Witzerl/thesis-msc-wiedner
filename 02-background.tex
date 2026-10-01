@@ -245,11 +245,6 @@ rather than the mask alone.
 \subsection{Optical Coherence Tomography of the Macula}
 \label{sec:background:ga-oct:oct}
 
-% TODO: cite Huang1991 (Huang et al., Science 254:1178-1181, "Optical
-% Coherence Tomography") once added to references.bib -- the seminal
-% paper introducing OCT, conventionally cited as the methodological
-% origin of the modality.
-
 % TODO: produce Figure fig:bg:oct-acquisition --- a four-panel
 % schematic showing how an OCT volume is built up from one-dimensional
 % depth profiles, intended to anchor the geometric vocabulary
@@ -307,8 +302,8 @@ rather than the mask alone.
   \label{fig:bg:oct-acquisition}
 \end{figure}
 
-Optical Coherence Tomography (OCT) produces micrometre-resolution
-cross-sectional images of the retina, in much the same way that
+Optical Coherence Tomography (OCT), introduced by \citet{Huang1991},
+produces micrometre-resolution cross-sectional images of the retina, in much the same way that
 ultrasound produces them for soft tissue --- except that low-coherence
 near-infrared light replaces sound. Concretely, the system shines a
 weak probe beam into the eye and measures how strongly each
@@ -466,10 +461,8 @@ $[0.12118,\, 0.003867,\, 0.00568]$\,mm in the $(x, z, y)$ directions,
 because the scans were resampled upstream to one gold-standard spacing.
 The resulting fixed physical window is approximately
 $5.94 \times 5.82$\,mm.
-% TODO: check the DICOM spacing fields to confirm the constant-spacing assumption.
-This constant-spacing assumption has only been checked against the
-cohort's own recorded transform files, where it holds to a tolerance of
-about two per cent. The ratio between the two in-plane spacings is
+This is an assumption whose limits are stated
+in~\S\ref{sec:discussion:limitations}. The ratio between the two in-plane spacings is
 roughly 21:1. This extreme anisotropy is a direct consequence of the
 clinical acquisition protocol and is reflected in several architectural
 choices in Chapter~\ref{ch:method}.

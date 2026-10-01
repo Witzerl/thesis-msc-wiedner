@@ -8,11 +8,9 @@
 % #1-#2): more technical, results with numbers, no moving mesh, no comparison
 % with another model. Numbers: Table 5.1 (mean +- sd over the five folds),
 % Sections 5.3.2-5.3.4, 5.4.1, 5.4.3, 5.5.1 (growth-rate r).
-% TODO: revisit the T-FEN value and the ordering of the three strongest
-% operators once the seed-7 T-FEN run is in.
-% 2026-10-01: it is in -- T-FEN > U-Net replicates (seed 7 +0.025, 5/5
-% folds), T-FEN vs stencil +0.016/+0.017 at both seeds; the global + local
-% ingredient does NOT replicate at seed 7 (5.3.3). Author decision pending.
+% 2026-10-01: author decisions (a)-(c) applied (prompts/open.txt section 2):
+% headline scoped (T-FEN above U-Net at both seeds, slightly above the
+% stencil), global + local demoted to a one-seed observation, objective added.
 
 \cleardoubleoddpage%  Make sure to start abstract on a new odd page
 \begin{abstract*}
@@ -38,22 +36,26 @@ this slot at matched parameter counts. They were compared by five-fold
 cross-validation on 75 eyes of 51 patients from the Medical University of
 Vienna, using the Dice of the changed region at one year.
 
-The framework served every operator without change, and the architecture
-class did not decide the outcome. The three strongest operators (a Finite
-Element Network, a graph network and a U-Net) reach a change-region Dice
-of $0.54 \pm 0.04$, $0.53 \pm 0.05$ and $0.50 \pm 0.06$ (mean $\pm$
-standard deviation over the five folds), against zero for a model that
-predicts no change. The differences between operators trace back to a few
+The framework served every operator without change, provided its loss
+weighted the lesion mask: without that weighting no change was learned, and
+a soft-Dice term added about 0.05. The three strongest operators come from
+three unrelated classes (a Finite Element Network, a graph network and a
+U-Net) and reach a change-region Dice of $0.54 \pm 0.04$, $0.53 \pm 0.05$
+and $0.50 \pm 0.06$ (mean $\pm$ standard deviation over the five folds),
+against zero for a model that predicts no change. The Finite Element
+Network lies above the U-Net at two seeds and only slightly above the
+graph network. The differences between operators trace back to a few
 properties, each measured on its own. The largest is physical reach.
 Replacing the index-space neighbour graph by a dilated stencil that
 reaches about 0.12\,mm, roughly as far as the lesion front moves between
 visits, raises the Dice by 0.064 at an identical parameter count, on all
 five folds. A learned transport term raises it by 0.062 over the same
-network without one, a second route to the same deficit. A global
-spectral operator alone stays below the U-Net, and a $3 \times 3$ local
-path of 800 parameters brings it level. Neither scaling the operators from
-about a quarter to four times their size nor replacing the single Euler
-step by fourth-order Runge--Kutta integration improved accuracy.
+network without one, a second route to the same deficit; these two are
+the two highest operators. A purely spectral operator stays below the
+U-Net; adding a local path closed the gap at one seed only. Neither
+scaling the operators from about a quarter to four times their size nor
+replacing the single Euler step by fourth-order Runge--Kutta integration
+improved accuracy.
 
 The growth rate of an individual eye over its whole follow-up is predicted
 less well than where the lesion changes, with a correlation of 0.40 with
@@ -100,13 +102,16 @@ Platz eingesetzt. Verglichen wurden sie mit fünffacher Kreuzvalidierung an
 75 Augen von 51 Patienten der Medizinischen Universität Wien, anhand des
 Dice-Koeffizienten der veränderten Region nach einem Jahr.
 
-Der Rahmen diente jedem Operator ohne Änderung, und die
-Architekturklasse entschied nicht über das Ergebnis. Die drei stärksten
-Operatoren (ein Finite-Elemente-Netzwerk, ein Graph-Netzwerk und ein
-U-Net) erreichen einen Change-Region-Dice von $0{,}54 \pm 0{,}04$,
-$0{,}53 \pm 0{,}05$ und $0{,}50 \pm 0{,}06$ (Mittelwert $\pm$
-Standardabweichung über die fünf Folds), gegenüber null für ein Modell,
-das keine Veränderung vorhersagt. Die Unterschiede zwischen den Operatoren
+Der Rahmen diente jedem Operator ohne Änderung, sofern seine
+Verlustfunktion die Läsionsmaske gewichtete: Ohne diese Gewichtung wurde
+keine Veränderung gelernt, und ein Soft-Dice-Term brachte etwa 0,05. Die
+drei stärksten Operatoren stammen aus drei unabhängigen Klassen (ein
+Finite-Elemente-Netzwerk, ein Graph-Netzwerk und ein U-Net) und erreichen
+einen Change-Region-Dice von $0{,}54 \pm 0{,}04$, $0{,}53 \pm 0{,}05$ und
+$0{,}50 \pm 0{,}06$ (Mittelwert $\pm$ Standardabweichung über die fünf
+Folds), gegenüber null für ein Modell, das keine Veränderung vorhersagt.
+Das Finite-Elemente-Netzwerk liegt bei zwei Seeds über dem U-Net und nur
+knapp über dem Graph-Netzwerk. Die Unterschiede zwischen den Operatoren
 gehen auf wenige Eigenschaften zurück, die jeweils einzeln gemessen
 wurden. Die größte ist die physikalische Reichweite. Wird der
 Nachbarschaftsgraph im Indexraum durch einen gedehnten Stencil ersetzt,
@@ -114,9 +119,9 @@ der etwa 0,12\,mm weit reicht, also ungefähr so weit, wie sich die
 Läsionsgrenze zwischen zwei Kontrollen bewegt, steigt der Dice bei
 identischer Parameterzahl um 0,064, auf allen fünf Folds. Ein gelernter
 Transportterm hebt ihn um 0,062 gegenüber demselben Netzwerk ohne diesen
-Term, ein zweiter Weg zum selben Defizit. Ein globaler spektraler Operator
-allein bleibt unter dem U-Net, und ein lokaler $3 \times 3$-Pfad mit 800
-Parametern bringt ihn auf dessen Niveau. Weder die Skalierung der
+Term, ein zweiter Weg zum selben Defizit; diese beiden sind die zwei
+stärksten Operatoren. Ein rein spektraler Operator bleibt unter dem U-Net;
+ein zusätzlicher lokaler Pfad schloss die Lücke nur bei einem Seed. Weder die Skalierung der
 Operatoren von etwa einem Viertel bis zum Vierfachen ihrer Größe noch der
 Ersatz des einzelnen Euler-Schritts durch eine Runge--Kutta-Integration
 vierter Ordnung verbesserte die Genauigkeit.
