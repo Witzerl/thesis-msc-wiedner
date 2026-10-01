@@ -1,0 +1,14 @@
+{
+    "files.associations": {
+        "*.aux": "plaintext",
+        "*.bbl": "plaintext",
+        "*.bcf": "plaintext",
+        "*.fls": "plaintext",
+        "*.fdb_latexmk": "plaintext",
+        "*.toc": "plaintext",
+        "*.lof": "plaintext",
+        "*.lot": "plaintext",
+        "*.out": "plaintext",
+        "*.run.xml": "plaintext"
+    }
+}
