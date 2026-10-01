@@ -1044,6 +1044,42 @@ attribution was checked through the MP-PDE text.
   progression), Lindner et al. 2015 (faster growth towards the periphery), Bui et al. 2022
   (description of the Mai cohort).
 
+### Editorial review: flow, clarity, tone, AI tone (2026-10-01)
+
+Whole-thesis editorial review against the author's brief (reader flow, clarity, academic tone,
+AI-tone mitigation; citations, references, formatting and numbers excluded). The GPTZero scans of
+2026-10-01 (every chapter "AI Generated", 67-89 % of words flagged, including 82 % of the plain
+Ch. 3) were used as pointers, not as evidence. Advisory only: no `.tex` file was changed.
+English abstract, Ch. 1-7 and App. A-G were reviewed; the German Kurzfassung was not.
+- [ ] Author to work through `reviews/editorial-2026-10-01/`: `00-overview.md` (macro feedback,
+  fix-first list, structure S1-S25, transitions T1-T13, repetition R1-R17, reader-lost points,
+  terminology table, AI-tone patterns P1-P14, rules of thumb) and 14 micro files with 544 verified
+  items (15 high, 277 medium, 252 low), each with `file:line`, GPTZero label and a suggested
+  rewrite. Line numbers refer to the sources of 2026-10-01, 21:43.
+- [ ] Fix first: two sentences are missing from the PDF because the prose sits at the end of a
+  `%` comment line: `05-experiments.tex:163` (§5.1.3, the second of the "two reasons") and
+  `05-experiments.tex:903` (§5.4.2, the cost of the soft-Dice term). Review items 5a.19, 5c.17.
+- [ ] Contradictions and dead pointers found (review S4, S5, S9, S22): §1.2 promises the
+  covariates are "tested in this thesis" (the test is commented out, §6.3 says unsettled);
+  layer channels "not auxiliary" (§2.1.5) vs "auxiliary targets" (§3.2, §4.2.2, §4.5.1); the Fig.
+  2.2 caption maps strata onto the ten channels although the boundary names are unknown; §2.1.1
+  points to §1.2 for subfoveal significance (it is §1.1); §3.7 promises fold heterogeneity is
+  "revisited in §5.1" (it is not). The mask-provenance contradiction §2.1.2 vs §3.1 is the open
+  FACT CHECK item of 2026-09-25 (review 2a.17).
+- [ ] Wording that changes a result's reading (review 5d.4, 5d.16, 5d.23, 4b.25, 5c.11): C2
+  criterion "by step or by order" lets the RK4 arm fail; "Its accuracy" in §5.5.2 reads as seed 7;
+  Pearson r described as checking scale; T-FEN transport mesh reads as one subsampled mesh; the
+  objective-test opener says each run changes one part (the first changes two).
+- [ ] Terms used before definition or with several meanings: arm (never defined), canonical
+  (fold / normalisation / age mode / model), "the same deficit" (abstract, §1.3; defined §5.3.5),
+  window (crop vs visit pair), floor, anchor, late epochs. Review suggests one definitions
+  paragraph at the end of §4.1.
+- [ ] Structural suggestions to decide (review S2, S3, S7, S12): research-question mapping (Ch. 4
+  never names sub-question 1; the framework evidence is in §5.4); §5.4 "Negative Results" holds
+  the clearest positive framework result (§5.4.2); framework spread over §4.2/§4.4/§4.5; §5.6
+  "Qualitative Analysis" contains only the Mai comparison. Repetition across chapters R1-R17
+  (crop census four times, Mai caveats about seven times, continuous-time caution four times).
+
 ### Figure plan (2026-10-01)
 
 Author: work the figures back to front (appendix and Chapter 5 first, medical illustrations
