@@ -1018,7 +1018,7 @@ through one item at a time.
   Mai's Table 2 (growth-region DSC 0.25 / 0.38 / 0.38 / 0.37 for 0–1 / 1–2 / 2–3 / >3 y). On
   growth *speed* the canonical model is clearly **weaker** than Mai (r 0.40 vs 0.61). Do not
   quote the old claim; see §5.5 inline TODO. (Mai2024 is in references.bib since 2026-09-26.)
-- [ ] Ground-truth GA **retraction/shrinkage** between visits should be quantified before
+- [x] (2026-10-01: net decrease in 5 % of 478 pairs, local border loss in 96 %, median 2.2 % of the lesion; in §6.3) Ground-truth GA **retraction/shrinkage** between visits should be quantified before
   it is discussed in Limitations.
 
 ---

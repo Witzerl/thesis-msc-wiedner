@@ -245,12 +245,17 @@ spacing fields. The GA reference was most likely annotated on fundus
 autofluorescence and registered onto the OCT grid, as described
 by~\citet{Mai2024} for this cohort; the provenance of the layer
 segmentation and the anatomical names of the ten boundaries are not
-recorded. The reference masks also shrink locally between some visits.
-Whether this reflects segmentation and registration noise or a real
-change has not been quantified, and it is one reason why no
-monotonic-growth constraint was imposed.
-% TODO: quantify the local shrinkage of the reference masks between visits
-% (fraction of visit pairs, area) before the thesis is submitted.
+recorded. The reference masks also shrink between visits. The total
+lesion area decreases in 5\,\% of the 478 pairs of consecutive visits, by a
+median of 2.6\,\%, but almost every pair (96\,\%) loses some atrophic
+pixels along the border, a median of 2.2\,\% of the lesion. This pattern is
+more consistent with annotation and registration noise at the boundary
+than with regression, although the masks alone cannot separate the two. It
+is one reason why no monotonic-growth constraint was imposed.
+% Computed 2026-10-01 from data/MUW_GA/scans/*/*/mask_oct.png (native grid;
+% the 49 x 1024 crop gives 5.4 % / 96 % / 2.1 %): 478 pairs, 75 eyes; net
+% decrease in 24 pairs (15 eyes), max -14 %; local loss > 5 % of the lesion
+% in 21 %, > 10 % in 5 % of pairs; lost / gained area over all pairs 22 %.
 
 \paragraph{Evaluation.}
 The one-year anchor is the first rollout step at or beyond 360 days and

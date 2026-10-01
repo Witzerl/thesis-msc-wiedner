@@ -332,7 +332,7 @@ tab:appendix:border-interior, Huang1991 in the bib); build clean:
     (SOLVER_FINAL_RUNS 9.18 / 9.6d).
 [x] (done 2026-10-01: loss-only single-pixel computation, review 2026-08-14 F2a; sentence reworded) 5.4.2: the 31.8x gradient ratio of the monotonic penalty -- in which setting was it
     measured (F2 audit)? Confirm or state the setting.
-[ ] [ce6] 6.3: quantify the local shrinkage of the reference masks between visits
+[x] (done 2026-10-01: 5 % net decrease, 96 % local loss, median 2.2 %; 6.3, 4.2.1, 5.4.2 updated) [ce6] 6.3: quantify the local shrinkage of the reference masks between visits
     (fraction of visit pairs with net/local shrinkage, area) -- inline TODO l. ~245; the
     text currently says "has not been quantified". Post-hoc analysis on the masks, no
     training run.
@@ -507,7 +507,7 @@ No run needed:
   [ ] 5.5 Qualitative Analysis + Figure 5.1 (rollout strip); then the 6.2 link (TODO l. ~206)
   [x] (done 2026-10-01, decisions a-g) 1.4 Contributions: keep / rewrite / remove
   [ ] 6.2 literature check: clinical Dice threshold (TODO l. ~195)
-  [ ] 6.3 quantify ground-truth shrinkage (TODO l. ~245; mask analysis only)
+  [x] 6.3 quantify ground-truth shrinkage (TODO l. ~245; mask analysis only)
   [ ] Author review: 5.6, Ch. 6, Ch. 7, abstract, Kurzfassung (points in section 5)
 
 Order that avoids rewriting twice: runs in -> Chapter 5 reporting pass -> one pass over
@@ -565,7 +565,7 @@ Indirectly waiting for a run:
                                               consistent with whatever 5.4.2 / 6.3 report
 
 No run needed:
-  [ ] 4.2.1 / 6.3: quantify reference-mask shrinkage; then delete the TODOs at 04-method
+  [x] 4.2.1 / 6.3: quantify reference-mask shrinkage; then delete the TODOs at 04-method
       l. ~152 and 06-discussion l. ~245 (section 3)
   [x] 04-method l. ~97: delete the stale trajectory-memory TODO (section 2)
   [ ] Appendix G: two TODOs moved there by this review -- why the moving mesh forces

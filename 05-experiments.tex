@@ -784,7 +784,7 @@ direct computation with the training loss on one such pixel, at penalty
 weight 2.0, gives a penalty gradient 31.8 times that of the data terms, so
 the total gradient points away from the ground truth. The penalty therefore enforces different
 priors on teacher-forced and on unrolled steps. In addition, the reference
-segmentations themselves shrink locally between some visits
+segmentations themselves shrink locally between most pairs of visits
 (\S\ref{sec:method:dt-residual}), which a strict growth constraint would
 contradict.
 % Source of 31.8x: code review 2026-08-14, item F2a (commit 45529fd in

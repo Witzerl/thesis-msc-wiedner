@@ -148,11 +148,8 @@ over the interval. The output of $f_\theta$ is signed and unbounded, so the
 model can in principle also predict a shrinking lesion, although atrophic
 tissue does not regenerate and a shrinking lesion is not clinically
 plausible. No monotonic-growth constraint is imposed, because the reference
-segmentations themselves shrink locally between some visits
+segmentations themselves shrink locally between most pairs of visits
 (\S\ref{sec:discussion:limitations}); the prior rests on slow change alone.
-% TODO: quantify the local shrinkage of the reference masks between visits
-% (segmentation/registration noise vs biology) before it is discussed in
-% Section 6.3 (author review #14, 2026-09-27).
 
 The final layer of every operator's output head is initialised to zero,
 weights and bias alike. Before training, $f_\theta$ therefore outputs zero
