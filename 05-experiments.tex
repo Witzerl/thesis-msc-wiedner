@@ -75,11 +75,11 @@ with the absence of a monotonic-growth constraint
 of \citet{Mai2024}, which this chapter also uses. The growth-region Dice
 scores only new atrophy, the pixels that are lesion at the anchor but not
 at baseline. The change-region Dice scores every changed pixel, growth and
-shrinkage alike. Both have a persistence floor of 0 and are easy to
-confuse: Table~\ref{tab:experiments:arms} and all fold-paired values use
-the change-region Dice, while the per-eye instrument uses the growth-region
-Dice (\S\ref{sec:experiments:protocol:stats}). The change-region Dice is
-also the model-selection metric.
+shrinkage alike. Both score 0 for persistence and are easy to confuse:
+Table~\ref{tab:experiments:arms} and all differences between arms use the
+change-region Dice, while the eye counts of
+\S\ref{sec:experiments:protocol:stats} use the growth-region Dice. The
+change-region Dice is also the model-selection metric.
 
 % TODO (author review v4 #19, 2026-09-30): crop-variant paragraph commented
 % out; neither variant enters any reported number. Decide later whether to
@@ -105,8 +105,8 @@ the padded grid positions excluded from both sides.
 
 Formally, the growth-region Dice compares the true new-atrophy region
 $\{\, i : y_i = 1 \text{ and } b_i = 0 \,\}$ with its predicted
-counterpart. It is used by the per-eye statistical instrument
-(\S\ref{sec:experiments:protocol:stats}). It is also computed at every
+counterpart. It is used for the eye counts of
+\S\ref{sec:experiments:protocol:stats}. It is also computed at every
 rollout step and grouped by the time since baseline into $(0, 1]$,
 $(1, 2]$, $(2, 3]$ and more than three years. These horizon bins show how
 the prediction degrades as the forecast reaches further than the one-year
@@ -211,54 +211,42 @@ All experiments
 use the patient-level five-fold cross-validation of~\S\ref{sec:data:splits},
 which has no test split; every result is a validation result.
 
-\subsection{Two Statistical Instruments and the Noise Floor}
+\subsection{Noise Level and Comparisons}
 \label{sec:experiments:protocol:stats}
 
-Repeated runs of the same configuration do not give identical results on
-the GPU (\S\ref{sec:method:implementation}). Seven pairs of runs with the
-same configuration on the same fold, two with the same seed and five with
-different seeds, give a per-run standard deviation of about 0.0127 for the
-late-epoch mean of the change-region Dice. Two thresholds follow from it. A
-difference measured on a single fold must exceed 0.036 to count as an
-effect, and a difference of five-fold paired means must exceed 0.016.
-Anything smaller is treated as noise. Same-seed and different-seed repeats
-spread about equally, so the seed adds nothing measurable on top of the
-run-to-run variation.
+Two sources of variation enter every comparison. The first is training
+noise. Repeated runs of the same configuration do not give identical
+results on the GPU (\S\ref{sec:method:implementation}): retraining the same
+model on the same fold already changes its late-epoch score by up to about
+0.02. The second is the fold. The five folds hold different eyes, and the
+spread between them is larger than most differences between arms
+(\S\ref{sec:experiments:main-results}). Two arms are therefore always
+compared fold by fold, on the same five folds, and the five differences
+are averaged.
 
-This floor was measured on graph-network runs. The seed pair of the
-parameter-matched U-Net spreads about 1.9 times wider. Any comparison with a
-U-Net on one side is therefore read against a mixed paired floor of about
-0.020. Noise affects nulls and effects differently: it can only widen a
-null.
+Differences of about 0.02 or less are within the noise level and are not
+interpreted on their own. A difference is treated as real only when its
+average over the five folds clearly exceeds what retraining alone
+produces, when it holds on most folds and most of the 75 validation eyes,
+and when it does not depend on a single fold. Results are stated in these
+terms, for example ``higher by 0.064 on average, on all five folds and on
+70 of the 75 eyes''. The eye counts use the growth-region Dice at the
+anchor, because the change-region Dice was logged only as a mean over the
+eyes of each fold. In tables, ``mean $\pm$ sd'' is the mean and the
+standard deviation over the five fold values, each the late-epoch mean of
+one run.
 
-Throughout the chapter, "mean $\pm$ sd" denotes the mean and the standard
-deviation over the five fold values, where each fold value is the
-late-epoch mean of one run. Differences between two arms are measured with
-two instruments. The first is the fold-paired mean, written
-$\Delta = x \pm y$~SE ($k$/5): the mean over the five folds of the
-per-fold difference, with its between-fold standard error, where $k$ is
-the number of folds on which the difference has the same sign as the mean.
-It is judged against the paired floor of 0.016, or 0.020 when a U-Net is
-involved.
-
-The second instrument is the pooled per-eye paired test, written
-"per eye: $x \pm y$ ($m$/75)". For every validation eye, the growth-region
-Dice at the one-year anchor is averaged over the late epochs. The two arms
-are paired eye by eye, and the pairs are pooled over the validation eyes of
-all five folds: 75 eyes, or 150 eye-seed pairs when an arm was run at two
-seeds. Here $m$ is the number of eyes on which the difference has the same
-sign as the mean, and the paired $t$ statistic is given where it is
-available. Robustness is checked by leaving out one fold at a time. This
-instrument uses the growth-region Dice rather than the headline metric,
-because the change-region Dice was logged per run as a cohort mean only,
-without per-eye values across epochs. This is a limitation of the logging,
-not a choice of metric.
-
-Both instruments are always quoted together. A result is established ---
-it \emph{graduates} --- only when both agree. The two instruments can
-disagree, and \S\ref{sec:experiments:ingredients} contains such a case.
-All numbers are for seed 42 unless they are marked as seed 7 or
-seed-pooled.
+The main comparisons were repeated with a second random seed, and the
+conclusions drawn in this chapter hold at both. All numbers in this
+chapter are for the first seed. Appendix~\ref{app:full-results:criteria}
+gives the exact criteria, and Appendix~\ref{app:full-results:seeds} the
+standard errors and test statistics of every comparison together with the
+values at the second seed.
+% Reporting scheme agreed 2026-10-01 (NOTES #23/#25/#31), applied 2026-10-02:
+% seed 42 only in the text, one noise level as an intuition, results in
+% words, statistics in Appendix E. The thresholds (0.0127 replicate sd;
+% 0.036 single fold; 0.016 five-fold paired; 0.020 with a U-Net) moved to
+% app:full-results:criteria. Counts are "first arm higher" everywhere.
 
 
 \section{The Arm Table}
@@ -282,7 +270,8 @@ lists every arm on the headline metric.
     in seconds over the five folds; it supports order-of-magnitude
     statements only (\S\ref{sec:experiments:cost}). The arms are ordered by
     mean, with the two locality floors and persistence at the bottom;
-    adjacent arms mostly differ by less than the noise floor.
+    adjacent arms mostly differ by less than the noise level
+    (\S\ref{sec:experiments:protocol:stats}).
     The T-FEN uses the energy-conserving form of its transport operator
     (\S\ref{sec:experiments:validity:tfen}).}
   \label{tab:experiments:arms}
@@ -372,21 +361,16 @@ lists every arm on the headline metric.
 \end{figure}
 
 The three highest arms come from three unrelated architecture classes: a
-finite-element network, a graph network and a U-Net. The T-FEN against the
-dilated-stencil graph network gives $\Delta = +0.0170 \pm 0.0085$~SE (4/5)
-and per eye $+0.0136 \pm 0.0062$ (46/75, $t = 2.2$): at the floor on one
-instrument and under it on the other, a tie. The dilated-stencil graph
-network against the U-Net gives $\Delta = +0.021 \pm 0.017$~SE at seed 42
-and only $+0.008 \pm 0.008$ at seed 7, both under the mixed floor of 0.020.
-At seed 7, the graph network reads $0.5279 \pm 0.0419$ and the U-Net
-0.5199. The T-FEN against the U-Net gives $\Delta = +0.0383 \pm 0.0134$~SE
-(5/5) and per eye $+0.0383 \pm 0.0075$ (51/75, $t = 5.1$) at seed 42, and
-$+0.0246 \pm 0.0073$~SE (5/5) and per eye $+0.0255 \pm 0.0074$ (52/75,
-$t = 3.4$) at seed 7. The lead is smaller at the second seed but present on
-every fold at both, so the T-FEN lies above the U-Net. Against the
-dilated-stencil network, the T-FEN is higher by $+0.0165 \pm 0.0021$~SE
-(5/5) and per eye $+0.0152 \pm 0.0048$ (49/75, $t = 3.1$) at seed 7, close
-to its seed-42 value: a small but consistent lead, at the noise level.
+finite-element network, a graph network and a U-Net. The T-FEN is higher
+than the dilated-stencil graph network by 0.017 on average, on four of the
+five folds and on 46 of the 75 eyes: a small lead at the noise level. The
+dilated-stencil network is higher than the U-Net by 0.021 on average, but
+on only three of the five folds; the scores of the U-Net vary more between
+runs than those of the graph networks
+(Appendix~\ref{app:full-results:criteria}), so this is at the noise
+level, and the two cannot be told apart. The T-FEN is higher than
+the U-Net by 0.038 on average, on all five folds and on 51 of the 75 eyes,
+and this lead is real.
 
 The three highest arms thus lie within about 0.04 of each other. The
 T-FEN is highest and lies above the U-Net; the dilated-stencil network and
@@ -415,8 +399,8 @@ compared in~\S\ref{sec:experiments:validity:tfen}.
 
 Although the T-FEN scores highest at the anchor, the dilated-stencil graph
 network is the canonical model of this thesis, for three reasons. First,
-the lead of the T-FEN is small, about 0.017 at both seeds, and it does not
-persist over longer horizons: in the growth-region Dice by year since
+the lead of the T-FEN is small, 0.017 and at the noise level, and it does
+not persist over longer horizons: in the growth-region Dice by year since
 baseline the two are level for three years, and beyond three years the
 graph network lies higher (0.655 against 0.611, a descriptive value that
 was not tested; \S\ref{sec:experiments:ingredients:transport}). Second,
@@ -442,8 +426,8 @@ coming from spatial context.
 The fold is a large source of variance. For the $k$-nearest-neighbour graph
 network, the fold values range from about 0.43 to 0.52. The standard
 deviations in the table are between-fold deviations and are much larger
-than the replicate floor, which is why differences are always read
-fold-paired. Figure~\ref{fig:experiments:arms-folds} shows the five fold
+than the noise level, which is why differences are always taken fold by
+fold. Figure~\ref{fig:experiments:arms-folds} shows the five fold
 values behind each row: the spread between the folds of one arm is larger
 than most differences between adjacent arms, and fold 2 is the highest
 fold for almost every arm.
@@ -466,7 +450,7 @@ fold for almost every arm.
     Table~\ref{tab:experiments:arms}; the per-pixel floor and persistence,
     both 0 on every fold, lie outside the plotted range and are omitted.}
   \label{fig:experiments:arms-folds}
-\end{figure} Adjacent rows mostly lie within the floor of each other, so
+\end{figure} Adjacent rows mostly lie within the noise level of each other, so
 the table is not a leaderboard. What it provides is the evidence for which
 components of an operator move the metric, which
 \S\ref{sec:experiments:ingredients} examines one at a time.
@@ -494,8 +478,8 @@ The strongest arms of different classes lie within about 0.04 of each
 other, so comparing whole architectures says little about what makes an
 operator work. This section therefore compares operators that differ in one
 property only, with the rest of the framework held fixed. Each comparison
-measures one ingredient. All comparisons are fold-paired over the same five
-folds.
+measures one ingredient. All comparisons are taken fold by fold over the
+same five folds (\S\ref{sec:experiments:protocol:stats}).
 
 \subsection{Spatial Context}
 \label{sec:experiments:ingredients:context}
@@ -505,12 +489,9 @@ $k$-nearest-neighbour graph with zero, one and two message-passing rounds
 (\S\ref{sec:method:family:floors}). With zero rounds, the per-pixel floor
 reads 0.0000 on every fold, identical to persistence. With one round, the
 one-hop floor reads $0.4515 \pm 0.0243$. With two rounds, the $k$-NN arm
-reads $0.4623 \pm 0.0361$. One round against two gives
-$\Delta = -0.0108 \pm 0.0061$~SE (1/5), under the paired floor, and per eye
-$-0.0122 \pm 0.0051$ (33/75, $t = -2.4$). At seed 7 the one-hop floor
-reads $0.4687 \pm 0.0253$ and lies level with the two-round arm
-($+0.0036 \pm 0.0049$~SE, 2/5; per eye $+0.0029$, 40/75). The second round
-thus adds at most about 0.01, and not reproducibly.
+reads $0.4623 \pm 0.0361$. The second round adds 0.011 on average, within
+the noise level: the one-hop floor is higher on one of the five folds and
+on 33 of the 75 eyes. The second round thus adds at most about 0.01.
 
 A single ring of neighbours therefore buys almost everything the graph
 network on this graph achieves, and the second ring adds little or nothing. Every
@@ -527,29 +508,27 @@ This comparison keeps the graph network, the loss and the data, and changes
 only the edge set, from the index-space $k$-nearest-neighbour graph to the
 dilated stencil (\S\ref{sec:method:graph}, Figure~\ref{fig:method:stencils}).
 Both networks use mean
-aggregation and have the same 67\,147 parameters. The dilated stencil
-against the $k$-NN arm gives $\Delta = +0.0635 \pm 0.0106$~SE (5/5) and per
-eye $+0.0647 \pm 0.0062$ (70/75, $t = 10.4$). The pre-committed
-replication at seed 7 gives $\Delta = +0.0629 \pm 0.0131$~SE (5/5) and per
-eye $+0.0620 \pm 0.0071$ (66/75, $t = 8.7$); pooled over both seeds, the
-per-eye difference is $+0.0633 \pm 0.0047$ (136/150 eye-seed pairs). This
-gain was obtained by changing only the edge set, at the same parameter
+aggregation and have the same 67\,147 parameters. The dilated stencil is
+higher by 0.064 on average, on all five folds and on 70 of the 75 eyes.
+This gain was obtained by changing only the edge set, at the same parameter
 count, and it is the reason the dilated stencil is the canonical
 configuration.
 
 Table~\ref{tab:experiments:reach} compares other stencil geometries with the
-default. Both a shorter (up to $\pm 12$ columns) and a longer (up to
-$\pm 42$ columns) reach along the rows are worse by more than the paired
-floor, so the default of $\pm 21$ columns, about 0.12\,mm, is a measured
-optimum on this axis. It lies close to the 90th percentile of the
+default. Both a shorter and a longer reach along the rows are lower: by
+0.019 for a reach of $\pm 12$ columns and by 0.026 for $\pm 42$ columns,
+each higher than the default on at most one fold. The default of $\pm 21$
+columns, about 0.12\,mm, is therefore the best of the tested reaches on
+this axis. It lies close to the 90th percentile of the
 per-visit front advance, 23 columns (\S\ref{sec:method:graph}). The
 $\pm 42$ geometry keeps the 20 neighbours of the default by doubling the
 column spacing from 7 to 14, so its neighbours are sparser. The geometry
 reaching $\pm 35$ columns keeps the default spacing of 7 columns instead,
-with 32 neighbours; it is also lower, but under the floor. A longer reach
-therefore does not help even when the spacing is kept, so the penalty at
-$\pm 42$ columns is not a matter of sparser neighbours alone. Widening the
-stencil across rows, to $\pm 2$ rows, costs the most of all geometries.
+with 32 neighbours; it is also lower, by 0.010, within the noise level. A
+longer reach therefore does not help even when the spacing is kept, so the
+penalty at $\pm 42$ columns is not a matter of sparser neighbours alone.
+Widening the stencil across rows, to $\pm 2$ rows, costs the most of all
+geometries, 0.039.
 Figure~\ref{fig:experiments:reach} places these geometries and the
 index-space graph on one axis of physical reach.
 % Corrected 2026-10-01: the text and table said "same number of neighbours"
@@ -563,21 +542,20 @@ index-space graph on one axis of physical reach.
   \caption[The reach ladder.]{%
     The reach ladder. Each geometry is compared with the default dilated
     stencil (rows $\pm 1$, columns $\{0, \pm 7, \pm 14, \pm 21\}$). The
-    values are fold-paired differences of the change-region Dice at the
-    one-year anchor over five folds, seed 42, with the between-fold
-    standard error and the number of folds on which the difference has the
-    sign of the mean. The paired noise floor is 0.016.}
+    difference is the mean over five folds of the per-fold difference of
+    the change-region Dice at the one-year anchor, seed 42; the counts give
+    the folds and the eyes on which the geometry is higher than the default.
+    Standard errors are given in Appendix~\ref{app:full-results:seeds}.}
   \label{tab:experiments:reach}
   \small
-  \begin{tabular}{l c c}
+  \begin{tabular}{l c c c}
     \toprule
-    Geometry & $\Delta$ vs.\ default & Folds \\
+    Geometry & Difference & Folds & Eyes \\
     \midrule
-    Columns up to $\pm 12$ (spacing 4, 20 neighbours) & $-0.019 \pm 0.008$ & 1/5 \\
-    Columns up to $\pm 35$ (spacing 7, 32 neighbours) & $-0.010 \pm 0.003$ &
-      1/5 \\
-    Columns up to $\pm 42$ (spacing 14, 20 neighbours) & $-0.026 \pm 0.004$ & 0/5 \\
-    Rows $\pm 2$ (34 neighbours) & $-0.039 \pm 0.005$ & 0/5 \\
+    Columns up to $\pm 12$ (spacing 4, 20 neighbours) & $-0.019$ & 1/5 & 20/75 \\
+    Columns up to $\pm 35$ (spacing 7, 32 neighbours) & $-0.010$ & 1/5 & 19/75 \\
+    Columns up to $\pm 42$ (spacing 14, 20 neighbours) & $-0.026$ & 0/5 & 16/75 \\
+    Rows $\pm 2$ (34 neighbours) & $-0.039$ & 0/5 & 9/75 \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -595,8 +573,9 @@ index-space graph on one axis of physical reach.
     the fold-paired difference of the change-region Dice at the one-year
     anchor against the default stencil (rows $\pm 1$, columns
     $\{0, \pm 7, \pm 14, \pm 21\}$, 20 neighbours), over five folds at
-    seed 42, with the between-fold standard error; the shaded band is the
-    paired noise floor of $\pm 0.016$. The horizontal axis gives the reach
+    seed 42, with the between-fold standard error; the shaded band marks
+    the noise level ($\pm 0.016$, Appendix~\ref{app:full-results:criteria}).
+    The horizontal axis gives the reach
     of one hop along a row, in columns (bottom) and millimetres (top). The
     connected points keep rows $\pm 1$ and vary the columns: a spacing of 4
     (reach $\pm 12$, 20 neighbours), the default spacing of 7 ($\pm 21$),
@@ -612,20 +591,18 @@ index-space graph on one axis of physical reach.
 
 A higher degree at the same reach buys nothing. The index-space
 $k$-nearest-neighbour graph with $k = 20$ reaches as far as with $k = 12$
-but has more neighbours. Against the same network with $k = 12$, it reads
-$-0.010 \pm 0.005$~SE (1/5), under the paired floor, and per eye
-$-0.011 \pm 0.003$ (20/75, $t = -4.1$). The two instruments do not agree,
-so the difference is not established, but neither points to a gain from
-the extra neighbours. What matters is where the neighbours are placed, not
-how many there are.
+but has more neighbours. Against the same network with $k = 12$, it is
+lower by 0.010 on average, higher on only one of the five folds and on 20
+of the 75 eyes. The fold average is within the noise level while the eyes
+lean consistently one way, so the difference is not established; neither
+view points to a gain from the extra neighbours. What matters is where the
+neighbours are placed, not how many there are.
 
 This also explains an earlier result. Before the dilated stencil, the
-parameter-matched U-Net was higher than the $k$-NN graph network:
-$\Delta = +0.0423 \pm 0.0246$~SE (4/5) and per eye $+0.0399 \pm 0.0102$
-(53/75, $t = 3.93$), and at seed 7, with the same seed on both sides,
-$+0.0548 \pm 0.0181$ fold-paired (5/5) and $+0.0517 \pm 0.0109$ per eye
-(59/75). At seed 42, fold 3 reads $-0.042$, so the effect is
-fold-heterogeneous. With the
+parameter-matched U-Net was higher than the $k$-NN graph network, by
+0.042 on average, on four of the five folds and on 53 of the 75 eyes.
+Fold 3 goes the other way ($-0.042$), so the effect varies between folds.
+With the
 dilated stencil, the graph network is indistinguishable from the U-Net
 (\S\ref{sec:experiments:main-results}). The deficit of the graph network
 was therefore located in its graph --- in where its neighbours lie
@@ -638,14 +615,13 @@ The Fourier Neural Operator has global spectral support but no local path
 (\S\ref{sec:method:family:dense}). The local-kernel hybrid adds a
 $3 \times 3$ local path to the same operator, at a cost of 800 parameters.
 
-The FNO against the $k$-NN graph network gives
-$\Delta = +0.0208 \pm 0.0258$~SE (3/5) and per eye $+0.0120 \pm 0.0135$
-(41/75). Fold 4 carries all of it: without fold 4 the fold-paired
-difference is $-0.001$, and on both instruments it does not survive leaving
-one fold out, so this difference is not established.
-The FNO against the U-Net gives $\Delta = -0.0215 \pm 0.0139$~SE (1/5) and
-per eye $-0.0279 \pm 0.0111$ (30/75). That the FNO lies below the U-Net at
-the one-year anchor is established. Beyond one year the order changes. In
+The FNO is higher than the $k$-NN graph network by 0.021 on average, on
+three of the five folds and on 41 of the 75 eyes. Fold 4 carries all of
+it: without fold 4 the average is $-0.001$, so this difference is not
+established. Against the U-Net, the FNO is lower by 0.022 on average and
+higher on only one of the five folds and on 30 of the 75 eyes: at the
+one-year anchor the FNO lies below the U-Net. Beyond one year the order
+changes. In
 the growth-region Dice by horizon, the FNO reads 0.546, 0.583 and 0.594 for
 one to two, two to three and more than three years, and the U-Net 0.563,
 0.581 and 0.555: the FNO trails the U-Net in the second year, ties it in
@@ -658,33 +634,23 @@ the horizon values are descriptive and were not tested for significance.
 % 0.553 / 0.571 / 0.553. Section 9.8a's per-eye-bin means for the same arms
 % use a different aggregation and must not be mixed with these.
 
-The hybrid against the $k$-NN graph network gives
-$\Delta = +0.0361 \pm 0.0166$~SE (4/5) and per eye $+0.0310 \pm 0.0111$
-(49/75, $t = 2.79$). Both instruments agree and the difference survives
-leaving any one fold out. The effect of the local path itself is the hybrid against the
-FNO: $\Delta = +0.0153 \pm 0.0110$~SE, which is under the paired floor,
-but per eye $+0.0190 \pm 0.0070$ (48/75), which graduates on that
-instrument. The two instruments disagree here, which is why both are
-always quoted. The hybrid against the U-Net gives
-$\Delta = -0.0061 \pm 0.0108$~SE and per eye $-0.0089$ (33/75): a tie.
+The hybrid is higher than the $k$-NN graph network by 0.036 on average,
+on four of the five folds and on 49 of the 75 eyes, and the difference
+does not depend on any single fold. The effect of the local path itself is
+the hybrid against the FNO: higher by 0.015 on average, on four of the
+five folds and on 48 of the 75 eyes. The fold average is within the noise
+level while the eyes lean consistently one way, so the effect is not
+established. The hybrid and the U-Net cannot be told apart ($-0.006$ on
+average).
 
-At seed 7 this pattern does not repeat. The FNO against the U-Net gives
-$\Delta = -0.0136 \pm 0.0105$~SE (2/5) and per eye $-0.0172 \pm 0.0104$
-(27/75), in the same direction as at seed 42 but under the floor. The local
-path no longer helps: the hybrid against the FNO gives
-$-0.0057 \pm 0.0105$~SE (3/5) and per eye $-0.0054$ (35/75). And the hybrid
-lies below the U-Net, by $-0.0193 \pm 0.0051$~SE on all five folds and per
-eye $-0.0227 \pm 0.0091$ (26/75, $t = -2.5$). Both operators with global
-support stay above the $k$-NN graph network at seed 7, by $+0.041$ (FNO)
-and $+0.036$ (hybrid).
-
-What holds at both seeds is therefore that global spectral support alone
-does not reach the U-Net at the one-year anchor. That a minimal local path
-closes this gap rests on seed 42 alone; at seed 7 it does not, and the
-claim is not established.
+Global spectral support alone therefore does not reach the U-Net at the
+one-year anchor. Whether a minimal local path closes this gap is not
+established.
 % Author decision (b), 2026-10-01: global + local is reported as an
 % observation, not as an established ingredient (5.3.5, 6.1, Ch. 7,
-% abstracts). Values: thesis_numbers.py pair, 2026-10-01.
+% abstracts). Values: thesis_numbers.py pair, 2026-10-01; recomputed
+% 2026-10-02. The seed-7 paragraph moved to tab:appendix:seeds (reporting
+% scheme; author: do not single out the local-path result in 5.1.4).
 
 \subsection{An Explicit Transport Term}
 \label{sec:experiments:ingredients:transport}
@@ -693,16 +659,12 @@ This comparison pairs the T-FEN with the same finite-element network
 without its transport head, at the same width
 (\S\ref{sec:method:family:fen}). The ablation is purely additive: both
 heads are zero-initialised, so both arms start as the same function. The
-difference is $\Delta = +0.0618 \pm 0.0040$~SE (5/5) and per eye
-$+0.0640 \pm 0.0058$ (68/75, $t = 11.0$). The effect is established on
-both instruments. At seed 7, against the free-form network of the same
-seed, it is $+0.0897 \pm 0.0142$~SE (5/5) and per eye
-$+0.0878 \pm 0.0071$ (71/75, $t = 12.4$). With the earlier Galerkin form of
-the transport operator the difference was of the same order,
-$+0.0527 \pm 0.0065$~SE at seed 42 and $+0.0758 \pm 0.0092$~SE at seed 7
-(both 5/5), so the effect does not depend on the form of the operator.
-% Seed-7 values: thesis_numbers.py pair, 2026-10-01, against
-% FEN_final_w96Frk4d45s7. The previously quoted seed-7 Galerkin value
+T-FEN is higher by 0.062 on average, on all five folds and on 68 of the 75
+eyes. With the earlier Galerkin form of the transport operator the
+difference was of the same order, 0.053, again on all five folds, so the
+effect does not depend on the form of the operator.
+% Seed-7 values (tab:appendix:seeds): thesis_numbers.py pair, 2026-10-01,
+% against FEN_final_w96Frk4d45s7. The previously quoted seed-7 Galerkin value
 % (+0.0495) used the seed-42 free-form control and is superseded.
 
 This control, however, is not parameter-matched: the T-FEN has
@@ -710,19 +672,17 @@ This control, however, is not parameter-matched: the T-FEN has
 Part of the gain could therefore come from the extra parameters. A second
 control closes this gap. It widens the free-form network to a width of
 139, which gives 68\,282 parameters, level with the T-FEN
-(\S\ref{sec:method:family:params}). At seed 42, this control does not train
-on fold 4: its training error rises from the first epoch instead of
-falling, and it reads 0.047 at the anchor, in two separate attempts, while
-the width-96 control trains normally on the same fold (0.501). On folds 0
-to 3, the T-FEN against the matched control gives
-$\Delta = +0.0716 \pm 0.0094$~SE (4/4) and per eye $+0.0737 \pm 0.0063$
-(59/63, $t = 11.7$). At seed 7 the matched control trains on every fold,
-including fold 4 (0.442), so the failure was specific to one seed. There,
-the T-FEN against the matched control gives $+0.0762 \pm 0.0105$~SE (5/5)
-and per eye $+0.0750 \pm 0.0062$ (73/75, $t = 12.2$). The extra width moves
-the free-form network by little at either seed ($-0.0084$ on folds 0 to 3
-at seed 42, $+0.0135$ at seed 7, both under the floor). The transport
-effect is therefore not a matter of parameter count.
+(\S\ref{sec:method:family:params}). This control does not train on fold 4:
+its training error rises from the first epoch instead of falling, and it
+reads 0.047 at the anchor, in two separate attempts, while the width-96
+control trains normally on the same fold (0.501). Repeated with the second
+seed, the matched control trains on all five folds, so the failure is
+specific to this run (Appendix~\ref{app:full-results:seeds}). On folds 0
+to 3, the T-FEN is higher than the matched control by 0.072 on average, on
+all four folds and on 59 of the 63 eyes. The extra width moves the
+free-form network by little ($-0.008$ on these four folds, within the
+noise level). The transport effect is therefore not a matter of parameter
+count.
 % Seed-7 values: thesis_numbers.py pair, 2026-10-01 (w139 s7 folds 0.4652,
 % 0.4468, 0.5351, 0.4521, 0.4418). Seed-42 values verified 2026-10-01 against
 % solver_results.csv (superseded fold-4 attempt skipped) and SOLVER_FINAL_RUNS
@@ -799,8 +759,8 @@ between two visits.
 Two unrelated constructions correct this deficit. The first is physical
 reach: the dilated stencil, whose single hop spans 21 columns. The second
 is an explicit transport term: the T-FEN, established against a
-parameter-matched control at both seeds (on the four folds on which that
-control trained at seed 42, and on all five at seed 7). Each is
+parameter-matched control (\S\ref{sec:experiments:ingredients:transport}).
+Each is
 established against its own control, and the two end up within about
 0.017 of each other, at the noise level; they are the two highest arms of
 Table~\ref{tab:experiments:arms}
@@ -811,7 +771,7 @@ is suggestive rather than a proof of mechanism.
 
 The architecture class therefore is not what separates the strongest
 operators; the ingredients they carry are. A third candidate, global and
-local context together, was seen at one seed only
+local context together, is not established
 (\S\ref{sec:experiments:ingredients:global}) and is not counted among
 them. \S\ref{sec:experiments:ablations} reports what
 was measured and did not matter.
@@ -820,9 +780,9 @@ was measured and did not matter.
 \section{Negative Results}
 \label{sec:experiments:ablations}
 
-A negative result here is a comparison whose difference stays under the
-floor of the instruments defined in~\S\ref{sec:experiments:protocol:stats}.
-It is a null at the available precision. It does not show that the tested
+A negative result here is a comparison whose difference stays within the
+noise level of~\S\ref{sec:experiments:protocol:stats}. It is a null at the
+available precision. It does not show that the tested
 alternative is equivalent, or that the mechanism behind it has no effect,
 and each finding is scoped to the backbone, the folds and the seed on which
 it was measured. This section reports three groups of such results: the
@@ -846,9 +806,8 @@ the canonical dilated-stencil network.
 The first test asks whether the multiplication by $\Delta t$ is needed.
 The multiplication was removed, so the update became
 $u_t + f_\theta(u_t, \Delta t, z)$, while $\Delta t$ remained an input of
-the operator. The change-region Dice does not change: $-0.0006$ on average
-($\pm 0.0061$~SE, higher on 2 of 5 folds) and per eye $-0.0028 \pm 0.0037$
-(30/75).
+the operator. The change-region Dice does not change: $-0.0006$ on average,
+higher on two of the five folds and on 30 of the 75 eyes.
 % Values: thesis_numbers.py pair ANISOGNN_final_dilmean_nodts
 % ANISOGNN_final_dilmean, 2026-10-01 (arm 0.5252 +/- 0.0425 vs 0.5258).
 % The k-NN run of this ablation is deliberately not reported (author).
@@ -874,8 +833,8 @@ results. In this setting the operator does not receive $\Delta t$ as an
 input (the autonomous field of \S\ref{sec:method:family:rk}); time enters
 only through the integrator, which steps over the
 interval. Over the dilated-stencil network, the change-region Dice is 0.012
-lower than with the single step, on 4 of 5 folds; over the FNO it is 0.006
-higher. Both differences lie within the noise level, and the Runge--Kutta
+lower than with the single step, on four of the five folds; over the FNO it
+is 0.006 higher. Both differences lie within the noise level, and the Runge--Kutta
 step costs about 4.8 times the training time (\S\ref{sec:experiments:cost}).
 % Values: ANISOGNN_final_oderk4n1 - ANISOGNN_final_dilmean -0.0119 +/-
 % 0.0037 SE (1/5 higher), per eye -0.0132 +/- 0.0055 (28/75);
@@ -923,9 +882,8 @@ The second run keeps the mask weighting and removes only the soft-Dice
 term. The network then does leave the collapse, but late: on the five folds, its
 change-region Dice first rises above 0 at epochs 2, 8, 3, 7 and 12, against
 epoch 0 with the full objective (Figure~\ref{fig:experiments:curves}b).
-It also ends lower, by $-0.050$ on average ($\pm 0.017$~SE, lower on all
-five folds) and per eye $-0.046 \pm 0.009$ (lower on 56 of 75 eyes,
-$t = -5.1$). The largest part comes from fold 4, where the collapse lasts
+It also ends lower, by 0.050 on average, on all five folds and on 56 of
+the 75 eyes. The largest part comes from fold 4, where the collapse lasts
 longest: the difference is $-0.114$ there and $-0.012$ to $-0.044$ on the
 other folds. The same fold makes the run less steady. It leaves the
 collapse only at epoch 12, inside the late-epoch window, so averaged over
@@ -952,9 +910,9 @@ The third run adds a monotonic-growth penalty. Atrophic tissue does not
 regenerate, so a penalty on any decrease of the mask where the previous
 state is atrophic is a natural prior. It is implemented
 (\S\ref{sec:method:training:loss}) but switched off in every other run.
-With the penalty at weight 2.0, the change-region Dice is $-0.0036$ on average
-($\pm 0.0037$~SE, higher on 2 of 5 folds) and per eye $-0.0042 \pm 0.0034$
-(34/75): no measurable effect, so the simpler objective is kept.
+With the penalty at weight 2.0, the change-region Dice is $-0.004$ on
+average, higher on two of the five folds and on 34 of the 75 eyes: no
+measurable effect, so the simpler objective is kept.
 % Values: thesis_numbers.py pair ANISOGNN_final_dilmean_mono2
 % ANISOGNN_final_dilmean, 2026-10-01 (arm 0.5221 +/- 0.0432).
 Two arguments speak against the penalty independently of its effect on the
@@ -996,58 +954,49 @@ across classes, because it adds parameters without changing how far one
 step reaches. Depth does change the reach of the graph network, so it is
 read for each class on its own; the U-Net and the FNO have no depth
 setting. The design and a decision rule were fixed before the first run: a
-width step that clears the floor on both instruments earns a further step
-up, and a width step without a gain earns a step down instead, to between
-about a sixth and a third of the original size.
+width step that raises the score beyond the noise level earns a further
+step up, and a width step without a gain earns a step down instead, to
+between about a sixth and a third of the original size.
 
 \begin{table}[t]
   \centering
   \caption[The capacity study.]{%
     The capacity study. Change-region Dice at the one-year anchor, five
     folds, seed 42; the mean is over the five fold values. The ratio is the
-    parameter count against the arm's own original size (1). The differences are against that original size,
-    fold-paired (mean $\pm$ SE, folds on which the scaled arm is higher) and
-    per eye (mean $\pm$ SE, eyes on which it is higher). The paired floor is
-    0.016, or 0.020 for the U-Net. $^\ast$All T-FEN points use the Galerkin
-    form of the transport operator
+    parameter count against the arm's own original size (1). The difference
+    is against that original size, as the mean over the five folds of the
+    per-fold difference; the counts give the folds and the eyes on which
+    the scaled arm is higher. Standard errors are given in
+    Appendix~\ref{app:full-results:seeds}. $^\ast$All T-FEN points use the
+    Galerkin form of the transport operator
     (\S\ref{sec:experiments:validity:tfen}).}
   \label{tab:experiments:capacity}
   \footnotesize
-  \setlength{\tabcolsep}{3pt}
-  \begin{tabular}{l l r r c c c}
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{l l r r c c c c}
     \toprule
-    Arm & Setting & Params & Ratio & Mean & $\Delta$ fold-paired
-      & $\Delta$ per eye \\
+    Arm & Setting & Params & Ratio & Mean & Difference & Folds higher
+      & Eyes higher \\
     \midrule
-    Stencil GNN & width 32 & 18\,219 & 0.27 & 0.520 &
-      $-0.005 \pm 0.006$ (1/5) & $-0.005 \pm 0.003$ (30/75) \\
-     & width 64 & 67\,147 & 1 & 0.526 & --- & --- \\
-     & width 128 & 257\,163 & 3.83 & 0.518 &
-      $-0.008 \pm 0.006$ (2/5) & $-0.009 \pm 0.004$ (22/75) \\
-     & 4 rounds & 119\,499 & 1.78 & 0.517 &
-      $-0.009 \pm 0.002$ (0/5) & $-0.010 \pm 0.004$ (20/75) \\
+    Stencil GNN & width 32 & 18\,219 & 0.27 & 0.520 & $-0.005$ & 1/5 & 30/75 \\
+     & width 64 & 67\,147 & 1 & 0.526 & --- & --- & --- \\
+     & width 128 & 257\,163 & 3.83 & 0.518 & $-0.008$ & 2/5 & 22/75 \\
+     & 4 rounds & 119\,499 & 1.78 & 0.517 & $-0.009$ & 0/5 & 20/75 \\
     \midrule
-    U-Net & width 2 & 13\,637 & 0.16 & 0.488 &
-      $-0.016 \pm 0.029$ (3/5) & $-0.019 \pm 0.015$ (40/75) \\
-     & width 5 & 83\,081 & 1 & 0.505 & --- & --- \\
-     & width 9 & 267\,149 & 3.22 & 0.508 &
-      $+0.004 \pm 0.013$ (1/5) & $+0.004 \pm 0.008$ (38/75) \\
+    U-Net & width 2 & 13\,637 & 0.16 & 0.488 & $-0.016$ & 3/5 & 40/75 \\
+     & width 5 & 83\,081 & 1 & 0.505 & --- & --- & --- \\
+     & width 9 & 267\,149 & 3.22 & 0.508 & $+0.004$ & 1/5 & 38/75 \\
      % width 32 (3,354,347, 40.4x) removed 2026-10-01 (author review v5 #4:
      % no mention of the huge U-Net anywhere).
     \midrule
-    FNO + $3{\times}3$ & width 2 & 13\,189 & 0.16 & 0.479 &
-      $-0.019 \pm 0.018$ (2/5) & $-0.020 \pm 0.010$ (30/75) \\
-     & width 5 & 79\,960 & 1 & 0.498 & --- & --- \\
-     & width 9 & 257\,804 & 3.22 & 0.481 &
-      $-0.018 \pm 0.008$ (1/5) & $-0.021 \pm 0.007$ (26/75) \\
+    FNO + $3{\times}3$ & width 2 & 13\,189 & 0.16 & 0.479 & $-0.019$ & 2/5 & 30/75 \\
+     & width 5 & 79\,960 & 1 & 0.498 & --- & --- & --- \\
+     & width 9 & 257\,804 & 3.22 & 0.481 & $-0.018$ & 1/5 & 26/75 \\
     \midrule
-    T-FEN$^\ast$ & width 48 & 20\,455 & 0.30 & 0.538 &
-      $+0.005 \pm 0.004$ (3/5) & $+0.004 \pm 0.004$ (40/75) \\
-     & width 96 & 68\,503 & 1 & 0.534 & --- & --- \\
-     & width 192 & 247\,543 & 3.61 & 0.443 &
-      $-0.090 \pm 0.059$ (3/5) & $-0.070 \pm 0.014$ (30/75) \\
-     & MLP depth 8 & 142\,999 & 2.09 & 0.329 &
-      $-0.204 \pm 0.067$ (0/5) & $-0.220 \pm 0.021$ (6/75) \\
+    T-FEN$^\ast$ & width 48 & 20\,455 & 0.30 & 0.538 & $+0.005$ & 3/5 & 40/75 \\
+     & width 96 & 68\,503 & 1 & 0.534 & --- & --- & --- \\
+     & width 192 & 247\,543 & 3.61 & 0.443 & $-0.090$ & 3/5 & 30/75 \\
+     & MLP depth 8 & 142\,999 & 2.09 & 0.329 & $-0.204$ & 0/5 & 6/75 \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -1085,8 +1034,9 @@ about a sixth and a third of the original size.
     a logarithmic axis. Lines and filled markers change the width; open
     markers change the depth (four message-passing rounds for the graph
     network, an eight-layer free-form network for the T-FEN). All operators
-    meet at the original size. The shaded band is the paired noise floor of
-    $\pm 0.016$; 0.020 applies to the U-Net. Two T-FEN points lie below the
+    meet at the original size. The shaded band marks the noise level
+    ($\pm 0.016$, or $\pm 0.020$ for the U-Net;
+    Appendix~\ref{app:full-results:criteria}). Two T-FEN points lie below the
     plotted range and are drawn at its lower edge with their value: width
     192, which diverged during training on two folds, and the eight-layer
     network, which trained poorly. All T-FEN points use the Galerkin form of
@@ -1095,7 +1045,7 @@ about a sixth and a third of the original size.
 \end{figure}
 
 Table~\ref{tab:experiments:capacity} gives the result. No width step raises
-any class above the floor on either instrument. The dilated-stencil graph
+any class beyond the noise level. The dilated-stencil graph
 network is flat from a quarter to four times its size (0.520, 0.526,
 0.518; Figure~\ref{fig:experiments:capacity}). The U-Net and the FNO with a local path do best at or near their
 original size.
@@ -1105,8 +1055,8 @@ level with width 96.
 
 Depth does not help where it was tested. Four message-passing rounds
 instead of two, which also double the reach of the dilated stencil, lower
-the graph network on every fold ($-0.009 \pm 0.002$~SE, 0/5), a small
-difference under the floor. The T-FEN with an eight-layer free-form network
+the graph network on every fold, by 0.009 on average, a small difference
+within the noise level. The T-FEN with an eight-layer free-form network
 trains poorly on every fold: its training error barely falls. At width 192,
 the T-FEN diverges during training on folds 1 and 4 and ties width 96 on the
 other three.
@@ -1243,7 +1193,7 @@ Two criteria make this operational:
   \item \textbf{C2, agreement:} all settings at least as fine as the one
     used in training, by step or by order, agree to within the run-to-run
     noise, the standard deviation of 0.0127 between repeated runs of one
-    configuration (\S\ref{sec:experiments:protocol:stats}).
+    configuration (Appendix~\ref{app:full-results:criteria}).
 \end{itemize}
 A model is read as a continuous-time model only if it satisfies both.
 
@@ -1381,9 +1331,10 @@ does not decide the accuracy.
 \label{sec:experiments:validity:tfen}
 
 The T-FEN was first trained with the Galerkin form of its transport
-operator (\S\ref{sec:method:family:fen}). Seven of its ten runs, five folds
-at two seeds, are unstable in the sense defined there, whereas the
-free-form FEN, which lacks only the transport term, is stable on every
+operator (\S\ref{sec:method:family:fen}). Four of its five runs are
+unstable in the sense defined there
+(Table~\ref{tab:experiments:tfen-stability}), and so are most of the runs
+repeated with the second seed, whereas the free-form FEN, which lacks only the transport term, is stable on every
 fold. Tracing the rollouts step by step showed where the divergence comes
 from. It starts at the edge of the crop, in a layer channel, driven by the
 transport term, and only after about 1.6 to 2 years: later than the
@@ -1408,11 +1359,10 @@ identical in every other respect, at seed 42 on all five folds. It passes the st
 every fold, with a largest late-epoch error of 2.32 on the mask channel and
 1.13 on the layer channels (Table~\ref{tab:experiments:tfen-stability},
 Figure~\ref{fig:experiments:tfen-stability}).
-The replication at seed 7 passes on every fold as well, with a largest
-error of 2.63 on the mask channel and 1.11 on the layer channels. The
+Repeated with the second seed, it passes on every fold as well. The
 energy-conserving form is also at least as accurate as the Galerkin form:
-at seed 42, $0.5428 \pm 0.0401$ against $0.5337 \pm 0.0453$, higher on all
-five folds, by
+$0.5428 \pm 0.0401$ against $0.5337 \pm 0.0453$, higher on all five folds,
+by
 $+0.009$, which is under the noise level. The gain sits where the defect
 was: on lesions that touch the crop border the change-region Dice rises
 from 0.516 to 0.544, while interior lesions are unchanged (0.535 and

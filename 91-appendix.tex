@@ -237,76 +237,216 @@ that outline, so most of the true change is missed.
 % 11-eye values. Re-checked 2026-10-01: k = 20 (r 0.411; AUC 0.735 / 0.737 /
 % 0.734) lies within rounding of k = 12 (0.411; 0.744 / 0.744 / 0.734).
 
-\section{Both Seeds for the Main Comparisons}
+\section{Statistical Criteria}
+\label{app:full-results:criteria}
+
+The noise level of~\S\ref{sec:experiments:protocol:stats} rests on seven
+pairs of runs with the same configuration on the same fold, two with the
+same seed and five with different seeds. They give a standard deviation of
+about 0.0127 for the late-epoch change-region Dice of a single run. The
+difference between two runs on one fold then has a standard deviation of
+about $\sqrt{2} \times 0.0127 \approx 0.018$, so a difference on a single
+fold has to exceed about 0.036 to count, and the mean of five fold-paired
+differences has to exceed $0.036 / \sqrt{5} \approx 0.016$. Same-seed and
+different-seed repeats spread about equally, so the seed adds nothing
+measurable on top of the variation between runs. These values were
+measured on graph networks. The two seeds of the parameter-matched U-Net
+differ about 1.9 times as much, so a comparison with a U-Net on one side
+is read against about 0.020.
+
+Every comparison is measured in two ways. The fold-paired mean is the mean
+of the five per-fold differences of the late-epoch change-region Dice,
+with its standard error over the folds and the number of folds on which
+the first arm is higher; it is read against the thresholds above. The
+per-eye test pairs the two arms eye by eye. For each of the 75 validation
+eyes, the growth-region Dice at the eye's first rollout step at or beyond
+0.95 years (about 347 days) is averaged over the late epochs, and the
+tables give the mean difference, its standard error, the number of eyes on
+which the first arm is higher and the paired $t$ statistic. Both values are
+also recomputed with each fold left out in turn.
+
+A difference is counted as established when the fold-paired mean exceeds
+its threshold, the per-eye $t$ statistic is about 2.5 or larger in
+magnitude, and neither value changes sign when any one fold is left out.
+For the comparisons that were repeated at the second seed, the difference
+also has to hold there. No threshold on $t$ was fixed in advance; the value
+of about 2.5 describes how the comparisons were read and should be taken
+as descriptive. The 75 eyes come from 51 patients, and the two eyes of one
+patient are not independent, so the per-eye standard errors are somewhat
+optimistic.
+% Written 2026-10-02 from the former Section 5.1.4 (reporting scheme). The
+% earlier scheme note said |t| >~ 2.7; the readings actually made (FNO - U-Net
+% at seed 42, t = -2.51, counted as established in SOLVER_FINAL_RUNS 9.8b;
+% T-FEN - stencil at seed 42, t = 2.17, and one - two rounds, t = -2.39, not)
+% correspond to about 2.5.
+
+\section{Statistics of the Comparisons}
 \label{app:full-results:seeds}
+
+Tables~\ref{tab:appendix:seeds} and~\ref{tab:appendix:seeds-b} give the
+comparisons of Chapter~\ref{ch:experiments} that were run at both seeds,
+Table~\ref{tab:appendix:seed42} those run at seed 42 only. The criteria
+are those of~\S\ref{app:full-results:criteria}.
 
 \begin{table}[h]
   \centering
-  \caption[Main comparisons at both seeds, with both instruments.]{%
-    The main comparisons of Chapter~\ref{ch:experiments} at seed 42 and at
-    the replication seed 7. Fold-paired: mean $\pm$ SE of the differences of
-    the late-epoch change-region Dice over the five folds, with the number
-    of folds on which the first arm is higher. Per eye: mean $\pm$ SE of the
-    differences of the growth-region Dice at each eye's first rollout step
-    past 0.95 years, with the number of eyes on which the first arm is
-    higher and the $t$ value (\S\ref{sec:experiments:protocol:stats}).
-    $^{a}$At seed 42 the matched control (width 139) did not train on
-    fold 4, so that row covers folds 0 to 3 (63 eyes).}
+  \caption[Comparisons at both seeds, part 1.]{%
+    Comparisons of \S\ref{sec:experiments:main-results} and
+    \S\ref{sec:experiments:ingredients:context}--\S\ref{sec:experiments:ingredients:reach}
+    at seed 42 and at the second seed 7. Fold-paired: mean $\pm$ SE of the
+    differences of the late-epoch change-region Dice over the five folds,
+    with the number of folds on which the first arm is higher. Per eye:
+    mean $\pm$ SE of the differences of the growth-region Dice at the
+    anchor, with the number of eyes on which the first arm is higher and
+    the paired $t$ statistic.}
   \label{tab:appendix:seeds}
   \footnotesize
   \begin{tabular}{l c l l}
     \toprule
     Comparison & Seed & Fold-paired & Per eye \\
     \midrule
-    \multicolumn{4}{l}{\textbf{Reach: dilated stencil $-$ $k$-NN}} \\
-    & 42 & $+0.0635 \pm 0.0106$ (5/5) & $+0.0647 \pm 0.0062$ (70/75, 10.4) \\
-    & 7  & $+0.0629 \pm 0.0131$ (5/5) & $+0.0620 \pm 0.0071$ (66/75, 8.7) \\
-    & \multicolumn{3}{l}{\emph{Reading:} established} \\[2pt]
-    \multicolumn{4}{l}{\textbf{U-Net $-$ $k$-NN}} \\
-    & 42 & $+0.0423 \pm 0.0246$ (4/5) & $+0.0399 \pm 0.0102$ (53/75, 3.9) \\
-    & 7  & $+0.0548 \pm 0.0181$ (5/5) & $+0.0517 \pm 0.0109$ (59/75, 4.7) \\
-    & \multicolumn{3}{l}{\emph{Reading:} established} \\[2pt]
+    \multicolumn{4}{l}{\textbf{T-FEN $-$ dilated stencil}} \\
+    & 42 & $+0.0170 \pm 0.0085$ (4/5) & $+0.0136 \pm 0.0062$ (46/75, 2.2) \\
+    & 7  & $+0.0165 \pm 0.0021$ (5/5) & $+0.0152 \pm 0.0048$ (49/75, 3.1) \\
+    & \multicolumn{3}{l}{\emph{Reading:} small lead at the noise level} \\[2pt]
+    \multicolumn{4}{l}{\textbf{Dilated stencil $-$ U-Net}} \\
+    & 42 & $+0.0212 \pm 0.0172$ (3/5) & $+0.0248 \pm 0.0081$ (50/75, 3.1) \\
+    & 7  & $+0.0081 \pm 0.0084$ (3/5) & $+0.0103 \pm 0.0074$ (42/75, 1.4) \\
+    & \multicolumn{3}{l}{\emph{Reading:} tie (at the threshold at seed 42,
+      under it at seed 7)} \\[2pt]
     \multicolumn{4}{l}{\textbf{T-FEN $-$ U-Net}} \\
     & 42 & $+0.0383 \pm 0.0134$ (5/5) & $+0.0383 \pm 0.0075$ (51/75, 5.1) \\
     & 7  & $+0.0246 \pm 0.0073$ (5/5) & $+0.0255 \pm 0.0074$ (52/75, 3.4) \\
     & \multicolumn{3}{l}{\emph{Reading:} T-FEN higher} \\[2pt]
-    \multicolumn{4}{l}{\textbf{T-FEN $-$ dilated stencil}} \\
-    & 42 & $+0.0170 \pm 0.0085$ (4/5) & $+0.0136 \pm 0.0062$ (46/75, 2.2) \\
-    & 7  & $+0.0165 \pm 0.0021$ (5/5) & $+0.0152 \pm 0.0048$ (49/75, 3.1) \\
-    & \multicolumn{3}{l}{\emph{Reading:} small lead, noise level} \\[2pt]
-    \multicolumn{4}{l}{\textbf{Dilated stencil $-$ U-Net}} \\
-    & 42 & $+0.0212 \pm 0.0172$ (3/5) & $+0.0248 \pm 0.0081$ (50/75, 3.1) \\
-    & 7  & $+0.0081 \pm 0.0084$ (3/5) & $+0.0103 \pm 0.0074$ (42/75, 1.4) \\
-    & \multicolumn{3}{l}{\emph{Reading:} tie} \\[2pt]
+    \multicolumn{4}{l}{\textbf{One round $-$ two rounds ($k$-NN)}} \\
+    & 42 & $-0.0108 \pm 0.0061$ (1/5) & $-0.0122 \pm 0.0051$ (33/75, $-2.4$) \\
+    & 7  & $+0.0036 \pm 0.0049$ (2/5) & $+0.0029 \pm 0.0033$ (40/75, 0.9) \\
+    & \multicolumn{3}{l}{\emph{Reading:} null} \\[2pt]
+    \multicolumn{4}{l}{\textbf{Reach: dilated stencil $-$ $k$-NN}} \\
+    & 42 & $+0.0635 \pm 0.0106$ (5/5) & $+0.0647 \pm 0.0062$ (70/75, 10.4) \\
+    & 7  & $+0.0629 \pm 0.0131$ (5/5) & $+0.0620 \pm 0.0071$ (66/75, 8.7) \\
+    & both & --- & $+0.0633 \pm 0.0047$ (136/150 eye-seed pairs) \\
+    & \multicolumn{3}{l}{\emph{Reading:} established} \\[2pt]
+    \multicolumn{4}{l}{\textbf{U-Net $-$ $k$-NN}} \\
+    & 42 & $+0.0423 \pm 0.0246$ (4/5) & $+0.0399 \pm 0.0102$ (53/75, 3.9) \\
+    & 7  & $+0.0548 \pm 0.0181$ (5/5) & $+0.0517 \pm 0.0109$ (59/75, 4.7) \\
+    & \multicolumn{3}{l}{\emph{Reading:} established} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}[h]
+  \centering
+  \caption[Comparisons at both seeds, part 2.]{%
+    Comparisons of
+    \S\ref{sec:experiments:ingredients:global}--\S\ref{sec:experiments:ingredients:transport}
+    at seed 42 and at the second seed 7, as in
+    Table~\ref{tab:appendix:seeds}. $^{a}$At seed 42 the matched control
+    (width 139) did not train on fold 4, so these rows cover folds 0 to 3
+    (63 eyes).}
+  \label{tab:appendix:seeds-b}
+  \footnotesize
+  \begin{tabular}{l c l l}
+    \toprule
+    Comparison & Seed & Fold-paired & Per eye \\
+    \midrule
+    \multicolumn{4}{l}{\textbf{FNO $-$ $k$-NN}} \\
+    & 42 & $+0.0208 \pm 0.0258$ (3/5) & $+0.0120 \pm 0.0135$ (41/75, 0.9) \\
+    & 7  & $+0.0412 \pm 0.0216$ (4/5) & $+0.0345 \pm 0.0149$ (40/75, 2.3) \\
+    & \multicolumn{3}{l}{\emph{Reading:} not established (at seed 42 the
+      sign changes without fold 4)} \\[2pt]
+    \multicolumn{4}{l}{\textbf{FNO $-$ U-Net}} \\
+    & 42 & $-0.0215 \pm 0.0139$ (1/5) & $-0.0279 \pm 0.0111$ (30/75, $-2.5$) \\
+    & 7  & $-0.0136 \pm 0.0105$ (2/5) & $-0.0172 \pm 0.0104$ (27/75, $-1.7$) \\
+    & \multicolumn{3}{l}{\emph{Reading:} FNO lower at both seeds; beyond the
+      threshold at seed 42 only} \\[2pt]
+    \multicolumn{4}{l}{\textbf{FNO $+ 3{\times}3$ $-$ $k$-NN}} \\
+    & 42 & $+0.0361 \pm 0.0166$ (4/5) & $+0.0310 \pm 0.0111$ (49/75, 2.8) \\
+    & 7  & $+0.0355 \pm 0.0206$ (4/5) & $+0.0291 \pm 0.0117$ (47/75, 2.5) \\
+    & \multicolumn{3}{l}{\emph{Reading:} established} \\[2pt]
+    \multicolumn{4}{l}{\textbf{Local path: FNO $+ 3{\times}3$ $-$ FNO}} \\
+    & 42 & $+0.0153 \pm 0.0110$ (4/5) & $+0.0190 \pm 0.0070$ (48/75, 2.7) \\
+    & 7  & $-0.0057 \pm 0.0105$ (3/5) & $-0.0054 \pm 0.0095$ (35/75, $-0.6$) \\
+    & \multicolumn{3}{l}{\emph{Reading:} not established} \\[2pt]
+    \multicolumn{4}{l}{\textbf{FNO $+ 3{\times}3$ $-$ U-Net}} \\
+    & 42 & $-0.0061 \pm 0.0108$ (2/5) & $-0.0089 \pm 0.0093$ (33/75, $-1.0$) \\
+    & 7  & $-0.0193 \pm 0.0051$ (0/5) & $-0.0227 \pm 0.0091$ (26/75, $-2.5$) \\
+    & \multicolumn{3}{l}{\emph{Reading:} tie at seed 42, lower at seed 7} \\[2pt]
     \multicolumn{4}{l}{\textbf{Transport: T-FEN $-$ free-form, same width}} \\
     & 42 & $+0.0618 \pm 0.0040$ (5/5) & $+0.0640 \pm 0.0058$ (68/75, 11.0) \\
     & 7  & $+0.0897 \pm 0.0142$ (5/5) & $+0.0878 \pm 0.0071$ (71/75, 12.4) \\
+    & \multicolumn{3}{l}{\emph{Reading:} established} \\[2pt]
+    \multicolumn{4}{l}{\textbf{Transport, Galerkin form: T-FEN $-$ free-form, same width}} \\
+    & 42 & $+0.0527 \pm 0.0065$ (5/5) & $+0.0555 \pm 0.0057$ (65/75, 9.7) \\
+    & 7  & $+0.0758 \pm 0.0092$ (5/5) & $+0.0761 \pm 0.0068$ (68/75, 11.3) \\
     & \multicolumn{3}{l}{\emph{Reading:} established} \\[2pt]
     \multicolumn{4}{l}{\textbf{Transport: T-FEN $-$ free-form, matched$^{a}$}} \\
     & 42 & $+0.0716 \pm 0.0094$ (4/4) & $+0.0737 \pm 0.0063$ (59/63, 11.7) \\
     & 7  & $+0.0762 \pm 0.0105$ (5/5) & $+0.0750 \pm 0.0062$ (73/75, 12.2) \\
     & \multicolumn{3}{l}{\emph{Reading:} established} \\[2pt]
-    \multicolumn{4}{l}{\textbf{FNO $-$ U-Net}} \\
-    & 42 & $-0.0215 \pm 0.0139$ (1/5) & $-0.0279 \pm 0.0111$ (30/75, $-2.5$) \\
-    & 7  & $-0.0136 \pm 0.0105$ (2/5) & $-0.0172 \pm 0.0104$ (27/75, $-1.7$) \\
-    & \multicolumn{3}{l}{\emph{Reading:} FNO lower; under the floor at seed 7} \\[2pt]
-    \multicolumn{4}{l}{\textbf{Local path: FNO $+ 3{\times}3$ $-$ FNO}} \\
-    & 42 & $+0.0153 \pm 0.0110$ (4/5) & $+0.0190 \pm 0.0070$ (48/75, 2.7) \\
-    & 7  & $-0.0057 \pm 0.0105$ (3/5) & $-0.0054 \pm 0.0095$ (35/75, $-0.6$) \\
-    & \multicolumn{3}{l}{\emph{Reading:} not replicated} \\[2pt]
-    \multicolumn{4}{l}{\textbf{FNO $+ 3{\times}3$ $-$ U-Net}} \\
-    & 42 & $-0.0061 \pm 0.0108$ (2/5) & $-0.0089 \pm 0.0093$ (33/75, $-1.0$) \\
-    & 7  & $-0.0193 \pm 0.0051$ (0/5) & $-0.0227 \pm 0.0091$ (26/75, $-2.5$) \\
-    & \multicolumn{3}{l}{\emph{Reading:} tie at seed 42, lower at seed 7} \\[2pt]
-    \multicolumn{4}{l}{\textbf{One round $-$ two rounds ($k$-NN)}} \\
-    & 42 & $-0.0108 \pm 0.0061$ (1/5) & $-0.0122 \pm 0.0051$ (33/75, $-2.4$) \\
-    & 7  & $+0.0036 \pm 0.0049$ (2/5) & $+0.0029 \pm 0.0033$ (40/75, 0.9) \\
-    & \multicolumn{3}{l}{\emph{Reading:} null} \\[2pt]
+    \multicolumn{4}{l}{\textbf{Free-form, width 139 $-$ width 96$^{a}$}} \\
+    & 42 & $-0.0084 \pm 0.0053$ (0/4) & $-0.0085 \pm 0.0037$ (23/63, $-2.3$) \\
+    & 7  & $+0.0135 \pm 0.0046$ (4/5) & $+0.0128 \pm 0.0046$ (47/75, 2.8) \\
+    & \multicolumn{3}{l}{\emph{Reading:} null (under the threshold at both
+      seeds)} \\
     \bottomrule
   \end{tabular}
 \end{table}
-% All values: thesis_numbers.py pair, recomputed 2026-10-01 (anchor
-% reproduced). Run names: Table tab:appendix:runs, seed 7 = suffix s7.
+
+\begin{table}[h]
+  \centering
+  \caption[Comparisons at seed 42 only.]{%
+    Comparisons of Chapter~\ref{ch:experiments} that were run at seed 42
+    only, as in Table~\ref{tab:appendix:seeds}. Reach-ladder rows are
+    against the default dilated stencil, capacity rows against the arm's
+    own original size (Table~\ref{tab:experiments:capacity}).}
+  \label{tab:appendix:seed42}
+  \footnotesize
+  \begin{tabular}{l l l}
+    \toprule
+    Comparison & Fold-paired & Per eye \\
+    \midrule
+    \multicolumn{3}{l}{\emph{Reach ladder (\S\ref{sec:experiments:ingredients:reach})}} \\
+    Columns up to $\pm 12$ & $-0.0193 \pm 0.0083$ (1/5) & $-0.0220 \pm 0.0042$ (20/75, $-5.2$) \\
+    Columns up to $\pm 35$ & $-0.0096 \pm 0.0031$ (1/5) & $-0.0103 \pm 0.0037$ (19/75, $-2.8$) \\
+    Columns up to $\pm 42$ & $-0.0256 \pm 0.0040$ (0/5) & $-0.0279 \pm 0.0048$ (16/75, $-5.8$) \\
+    Rows $\pm 2$ & $-0.0390 \pm 0.0047$ (0/5) & $-0.0411 \pm 0.0048$ (9/75, $-8.5$) \\
+    $k$-NN, $k = 20$ $-$ $k = 12$ & $-0.0104 \pm 0.0051$ (1/5) & $-0.0114 \pm 0.0028$ (20/75, $-4.1$) \\
+    \midrule
+    \multicolumn{3}{l}{\emph{Time handling (\S\ref{sec:experiments:ablations:time})}} \\
+    No multiplication by $\Delta t$ & $-0.0006 \pm 0.0061$ (2/5) & $-0.0028 \pm 0.0037$ (30/75, $-0.8$) \\
+    RK4 $-$ Euler, dilated stencil & $-0.0119 \pm 0.0037$ (1/5) & $-0.0132 \pm 0.0055$ (28/75, $-2.4$) \\
+    RK4 $-$ Euler, FNO & $+0.0062 \pm 0.0056$ (4/5) & $+0.0064 \pm 0.0069$ (43/75, 0.9) \\
+    \midrule
+    \multicolumn{3}{l}{\emph{Objective (\S\ref{sec:experiments:ablations:loss})}} \\
+    Plain mean squared error & $-0.5258 \pm 0.0222$ (0/5) & $-0.5524 \pm 0.0138$ (0/75, $-40.0$) \\
+    Without soft-Dice term & $-0.0496 \pm 0.0172$ (0/5) & $-0.0460 \pm 0.0091$ (19/75, $-5.1$) \\
+    Monotonic penalty, weight 2.0 & $-0.0036 \pm 0.0037$ (2/5) & $-0.0042 \pm 0.0034$ (34/75, $-1.3$) \\
+    \midrule
+    \multicolumn{3}{l}{\emph{Capacity (\S\ref{sec:experiments:ablations:capacity})}} \\
+    Stencil GNN, width 32 & $-0.0053 \pm 0.0063$ (1/5) & $-0.0050 \pm 0.0034$ (30/75, $-1.5$) \\
+    Stencil GNN, width 128 & $-0.0081 \pm 0.0056$ (2/5) & $-0.0091 \pm 0.0036$ (22/75, $-2.5$) \\
+    Stencil GNN, 4 rounds & $-0.0090 \pm 0.0021$ (0/5) & $-0.0097 \pm 0.0037$ (20/75, $-2.6$) \\
+    U-Net, width 2 & $-0.0163 \pm 0.0290$ (3/5) & $-0.0186 \pm 0.0155$ (40/75, $-1.2$) \\
+    U-Net, width 9 & $+0.0036 \pm 0.0126$ (1/5) & $+0.0041 \pm 0.0082$ (38/75, 0.5) \\
+    FNO $+ 3{\times}3$, width 2 & $-0.0192 \pm 0.0175$ (2/5) & $-0.0205 \pm 0.0101$ (30/75, $-2.0$) \\
+    FNO $+ 3{\times}3$, width 9 & $-0.0177 \pm 0.0075$ (1/5) & $-0.0207 \pm 0.0070$ (26/75, $-2.9$) \\
+    T-FEN, width 48$^\ast$ & $+0.0046 \pm 0.0044$ (3/5) & $+0.0042 \pm 0.0038$ (40/75, 1.1) \\
+    T-FEN, width 192$^\ast$ & $-0.0905 \pm 0.0586$ (3/5) & $-0.0699 \pm 0.0142$ (30/75, $-4.9$) \\
+    T-FEN, MLP depth 8$^\ast$ & $-0.2042 \pm 0.0674$ (0/5) & $-0.2199 \pm 0.0212$ (6/75, $-10.4$) \\
+    \bottomrule
+    \multicolumn{3}{l}{$^\ast$Galerkin form of the transport operator.}
+  \end{tabular}
+\end{table}
+% All values: thesis_numbers.py pair (code repo), recomputed 2026-10-02 for
+% every row (seed 42 and seed 7; reproduces every number of Chapter 5 and of
+% the 2026-10-01 table). Run names: Table tab:appendix:runs, seed 7 = suffix
+% s7; reach ladder ANISOGNN_final_mean{p4,t5,p14,r2}; time handling
+% ANISOGNN_final_dilmean_nodts, ANISOGNN_final_oderk4n1, FNO_final_w5rk4;
+% objective ANISOGNN_final_dilmean_{plainmse,nodice,mono2}; capacity
+% ANISOGNN_final_dilmean_{h32,h128,l4}, UNET_final_w{2,9}, FNO_final_w{2,9}k3,
+% FEN_final_w48ftp7rk4d45, FEN_final_w192ftp7rk4d45, FEN_final_w96d8ftp7rk4d45
+% against their 1x twins (T-FEN Galerkin twin FEN_final_w96ftp7rk4d45).
 
 
 \cleardoubleoddpage
@@ -833,7 +973,8 @@ can therefore not be explained by a broken mesh.
 
 The single-branch model, the dual-branch model and the bypass control were
 compared over the five folds at seed 42, with the evaluation protocol of
-the main text (\S\ref{sec:experiments:protocol:stats}). All three arms use
+the main text (\S\ref{sec:experiments:protocol:stats}) and the thresholds
+of~\S\ref{app:full-results:criteria}. All three arms use
 the earlier $k$-nearest-neighbour graph network with mean and maximum
 aggregation. This is neither the canonical dilated stencil nor the
 $k$-nearest-neighbour arm of Table~\ref{tab:experiments:arms}, which uses

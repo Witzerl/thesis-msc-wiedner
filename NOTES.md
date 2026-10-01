@@ -859,8 +859,29 @@ Being worked through one item at a time.
   description** of what it measures — check Chapters 5–6 for metrics used without one.
 - [x] #22 §5.1.3 "Runs are compared only when … same version of the pipeline" removed
   (2026-10-01).
-- [ ] **#23 / #25 / #31 — Chapter 5 reporting scheme (agreed 2026-10-01, author to review once
+- [x] **#23 / #25 / #31 — Chapter 5 reporting scheme (agreed 2026-10-01, author to review once
   more on 2026-10-02; apply as ONE dedicated pass after the remaining review items):**
+  APPLIED 2026-10-02. §5.1.4 rewritten as "Noise Level and Comparisons" (~2/3 page): training
+  noise and folds, "differences of about 0.02 or less are within the noise level", the rule in
+  words, eye counts on growth-region Dice, one sentence on the second seed ("the conclusions
+  drawn in this chapter hold at both"; author: do NOT single out the local-path result there).
+  Chapter 5 text now seed 42 only, results in words ("higher by X on average, on k of the five
+  folds and on m of the 75 eyes"; counts are "first arm higher" everywhere), no SE / t / Δ
+  notation; the reach and capacity tables show the mean difference and folds/eyes higher only.
+  §5.3.3 seed-7 paragraph removed (local path "not established", with the hybrid/FNO
+  instrument disagreement as one sentence; k = 20 likewise); §5.3.4 keeps one qualitative
+  sentence that the matched control trains on all folds at the second seed (explains the
+  fold-4 failure); §5.5.2 Galerkin count now seed 42 (4/5) + "most of the runs repeated with the
+  second seed". Appendix E: new section "Statistical Criteria" (`app:full-results:criteria`:
+  0.0127 replicate sd, √2/√5 derivation -> 0.036 / 0.016, U-Net 1.9x -> 0.020, both
+  instruments, LOFO, |t| about 2.5 -- not fixed in advance, the earlier note said 2.7 but the
+  readings made correspond to 2.5 (FNO - U-Net t -2.51 counted, T-FEN - stencil 2.17 not) --
+  second-seed requirement, fellow-eye caveat); "Statistics of the Comparisons" now three tables
+  (`tab:appendix:seeds`, `tab:appendix:seeds-b`, `tab:appendix:seed42`) covering every
+  comparison quoted in Ch. 5, all recomputed with thesis_numbers.py pair (every Ch. 5 number
+  reproduced). The old "Float too large" warning in Appendix E is gone (table split).
+  Still to decide (author): §6.1 and Ch. 7 still mention seeds ("at both seeds", local path
+  "level at one seed but not at the second", Ch. 7 transport bullet "at a second seed ... 0.076").
   1. **One seed in the text** (seed 42). One sentence in §5.1: the main comparisons were
      repeated with a second seed and every conclusion held (Appendix E). All seed-7 numbers
      move to an appendix table (reach, U-Net vs k-NN, T-FEN, transport term, stencil / U-Net /
@@ -903,7 +924,8 @@ Being worked through one item at a time.
   visits).
 - [ ] TODO: the commented-out §5.4.3 (covariates) and §5.4.4 (GNN-internal settings) were run
   on the mean+max k-NN arm; if either is reinstated, it needs mean twins or an explicit note.
-- [ ] TODO: fold/eye-count convention. §5.1.4 defines k (and m) as the number of folds (eyes)
+- [x] (resolved 2026-10-02 by the reporting pass: counts are "first arm higher" everywhere, in the
+  text and in Appendix E) TODO: fold/eye-count convention. §5.1.4 defines k (and m) as the number of folds (eyes)
   on which the difference has **the same sign as the mean**, but Chapter 5 counts the folds
   where the first arm is **higher** (e.g. FNO − U-Net −0.0215 "(1/5)", per eye "(30/75)";
   Table 5.2 "0/5" for negative means). Fix the definition in §5.1.4 (and the Table 5.2
@@ -1250,8 +1272,8 @@ worked through one item at a time.
 - [ ] Optional (from #13, option B, not chosen for now): a subsection "Behaviour beyond one year"
   with yearly bins for every main operator (hybrid, k-NN, free-form FEN still to compute from the
   mai/ records) and a per-eye test of the > 3 y difference.
-- [ ] #14 §5.1.4/§5.2 -- "I thought it was agreed only to report one seed and have the second
-  in appendix E" (= the reporting-scheme pass #23/#25/#31 above).
+- [x] #14 §5.1.4/§5.2 -- "I thought it was agreed only to report one seed and have the second
+  in appendix E" (= the reporting-scheme pass #23/#25/#31 above). Done 2026-10-02, see there.
 - [x] #15 §5.4.2 heading "Is the weighting of the mask channel needed?", #16 §5.5.2 "The
   energy-conserving form.", #20 Ch. 7 "The framework." -- the author dislikes the run-in
   paragraph headings. Done 2026-10-02 (author: remove them in §5.4, §5.5, §6.2, §6.3, Ch. 7 and
