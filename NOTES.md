@@ -924,7 +924,7 @@ Being worked through one item at a time.
 - [ ] A **cohort-level baseline-area distribution table** comparable to Mai et al. 2024 is
   still missing for the data chapter; growth-rate statistics exist (median √area growth
   0.234 mm/yr, IQR 0.153–0.340, p90 0.473 over 75 eyes).
-- [ ] The **T-FEN transport term has no matched-capacity control** (a width-≈139 control
+- [x] (superseded 2026-10-01: matched control run; reported T-FEN is the stable skew form) The **T-FEN transport term has no matched-capacity control** (a width-≈139 control
   has never been run); the 45-day T-FEN is **not a valid long-horizon integrator** as
   trained (5/10 runs diverge free-running, 9/10 final checkpoints exceed the Courant
   bound) — the learned velocity map is **not quotable**, though the Dice contribution
@@ -1277,12 +1277,12 @@ Pulled from the code repository (`masterthesis-docker/NOTES.md` + `PROJECT_CONTE
     (0.67x) and the free-form FEN (0.52x) do not. Caption and text now say why.
   - Two tables (this one and §4.3.3's) were ~5 pt wider than the text block; narrowed.
     The one remaining overfull-box warning predates this session (template, \output).
-- [ ] TODO: the RK4 stability limit for the T-FEN transport stencil is recorded two ways
+- [x] (superseded 2026-10-01 by the skew-form rewrite of §4.3.6: one sentence, RK4 limit ~2.4) TODO: the RK4 stability limit for the T-FEN transport stencil is recorded two ways
   (2.8 as implemented vs ~2.4 derived from a spectral radius of 1.1-1.2). §4.4.4 carries an
   inline TODO. Also confirm "monitored, not enforced during training" against the code;
   it is inferred from the out-of-bound final checkpoints and the parked bounded-velocity
   head.
-- [ ] TODO: a parameter-matched free-form FEN control (width ~139, ~5 GPU-h at 5 folds) has
+- [x] (run and reported 2026-10-01, folds 0-3) TODO: a parameter-matched free-form FEN control (width ~139, ~5 GPU-h at 5 folds) has
   never been run; §4.4.4 and §4.4.6 state the 1.97x gap. Inline TODO in §4.4.4.
 - [ ] TODO (code repo, not editable from here) -- three statements in
   `THESIS_FRAMEWORK.md` §4b found wrong or misleading while checking the papers:
@@ -1331,8 +1331,8 @@ Pulled from the code repository (`masterthesis-docker/NOTES.md` + `PROJECT_CONTE
     that the T-FEN velocity field is not interpreted (§5.5); the U-Net-vs-k-NN numbers moved
     before the conclusion they support; "per-pixel baseline" renamed to "floor"; `\S
 ef` style.
-- [ ] TODO (§5.2 inline): the one-hop floor's minimum epoch time and fold.
-- [ ] TODO (§5.3.3/§5.3.4 inline): per-horizon growth-region Dice -- FNO vs U-Net beyond one
+- [x] (filled 2026-09-28: 59 s; 37 s since the mean one-hop floor of 2026-10-01) TODO (§5.2 inline): the one-hop floor's minimum epoch time and fold.
+- [x] (filled 2026-10-01 from SOLVER_FINAL_RUNS §9.20) TODO (§5.3.3/§5.3.4 inline): per-horizon growth-region Dice -- FNO vs U-Net beyond one
   year; T-FEN / free-form FEN / one-hop floor / dilated stencil in the 0-1 y bin; horizon
   profiles of the T-FEN and the dilated stencil. From SOLVER_FINAL_RUNS.md (code repo). The
   transport-vs-capacity argument in §5.3.4 rests partly on these.
@@ -1468,7 +1468,7 @@ GNN, FNO and FEN have never been run at another size.
     reparameterisation target; `\times` for "4.8x", "2x", "14x".
   - The §4.3.6 TODO on the Courant bound (2.8 vs ~2.4) is answered in §5.5.2 ("settles the open
     value"); §4.3.6 itself still carries the TODO -- fix in the Chapter 4 review.
-- [ ] TODO (§5.4.1 inline): per-eye instrument for the Delta t-scaling ablation, if computed
+- [x] (superseded 2026-10-01: the k-NN ablation is no longer reported; the stencil run `ANISOGNN_final_dilmean_nodts` is queued) TODO (§5.4.1 inline): per-eye instrument for the Delta t-scaling ablation, if computed
   (SOLVER_FINAL_RUNS.md, the `nodts` / `euler_dt_scale False` arm).
 - [ ] ⚠️ Mirror is stale (code repo wins): the T-FEN's free-running rollout is unstable on
   **7 of 10** runs (corrected in SOLVER_FINAL_RUNS.md §9.15 on 2026-09-16), not "5 of 10" as
@@ -1476,16 +1476,17 @@ GNN, FNO and FEN have never been run at another size.
   the runs were judged against is 2.8; the correct bound for the assembled stencil is ~2.4
   (spectral radius ~1.17 |v|) -- this resolves the §4.3.6 TODO; fix §4.3.6 in the Chapter 4
   review. Re-mirror when convenient.
+- [ ] 2026-10-01: open items of the 2026-09-27/28 session merged into `prompts/open.txt` (marked [s27], overview in its section 8).
 - [ ] TODO: produce Figure `fig:experiments:rollout` (§5.2) -- rollout strip for one eye, from
   masterthesis-docker/practical/scripts/fig_rollout.py and the final-epoch rollout exports.
 
-- [ ] TODO: 5.1 Evaluation protocol (MSE caveat first, then Dice/IoU@360d, persistence floor).
+- [x] (drafted 2026-09-27) TODO: 5.1 Evaluation protocol (MSE caveat first, then Dice/IoU@360d, persistence floor).
 - [x] (obsolete 2026-09-27: section removed, see above) TODO: 5.2 Baselines.
-- [ ] TODO: 5.3 Main results table + rollout figure.
-- [ ] TODO: 5.4 Ablations sweep.
+- [x] (table drafted 2026-09-27; rollout figure tracked separately) TODO: 5.3 Main results table + rollout figure.
+- [x] (drafted 2026-09-28, rewritten 2026-10-01) TODO: 5.4 Ablations sweep.
 - [x] (moved to Appendix G.3 2026-09-27) TODO: 5.5 Moving mesh quality.
 - [ ] TODO: 5.6 Qualitative analysis (success + failure modes).
-- [ ] TODO: 5.7 Computational cost.
+- [x] (written as §5.6 in ce6bf3e) TODO: 5.7 Computational cost.
 
 ### Chapter 6 - Discussion (`06-discussion.tex`)
 

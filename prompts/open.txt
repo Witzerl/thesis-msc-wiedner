@@ -6,6 +6,11 @@ Status as of 2026-10-01 09:00, after commits 7f93ab9 (this session) and ce6bf3e
 Merged 2026-10-01 with the open items of the Ch. 6/7/abstract session (commits 714a87e
 prompt, ce6bf3e draft + audit). Those items are marked [ce6] below; section 7 is the
 overview of what is left from that session alone.
+Merged 2026-10-01 with the open items of the session of 2026-09-27/28 (restructure:
+MP-PDE out of Ch. 2, one Operators section, MM-PDE to Appendix G; first drafts of 4.4-4.6
+and 5.1-5.5; the capacity pre-registration; commits b69f352 ... 6ac45a1). Those items are
+marked [s27]; section 8 is the overview of what is left from that session alone. Most of
+its items were resolved later and are listed in section 6.
 
 
 1. RUNS ON THE CLUSTER -> WHERE THEIR RESULT GOES
@@ -30,6 +35,10 @@ Job        Run (experiment name)                 Per fold  Fills
                                                            ("lie close together"); 6.1 "three highest
                                                            arms ... lie close together"; 6.3
                                                            "Unfinished replications"
+           [s27] 7875520 and 7875528-30 continue the capacity plan pre-registered
+           2026-09-28 (NOTES "Capacity experiment -- PRE-REGISTRATION"): the seed-42
+           Stage-1/Stage-2 runs of that plan are in and written up (5.4.3); these are the
+           seed-7 matched control and the T-FEN capacity points redone in the skew form.
 7875528    FEN_final_w48ftp7rk4d45skew           ~2.7 h    5.4.3 capacity table, T-FEN 1/4x row (skew)
                                                            [ce6] 6.3 "Unfinished replications"
 7875529    FEN_final_w192ftp7rk4d45skew          ~6.5 h    5.4.3 capacity table, T-FEN 4x row (skew)
@@ -121,6 +130,34 @@ skew capacity points -> FEN_final_w96ftp7rk4d45skew (0.5428).
 [ ] 04-method.tex: stale TODO comments to clean up -- l. ~301 (theta_PDE, now in 6.1),
     l. ~1230 ("cost convention -> TODO in Section 5.7", now in 5.6), l. ~97 (trajectory
     memory, now in 6.3/6.4).
+[ ] [s27] Bibliography: four references introduced in 4.5/4.6 are still plain-text
+    placeholders with "% TODO: cite" markers and are NOT in references.bib:
+    Milletari2016 (soft-Dice, V-Net, 3DV 2016, arXiv:1606.04797; 04-method l. ~1038),
+    Loshchilov2019 (AdamW, ICLR 2019, arXiv:1711.05101; l. ~1136),
+    Paszke2019 (PyTorch, NeurIPS 2019, arXiv:1912.01703; l. ~1194),
+    Fey2019 (PyTorch Geometric, ICLR 2019 RLGM workshop, arXiv:1903.02428; l. ~1196).
+    Add the entries, switch the text to \citep/\citet, delete the markers.
+[ ] [s27] Appendix G (moving mesh) is still a skeleton apart from G.1 (background). Open
+    TODOs in 91-appendix.tex: G.2 DMM for GA (physics loss, native-grid scalar monitor,
+    pretrained + frozen) and dual-branch composition (uniform branch full state, moved
+    branch Delta-t delta, ItpNet renormalised, alpha gate); four facts moved there from
+    Ch. 4 on 2026-09-27 (no zero-init on the correction branch, own k-NN on the moved
+    mesh, RK wrapper single-branch only, ItpNet pretraining at epoch 0); G.3 mesh quality
+    (equidistribution CoV, tangled cells, geometric quality; in-sample caveat); the result
+    (dual - bypass = -0.0001 +/- 0.0060, scoped as the correction branch's failure to
+    optimise) and the ~10x cost; why the mesh also forces one-step prediction; which
+    channels each part uses. Numbers: THESIS_FRAMEWORK 3, 5, 7.5 (T4, T8g). No run needed.
+    Natural candidate for the fact-sheet prompt + external draft + audit workflow.
+[ ] [s27] Figure 4.1 (fig:method:pipeline): still a placeholder; the dashed moving-mesh
+    path was removed from its spec on 2026-09-27 (operator slot = the only varying box).
+[ ] [s27] THESIS_STRUCTURE.md is stale against the text: 4.6 still describes the layer
+    encoder as a reported null; "Parameter matching" still names the width-32 U-Net as a
+    deliberate control; the Chapter 5 outline still lists 5.4 "Capacity -- the width-32
+    U-Net", covariates / encoder / GNN knobs as reported nulls, and the old 5.5-5.8
+    numbering. CLAUDE.md still says "except two deliberate controls" and lists the
+    encoder / covariates / GNN knobs as reported nulls. Update both to the current text
+    (5.4.1 time handling, 5.4.2 objective, 5.4.3 capacity incl. width-32 as a capacity
+    point; 5.5 validity incl. Mai; covariates/encoder/GNN knobs commented out).
 
 
 3. VERIFICATION (open)
@@ -136,6 +173,12 @@ skew capacity points -> FEN_final_w96ftp7rk4d45skew (0.5428).
     (fraction of visit pairs with net/local shrinkage, area) -- inline TODO l. ~245; the
     text currently says "has not been quantified". Post-hoc analysis on the masks, no
     training run.
+[ ] [s27] 4.5.2: confirm in the code that the feasible-start-window restriction applies
+    only for a budget B > 0 (for B = 0 the first-interval condition could never hold);
+    inline TODO 04-method l. ~1111. Code reading only (utils/utils.py,
+    compute_time_table / min_budget_days).
+[ ] [s27] 4.6: record the PyTorch Geometric version of the container (inline TODO
+    04-method l. ~1202).
 [ ] [ce6] 6.2 quotes the canonical model's growth-region Dice beyond one year as "about
     0.60 to 0.66" (= 0.600 / 0.634 / 0.655 from 5.3.4, SOLVER_FINAL_RUNS 9.19a); covered
     by the general re-check above, listed here because it is a new place the numbers appear.
@@ -152,6 +195,12 @@ skew capacity points -> FEN_final_w96ftp7rk4d45skew (0.5428).
     own table gives 4/5 (folds 0, 1, 2, 4). The thesis uses 4/5 at seed 42, 7/10 overall.
 [ ] THESIS_FRAMEWORK.md: both copies (code repo + thesis mirror) identical but stale since
     2026-09-17; update code-side and re-mirror.
+[ ] [s27] When re-mirroring, PROJECT_CONTEXT.md and THESIS_FRAMEWORK.md also still say:
+    Galerkin T-FEN "diverges on 5 of 10 runs" (code repo corrected to 7/10 on 2026-09-16);
+    "44x" U-Net (50x against the canonical 67,147); "nine settings, six classes" incl. the
+    graph U-Net; the 3x3 FNO hybrid called "the localized-kernel operator" of
+    Liu-Schiaffini et al. (it is a simplified relative); the FEN "no divergence constraint"
+    as a departure from Lienen & Guennemann (it is not one).
 
 
 5. FOR THE AUTHOR TO REVIEW
@@ -188,6 +237,18 @@ skew capacity points -> FEN_final_w96ftp7rk4d45skew (0.5428).
 [x] Resolved by the other session (ce6bf3e): cost convention + RK4 cost (5.6); Chapter 6
     items theta_PDE, predictions between visits (regulariser + RK4 arm), "good at where,
     weaker at how fast", covariates unsettled, crop censoring, trajectory memory.
+[x] [s27] Resolved since the 2026-09-27/28 session: MP-PDE out of Ch. 2 + one Operators
+    section; MM-PDE sections of Ch. 4 and Ch. 5 moved to Appendix G (skeleton); Baselines
+    section removed; 4.4-4.6 and 5.1-5.5 drafted and audited; one-hop floor cost in
+    Table 5.1; per-horizon numbers (5.3.3/5.3.4, from 9.20); the capacity question
+    (dropped 2026-09-28, pre-registered the same day, run, written up as 5.4.3 -- the
+    width-32 U-Net returned there as a capacity point); the matched free-form control
+    (seed 42); the Courant-bound TODO of 4.3.6 (superseded by the skew-form rewrite);
+    the "T-FEN is not stable" warning in 5.2 (superseded: the reported T-FEN is the skew
+    form); the pad-exclusion decision in 4.5.1 ("off in every reported run"); the Delta-t
+    per-eye TODO (k-NN ablation no longer reported; stencil run 7875536 queued); Mai
+    published values (in NOTES / 5.5.1); the scripted-edit backslash corruption (memory
+    note updated; splice from a file).
 [x] [ce6] Also resolved there: layer encoder as future work (6.4, old 4.4 TODO); better
     cropping (6.4, review #33); Ch. 7 and both abstracts written (were empty TODOs); 5.6
     states that inference time and memory were not measured (old 5.7 TODO "inference time
@@ -225,3 +286,34 @@ No run needed:
 Order that avoids rewriting twice: runs in -> Chapter 5 reporting pass -> one pass over
 6.1 / 6.3 / Ch. 7 / abstracts (remove the "Unfinished replications" items that are done)
 -> Kurzfassung re-translated from the final English abstract.
+
+
+8. OVERVIEW: WHAT IS LEFT FROM THE 2026-09-27/28 SESSION ONLY  [s27]
+--------------------------------------------------------------------
+(restructure + first drafts of 4.4-4.6 and 5.1-5.5 + capacity pre-registration;
+commits b69f352 ... 6ac45a1)
+
+Cluster runs from this session: the capacity plan (Stage 1 + Stage 2, seed 42) was
+submitted by the author from another session; its job IDs were never recorded here. All
+of it is in and written up (5.4.3). What still runs from that plan:
+
+  Run / job                                   Text that changes
+  ------------------------------------------  ------------------------------------------
+  FEN_final_w48ftp7rk4d45skew     (7875528)   5.4.3 T-FEN 1/4x row (skew form)
+  FEN_final_w192ftp7rk4d45skew    (7875529)   5.4.3 T-FEN 4x row (skew form)
+  FEN_final_w96d8ftp7rk4d45skew   (7875530)   5.4.3 T-FEN depth-8 row (skew form)
+  FEN_final_w139Frk4d45s7         (7875520*)  5.3.4 seed-7 matched transport control
+
+No run needed:
+  [ ] Bibliography: Milletari2016, Loshchilov2019, Paszke2019, Fey2019 (section 2)
+  [ ] Appendix G content: G.2 DMM + dual branch, G.3 mesh quality, result + cost (section 2)
+  [ ] Figure 4.1 pipeline (section 2); Figure 4.2 stencils and Figure 5.1 rollout strip are
+      already listed in section 2
+  [ ] 4.5.2: B > 0 feasibility restriction -- code check (section 3)
+  [ ] 4.6: PyTorch Geometric version (section 3)
+  [ ] THESIS_STRUCTURE.md + CLAUDE.md out of date against the text (section 2)
+  [ ] Mirror corrections to carry into the next re-mirror (section 4)
+
+Order: bibliography and the two small checks any time; Appendix G as its own
+prompt -> draft -> audit pass; THESIS_STRUCTURE.md / CLAUDE.md after the Chapter 5
+reporting pass, so they describe the final structure once.
