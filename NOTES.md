@@ -990,6 +990,48 @@ through one item at a time.
   `% TODO` comment there (runs in progress, results expected within hours).
 - All 12 items of review v5 worked through.
 
+### Figure plan (2026-10-01)
+
+Author: work the figures back to front (appendix and Chapter 5 first, medical illustrations
+last), not sequentially. Every figure and its script go into the thesis repo (`images/`,
+`images/scripts/`) and follow `style/`; code-repo scripts (practical, poster, presentation)
+are ported, not edited. The per-figure TODOs further down in this file stay the content specs.
+
+Local resources checked: raw scans for all 75 eyes (`masterthesis-docker/data/MUW_GA/scans`:
+SLO, FAF, mask_global, mask_oct, layers, transforms), precomputes for splits 0-2 only, `last.pt`
+for every fold-2 arm, `metrics.jsonl` + per-eye `mai/` records for every run, the native DMM
+checkpoint `GA_NAT_O512x2_S1`, the `MPPDE` conda env (torch 2.7, PyG 2.6.1) and an RTX 3080.
+Rollout NPZs exist only for two superseded runs (k-NN mean+max, dual branch), so rollout
+figures need regenerated rollouts.
+
+Planned in the text (9 placeholders + 2 appendix chapters), in working order:
+- [ ] App. G `fig:appendix:moved-mesh` -- Python, autonomous (port `practical/scripts/fig_mesh.py`;
+  the poster's `fig_mesh_adaptation.png` is a synthetic lesion on a square domain, not reusable).
+- [ ] App. D additional rollouts incl. failure cases -- Python, autonomous once the rollout
+  pipeline below exists; failure cases chosen by a stated rule.
+- [ ] App. A cohort plots (visit intervals, visits per eye, baseline area, sqrt-area growth
+  rate, crop census) -- Python, autonomous from the raw scans.
+- [ ] §5.2 `fig:experiments:rollout` -- Python, autonomous: regenerate fold-2 rollouts from
+  `last.pt`, check that they reproduce the logged per-eye Dice, choose the eye by a stated rule.
+- [ ] §4.3.3 `fig:method:stencils` -- Python, autonomous (geometry only). Its TODO says "script
+  in the code repo"; it goes to `images/scripts/` instead.
+- [ ] §4.1 `fig:method:pipeline` -- schematic (TikZ draft), needs author review.
+- [ ] §3.1 `fig:data:example-state` -- Python from raw data; needs the author's decision whether
+  a patient's SLO image may be printed.
+- [ ] §2.2.2 `fig:bg:solver-path` -- schematic (TikZ draft), needs author review.
+- [ ] §2.1.3 `fig:bg:oct-acquisition`, §2.1.2 `fig:bg:retinal-anatomy`, §2.1.1
+  `fig:bg:eye-anatomy` -- illustrations, generated with the author. The retinal-anatomy caption
+  names layer strata and maps them to the ten channels, which the 2026-09-25 decision forbids
+  (boundary names unknown); a real B-scan is not in the repository.
+- [ ] Not yet in the text: GA progression stages from the poster (`poster/figs/eye_stage_1-4.png`),
+  e.g. in §1.1 or §2.1.2 -- placement to be decided.
+
+Proposed data figures for Chapter 5 (not in the text; add only after author approval): arm
+overview per fold (§5.2), reach ladder (§5.3.2), growth-region Dice by horizon with Mai (§5.3,
+§5.5.1), capacity curves (§5.4.3, T-FEN skew rows pending), predicted vs true growth rate
+(§5.5.1), solver swap (§5.5.1), T-FEN free-running error Galerkin vs skew (§5.5.2), training
+curves with the late-epoch window (§5.1.3).
+
 ### Assets that now exist and should be reused
 
 - **The Practical Work report** (`masterthesis-docker/practical/`) was handed in
