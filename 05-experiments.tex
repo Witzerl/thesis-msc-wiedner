@@ -160,7 +160,8 @@ within one run (Figure~\ref{fig:experiments:curves}a), so the highest epoch
 is mostly the luckiest one.
 % Corrected 2026-10-01 (was "0.02 to 0.10", not reproducible): per-fold sd of
 % change-region Dice over epochs 10-29, arms of Table 5.1, is 0.005-0.047
-% (canonical 0.010-0.022); images/scripts/fig_experiments_curves.py. Second, the highest epoch is chosen on the same validation
+% (canonical 0.010-0.022); images/scripts/fig_experiments_curves.py.
+Second, the highest epoch is chosen on the same validation
 eyes on which it would be reported. There is no separate test split
 (\S\ref{sec:data:splits}), so a best-epoch value is biased upwards, and the
 more so the noisier the metric. Every reported number is instead a
@@ -900,7 +901,8 @@ collapse, and the soft-Dice term adds an immediate escape and a higher
 score.
 % Corrected 2026-10-01: the text said the run is "about three times" less
 % steady without qualification; per-fold late sd nodice 0.013/0.020/0.023/
-% 0.013/0.147 vs full 0.011/0.019/0.010/0.012/0.022 (fold 4 carries it). Its cost is the stretch of the raw mask regression described
+% 0.013/0.147 vs full 0.011/0.019/0.010/0.012/0.022 (fold 4 carries it).
+Its cost is the stretch of the raw mask regression described
 in~\S\ref{sec:method:training:loss}: the raw mask error of the free-running
 rollout is about twice as large with the term as without it (1.10 against
 0.51). It does not change any thresholded metric.

@@ -1056,9 +1056,11 @@ English abstract, Ch. 1-7 and App. A-G were reviewed; the German Kurzfassung was
   terminology table, AI-tone patterns P1-P14, rules of thumb) and 14 micro files with 544 verified
   items (15 high, 277 medium, 252 low), each with `file:line`, GPTZero label and a suggested
   rewrite. Line numbers refer to the sources of 2026-10-01, 21:43.
-- [ ] Fix first: two sentences are missing from the PDF because the prose sits at the end of a
+- [x] Fix first: two sentences are missing from the PDF because the prose sits at the end of a
   `%` comment line: `05-experiments.tex:163` (§5.1.3, the second of the "two reasons") and
   `05-experiments.tex:903` (§5.4.2, the cost of the soft-Dice term). Review items 5a.19, 5c.17.
+  Fixed 2026-10-01 by a line break after each comment (wording unchanged), verified in the PDF
+  text. Review line numbers in `05-experiments.tex` after l. 163 are now +1, after l. 904 +2.
 - [ ] Contradictions and dead pointers found (review S4, S5, S9, S22): §1.2 promises the
   covariates are "tested in this thesis" (the test is commented out, §6.3 says unsettled);
   layer channels "not auxiliary" (§2.1.5) vs "auxiliary targets" (§3.2, §4.2.2, §4.5.1); the Fig.
