@@ -900,6 +900,48 @@ Being worked through one item at a time.
 - [ ] TODO (§6.2 inline): link to the failure cases once §5.5 qualitative is written.
 - [ ] Author to review §5.6, Ch. 6, Ch. 7 and both abstracts (German text in particular).
 
+### Author's tablet review of the abstract, Ch. 6 and Ch. 7 (2026-10-01)
+
+Fifth handwritten review (build of 2026-10-01), decoded from
+`main-thesis_v5_261001_095557.sdocx`: 12 marks on 7 pages (abstract, pp. 63-65, 67,
+68, 70); no marks in Chapters 4-5. Blue = rewrite, red = wrong/remove. Being worked
+through one item at a time.
+
+- [x] #1/#2 Abstract (blue: moving-mesh sentence; last paragraph "don't like this").
+  Author: no moving mesh (not the main part), no comparison with another model, too
+  simple, needs technical aspects and results. Rewritten in full 2026-10-01 (English and
+  German): state (11 channels, 49 x 1024), update u + Δt f_θ, zero-init, curriculum, the
+  operators; results 0.54 ± 0.04 / 0.53 ± 0.05 / 0.50 ± 0.06 (mean ± sd over folds,
+  Table 5.1), reach +0.064 at equal parameters (5/5), transport +0.062 (same-width
+  control), FNO below U-Net and the 3 x 3 path bringing it level, capacity 1/4x-4x and
+  RK4 nulls, growth-rate r 0.40 without the Mai comparison.
+- [ ] Abstract length: English ~470 words fits one page; the German Kurzfassung now runs
+  onto a second page (pp. iii-iv). Decide whether to shorten.
+- [ ] TODO (abstract inline): T-FEN value and the ordering of the three strongest
+  operators after the seed-7 skew T-FEN run.
+- [x] #3 §6.1 "which scores zero on the headline metric (Table 5.1)" removed.
+- [x] #4/#12 huge U-Net (width 32, 3.35 M, ~40x): author wants **no mention anywhere**
+  ("makes no sense to report"). Removed from §6.1 Capacity (now "no width step raised a
+  class above the noise level, and the smaller versions lost little"), §5.4.3 (table row
+  commented out, sentence removed), Ch. 7 "What did not matter"; THESIS_STRUCTURE.md and
+  CLAUDE.md updated so it does not come back. Ch. 4 had it commented out since 09-28.
+- [x] #5 §6.1 sentence on the earlier GNN-internal ablation removed (the moving-mesh
+  clause of the preceding sentence kept, author).
+- [x] #6 §6.2 ", and none was tested" removed.
+- [x] #7 §6.3 ": an ablation on an earlier configuration found no detectable benefit,"
+  removed (joined with a semicolon).
+- [x] #8 §6.3 "The survey leaves out two classes …" removed; §6.4 Trajectory memory now
+  "It is also the setting in which sequence models such as recurrent networks and
+  transformers apply." (author: not "we didn't bother").
+- [x] #9 + #11 §6.3: moving-mesh scope sentence replaced by: all operators on the uniform
+  grid; mesh adaptation might help but excludes regular-grid operators (U-Net, FNO); one
+  extension tested in Appendix G, no conclusion drawn. §6.4 "The moving mesh" paragraph
+  removed; its next-state-monitor sentence moved to a new Appendix G section "Outlook"
+  (`app:mm-pde:outlook`).
+- [x] #10 §6.3 "Unfinished replications" removed; the pending-run list is kept as a
+  `% TODO` comment there (runs in progress, results expected within hours).
+- All 12 items of review v5 worked through.
+
 ### Assets that now exist and should be reused
 
 - **The Practical Work report** (`masterthesis-docker/practical/`) was handed in

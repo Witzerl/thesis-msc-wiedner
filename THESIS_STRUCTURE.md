@@ -133,7 +133,7 @@ Everything else that occupies the same slot, described on identical terms and at
 - **The locality floors:** the one-hop floor and the per-pixel model with no spatial context as the lower floor. (The graph U-Net arm was dropped 2026-09-27, author review: not used; its subsection is commented out in `04-method.tex`.)
 - **The Finite Element Network**, free-form and with the learned transport (advection) term.
 - **Time integration:** the fixed-step Runge-Kutta wrapper over any backbone, and what a continuous-time reading would require.
-- **Parameter matching:** what is matched to what, the 1.25x band, and the two deliberate out-of-band controls (the width-32 U-Net at ~50x the canonical model -- 44.5x the k-NN arm -- and the 0.22x per-pixel floor) and why each exists.
+- **Parameter matching:** what is matched to what, the 1.25x band, and the out-of-band per-pixel floor (0.22x) and why it exists. (The width-32 U-Net at ~50x is not reported anywhere -- author, 2026-10-01.)
 
 ### 4.5 ~~The moving-mesh extension as a tested hypothesis~~ → moved to Appendix G (done 2026-09-27, now G.2)
 Content below is retained as the specification for Appendix G. Chapter 4 now reads 4.1 Overview, 4.2 Framework, 4.3 Operators, 4.4 Conditioning, 4.5 Training, 4.6 Implementation.
@@ -181,7 +181,7 @@ Reported as findings, not as failures, each with its instrument and its scope.
 - **Mesh adaptation / the dual branch — one-line pointer only; full treatment in Appendix G (2026-09-25).** The tightest null in the project, parameter-matched, at ~10x the cost. **Constraint on scope: α stays shut in the parameter-matched bypass control as well as in the mesh arm, so what the gate measured is the correction branch's failure to optimise — not "mesh adaptation does not transfer to GA". Weight decay is refuted as the cause.**
 - **Patient covariates** — both instruments agree, neither graduates, and the residual points against them.
 - **The learned coefficient surrogate** — null at every width over an 8x range, at 30-55 % more compute.
-- **Capacity** — the width-32 U-Net (~50x the canonical model) erases its own smaller twin's win.
+- **Capacity** — each class scaled from about 1/4x to 4x its size (§5.4.3): no gain. The width-32 U-Net is not reported (author, 2026-10-01).
 - **Time-integration order** — RK4 vs Euler null over both a local graph operator and a global spectral one, at ~4.8x the cost.
 - **Every GNN-internal knob** — normalisation, aggregation, edge-direction features. The geometry mattered; the message function did not.
 - **The intermediate-time-point regulariser** — evaluated and removed.

@@ -26,8 +26,7 @@ starts every operator at persistence, the curriculum measured in elapsed
 days, the loss, and one evaluation for all arms
 (\S\ref{sec:method:framework}). Under these conditions, every operator
 with any spatial context learned, and every one of them lies far above
-persistence, which scores zero on the headline metric
-(Table~\ref{tab:experiments:arms}). This is what made the comparison of
+persistence. This is what made the comparison of
 Chapter~\ref{ch:experiments} possible at all, and it is the answer to the
 first part of the question.
 
@@ -81,10 +80,8 @@ forecasts than for the one-year anchor.
 
 \paragraph{Capacity.}
 Capacity was not a lever in any of the four classes tested
-(\S\ref{sec:experiments:ablations:capacity}). The dilated-stencil network
-is flat from about a quarter to about four times its size, and the widest
-U-Net, at about forty times its original parameter count, falls below the
-original. With 75 eyes, this is what the low-data argument of
+(\S\ref{sec:experiments:ablations:capacity}): no width step raised a class
+above the noise level, and the smaller versions lost little. With 75 eyes, this is what the low-data argument of
 Chapter~\ref{ch:introduction} leads one to expect: the assumptions built
 into an operator weigh more than its size. The capacity study shows that
 size did not help; that the built-in assumptions are the reason is an
@@ -135,10 +132,7 @@ along the direction in which the front moves --- or adding a mechanism
 that transports the state produced the largest effects. Larger models, a
 higher integration order and the moving-mesh extension of
 Appendix~\ref{app:mm-pde}, whose correction branch never engaged, did not
-improve accuracy at the available precision. An earlier ablation on an
-older configuration of the graph network found the same for the settings
-of its message function (normalisation, aggregation and direction
-features). For a new disease-forecasting task of this kind, the first
+improve accuracy at the available precision. For a new disease-forecasting task of this kind, the first
 question to ask of an operator is therefore how far one update reaches
 compared with how far the disease moves between visits.
 
@@ -166,7 +160,7 @@ its border. It is still notable that a model given the segmented lesion
 as input is weaker on growth speed than one that must find the lesion
 itself.
 
-Several explanations are possible, and none was tested. A local model
+Several explanations are possible. A local model
 applied autoregressively over several years can drift, and the growth
 rate is taken at the last visit, often three or more years after
 baseline. Large, fast-growing lesions are the ones most often cut by the
@@ -258,30 +252,26 @@ Every operator sees one visit and has no memory of the trajectory so far,
 although each eye has 5 to 13 visits. An eye's own past growth, the most
 direct evidence of its speed, is therefore never used. The patient
 covariates are enabled in every operator, but whether they carry useful
-information is not settled: an ablation on an earlier configuration found
-no detectable benefit, and two numbers shared by every grid position
+information is not settled; two numbers shared by every grid position
 cannot localise anything. The pipeline starts from segmented masks, so
 it neither benefits from nor accounts for the information in the raw OCT
 volume.
 
-The survey leaves out two classes that would complete it: a plain
-recurrent network and a transformer. Physics-informed neural networks
+Physics-informed neural networks
 were deliberately not run, because the governing equation is unknown and
-the residual would have to be taken on a binary mask. The moving-mesh
-null of Appendix~\ref{app:mm-pde} is scoped to its implementation: the
-gated correction branch did not engage, with or without the moving mesh,
-which is not a statement about mesh adaptation for GA in general.
+the residual would have to be taken on a binary mask. All operators work on the uniform $49 \times 1024$ grid. Adapting the mesh
+to the lesion, so that grid points concentrate where the front moves, might
+help, but it excludes the operators that need a regular grid, such as the
+U-Net and the FNO. A moving-mesh extension of the graph network was tested
+as one additional experiment (Appendix~\ref{app:mm-pde}); no conclusion
+about mesh adaptation is drawn from it.
 
-\paragraph{Unfinished replications.}
-Several runs were still pending when this chapter was written: a second
-seed of the T-FEN in its energy-conserving form, which decides whether its
-lead over the U-Net is established; a second seed of the parameter-matched
-transport control, which has so far been compared on four folds only;
-the ablations of the $\Delta t$ multiplication and of the loss terms on the
-canonical network; and the capacity points of the T-FEN in its
-energy-conserving form.
-% TODO: update this paragraph (and remove what is done) once the queued
-% runs of 2026-10-01 are read out.
+% Paragraph "Unfinished replications" removed 2026-10-01 (author review v5
+% #10). TODO: runs in progress (results expected 2026-10-01/02) -- seed-7
+% skew T-FEN (decides whether its lead over the U-Net is established),
+% seed-7 matched transport control, Delta t-multiplication and loss-term
+% ablations on the canonical network, T-FEN capacity points in skew form.
+% Fill Chapter 5 and revise Sections 6.1 and 6.3 once they are read out.
 
 
 \section{Future Work}
@@ -297,8 +287,8 @@ this censoring and make areas comparable with whole-field studies.
 Giving the operator several past visits, or a recurrent state carried
 along the rollout, would let it use the eye's own growth history. This
 addresses the growth-speed gap of \S\ref{sec:discussion:clinical}
-directly, and it would also bring in the two classes the survey is
-missing, a recurrent network and a transformer.
+directly. It is also the setting in which sequence models such as
+recurrent networks and transformers apply.
 
 \paragraph{An eye-level descriptor.}
 A learned descriptor could take the place of the missing equation
@@ -326,12 +316,8 @@ A forecast used for treatment decisions needs a measure of its own
 uncertainty, which none of the operators provides. Joint training across
 several retinal diseases could also ease the data limitation.
 
-\paragraph{The moving mesh.}
-For the moving-mesh extension, the monitor that guides the mesh is
-computed from the current state, whereas the change happens in the next
-one. A monitor built on a surrogate of the next state, the open problem
-named by \citet{Hu2024}, is the natural continuation
-(Appendix~\ref{app:mm-pde}).
+% Paragraph "The moving mesh" moved 2026-10-01 to the end of Appendix G
+% (author review v5 #11); the uniform-grid statement is in Section 6.3.
 
 % TODO (author review #33, 2026-09-26): the better-cropping item above
 % replaces the earlier TODO; check that it says what is intended.

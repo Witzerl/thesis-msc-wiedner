@@ -781,8 +781,8 @@ quarter of the original size.
      & width 5 & 83\,081 & 1 & 0.505 & --- & --- \\
      & width 9 & 267\,149 & 3.22 & 0.508 &
       $+0.004 \pm 0.013$ (1/5) & $+0.004 \pm 0.008$ (38/75) \\
-     & width 32 & 3\,354\,347 & 40.4 & 0.457 &
-      $-0.048 \pm 0.030$ (1/5) & $-0.045 \pm 0.011$ (17/75) \\
+     % width 32 (3,354,347, 40.4x) removed 2026-10-01 (author review v5 #4:
+     % no mention of the huge U-Net anywhere).
     \midrule
     FNO + $3{\times}3$ & width 2 & 13\,189 & 0.16 & 0.479 &
       $-0.019 \pm 0.018$ (2/5) & $-0.021 \pm 0.010$ (30/75) \\
@@ -814,8 +814,7 @@ Table~\ref{tab:experiments:capacity} gives the result. No width step raises
 any class above the floor on either instrument. The dilated-stencil graph
 network is flat from a quarter to four times its size (0.521, 0.526,
 0.518). The U-Net and the FNO with a local path do best at or near their
-original size. The widest U-Net, at about forty times the parameters, falls
-below its original size on both instruments ($-0.045$ per eye, 17/75).
+original size.
 Scaling down costs little: the graph network at 18\,219 parameters stays
 within 0.005 of the canonical configuration, and the T-FEN at width 48 is
 level with width 96.
