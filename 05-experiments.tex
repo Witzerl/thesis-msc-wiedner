@@ -686,7 +686,8 @@ In the second test, the single step was replaced by a classical
 fourth-order Runge--Kutta step (\S\ref{sec:method:family:rk}), which
 evaluates the operator four times within the interval and combines the
 results. In this setting the operator does not receive $\Delta t$ as an
-input; time enters only through the integrator, which steps over the
+input (the autonomous field of \S\ref{sec:method:family:rk}); time enters
+only through the integrator, which steps over the
 interval. Over the dilated-stencil network, the change-region Dice is 0.012
 lower than with the single step, on 4 of 5 folds; over the FNO it is 0.006
 higher. Both differences lie within the noise level, and the Runge--Kutta
@@ -1044,7 +1045,8 @@ settings the Dice spans 0.086, almost seven times the run-to-run noise
 (C2). The reason is structural. The operator receives $\Delta t$ as an
 input, so a smaller step also changes the input on which the operator is
 conditioned. There is no single vector field $g(u)$ to converge to: the
-canonical network is a one-step map conditioned on the length of the step.
+canonical network is a one-step map conditioned on the length of the step,
+a single jump in the sense of \S\ref{sec:method:family:rk}.
 
 The network trained inside the Runge--Kutta wrapper passes both criteria.
 Its Euler refinements change the Dice by $+0.018$ and then by $+0.004$
@@ -1061,10 +1063,12 @@ described as a continuous-time model: no statement about an ordinary
 differential equation, a learned rate of growth or learned dynamics is
 made for it. For the network trained inside the Runge--Kutta wrapper and
 for the energy-conserving T-FEN, a continuous-time reading is admissible,
-within the scope of one fold and one seed. Neither of them is more accurate
-than the canonical network at the one-year anchor
-(\S\ref{sec:experiments:ablations:time}, \S\ref{sec:experiments:main-results}).
-The continuous-time property can therefore be obtained on this task, but it
+within the scope of one fold and one seed. The network trained inside the
+Runge--Kutta wrapper is not more accurate than the canonical network
+(\S\ref{sec:experiments:ablations:time}). The T-FEN lies slightly above it,
+at the noise level (\S\ref{sec:experiments:main-results}), and owes this to
+its transport term (\S\ref{sec:experiments:ingredients:transport}), not to
+the continuous-time property. The continuous-time property can therefore be obtained on this task, but it
 does not decide the accuracy.
 % Sources: SOLVER_FINAL_RUNS section 9.17 (graph networks, fold 2,
 % 2026-09-17) and section 9.19b (skew T-FEN, fold 0, 2026-10-01). The

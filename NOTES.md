@@ -873,7 +873,7 @@ Being worked through one item at a time.
   first version (layer encoder) tried only at four widths on one backbone, null (inline TODO).
 - [ ] TODO (from #12): §6.3 — covariates are enabled but their value is unsettled; the
   ablation (k-NN, mean+max era) is not reported in Ch. 5 (inline TODO in 06-discussion.tex).
-- [ ] TODO (author, 2026-09-30): **explain the RK4 setting much more plainly** in §4.3.7,
+- [x] (done 2026-10-01: 4.3.7 rewritten; 5.4.1 / 5.5.1 aligned) TODO (author, 2026-09-30): **explain the RK4 setting much more plainly** in §4.3.7,
   §5.4.1 and §5.5.1 (inline TODO in §4.3.7 lists what to cover: Euler vs RK4, "autonomous"
   = Δt input zeroed, why the wrapper exists — FEN integrator, integration-order null,
   continuous-time question — and jump model vs continuous-time model). Decide the fate of

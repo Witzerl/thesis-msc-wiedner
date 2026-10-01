@@ -177,7 +177,7 @@ tab:appendix:border-interior, Huang1991 in the bib); build clean:
     70 of 75 eyes"), one noise level "about 0.02" instead of 0.036/0.016/0.020, SE / t /
     LOFO in an Appendix E table, 5.1.4 cut to ~1/2 page. Do it AFTER the runs above, so each
     number is rewritten once.
-[x] (4.3.7 rewritten 2026-10-01; 5.4.1 / 5.5.1 wording check still open) 4.3.7: explain the RK4 setting plainly (Euler vs RK4; "autonomous" = Delta t input set
+[x] (4.3.7 rewritten 2026-10-01; 5.4.1 / 5.5.1 aligned, T-FEN accuracy statement in 5.5.1 corrected) 4.3.7: explain the RK4 setting plainly (Euler vs RK4; "autonomous" = Delta t input set
     to zero, the update is not zero; why the wrapper exists: FEN integrator,
     integration-order test, continuous-time question). Inline TODO at 4.3.7.
 [x] (done 2026-10-01: table tab:experiments:mai-bins, stencil / U-Net / T-FEN vs Mai, caveats) 5.5.1 (Mai comparison): compare growth-region Dice per horizon bin with Mai Table 2
