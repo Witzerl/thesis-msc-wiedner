@@ -1097,6 +1097,16 @@ English abstract, Ch. 1-7 and App. A-G were reviewed; the German Kurzfassung was
   the Table 5.4 caption "in both step and order" (with "by step or by order" the RK4 network's
   Euler one-step setting, -0.020, would fail it); 5d.23 §5.6.1 Pearson r no longer said to check
   scale. Build clean, all nine passages verified in the PDF text.
+- [x] 2026-10-02: three more fix-first items closed: §2.1.5 "not auxiliary context" -> "carry
+  information on the growth rate" (no clash with "auxiliary targets" in §3.2/§4.5.1 any more);
+  §2.1.1 pointer to §1.2 -> §1.1; "arm" defined in §4.1 ("Each setting of the slot is referred to
+  below as an arm of the comparison."). §3.7 "revisited in §5.1" was already gone (c6b9d48).
+  Still open from this list: the Fig. 2.2 caption mapping strata onto the ten channels (figure is
+  a placeholder), "canonical" with several meanings, "canonical fold" undefined.
+- [ ] Status of all 544 review items on 2026-10-02 (quoted text checked against the current
+  sources): 465 unchanged (240 medium, 225 low), 49 partly changed, 28 gone, 2 fixed by the
+  comment fix. All 15 high items are closed. Of the 465 open ones, 128 are flow items (83
+  medium), the rest clarity and tone polish.
 - [ ] Contradictions and dead pointers found (review S4, S5, S9, S22): §1.2 promises the
   covariates are "tested in this thesis" (the test is commented out, §6.3 says unsettled);
   layer channels "not auxiliary" (§2.1.5) vs "auxiliary targets" (§3.2, §4.2.2, §4.5.1); the Fig.

@@ -22,7 +22,8 @@ handling, time representation or optimisation would be confounded with
 the architectural differences under test. A single pipeline is therefore
 fixed, and it provides one swappable slot for the update operator
 $f_\theta$. The operator placed in this slot is the only component that
-changes between experiments.
+changes between experiments. Each setting of the slot is referred to
+below as an \emph{arm} of the comparison.
 
 Everything outside the slot is held fixed. The input is the eleven-channel
 state on the $49 \times 1024$ grid of Chapter~\ref{ch:data}. Time is
