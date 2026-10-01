@@ -1184,9 +1184,10 @@ in~\S\ref{sec:experiments:protocol}.
 \label{sec:method:implementation}
 
 The framework is implemented in Python with PyTorch 2.4.1 and CUDA 12.1
-\citep{Paszke2019}. The graph operators use PyTorch Geometric
+\citep{Paszke2019}. The graph operators use PyTorch Geometric 2.6.1
 \citep{Fey2019}.
-% TODO: record the PyTorch Geometric version from the container.
+% Versions read from the cluster container
+% pytorch-2.4.1-cu121-cudnn9-runtime.sif on 2026-10-01 (2.4.1+cu121, 2.6.1).
 All dependencies are pinned in a fixed container image. Every reported run
 was trained on a single NVIDIA RTX A6000 GPU on a cluster managed by
 Slurm, and the five folds of an experiment are submitted together as a job

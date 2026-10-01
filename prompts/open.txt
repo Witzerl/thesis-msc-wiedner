@@ -344,7 +344,7 @@ tab:appendix:border-interior, Huang1991 in the bib); build clean:
     only for a budget B > 0 (for B = 0 the first-interval condition could never hold);
     inline TODO 04-method l. ~1111. Code reading only (utils/utils.py,
     compute_time_table / min_budget_days).
-[ ] [s27] 4.6: record the PyTorch Geometric version of the container (inline TODO
+[x] (done 2026-10-01: 2.6.1, read from the container) [s27] 4.6: record the PyTorch Geometric version of the container (inline TODO
     04-method l. ~1202).
 [ ] [ce6] 6.2 quotes the canonical model's growth-region Dice beyond one year as "about
     0.60 to 0.66" (= 0.600 / 0.634 / 0.655 from 5.3.4, SOLVER_FINAL_RUNS 9.19a); covered
@@ -536,7 +536,7 @@ No run needed:
   [ ] Figure 4.1 pipeline (section 2); Figure 4.2 stencils and Figure 5.1 rollout strip are
       already listed in section 2
   [x] 4.5.2: B > 0 feasibility restriction -- code check (section 3)
-  [ ] 4.6: PyTorch Geometric version (section 3)
+  [x] 4.6: PyTorch Geometric version (section 3)
   [ ] THESIS_STRUCTURE.md + CLAUDE.md out of date against the text (section 2)
   [ ] Mirror corrections to carry into the next re-mirror (section 4)
 

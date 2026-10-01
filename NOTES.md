@@ -483,7 +483,7 @@ be longer, since it supplies two arms and the floors).
   reported in Chapter 5; if not, the text stays "off in every reported run".
 - [x] (confirmed 2026-10-01, utils/utils.py _rebuild_valid_t0s) TODO (§4.5.2 inline): confirm in the code that the feasible-window restriction applies only
   for B > 0 (for B = 0 the first-interval condition could never hold).
-- [ ] TODO (§4.6 inline): record the PyTorch Geometric version of the container.
+- [x] (2026-10-01: 2.6.1, PyTorch 2.4.1+cu121, read from the .sif) TODO (§4.6 inline): record the PyTorch Geometric version of the container.
 - [x] (added to references.bib and cited 2026-10-01) Pending external citations from §4.5-§4.6: **Milletari2016**, **Loshchilov2019**,
   **Paszke2019** (PyTorch, NeurIPS 2019, arXiv:1912.01703), **Fey2019** (PyTorch Geometric,
   ICLR 2019 RLGM workshop, arXiv:1903.02428); each has a `% TODO: cite` marker.
