@@ -1207,7 +1207,9 @@ worked through one item at a time.
   2026-10-02 (the covariate ablation is commented out; §6.3 calls their value unsettled).
 - [x] Abstract (EN/DE): growth-speed sentence (r 0.40) removed at the author's request
   (2026-10-02); the author accepts the abstract as it now stands.
-- [ ] #6 §1.3 "organised around a single question" -- "a single" circled, "?".
+- [x] #6 §1.3 "organised around a single question" -- "a single" circled, "?". Now "This thesis
+  addresses one question, divided into two parts:" (2026-10-02, author chose option A; matches
+  Ch. 7 "It was split into two parts").
 - [ ] #7 §2.2.2 "which holds the rate constant over the step" -- "is this not why we have a
   linear line, [?] speed?" (reading uncertain).
 - [ ] #8 end of §2.2.3 -- "few sentences! what does understanding these yield / is this
