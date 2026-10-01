@@ -915,8 +915,8 @@ through one item at a time.
   Table 5.1), reach +0.064 at equal parameters (5/5), transport +0.062 (same-width
   control), FNO below U-Net and the 3 x 3 path bringing it level, capacity 1/4x-4x and
   RK4 nulls, growth-rate r 0.40 without the Mai comparison.
-- [ ] Abstract length: English ~470 words fits one page; the German Kurzfassung now runs
-  onto a second page (pp. iii-iv). Decide whether to shorten.
+- [x] (author 2026-10-01: "it's fine", keep as is) Abstract length: English ~470 words fits one page; the German Kurzfassung now runs
+  onto a second page (pp. iii-iv).
 - [ ] TODO (abstract inline): T-FEN value and the ordering of the three strongest
   operators after the seed-7 skew T-FEN run.
 - [x] #3 §6.1 "which scores zero on the headline metric (Table 5.1)" removed.
