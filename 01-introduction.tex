@@ -132,11 +132,10 @@ periphery than towards the fovea, peak progression rate occurs at
 approximately one millimetre from the foveal centre when the lesion grows
 foveally, and complement inhibition has a spatially asymmetric treatment
 effect \citep{Singh2025}. The forward operator that maps the present state
-to the future state therefore has both \emph{local} and
-\emph{spatially adaptive} character --- two inductive biases that classical
-finite-difference and finite-volume PDE solvers exploit explicitly through
-local stencils and adaptive meshes, and that generic dense convolutional
-predictors must learn implicitly from data.
+to the future state is therefore \emph{local}, but its reach must match
+the distance the front moves between two visits, which differs between
+directions --- properties that classical solvers build in explicitly
+through the size and shape of their stencils.
 
 Neural PDE solvers turn these classical ideas into learned models.
 Instead of discretising a known equation, they learn from data an operator

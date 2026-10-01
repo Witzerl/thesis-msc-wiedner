@@ -281,7 +281,7 @@ tab:appendix:border-interior, Huang1991 in the bib); build clean:
 [ ] [s25] THESIS_STRUCTURE.md 2.2 entry stale (method of lines, no FEM) -- together with the
     [s27] THESIS_STRUCTURE/CLAUDE.md update above.
 
-[ ] [r25] 1.3 second paragraph still sets up the moving mesh: "both local and spatially
+[x] (done 2026-10-01: rewritten around locality and reach) [r25] 1.3 second paragraph still sets up the moving mesh: "both local and spatially
     adaptive character -- two inductive biases that classical ... PDE solvers exploit
     explicitly through local stencils and adaptive meshes" (01-introduction l. ~134-139).
     Mesh adaptation is Appendix G now; reword around locality / reach (or point to
@@ -663,7 +663,7 @@ Still open (checked against the current .tex on 2026-10-01):
   [x] 2.1.2 "cRORA endpoint, as channel 0" -- factual, small reword (section 2)
   [x] 3.1 FAF origin of the mask as a dataset fact (section 2)
   [x] 2.1.5 provenance TODO comment: keep only the layer part (section 2)
-  [ ] 1.3 "spatially adaptive ... adaptive meshes" (section 2)
+  [x] 1.3 "spatially adaptive ... adaptive meshes" (section 2)
   [x] (done 2026-10-01, decisions a-g) Provenance sentence (clinical partner) -> 1.4 or start of Ch. 4 (section 2)
   [x] (done 2026-10-01, decisions a-g) 1.4 Contributions keep / rewrite / remove (= [ce6] item, section 2)
   [ ] Shortening pass on Ch. 1-2 (section 2)
