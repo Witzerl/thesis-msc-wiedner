@@ -40,3 +40,8 @@ pdfs/
 # NOTES.md
 # PROJECT_CONTEXT.md
 # THESIS_STRUCTURE.md
+
+# figure previews and derived data caches (images/scripts/_common.py)
+images/_preview/
+images/data/
+images/scripts/__pycache__/

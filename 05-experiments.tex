@@ -441,10 +441,18 @@ $\pm 42$ columns) reach along the rows are worse by more than the paired
 floor, so the default of $\pm 21$ columns, about 0.12\,mm, is a measured
 optimum on this axis. It lies close to the 90th percentile of the
 per-visit front advance, 23 columns (\S\ref{sec:method:graph}). The
-geometry reaching $\pm 35$ columns with an unchanged number of neighbours
-is also lower, but under the floor; it shows that the penalty at
-$\pm 42$ columns is not a matter of neighbour density alone. Widening the
+$\pm 42$ geometry keeps the 20 neighbours of the default by doubling the
+column spacing from 7 to 14, so its neighbours are sparser. The geometry
+reaching $\pm 35$ columns keeps the default spacing of 7 columns instead,
+with 32 neighbours; it is also lower, but under the floor. A longer reach
+therefore does not help even when the spacing is kept, so the penalty at
+$\pm 42$ columns is not a matter of sparser neighbours alone. Widening the
 stencil across rows, to $\pm 2$ rows, costs the most of all geometries.
+% Corrected 2026-10-01: the text and table said "same number of neighbours"
+% for the +/-35 geometry. Per baselines/anisognn.py, ANISOGNN_final_meant5 is
+% pitch 7, taps 5 (columns 0, +/-7..+/-35; 32 neighbours) and
+% ANISOGNN_final_meanp14 is pitch 14, taps 3 (columns 0, +/-14, +/-28,
+% +/-42; 20 neighbours); rows +/-2 (meanr2) has 34 neighbours.
 
 \begin{table}[t]
   \centering
@@ -461,11 +469,11 @@ stencil across rows, to $\pm 2$ rows, costs the most of all geometries.
     \toprule
     Geometry & $\Delta$ vs.\ default & Folds \\
     \midrule
-    Columns up to $\pm 12$ & $-0.019 \pm 0.008$ & 1/5 \\
-    Columns up to $\pm 35$, same number of neighbours & $-0.010 \pm 0.003$ &
+    Columns up to $\pm 12$ (spacing 4, 20 neighbours) & $-0.019 \pm 0.008$ & 1/5 \\
+    Columns up to $\pm 35$ (spacing 7, 32 neighbours) & $-0.010 \pm 0.003$ &
       1/5 \\
-    Columns up to $\pm 42$ & $-0.026 \pm 0.004$ & 0/5 \\
-    Rows $\pm 2$ & $-0.039 \pm 0.005$ & 0/5 \\
+    Columns up to $\pm 42$ (spacing 14, 20 neighbours) & $-0.026 \pm 0.004$ & 0/5 \\
+    Rows $\pm 2$ (34 neighbours) & $-0.039 \pm 0.005$ & 0/5 \\
     \bottomrule
   \end{tabular}
 \end{table}
