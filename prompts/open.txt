@@ -182,7 +182,8 @@ tab:appendix:border-interior, Huang1991 in the bib); build clean:
     integration-order test, continuous-time question). Inline TODO at 4.3.7.
 [x] (done 2026-10-01: table tab:experiments:mai-bins, stencil / U-Net / T-FEN vs Mai, caveats) 5.5.1 (Mai comparison): compare growth-region Dice per horizon bin with Mai Table 2
     (0.25 / 0.38 / 0.38 / 0.37); the old note "our growth-region Dice is higher" is
-    unverified. Optional: appendix table of r / AUC for all arms (values in NOTES).
+    unverified. Appendix table of r / AUC for all arms: DONE 2026-10-01
+    (tab:appendix:growth-speed).
 [ ] Check Chapters 5-6 for metrics mentioned without a plain description (author rule).
 [ ] Appendix E: seed-7 table + full statistics per comparison. Data now complete for every
     seed-7 arm (2026-10-01; values in SOLVER_FINAL_RUNS 9.21 + 9.22 and NOTES "Batch readout").

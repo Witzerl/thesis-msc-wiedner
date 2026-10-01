@@ -75,6 +75,51 @@
 % FEN_final_w96Frk4d45, MPPDE_final_aggrmean, MPPDE_final_l1mean; one row per
 % fold, none superseded; computed 2026-10-01.
 
+\section{Growth-Speed Measures for All Arms}
+\label{app:full-results:growth-speed}
+
+\begin{table}[h]
+  \centering
+  \caption[Growth-speed measures for all arms.]{%
+    Eye-level growth-speed measures for every arm of
+    Table~\ref{tab:experiments:arms}, computed as for the canonical model in
+    \S\ref{sec:experiments:qualitative:mai}: growth rate on the square-root
+    area scale over each eye's whole follow-up, predicted rate averaged over
+    the late epochs, 75 validation eyes of the five folds pooled, seed 42.
+    The AUC separates the top 10, 15 and 20\,\% of true growth rates (8, 11
+    and 15 eyes) from the rest. Only point estimates are given; the 95\,\%
+    bootstrap intervals are about $\pm 0.2$ wide for every arm (see
+    Table~\ref{tab:experiments:mai} for the canonical model), so the arms
+    cannot be told apart on these measures.}
+  \label{tab:appendix:growth-speed}
+  \small
+  \begin{tabular}{l c c c c}
+    \toprule
+    Arm & Pearson $r$ & AUC 10\,\% & AUC 15\,\% & AUC 20\,\% \\
+    \midrule
+    T-FEN                            & 0.40 & 0.72 & 0.70 & 0.74 \\
+    Dilated-stencil GNN              & 0.40 & 0.74 & 0.70 & 0.70 \\
+    Dilated-stencil GNN + RK4        & 0.30 & 0.74 & 0.68 & 0.69 \\
+    U-Net (width 5)                  & 0.43 & 0.68 & 0.69 & 0.76 \\
+    FNO + $3 \times 3$ local path    & 0.33 & 0.75 & 0.77 & 0.78 \\
+    FNO + RK4                        & 0.31 & 0.78 & 0.74 & 0.72 \\
+    FNO                              & 0.33 & 0.72 & 0.67 & 0.70 \\
+    FEN, free-form only              & 0.39 & 0.66 & 0.70 & 0.72 \\
+    $k$-NN GNN                       & 0.41 & 0.74 & 0.74 & 0.73 \\
+    $k$-NN GNN, $k = 20$             & 0.41 & 0.74 & 0.74 & 0.73 \\
+    One-hop floor                    & 0.47 & 0.76 & 0.71 & 0.71 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+% Computed 2026-10-01 from mai/epoch_*.json (per_eye: growth_rate_pred /
+% growth_rate_true, epochs 10-29) of FEN_final_w96ftp7rk4d45skew,
+% ANISOGNN_final_dilmean, ANISOGNN_final_oderk4n1, UNET_final_w5,
+% FNO_final_w5k3, FNO_final_w5rk4, FNO_final_w5, FEN_final_w96Frk4d45,
+% MPPDE_final_aggrmean, MPPDE_final_k20, MPPDE_final_l1mean (folds 0-4).
+% Positives: the top round(q * 75) eyes by true rate. Reproduces the point
+% estimates of the canonical row of tab:experiments:mai exactly. Script:
+% scratchpad growth_rates.py (session 2026-10-01); not stored in the repo.
+
 
 \cleardoubleoddpage
 \chapter{Code Structure}

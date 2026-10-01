@@ -831,7 +831,8 @@ Being worked through one item at a time.
     r 0.40 [0.22, 0.56] (Mai 0.61); AUC top 10 % 0.74 [0.52, 0.91] (8 eyes, Mai 0.81); top
     15 % 0.70 [0.53, 0.86] (11, Mai 0.79); top 20 % 0.70 [0.53, 0.84] (15, Mai 0.77).
     Baseline √area alone r −0.10. Mean follow-up 3.3 y (median 3.0, 2.0–5.9); Mai 32 months.
-  - All arms (r; AUC10; AUC20): stencil 0.40/0.74/0.70, U-Net 0.43/0.68/0.76, T-FEN
+  - (Superseded 2026-10-01 by Appendix E tab:appendix:growth-speed, skew T-FEN r 0.40, RK4 arms
+    0.30 / 0.31 -> range 0.30-0.47.) All arms (r; AUC10; AUC20): stencil 0.40/0.74/0.70, U-Net 0.43/0.68/0.76, T-FEN
     0.32/0.70/0.67, FNO+3×3 0.33/0.75/0.78, FNO 0.33/0.72/0.70, k-NN mean 0.41/0.74/0.73,
     one-hop 0.47/0.76/0.71 — all intervals overlap; the arms do not differ on these measures.
   - The per-fold r/AUC logged by the code (16 eyes, 2 positives) are not usable; only the
