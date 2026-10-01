@@ -1186,8 +1186,16 @@ worked through one item at a time.
 - [x] #1 title page keywords: MP-PDE, MM-PDE and moving mesh removed, U-Net added
   (2026-10-02). Now: Geographic Atrophy, OCT, neural PDE solvers, graph neural networks, U-Net,
   medical imaging, longitudinal prediction.
-- [ ] #2-#4 abstract: "Only the operator f_θ varies … matched parameter counts" marked
+- [x] #2-#4 abstract: "Only the operator f_θ varies … matched parameter counts" marked
   "different"; bar along the results paragraph; "This whole thing reads terribly ?!".
+  Done 2026-10-02 (English and German): the slot sentence now starts from the slot ("It was
+  filled in turn, at matched parameter counts, with operators from four families: …"); the
+  results paragraph is split into a framework paragraph (spatial context needed, per-pixel
+  model = persistence, loss must emphasise the mask, RK4 and model size no gain) and an
+  operator paragraph (three strongest from three families; reach explained by the 21:1
+  spacing, ±0.011 mm k-NN hop vs ~0.07 mm front advance; stencil +0.064; transport +0.062;
+  the two carrying these properties are the two highest). Dropped: the spectral / local-path
+  sentence, "the largest effect", "the same deficit". English fits on one page again.
 - [ ] #5 §1.2 "and is tested in this thesis" (covariates) -- "is it though".
 - [ ] #6 §1.3 "organised around a single question" -- "a single" circled, "?".
 - [ ] #7 §2.2.2 "which holds the rate constant over the step" -- "is this not why we have a

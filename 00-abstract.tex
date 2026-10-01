@@ -11,6 +11,13 @@
 % 2026-10-01: author decisions (a)-(c) applied (prompts/open.txt section 2):
 % headline scoped (T-FEN above U-Net at both seeds, slightly above the
 % stencil), global + local demoted to a one-seed observation, objective added.
+% 2026-10-02 (author review v6 #2-#4): slot sentence starts from the slot,
+% not the model list; results split into a framework paragraph and an
+% operator paragraph (reach explained by the 21:1 spacing and the front
+% advance, median ~12 columns ~ 0.07 mm per visit; k-NN one hop +-0.011 mm
+% along a row, Fig. 4.2); spectral / local-path sentence dropped. "Plain
+% mean squared error" = ANISOGNN_final_dilmean_plainmse (no mask weighting
+% and no soft-Dice), Section 5.4.2.
 
 \cleardoubleoddpage%  Make sure to start abstract on a new odd page
 \begin{abstract*}
@@ -29,39 +36,41 @@ $u + \Delta t\, f_\theta(u, \Delta t)$, conditioned on the time elapsed
 between visits. A zero-initialised output starts every operator at exact
 persistence, and all operators are trained with one pushforward curriculum
 measured in elapsed days and one loss. Only the operator $f_\theta$
-varies. Message-passing graph networks on two neighbourhood graphs, a
-U-Net, Fourier Neural Operators with and without a local path, and Finite
-Element Networks with and without a learned transport term were placed in
-this slot at matched parameter counts. They were compared by five-fold
-cross-validation on 75 eyes of 51 patients from the Medical University of
-Vienna, using the Dice of the changed region at one year.
+changes between experiments. It was filled in turn, at matched parameter
+counts, with operators from four families: message-passing graph networks
+on two neighbourhood graphs, a U-Net, Fourier Neural Operators with and
+without a local path, and Finite Element Networks with and without a
+learned transport term. They were compared by five-fold cross-validation
+on 75 eyes of 51 patients from the Medical University of Vienna, using
+the change-region Dice at one year.
 
-The framework served every operator without change, provided its loss
-weighted the lesion mask: without that weighting no change was learned, and
-a soft-Dice term added about 0.05. The three strongest operators come from
-three unrelated classes (a Finite Element Network, a graph network and a
-U-Net) and reach a change-region Dice of $0.54 \pm 0.04$, $0.53 \pm 0.05$
-and $0.50 \pm 0.06$ (mean $\pm$ standard deviation over the five folds),
-against zero for a model that predicts no change. The Finite Element
-Network lies above the U-Net at two seeds and only slightly above the
-graph network. The differences between operators trace back to a few
-properties, each measured on its own. The largest is physical reach.
-Replacing the index-space neighbour graph by a dilated stencil that
-reaches about 0.12\,mm, roughly as far as the lesion front moves between
-visits, raises the Dice by 0.064 at an identical parameter count, on all
-five folds. A learned transport term raises it by 0.062 over the same
-network without one, a second route to the same deficit; these two are
-the two highest operators. A purely spectral operator stays below the
-U-Net; adding a local path closed the gap at one seed only. Neither
-scaling the operators from about a quarter to four times their size nor
-replacing the single Euler step by fourth-order Runge--Kutta integration
-improved accuracy.
+Every operator with spatial context learned to forecast change; a
+per-pixel model without it reproduced persistence exactly. The loss has
+to emphasise the lesion mask: trained with a plain mean squared error,
+the model learned no change at all, and a soft-Dice term added about
+0.05. Neither fourth-order Runge--Kutta integration in place of a single
+Euler step nor scaling the operators from about a quarter to four times
+their size improved the forecast.
 
-The growth rate of an individual eye over its whole follow-up is predicted
-less well than where the lesion changes, with a correlation of 0.40 with
-the true rates. For forecasts of this kind, the decisive design question
-is how far one update reaches compared with how far the disease moves
-between visits, not which family the operator belongs to.
+The three strongest operators come from three different families, a
+Finite Element Network, a graph network and a U-Net, and reach a
+change-region Dice of $0.54 \pm 0.04$, $0.53 \pm 0.05$ and
+$0.50 \pm 0.06$ (mean $\pm$ standard deviation over five folds; zero for
+persistence). What separates the operators is how far one update
+reaches. The pixel spacing across B-scans is about 21 times larger than
+along them, so a neighbourhood graph built on pixel indices reaches only
+about 0.01\,mm along a B-scan per step, while the lesion front moves
+about 0.07\,mm between visits. A dilated stencil that reaches about
+0.12\,mm in both directions raises the Dice by 0.064 at an identical
+parameter count, on all five folds. A learned transport term in the
+Finite Element Network makes up for the same shortfall by a different
+mechanism (+0.062 over the same network without it). The two operators
+that carry these properties are the two highest.
+
+The growth rate of an eye over its whole follow-up is predicted less well
+than where the lesion changes (correlation 0.40 with the true rates). For
+such forecasts, what matters is how far one update reaches compared with
+how far the disease moves between visits, not the family of the operator.
 \end{abstract*}
 
 %%
@@ -94,44 +103,46 @@ Kontrollen verstrichenen Zeit abhängt. Eine mit null initialisierte
 Ausgabe lässt jeden Operator bei exakter Persistenz beginnen, und alle
 Operatoren werden mit einem in verstrichenen Tagen bemessenen
 Pushforward-Curriculum und einer gemeinsamen Verlustfunktion trainiert.
-Variiert wird nur der Operator $f_\theta$. Message-Passing-Graph-Netzwerke
-auf zwei Nachbarschaftsgraphen, ein U-Net, Fourier Neural Operators mit
-und ohne lokalen Pfad sowie Finite-Elemente-Netzwerke mit und ohne
-gelernten Transportterm wurden bei abgeglichener Parameterzahl in diesen
-Platz eingesetzt. Verglichen wurden sie mit fünffacher Kreuzvalidierung an
+Zwischen den Experimenten ändert sich nur der Operator $f_\theta$. Er
+wurde nacheinander, bei abgeglichener Parameterzahl, mit Operatoren aus
+vier Familien besetzt: Message-Passing-Graph-Netzwerken auf zwei
+Nachbarschaftsgraphen, einem U-Net, Fourier Neural Operators mit und ohne
+lokalen Pfad sowie Finite-Elemente-Netzwerken mit und ohne gelernten
+Transportterm. Verglichen wurden sie mit fünffacher Kreuzvalidierung an
 75 Augen von 51 Patienten der Medizinischen Universität Wien, anhand des
-Dice-Koeffizienten der veränderten Region nach einem Jahr.
+Dice-Koeffizienten der veränderten Region (Change-Region-Dice) nach einem
+Jahr.
 
-Der Rahmen diente jedem Operator ohne Änderung, sofern seine
-Verlustfunktion die Läsionsmaske gewichtete: Ohne diese Gewichtung wurde
-keine Veränderung gelernt, und ein Soft-Dice-Term brachte etwa 0,05. Die
-drei stärksten Operatoren stammen aus drei unabhängigen Klassen (ein
-Finite-Elemente-Netzwerk, ein Graph-Netzwerk und ein U-Net) und erreichen
+Jeder Operator mit räumlichem Kontext lernte, Veränderung vorherzusagen;
+ein Modell, das jedes Pixel für sich betrachtet, reproduzierte exakt die
+Persistenz. Die Verlustfunktion muss die Läsionsmaske betonen: Mit einem
+einfachen mittleren quadratischen Fehler trainiert, lernte das Modell
+keinerlei Veränderung, und ein Soft-Dice-Term brachte etwa 0,05. Weder eine
+Runge--Kutta-Integration vierter Ordnung anstelle eines einzelnen
+Euler-Schritts noch die Skalierung der Operatoren von etwa einem Viertel
+bis zum Vierfachen ihrer Größe verbesserte die Vorhersage.
+
+Die drei stärksten Operatoren stammen aus drei verschiedenen Familien, ein
+Finite-Elemente-Netzwerk, ein Graph-Netzwerk und ein U-Net, und erreichen
 einen Change-Region-Dice von $0{,}54 \pm 0{,}04$, $0{,}53 \pm 0{,}05$ und
-$0{,}50 \pm 0{,}06$ (Mittelwert $\pm$ Standardabweichung über die fünf
-Folds), gegenüber null für ein Modell, das keine Veränderung vorhersagt.
-Das Finite-Elemente-Netzwerk liegt bei zwei Seeds über dem U-Net und nur
-knapp über dem Graph-Netzwerk. Die Unterschiede zwischen den Operatoren
-gehen auf wenige Eigenschaften zurück, die jeweils einzeln gemessen
-wurden. Die größte ist die physikalische Reichweite. Wird der
-Nachbarschaftsgraph im Indexraum durch einen gedehnten Stencil ersetzt,
-der etwa 0,12\,mm weit reicht, also ungefähr so weit, wie sich die
-Läsionsgrenze zwischen zwei Kontrollen bewegt, steigt der Dice bei
-identischer Parameterzahl um 0,064, auf allen fünf Folds. Ein gelernter
-Transportterm hebt ihn um 0,062 gegenüber demselben Netzwerk ohne diesen
-Term, ein zweiter Weg zum selben Defizit; diese beiden sind die zwei
-stärksten Operatoren. Ein rein spektraler Operator bleibt unter dem U-Net;
-ein zusätzlicher lokaler Pfad schloss die Lücke nur bei einem Seed. Weder die Skalierung der
-Operatoren von etwa einem Viertel bis zum Vierfachen ihrer Größe noch der
-Ersatz des einzelnen Euler-Schritts durch eine Runge--Kutta-Integration
-vierter Ordnung verbesserte die Genauigkeit.
+$0{,}50 \pm 0{,}06$ (Mittelwert $\pm$ Standardabweichung über fünf Folds;
+null für Persistenz). Was die Operatoren unterscheidet, ist, wie weit ein
+einzelnes Update reicht. Der Pixelabstand quer zu den B-Scans ist etwa
+21-mal größer als entlang der B-Scans, daher reicht ein auf Pixelindizes
+gebauter Nachbarschaftsgraph pro Schritt entlang eines B-Scans nur etwa
+0,01\,mm weit, während sich die Läsionsgrenze zwischen zwei Kontrollen um
+etwa 0,07\,mm bewegt. Ein gedehnter Stencil, der in beide Richtungen etwa
+0,12\,mm weit reicht, hebt den Dice bei identischer Parameterzahl um
+0,064, auf allen fünf Folds. Ein gelernter Transportterm im
+Finite-Elemente-Netzwerk gleicht dasselbe Defizit über einen anderen
+Mechanismus aus (+0,062 gegenüber demselben Netzwerk ohne diesen Term).
+Die beiden Operatoren mit diesen Eigenschaften sind die zwei stärksten.
 
-Die Wachstumsrate eines einzelnen Auges über die gesamte Beobachtungszeit
-wird schlechter vorhergesagt als der Ort der Veränderung; die Korrelation
-mit den tatsächlichen Raten beträgt 0,40. Für Vorhersagen dieser Art ist
-die entscheidende Entwurfsfrage, wie weit ein einzelnes Update reicht im
-Vergleich dazu, wie weit sich die Erkrankung zwischen zwei Kontrollen
-bewegt, und nicht, zu welcher Familie der Operator gehört.
+Die Wachstumsrate eines Auges über die gesamte Beobachtungszeit wird
+schlechter vorhergesagt als der Ort der Veränderung (Korrelation 0,40 mit
+den tatsächlichen Raten). Für solche Vorhersagen zählt, wie weit ein
+einzelnes Update reicht im Vergleich dazu, wie weit sich die Erkrankung
+zwischen zwei Kontrollen bewegt, und nicht die Familie des Operators.
 \end{abstract*}
 \end{otherlanguage}
 
