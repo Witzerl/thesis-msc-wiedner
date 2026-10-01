@@ -120,6 +120,77 @@
 % estimates of the canonical row of tab:experiments:mai exactly. Script:
 % scratchpad growth_rates.py (session 2026-10-01); not stored in the repo.
 
+\section{Both Seeds for the Main Comparisons}
+\label{app:full-results:seeds}
+
+\begin{table}[h]
+  \centering
+  \caption[Main comparisons at both seeds, with both instruments.]{%
+    The main comparisons of Chapter~\ref{ch:experiments} at seed 42 and at
+    the replication seed 7. Fold-paired: mean $\pm$ SE of the differences of
+    the late-epoch change-region Dice over the five folds, with the number
+    of folds on which the first arm is higher. Per eye: mean $\pm$ SE of the
+    differences of the growth-region Dice at each eye's first rollout step
+    past 0.95 years, with the number of eyes on which the first arm is
+    higher and the $t$ value (\S\ref{sec:experiments:protocol:stats}).
+    $^{a}$At seed 42 the matched control (width 139) did not train on
+    fold 4, so that row covers folds 0 to 3 (63 eyes).}
+  \label{tab:appendix:seeds}
+  \footnotesize
+  \begin{tabular}{l c l l}
+    \toprule
+    Comparison & Seed & Fold-paired & Per eye \\
+    \midrule
+    \multicolumn{4}{l}{\textbf{Reach: dilated stencil $-$ $k$-NN}} \\
+    & 42 & $+0.0635 \pm 0.0106$ (5/5) & $+0.0647 \pm 0.0062$ (70/75, 10.4) \\
+    & 7  & $+0.0629 \pm 0.0131$ (5/5) & $+0.0620 \pm 0.0071$ (66/75, 8.7) \\
+    & \multicolumn{3}{l}{\emph{Reading:} established} \\[2pt]
+    \multicolumn{4}{l}{\textbf{U-Net $-$ $k$-NN}} \\
+    & 42 & $+0.0423 \pm 0.0246$ (4/5) & $+0.0399 \pm 0.0102$ (53/75, 3.9) \\
+    & 7  & $+0.0548 \pm 0.0181$ (5/5) & $+0.0517 \pm 0.0109$ (59/75, 4.7) \\
+    & \multicolumn{3}{l}{\emph{Reading:} established} \\[2pt]
+    \multicolumn{4}{l}{\textbf{T-FEN $-$ U-Net}} \\
+    & 42 & $+0.0383 \pm 0.0134$ (5/5) & $+0.0383 \pm 0.0075$ (51/75, 5.1) \\
+    & 7  & $+0.0246 \pm 0.0073$ (5/5) & $+0.0255 \pm 0.0074$ (52/75, 3.4) \\
+    & \multicolumn{3}{l}{\emph{Reading:} T-FEN higher} \\[2pt]
+    \multicolumn{4}{l}{\textbf{T-FEN $-$ dilated stencil}} \\
+    & 42 & $+0.0170 \pm 0.0085$ (4/5) & $+0.0136 \pm 0.0062$ (46/75, 2.2) \\
+    & 7  & $+0.0165 \pm 0.0021$ (5/5) & $+0.0152 \pm 0.0048$ (49/75, 3.1) \\
+    & \multicolumn{3}{l}{\emph{Reading:} small lead, noise level} \\[2pt]
+    \multicolumn{4}{l}{\textbf{Dilated stencil $-$ U-Net}} \\
+    & 42 & $+0.0212 \pm 0.0172$ (3/5) & $+0.0248 \pm 0.0081$ (50/75, 3.1) \\
+    & 7  & $+0.0081 \pm 0.0084$ (3/5) & $+0.0103 \pm 0.0074$ (42/75, 1.4) \\
+    & \multicolumn{3}{l}{\emph{Reading:} tie} \\[2pt]
+    \multicolumn{4}{l}{\textbf{Transport: T-FEN $-$ free-form, same width}} \\
+    & 42 & $+0.0618 \pm 0.0040$ (5/5) & $+0.0640 \pm 0.0058$ (68/75, 11.0) \\
+    & 7  & $+0.0897 \pm 0.0142$ (5/5) & $+0.0878 \pm 0.0071$ (71/75, 12.4) \\
+    & \multicolumn{3}{l}{\emph{Reading:} established} \\[2pt]
+    \multicolumn{4}{l}{\textbf{Transport: T-FEN $-$ free-form, matched$^{a}$}} \\
+    & 42 & $+0.0716 \pm 0.0094$ (4/4) & $+0.0737 \pm 0.0063$ (59/63, 11.7) \\
+    & 7  & $+0.0762 \pm 0.0105$ (5/5) & $+0.0750 \pm 0.0062$ (73/75, 12.2) \\
+    & \multicolumn{3}{l}{\emph{Reading:} established} \\[2pt]
+    \multicolumn{4}{l}{\textbf{FNO $-$ U-Net}} \\
+    & 42 & $-0.0215 \pm 0.0139$ (1/5) & $-0.0279 \pm 0.0111$ (30/75, $-2.5$) \\
+    & 7  & $-0.0136 \pm 0.0105$ (2/5) & $-0.0172 \pm 0.0104$ (27/75, $-1.7$) \\
+    & \multicolumn{3}{l}{\emph{Reading:} FNO lower; under the floor at seed 7} \\[2pt]
+    \multicolumn{4}{l}{\textbf{Local path: FNO $+ 3{\times}3$ $-$ FNO}} \\
+    & 42 & $+0.0153 \pm 0.0110$ (4/5) & $+0.0190 \pm 0.0070$ (48/75, 2.7) \\
+    & 7  & $-0.0057 \pm 0.0105$ (3/5) & $-0.0054 \pm 0.0095$ (35/75, $-0.6$) \\
+    & \multicolumn{3}{l}{\emph{Reading:} not replicated} \\[2pt]
+    \multicolumn{4}{l}{\textbf{FNO $+ 3{\times}3$ $-$ U-Net}} \\
+    & 42 & $-0.0061 \pm 0.0108$ (2/5) & $-0.0089 \pm 0.0093$ (33/75, $-1.0$) \\
+    & 7  & $-0.0193 \pm 0.0051$ (0/5) & $-0.0227 \pm 0.0091$ (26/75, $-2.5$) \\
+    & \multicolumn{3}{l}{\emph{Reading:} tie at seed 42, lower at seed 7} \\[2pt]
+    \multicolumn{4}{l}{\textbf{One round $-$ two rounds ($k$-NN)}} \\
+    & 42 & $-0.0108 \pm 0.0061$ (1/5) & $-0.0122 \pm 0.0051$ (33/75, $-2.4$) \\
+    & 7  & $+0.0036 \pm 0.0049$ (2/5) & $+0.0029 \pm 0.0033$ (40/75, 0.9) \\
+    & \multicolumn{3}{l}{\emph{Reading:} null} \\[2pt]
+    \bottomrule
+  \end{tabular}
+\end{table}
+% All values: thesis_numbers.py pair, recomputed 2026-10-01 (anchor
+% reproduced). Run names: Table tab:appendix:runs, seed 7 = suffix s7.
+
 
 \cleardoubleoddpage
 \chapter{Code Structure}
