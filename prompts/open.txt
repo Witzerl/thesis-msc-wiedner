@@ -53,6 +53,8 @@ code repo, not committed there; NOTES.md "Batch readout"):
                                     -> 5.4.2 filled (soft-Dice RAISES the score)
   [x] 7875539  dilmean_plainmse IN  0.0000, never escapes the collapse -> 5.4.2 filled
   (job IDs marked * below were inferred; all experiment names matched runs on disk)
+  Author 2026-10-01: the Ch. 5 wording of the filled-in results is accepted; no
+  SOLVER_FINAL_RUNS copy is needed in the thesis repo (the code repo holds it).
 
 Job IDs marked * are inferred from the submission order, not from a squeue line.
 Durations: minimum epoch time x 30 epochs + ~25 % overhead, per fold.
@@ -149,7 +151,8 @@ skew capacity points -> FEN_final_w96ftp7rk4d45skew (0.5428).
     (0.25 / 0.38 / 0.38 / 0.37); the old note "our growth-region Dice is higher" is
     unverified. Optional: appendix table of r / AUC for all arms (values in NOTES).
 [ ] Check Chapters 5-6 for metrics mentioned without a plain description (author rule).
-[ ] Appendix E: seed-7 table + full statistics per comparison (needs section 1).
+[ ] Appendix E: seed-7 table + full statistics per comparison. Data now complete for every
+    seed-7 arm (2026-10-01; values in SOLVER_FINAL_RUNS 9.21 + 9.22 and NOTES "Batch readout").
 [ ] Appendix F: run identity (moved from 4.6; inline TODO).
 [ ] Figure 4.2 (stencils, index-space diamond vs dilated stencil), spec extended with the
     two-round reach (+/-4 vs +/-42 columns); render by script from grid spacing + offsets.
@@ -332,6 +335,9 @@ skew capacity points -> FEN_final_w96ftp7rk4d45skew (0.5428).
     queued (section 1). Read the seed-7 transport effect against the seed-7 free-form run.
 [ ] SOLVER_FINAL_RUNS 9.19a says the Galerkin T-FEN failed on "3/5" folds at seed 42; its
     own table gives 4/5 (folds 0, 1, 2, 4). The thesis uses 4/5 at seed 42, 7/10 overall.
+[ ] SOLVER_FINAL_RUNS 9.22 (the 2026-10-01 batch readout, written from the thesis session at
+    the author's request) is appended in the code repo but NOT committed there -- commit it
+    code-side.
 [ ] THESIS_FRAMEWORK.md: both copies (code repo + thesis mirror) identical but stale since
     2026-09-17; update code-side and re-mirror.
 [ ] [s27] When re-mirroring, PROJECT_CONTEXT.md and THESIS_FRAMEWORK.md also still say:
