@@ -11,6 +11,9 @@ MP-PDE out of Ch. 2, one Operators section, MM-PDE to Appendix G; first drafts o
 and 5.1-5.5; the capacity pre-registration; commits b69f352 ... 6ac45a1). Those items are
 marked [s27]; section 8 is the overview of what is left from that session alone. Most of
 its items were resolved later and are listed in section 6.
+Merged 2026-10-01 with the open items of the author review of 3.4-4.2 (tablet review v3,
+19 marks, commit aed045c, 2026-09-27; the same chat session that later produced the [s27]
+commits). Those items are marked [rev]; section 9 is the overview of what is left from it.
 
 
 1. RUNS ON THE CLUSTER -> WHERE THEIR RESULT GOES
@@ -129,7 +132,8 @@ skew capacity points -> FEN_final_w96ftp7rk4d45skew (0.5428).
     it was computed and not reported -- it currently does; if it is reported, change 6.3.
 [ ] 04-method.tex: stale TODO comments to clean up -- l. ~301 (theta_PDE, now in 6.1),
     l. ~1230 ("cost convention -> TODO in Section 5.7", now in 5.6), l. ~97 (trajectory
-    memory, now in 6.3/6.4).
+    memory, now in 6.3/6.4). [rev] the l. ~97 TODO was added in review #11; 6.3 now
+    has the paragraph (06-discussion l. ~257), so the comment can simply go.
 [ ] [s27] Bibliography: four references introduced in 4.5/4.6 are still plain-text
     placeholders with "% TODO: cite" markers and are NOT in references.bib:
     Milletari2016 (soft-Dice, V-Net, 3DV 2016, arXiv:1606.04797; 04-method l. ~1038),
@@ -158,6 +162,9 @@ skew capacity points -> FEN_final_w96ftp7rk4d45skew (0.5428).
     encoder / covariates / GNN knobs as reported nulls. Update both to the current text
     (5.4.1 time handling, 5.4.2 objective, 5.4.3 capacity incl. width-32 as a capacity
     point; 5.5 validity incl. Mai; covariates/encoder/GNN knobs commented out).
+    [rev] Also stale in THESIS_STRUCTURE.md: 3.5 still says the two age encodings "are
+    later measured (5.4, negative results)" -- the 3.5 pointer to 5.4 was cut in review #4
+    and the covariate ablation is commented out in 5.4.
 
 
 3. VERIFICATION (open)
@@ -173,6 +180,11 @@ skew capacity points -> FEN_final_w96ftp7rk4d45skew (0.5428).
     (fraction of visit pairs with net/local shrinkage, area) -- inline TODO l. ~245; the
     text currently says "has not been quantified". Post-hoc analysis on the masks, no
     training run.
+    [rev] Same quantity, second place: 4.2.1 (review #14) justifies "no monotonic-growth
+    constraint" by "the reference segmentations themselves shrink locally between some
+    visits (6.3)", with its own inline TODO (04-method l. ~152). When the number exists,
+    check that 4.2.1 still holds and delete that TODO too. Run 7875537 (mono2) feeds the
+    same paragraph.
 [ ] [s27] 4.5.2: confirm in the code that the feasible-start-window restriction applies
     only for a budget B > 0 (for B = 0 the first-interval condition could never hold);
     inline TODO 04-method l. ~1111. Code reading only (utils/utils.py,
@@ -198,7 +210,7 @@ skew capacity points -> FEN_final_w96ftp7rk4d45skew (0.5428).
 [ ] [s27] When re-mirroring, PROJECT_CONTEXT.md and THESIS_FRAMEWORK.md also still say:
     Galerkin T-FEN "diverges on 5 of 10 runs" (code repo corrected to 7/10 on 2026-09-16);
     "44x" U-Net (50x against the canonical 67,147); "nine settings, six classes" incl. the
-    graph U-Net; the 3x3 FNO hybrid called "the localized-kernel operator" of
+    graph U-Net ([rev] dropped from the thesis text in review #8); the 3x3 FNO hybrid called "the localized-kernel operator" of
     Liu-Schiaffini et al. (it is a simplified relative); the FEN "no divergence constraint"
     as a departure from Lienen & Guennemann (it is not one).
 
@@ -255,6 +267,12 @@ skew capacity points -> FEN_final_w96ftp7rk4d45skew (0.5428).
     per rollout step, memory" closed by saying so); the external-draft errors (31.1 % of
     lesions not visits, +0.062 vs +0.072 transport controls, 4.8x not general, Mai et al.
     not a "baseline", unsupported "results" of pending runs) fixed before commit.
+[x] [rev] Resolved since the review of 3.4-4.2 (aed045c): the 4.3 intro sentence "built
+    rather than imported" (gone with the one-Operators-section restructure, b69f352);
+    "Chapter 5" in 4.2.1 is now \ref to the validity section (sec:experiments:validity);
+    trajectory memory is discussed in 6.3 (only the stale 4.2 comment remains, section 2);
+    the 6.3 TODO added in review #11 was replaced by that paragraph; the graph U-Net is
+    gone from every uncommented line of the .tex files.
 
 
 7. OVERVIEW: WHAT IS LEFT FROM THE CH. 6/7/ABSTRACT SESSION ONLY  [ce6]
@@ -317,3 +335,38 @@ No run needed:
 Order: bibliography and the two small checks any time; Appendix G as its own
 prompt -> draft -> audit pass; THESIS_STRUCTURE.md / CLAUDE.md after the Chapter 5
 reporting pass, so they describe the final structure once.
+
+
+9. OVERVIEW: WHAT IS LEFT FROM THE REVIEW OF 3.4-4.2 ONLY  [rev]
+----------------------------------------------------------------
+(tablet review v3, 19 marks, 2026-09-27, commit aed045c; all 19 marks applied)
+
+Cluster runs from this review: none were created. It only edited text. The runs of the
+same chat session ([s27], the capacity plan) are covered in sections 1 and 8; their
+seed-42 job IDs were never recorded in this repository and cannot be read from here (no
+cluster access from the thesis session) -- sacct on the cluster, filtered by the
+experiment names in section 1, would recover them.
+
+Indirectly waiting for a run:
+  Run / job                                   Text that changes
+  ------------------------------------------  ------------------------------------------
+  ANISOGNN_final_dilmean_mono2    (7875537)   4.2.1 "No monotonic-growth constraint is
+                                              imposed, because the reference segmentations
+                                              themselves shrink ..." (review #14) -- keep
+                                              consistent with whatever 5.4.2 / 6.3 report
+
+No run needed:
+  [ ] 4.2.1 / 6.3: quantify reference-mask shrinkage; then delete the TODOs at 04-method
+      l. ~152 and 06-discussion l. ~245 (section 3)
+  [ ] 04-method l. ~97: delete the stale trajectory-memory TODO (section 2)
+  [ ] Appendix G: two TODOs moved there by this review -- why the moving mesh forces
+      one-step prediction (#13, 91-appendix l. ~242) and which channels the mesh mover and
+      the moved branch use (#19, l. ~246); part of the Appendix G item in section 2
+  [ ] THESIS_STRUCTURE.md 3.5 still points to covariate results in 5.4 (section 2)
+  [ ] Re-mirror: drop the graph U-Net / "nine settings, six classes" (section 4)
+  [ ] Optional: Gao2019 is no longer cited (graph U-Net commented out); the bib entry is
+      harmless (biblatex prints only cited keys) -- keep it in case the arm returns, or
+      delete it
+
+Order: the two deletions any time; shrinkage together with the 6.3 item after 7875537
+is in; the rest rides along with the items it is filed under.
