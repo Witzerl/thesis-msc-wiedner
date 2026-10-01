@@ -316,6 +316,21 @@ lesions. A larger or adaptive window with a mask for padded positions, or
 a crop that follows the registration to the fundus image, would reduce
 this censoring and make areas comparable with whole-field studies.
 
+\paragraph{A continuous representation of the lesion.}
+% Author review v6 #9 (2026-10-02): "future: the continuous distance from
+% lesion experiment".
+The lesion enters the state as a binary mask, so the normalised state has
+a hard step at the lesion edge (\S\ref{sec:data:normalization}), and a
+pixel that becomes atrophic has to jump the full distance between the two
+mask values in a single update (\S\ref{sec:experiments:ablations:time}).
+A signed distance to the lesion boundary would replace the step by a
+smooth field whose zero level marks the boundary. Growth would then appear
+as a gradual change of this field rather than as jumps at single pixels,
+and the binary forecast would be recovered by thresholding at zero.
+Whether this makes the forecast easier to learn, including the growth
+speed that the binary state predicts less well
+(\S\ref{sec:discussion:clinical}), is untested.
+
 \paragraph{Trajectory memory.}
 Giving the operator several past visits, or a recurrent state carried
 along the rollout, would let it use the eye's own growth history. This

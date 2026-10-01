@@ -1222,8 +1222,9 @@ worked through one item at a time.
   mechanisms are used (Euler step in residual form = the framework's update; learned stencils,
   global spectral methods and finite elements = the operators; reach, higher-order integrator
   and stability = what Chapter 5 asks), without previewing results.
-- [ ] #9 §3.4 "a hard step at the lesion edge" -- "future: the continuous distance from lesion
-  experiment" (§6.4).
+- [x] #9 §3.4 "a hard step at the lesion edge" -- "future: the continuous distance from lesion
+  experiment". Done 2026-10-02: new §6.4 paragraph "A continuous representation of the lesion"
+  (signed distance to the boundary instead of the binary step; untested).
 - [ ] #10 §3.7 empty test split -- "no test because lack of data".
 - [ ] #11 §4.1 provenance sentence (MP-PDE/MM-PDE suggested by the clinical partner) -- "we can
   absolutely not write this".
