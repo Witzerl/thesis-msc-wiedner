@@ -187,7 +187,7 @@ tab:appendix:border-interior, Huang1991 in the bib); build clean:
 [x] (done 2026-10-01: all defined; border-touching definition added to 5.1.2) Check Chapters 5-6 for metrics mentioned without a plain description (author rule).
 [ ] Appendix E: seed-7 table + full statistics per comparison. Data now complete for every
     seed-7 arm (2026-10-01; values in SOLVER_FINAL_RUNS 9.21 + 9.22 and NOTES "Batch readout").
-[ ] Appendix F: run identity (moved from 4.6; inline TODO).
+[x] (done 2026-10-01: repo map, run identity, arm -> experiment name; code private, on request) Appendix F: run identity (moved from 4.6; inline TODO).
 [ ] Figure 4.2 (stencils, index-space diamond vs dilated stencil), spec extended with the
     two-round reach (+/-4 vs +/-42 columns); render by script from grid spacing + offsets.
 [x] (done 2026-10-01, decisions a-g) Border vs interior split (5.1.2 variants commented out): report once (5.2 sentence or

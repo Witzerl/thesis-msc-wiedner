@@ -125,17 +125,87 @@
 \chapter{Code Structure}
 \label{app:code}
 
-% TODO: brief map of the repository, pointer to GitHub, reproducibility
-% instructions.
-% TODO (moved from Section 4.6, author review v4 #16/#17, 2026-09-30): run
-% identity -- every run writes its full configuration into its run directory;
-% the directory name encodes the key settings, fold and data variant; since
-% 2 September 2026 each run records the code version (earlier runs are dated
-% by their directory timestamp); each run records which fold and data variant
-% it loaded; latest and best checkpoints saved every epoch; resume disabled,
-% so every reported run was trained in one piece; all per-epoch metrics are
-% collected into one version-controlled results table from which every
-% reported number is read.
+The code is kept in a private repository and is available from the author
+on request. Its main parts are listed in
+Table~\ref{tab:appendix:repo}.
+
+\begin{table}[h]
+  \centering
+  \caption[Main parts of the code repository.]{%
+    Main parts of the code repository.}
+  \label{tab:appendix:repo}
+  \small
+  \begin{tabular}{p{0.32\textwidth} p{0.6\textwidth}}
+    \toprule
+    Path & Content \\
+    \midrule
+    \texttt{tools/precompute\_graphs\_ga.py} & Preprocessing: crop or pad
+      to $49 \times 1024$, normalisation, covariates, training windows,
+      one data variant per fold (Chapter~\ref{ch:data}) \\
+    \texttt{GraphPDE/train.py},
+    \texttt{GraphPDE/train\_helper.py} & The shared framework: loss,
+      curriculum, optimisation, evaluation and logging
+      (\S\ref{sec:method:framework}, \S\ref{sec:method:training}) \\
+    \texttt{GraphPDE/gnn.py} & The message-passing graph network
+      (\S\ref{sec:method:mppde}) \\
+    \texttt{GraphPDE/baselines/} & The other operators: dilated stencil,
+      U-Net, FNO, FEN and the Runge--Kutta wrapper
+      (\S\ref{sec:method:family}) \\
+    \texttt{GraphPDE/mesh/}, \texttt{interpolate.py} & The moving-mesh
+      extension (Appendix~\ref{app:mm-pde}) \\
+    \texttt{utils/utils.py} & Dataset and window sampling \\
+    \texttt{jobs/} & Slurm scripts; one five-fold experiment is one job
+      array \\
+    \texttt{Dockerfile} & Local environment; the cluster runs use a fixed
+      container with PyTorch 2.4.1 (\S\ref{sec:method:implementation}) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{Run identity.}
+Every run writes its complete configuration into its run directory at the
+start. The name of the directory encodes the key settings, the fold and the
+data variant. Since 2 September 2026, each run also records the version of
+the code it ran; earlier runs are dated by the timestamp of their
+directory. Because every fold is mounted at the same path on the cluster,
+each run also records which fold and data variant it loaded. Resuming an
+interrupted run is disabled, so every reported run was trained in one
+piece. The per-epoch metrics of all runs are collected into one
+version-controlled results table, and every training result in this thesis
+is read from it. Table~\ref{tab:appendix:runs} gives the experiment name
+behind each arm; the five folds are the runs \texttt{<name>\_f0} to
+\texttt{<name>\_f4}, and the second seed adds the suffix \texttt{s7}.
+
+\begin{table}[h]
+  \centering
+  \caption[Experiment names of the reported arms.]{%
+    Experiment names of the arms of Table~\ref{tab:experiments:arms}, seed
+    42.}
+  \label{tab:appendix:runs}
+  \small
+  \begin{tabular}{l l}
+    \toprule
+    Arm & Experiment name \\
+    \midrule
+    T-FEN                               & \texttt{FEN\_final\_w96ftp7rk4d45skew} \\
+    Graph network, dilated stencil      & \texttt{ANISOGNN\_final\_dilmean} \\
+    Graph network, dilated stencil, RK4 & \texttt{ANISOGNN\_final\_oderk4n1} \\
+    U-Net, width 5                      & \texttt{UNET\_final\_w5} \\
+    FNO with $3 \times 3$ local path    & \texttt{FNO\_final\_w5k3} \\
+    FNO, RK4                            & \texttt{FNO\_final\_w5rk4} \\
+    FNO                                 & \texttt{FNO\_final\_w5} \\
+    FEN, free-form only                 & \texttt{FEN\_final\_w96Frk4d45} \\
+    FEN, free-form, matched width 139   & \texttt{FEN\_final\_w139Frk4d45} \\
+    Graph network, $k$-NN, $k = 12$     & \texttt{MPPDE\_final\_aggrmean} \\
+    Graph network, $k$-NN, $k = 20$     & \texttt{MPPDE\_final\_k20} \\
+    One-hop floor                       & \texttt{MPPDE\_final\_l1mean} \\
+    Per-pixel floor                     & \texttt{MPPDE\_final\_pxmean} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+% Names checked 2026-10-01 against GraphPDE/results (five folds each). Run-
+% identity paragraph restored from 04-method.tex before 7f93ab9 (audited
+% 2026-09-27), checkpoint sentence dropped.
 
 
 \cleardoubleoddpage
