@@ -265,7 +265,7 @@ tab:appendix:border-interior, Huang1991 in the bib); build clean:
     pdfs/GA/<Key>.pdf, all methods / numerics papers to a new pdfs/Methods/<Key>.pdf;
     misnamed files copied (not moved) to their key names, since notes may link the old
     names. Optional: a .bib and .md next to each, as in pdfs/GA/.
-[ ] [s26] references.bib: Brandstetter2022 and Hu2024 are still typed as arXiv preprints
+[x] (done 2026-10-01: both @inproceedings ICLR, Hu2024 year 2024) [s26] references.bib: Brandstetter2022 and Hu2024 are still typed as arXiv preprints
     ("journal = arXiv preprint ..."), but both are ICLR papers (2022 and 2024), and Hu2024
     carries year = 2023, so Appendix G.1 prints "Hu et al. (2023)". Fix both entries
     (NOTES "Bibliography" has the year item since 2026-09-26; never done).
@@ -592,7 +592,7 @@ No run needed:
   [ ] Paper archive: 43 cited references without a PDF, 3 misnamed; 32 freely
       downloadable, 11 via the JKU library; layout pdfs/GA + pdfs/Methods, <Key>.pdf --
       waiting for the author's go-ahead (section 2)
-  [ ] references.bib: Brandstetter2022 / Hu2024 as ICLR papers, Hu2024 year 2023 -> 2024
+  [x] references.bib: Brandstetter2022 / Hu2024 as ICLR papers, Hu2024 year 2023 -> 2024
       (section 2)
   [x] (done 2026-10-01, decisions a-g) Huang1991: cite in 2.1.3 or delete the marker (section 2)
   [x] (done 2026-10-01, decisions a-g) 2.1.6 vs 6.3: the ~2 % spacing check stated twice (section 2)
