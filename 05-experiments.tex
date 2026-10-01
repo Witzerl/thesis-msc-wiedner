@@ -1304,9 +1304,50 @@ registered annotation, whereas the areas here are measured inside the
 $49 \times 1024$ crop, which censors growth at its border
 (\S\ref{sec:data:spatial}). The paper does not state whether its growth
 rate is a difference between two visits or a fit over all visits.
-% TODO: compare the growth-region Dice per horizon bin with Table 2 of Mai
-% et al. (0.25 / 0.38 / 0.38 / 0.37 for 0-1 / 1-2 / 2-3 / >3 years); the
-% earlier note that this thesis scores higher has not been re-checked.
+
+\citet{Mai2024} also report the growth-region Dice by time since baseline:
+the Dice of the newly atrophic region, follow-up lesion minus baseline
+lesion, averaged over the follow-up visits in each bin. The same quantity
+is computed here for the follow-up visits of the rollouts, averaged over
+the late epochs (Table~\ref{tab:experiments:mai-bins}). All three operators
+lie above the values of \citet{Mai2024} in every bin, by 0.2 to 0.3. This
+gap is not evidence that one approach predicts better. The models of this
+thesis receive the segmented baseline lesion as input, so its outline is
+given exactly, whereas \citet{Mai2024} must first find the lesion in the
+raw OCT volume. The areas here are measured inside the crop, and the two
+studies evaluate different sets of visits. The comparison mainly shows how
+much of the spatial forecast the segmented mask already carries; on growth
+speed, where the mask helps less, the model of \citet{Mai2024} is ahead.
+
+\begin{table}[t]
+  \centering
+  \caption[Growth-region Dice by horizon against Mai et al. (2024).]{%
+    Growth-region Dice (newly atrophic region, follow-up minus baseline) by
+    time since baseline, against Table~2 of \citet{Mai2024}. Values of this
+    thesis: mean over the follow-up visits in each bin and over the late
+    epochs, pooled over the five folds, seed 42. Number of visits per bin in
+    brackets. The inputs, the field of view and the evaluated visits
+    differ between the studies (see text), so the values are not a
+    head-to-head comparison.}
+  \label{tab:experiments:mai-bins}
+  \small
+  \begin{tabular}{l c c c c}
+    \toprule
+    Years since baseline & \citet{Mai2024} & Dilated stencil & U-Net & T-FEN \\
+    \midrule
+    0--1      & 0.25 (296) & 0.503 (149) & 0.458 & 0.519 \\
+    1--2      & 0.38 (260) & 0.600 (149) & 0.563 & 0.602 \\
+    2--3      & 0.38 (148) & 0.634 (109) & 0.581 & 0.633 \\
+    $>3$      & 0.37 (79)  & 0.655 (71)  & 0.555 & 0.611 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+% Values: thesis_numbers.py horizon ANISOGNN_final_dilmean UNET_final_w5
+% FEN_final_w96ftp7rk4d45skew, 2026-10-01 (steps per bin 2980 / 2980 / 2180 /
+% 1420 = 20 late epochs x 149 / 149 / 109 / 71 visits; reproduces SOLVER_FINAL_RUNS
+% 9.20). Mai et al.: PMC11000109, Table 2 (n = OCT volumes). Same metric
+% definition (follow-up AND NOT baseline); Mai do not state how empty growth
+% regions are handled, here they are left out.
 
 
 \section{Computational Cost}

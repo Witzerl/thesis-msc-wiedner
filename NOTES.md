@@ -836,7 +836,7 @@ Being worked through one item at a time.
     one-hop 0.47/0.76/0.71 — all intervals overlap; the arms do not differ on these measures.
   - The per-fold r/AUC logged by the code (16 eyes, 2 positives) are not usable; only the
     pooled values are.
-- [ ] TODO (from #20): §5.5.1 — compare growth-region Dice per horizon bin with Mai Table 2
+- [x] (done 2026-10-01: all three arms above Mai in every bin by 0.2-0.3; stated as not head-to-head) TODO (from #20): §5.5.1 — compare growth-region Dice per horizon bin with Mai Table 2
   (inline TODO); optional appendix table of r/AUC for all arms.
 - [ ] TODO (from #20): §6.2 — "good at where, weaker at how fast" (inline TODO).
 - [ ] TODO (from #20, author 2026-10-01): **every metric mentioned anywhere must have a plain
@@ -1011,6 +1011,8 @@ through one item at a time.
   same MUW cohort, same task. Our growth-region Dice is higher, **with the mandatory
   caveat that this model takes pre-segmented masks as input whereas Mai works from raw
   OCT**. Needs a `references.bib` entry.
+  ✔ 2026-10-01 (later): checked -- higher in every bin (0.50-0.66 vs 0.25-0.38), same metric definition,
+  different inputs / FOV / visit sets; now in §5.5.1. Earlier note:
   ⚠️ 2026-10-01: "our growth-region Dice is higher" is **unverified** — never checked against
   Mai's Table 2 (growth-region DSC 0.25 / 0.38 / 0.38 / 0.37 for 0–1 / 1–2 / 2–3 / >3 y). On
   growth *speed* the canonical model is clearly **weaker** than Mai (r 0.40 vs 0.61). Do not
