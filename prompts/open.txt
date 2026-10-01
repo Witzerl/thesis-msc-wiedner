@@ -130,6 +130,34 @@ skew capacity points -> FEN_final_w96ftp7rk4d45skew (0.5428).
 
 2. WRITING (open)
 -----------------
+AUTHOR DECISIONS TAKEN 2026-10-01 (later session) -- to be APPLIED in one pass:
+  (a) Headline: SCOPE it. "Three strongest operators from three unrelated classes lie
+      within 0.04 (0.50-0.54). The T-FEN is highest: above the U-Net at both seeds and on
+      every fold, slightly above the stencil (~0.017 at both seeds, at the noise level).
+      Stencil and U-Net cannot be told apart. The two highest operators are the two that
+      carry the reach/transport ingredient; the class itself is not what separates them."
+      -> 5.2, 5.3.5, 6.1, Ch. 7, both abstracts.
+  (b) Global + local: DEMOTE to an observation. Three established ingredients (spatial
+      context, reach, transport). "A purely global operator (FNO) lies below the U-Net at
+      one year at both seeds; a small local path brought it level at one seed but not the
+      second -- not established." -> 5.3 intro, 5.3.5, 6.1, Ch. 7 (bullet -> sentence after
+      the list), both abstracts.
+  (c) Objective: ADD to 6.1 "The framework" + Ch. 7 "The framework" (+ half a sentence in the
+      abstract): mask weighting required (plain MSE: no change learned), soft-Dice +~0.05 and
+      steadier training, monotonic penalty nothing. Scope: canonical operator only (the loss
+      ablations ran on the stencil).
+  (d) 1.4 Contributions: MERGE into 1.3 -- one paragraph after the research question naming
+      what the thesis delivers (aligned with Ch. 7 / abstract); delete the 1.4 section and its
+      stale bullets (nothing references sec:introduction:contributions or
+      eq:intro:dt-residual). Provenance sentence ("clinical partner") -> start of Ch. 4.
+  (e) Border vs interior split: REPORT -- one sentence in 5.2 (ordering unchanged on interior
+      eyes) + per-arm table in Appendix E; adjust 6.3 ("computed but not reported").
+  (f) Huang1991: CITE in the first OCT sentence of 2.1.3 (add bib entry).
+  (g) ~2 % spacing check: 6.3 ONLY; 2.1.6 keeps "treated as constant" + pointer to 6.3.
+  (h) Gao2019: KEEP the bib entry (uncited, harmless); no PDF / hub note needed.
+  (i) Knowledge base: author wants a local PDF of EVERY cited reference and every citation
+      in the thesis traceable to its source passage (see section 13).
+
 [ ] AUTHOR DECISIONS from the 2026-10-01 batch (inline TODOs in 5.2, 5.3.3, 6.1, Ch. 7,
     abstract): (a) skew T-FEN above the U-Net at both seeds (+0.038 / +0.025, 5/5 each)
     and +0.016/+0.017 above the stencil at both -- reword or scope "the strongest arms of
@@ -642,3 +670,17 @@ Still open (checked against the current .tex on 2026-10-01):
 Order: the token now; the three factual items (2.1.2, 3.1, 2.1.5 comment) together in one
 small pass, since they are the same fact; 1.3 wording any time; the provenance sentence
 together with the 1.4 decision; the shortening pass last, after the author read-back.
+
+
+13. KNOWLEDGE BASE (status checked 2026-10-01)
+----------------------------------------------
+  59 keys cited (+4 to add: Milletari2016, Loshchilov2019, Paszke2019, Fey2019; +Huang1991).
+  Hub notes: 15 (13 GA papers of the April ingest + Brandstetter2022, Hu2024). PDFs: 15.
+  literature/, pdfs/, INBOX/ are in .gitignore -> NO BACKUP.
+  Plan (agreed in principle, details to confirm):
+  [ ] Local copy pdfs/<Key>.pdf for every cited key + extracted <Key>.txt (searchable);
+      download list with sources to the author before downloading; ~11 via JKU library.
+  [ ] Citation ledger: each hub note gets "## Cited in thesis" -- per use: file + section,
+      the claim, source page, short verbatim supporting passage.
+  [ ] Hub + concept notes for the 44 missing references (/ingest workflow).
+  [ ] Backup: track literature/ in git (PDFs: author's call).

@@ -749,7 +749,10 @@ Being worked through one item at a time.
   §5.5.2 (skew s7 stable 5/5, max mask 2.63, layer 1.11). §6.1 l. 40 TODO closed (Δt null).
   Capacity: w48 skew 0.5434 (= w96 skew, +0.0006), stable 5/5 -- rows replaced only once w192 /
   depth-8 skew are complete.
-- [ ] **Author decisions from the batch (2026-10-01)** -- inline TODOs in 5.2, 5.3.3, 6.1, Ch. 7,
+- [x] (decided 2026-10-01, later session: (a) scope the headline, (b) demote global+local to an
+  observation, (c) objective into 6.1 + Ch. 7; also 1.4 merged into 1.3, border split reported,
+  Huang1991 cited, spacing check in 6.3 only, Gao2019 kept -- full wording in prompts/open.txt
+  section 2; NOT YET APPLIED to the text) **Author decisions from the batch (2026-10-01)** -- inline TODOs in 5.2, 5.3.3, 6.1, Ch. 7,
   abstract: (a) the skew T-FEN lies above the U-Net at both seeds and +0.016/+0.017 above the
   stencil at both -- "the strongest arms of different classes are indistinguishable" / "lie close
   together" / "architecture class does not decide" need rewording or scoping; (b) the global +
