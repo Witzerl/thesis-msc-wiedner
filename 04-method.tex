@@ -1039,11 +1039,8 @@ clinical target. The layer channels are auxiliary targets, but the
 operator must still predict them, because they are part of the next state
 that is fed back during a rollout.
 
-% TODO: cite Milletari2016 (Milletari, Navab & Ahmadi, "V-Net: Fully
-% Convolutional Neural Networks for Volumetric Medical Image
-% Segmentation", 3DV 2016, arXiv:1606.04797)
-The second term is a soft-Dice loss on the mask channel (Milletari et al.,
-2016), with the weight $\lambda_{\text{Dice}} = 5$. It addresses a property
+The second term is a soft-Dice loss on the mask channel
+\citep{Milletari2016}, with the weight $\lambda_{\text{Dice}} = 5$. It addresses a property
 of the data. Between two consecutive visits, almost all mask pixels are
 unchanged, so a plain MSE is dominated by static pixels and gives little
 gradient at the moving lesion boundary. A model trained on it can settle on
@@ -1137,9 +1134,7 @@ training mode, which is why no operator may use batch statistics
 \subsection{Optimisation}
 \label{sec:method:training:optim}
 
-% TODO: cite Loshchilov2019 (Loshchilov & Hutter, "Decoupled Weight Decay
-% Regularization", ICLR 2019, arXiv:1711.05101)
-All operators are trained with AdamW (Loshchilov and Hutter, 2019), a
+All operators are trained with AdamW \citep{Loshchilov2019}, a
 learning rate of $2 \times 10^{-3}$ and a weight decay of
 $1 \times 10^{-2}$ on all trainable parameters. The learning rate is
 multiplied by 0.4 after epoch 5 and again after epoch 20.
@@ -1195,14 +1190,9 @@ in~\S\ref{sec:experiments:protocol}.
 \section{Implementation Details}
 \label{sec:method:implementation}
 
-% TODO: cite Paszke2019 (Paszke et al., "PyTorch: An Imperative Style,
-% High-Performance Deep Learning Library", NeurIPS 2019, arXiv:1912.01703)
-% TODO: cite Fey2019 (Fey & Lenssen, "Fast Graph Representation Learning
-% with PyTorch Geometric", ICLR 2019 Workshop on Representation Learning on
-% Graphs and Manifolds, arXiv:1903.02428)
 The framework is implemented in Python with PyTorch 2.4.1 and CUDA 12.1
-(Paszke et al., 2019). The graph operators use PyTorch Geometric (Fey and
-Lenssen, 2019).
+\citep{Paszke2019}. The graph operators use PyTorch Geometric
+\citep{Fey2019}.
 % TODO: record the PyTorch Geometric version from the container.
 All dependencies are pinned in a fixed container image. Every reported run
 was trained on a single NVIDIA RTX A6000 GPU on a cluster managed by

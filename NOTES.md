@@ -484,7 +484,7 @@ be longer, since it supplies two arms and the floors).
 - [ ] TODO (§4.5.2 inline): confirm in the code that the feasible-window restriction applies only
   for B > 0 (for B = 0 the first-interval condition could never hold).
 - [ ] TODO (§4.6 inline): record the PyTorch Geometric version of the container.
-- [ ] Pending external citations from §4.5-§4.6: **Milletari2016**, **Loshchilov2019**,
+- [x] (added to references.bib and cited 2026-10-01) Pending external citations from §4.5-§4.6: **Milletari2016**, **Loshchilov2019**,
   **Paszke2019** (PyTorch, NeurIPS 2019, arXiv:1912.01703), **Fey2019** (PyTorch Geometric,
   ICLR 2019 RLGM workshop, arXiv:1903.02428); each has a `% TODO: cite` marker.
 - [x] #11 §4.2 "no memory of the trajectory": TODO added in 04-method.tex and a matching one in

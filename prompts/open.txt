@@ -215,7 +215,7 @@ tab:appendix:border-interior, Huang1991 in the bib); build clean:
     l. ~1230 ("cost convention -> TODO in Section 5.7", now in 5.6), l. ~97 (trajectory
     memory, now in 6.3/6.4). [rev] the l. ~97 TODO was added in review #11; 6.3 now
     has the paragraph (06-discussion l. ~257), so the comment can simply go.
-[ ] [s27] Bibliography: four references introduced in 4.5/4.6 are still plain-text
+[x] (done 2026-10-01: bib entries added, \citep in 4.5/4.6, markers removed) [s27] Bibliography: four references introduced in 4.5/4.6 are still plain-text
     placeholders with "% TODO: cite" markers and are NOT in references.bib:
     Milletari2016 (soft-Dice, V-Net, 3DV 2016, arXiv:1606.04797; 04-method l. ~1038),
     Loshchilov2019 (AdamW, ICLR 2019, arXiv:1711.05101; l. ~1136),
@@ -531,7 +531,7 @@ of it is in and written up (5.4.3). What still runs from that plan:
   FEN_final_w139Frk4d45s7         (7875520*)  5.3.4 seed-7 matched transport control
 
 No run needed:
-  [ ] Bibliography: Milletari2016, Loshchilov2019, Paszke2019, Fey2019 (section 2)
+  [x] Bibliography: Milletari2016, Loshchilov2019, Paszke2019, Fey2019 (section 2)
   [ ] Appendix G content: G.2 DMM + dual branch, G.3 mesh quality, result + cost (section 2)
   [ ] Figure 4.1 pipeline (section 2); Figure 4.2 stencils and Figure 5.1 rollout strip are
       already listed in section 2
