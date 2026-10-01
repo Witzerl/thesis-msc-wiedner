@@ -329,7 +329,7 @@ tab:appendix:border-interior, Huang1991 in the bib); build clean:
     List of old -> new values in NOTES.md.
 [x] (moot 2026-10-01: width-32 U-Net removed everywhere in cc2c864) Width-32 U-Net per eye: -0.0453 +/- 0.0113 (this session) vs -0.0469 +/- 0.0090
     (SOLVER_FINAL_RUNS 9.18 / 9.6d).
-[ ] 5.4.2: the 31.8x gradient ratio of the monotonic penalty -- in which setting was it
+[x] (done 2026-10-01: loss-only single-pixel computation, review 2026-08-14 F2a; sentence reworded) 5.4.2: the 31.8x gradient ratio of the monotonic penalty -- in which setting was it
     measured (F2 audit)? Confirm or state the setting.
 [ ] [ce6] 6.3: quantify the local shrinkage of the reference masks between visits
     (fraction of visit pairs with net/local shrinkage, area) -- inline TODO l. ~245; the

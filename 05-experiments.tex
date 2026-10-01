@@ -768,15 +768,19 @@ score. Under the pushforward curriculum
 (\S\ref{sec:method:training:curriculum}), the previous state on an unrolled
 step is the model's own earlier prediction, so the penalty locks in the
 model's own false positives: a pixel wrongly marked as atrophic can no
-longer be corrected toward the ground truth without paying the penalty. On
-such a pixel, the gradient of the penalty was measured at 31.8 times the
-gradient of the data terms. The penalty therefore enforces different
+longer be corrected toward the ground truth without paying the penalty. A
+direct computation with the training loss on one such pixel, at penalty
+weight 2.0, gives a penalty gradient 31.8 times that of the data terms, so
+the total gradient points away from the ground truth. The penalty therefore enforces different
 priors on teacher-forced and on unrolled steps. In addition, the reference
 segmentations themselves shrink locally between some visits
 (\S\ref{sec:method:dt-residual}), which a strict growth constraint would
 contradict.
-% TODO: check that the 31.8x gradient ratio (F2 audit) holds for the final
-% pipeline, or state the setting in which it was measured.
+% Source of 31.8x: code review 2026-08-14, item F2a (commit 45529fd in
+% masterthesis-docker): single-pixel gradient of the real loss class at the
+% then-canonical weights (penalty 2.0), not a model measurement; it holds for
+% every backbone. The per-graph fix of 2026-08-15 leaves the single-eye case
+% unchanged.
 
 % Removed 2026-10-01 (author review v4 #35/#36): the fold-2 loss ladder,
 % the sharpness sweep (escape epochs 0/2/5/9/26, raw RMSE 0.880/0.336/0.362),
