@@ -1142,7 +1142,8 @@ training mode, which is why no operator may use batch statistics
 All operators are trained with AdamW \citep{Loshchilov2019}, a
 learning rate of $2 \times 10^{-3}$ and a weight decay of
 $1 \times 10^{-2}$ on all trainable parameters. The learning rate is
-multiplied by 0.4 after epoch 5 and again after epoch 20.
+multiplied by 0.4 from epoch 5 on and again from epoch 20 on, counting
+epochs from 0 (the first five epochs run at the initial rate).
 
 Training runs for 30 epochs. One epoch consists of 20 passes. In each pass,
 a new time budget is drawn, and every training eye contributes one randomly

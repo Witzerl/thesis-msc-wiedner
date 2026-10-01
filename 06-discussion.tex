@@ -246,8 +246,9 @@ optimistic.
 The fixed $49 \times 1024$ window is a deliberate trade-off with a
 measured cost (\S\ref{sec:data:spatial}). It cuts real lesion area in
 27.3\,\% of the visits, more than 5\,\% of the lesion in 6.0\,\%, and up
-to 25.7\,\% in the worst case. Of the cropped lesions, 31.1\,\% touch the
-crop border, so their growth across it is censored, in the training
+to 25.7\,\% in the worst case. In 31.1\,\% of the visits, the lesion
+touches the edge of the imaged field inside the window, so its growth
+across that edge is censored, in the training
 targets and in the metrics, without any flag. Larger windows would trade
 this for up to 35\,\% zero padding and about $1.9\times$ as many grid
 positions, and about 19\,\% of lesions would touch the border anyway

@@ -4,8 +4,71 @@
 \chapter{Dataset Details}
 \label{app:dataset}
 
-% TODO: full demographic tables; visit-interval histograms; per-channel
-% statistics.
+% TODO: full demographic tables; per-channel statistics. (Visit-interval
+% histograms: Figure fig:appendix:cohort, done 2026-10-01.)
+
+This appendix summarises the visit schedule, the lesion scale and the
+spatial extent of the cohort described in Chapter~\ref{ch:data}.
+
+\section{Visit Schedule and Lesion Scale}
+\label{app:dataset:schedule}
+
+The visit schedule and the lesion scale of the cohort are summarised in
+Figure~\ref{fig:appendix:cohort}. Most eyes were seen six or seven times,
+three in four intervals between visits are 180 days long, and the baseline
+lesion area ranges from 0.11 to 20.8\,mm$^2$, with a median of
+6.7\,mm$^2$.
+
+% Figure: images/scripts/fig_appendix_cohort.py (raw scans, mask_oct.png on
+% the 49 x 1024 grid; gaps from tools/cohort_visit_stats.py). Reproduces every
+% cohort number of Chapter 3; growth-rate quantiles are order-statistic
+% (nearest-rank) quantiles, as in 3.1.
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{images/fig_appendix_cohort.pdf}
+  \caption[Visit schedule and lesion scale of the cohort.]{%
+    Visit schedule and lesion scale of the 75 eyes of the cohort.
+    \emph{(a)}~Number of visits per eye.
+    \emph{(b)}~Intervals between consecutive visits over the 478 windows;
+    every interval is a multiple of 90 days, and the most common interval,
+    180 days, is highlighted.
+    \emph{(c)}~Lesion area at the baseline visit, on the $49 \times 1024$
+    modelling grid.
+    \emph{(d)}~Growth rate of the square root of the lesion area from the
+    baseline to the last visit, on the same grid.
+    Dashed lines mark the medians (6.7\,mm$^2$ and 0.234\,mm per year).
+    Areas assume the constant pixel spacing stated
+    in~\S\ref{sec:data:dataset}.}
+  \label{fig:appendix:cohort}
+\end{figure}
+
+\section{Native Grids and the Crop}
+\label{app:dataset:crop}
+
+Figure~\ref{fig:appendix:crop} relates the native grids of the eyes to the
+modelling window of~\S\ref{sec:data:spatial} and shows how much lesion
+area the window removes: some lesion area in 27.3\,\% of the visits, more
+than 5\,\% of it in 6.0\,\%, and at most 25.7\,\%.
+
+% Figure: images/scripts/fig_appendix_crop.py (native mask_oct.png per visit,
+% the precompute's centre-crop / pad arithmetic).
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{images/fig_appendix_crop.pdf}
+  \caption[Native grids and the lesion area removed by the modelling
+  window.]{%
+    Native en-face grids and the lesion area removed by the
+    $49 \times 1024$ window.
+    \emph{(a)}~Native grid of each of the 75 eyes, in B-scans (rows) and
+    A-scans per B-scan (columns). The grid is the same at every visit of an
+    eye, and eyes with identical grids overlap (67 distinct grids). Dashed
+    lines mark the window size: an eye left of or below a line is
+    zero-padded along that axis, and an eye right of or above it is
+    centre-cropped.
+    \emph{(b)}~Share of the 553 visits that lose more than a fraction $x$
+    of their lesion area to the window, measured on the native mask.}
+  \label{fig:appendix:crop}
+\end{figure}
 
 
 \cleardoubleoddpage
@@ -117,8 +180,12 @@
 % FNO_final_w5k3, FNO_final_w5rk4, FNO_final_w5, FEN_final_w96Frk4d45,
 % MPPDE_final_aggrmean, MPPDE_final_k20, MPPDE_final_l1mean (folds 0-4).
 % Positives: the top round(q * 75) eyes by true rate. Reproduces the point
-% estimates of the canonical row of tab:experiments:mai exactly. Script:
-% scratchpad growth_rates.py (session 2026-10-01); not stored in the repo.
+% estimates of the canonical row of tab:experiments:mai exactly. The canonical
+% row is recomputed by images/scripts/fig_experiments_growth_rate.py; the
+% original scratchpad script (growth_rates.py, not in the repo) set positives
+% by a quantile cut instead (12 eyes at 15 %), so it is not the source of the
+% 11-eye values. Re-checked 2026-10-01: k = 20 (r 0.411; AUC 0.735 / 0.737 /
+% 0.734) lies within rounding of k = 12 (0.411; 0.744 / 0.744 / 0.734).
 
 \section{Both Seeds for the Main Comparisons}
 \label{app:full-results:seeds}
@@ -675,22 +742,38 @@ although a weight of 100 scored higher on edge gain, by 0.029 on head-16
 and 0.105 on spread-16; it was rejected on a lesion-specificity check that
 was computed only on the biased head-16 pool.
 
+Figure~\ref{fig:appendix:moved-mesh} shows the moved mesh for three eyes
+with a small, a medium and a large lesion. In all three, nodes are drawn
+from the surrounding retina towards the lesion, most strongly at its
+border, and no cell folds.
+
 The mesh mover thus produces valid meshes without folds that concentrate
 nodes on the lesion border. The null result of \S\ref{app:mm-pde:result}
 can therefore not be explained by a broken mesh.
 
-% TODO: produce Figure fig:appendix:moved-mesh -- the moved mesh (every
-% k-th grid line) over the GA mask of two or three representative eyes, at
-% the physical aspect ratio (about 5.94 x 5.82 mm), next to the uniform grid.
+% Figure: images/scripts/fig_appendix_moved_mesh.py (checkpoint
+% GA_NAT_O512x2_S1, seed 42, epoch 500; edge gain and folded cells computed
+% with the code repo's dmm_metrics). Eye rule fixed before drawing: lower
+% quartile, median and upper quartile of baseline lesion area among the 16
+% validation eyes of fold 2 (PEAT0058_OS, PEA00034_OS, GX511424_OS).
 \begin{figure}[t]
   \centering
-  \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering Placeholder for
-    Figure~\ref{fig:appendix:moved-mesh}. See accompanying
-    \texttt{\% TODO} for the intended content.}}
-  \caption[Moved meshes of representative eyes.]{%
-    Meshes moved by the canonical mesh mover for representative eyes,
-    drawn over the GA mask at the physical aspect ratio, with the uniform
-    grid for comparison. Every $k$-th grid line is shown.}
+  \includegraphics[width=\textwidth]{images/fig_appendix_moved_mesh.png}
+  \caption[Moved meshes of three representative eyes.]{%
+    Meshes of the canonical mesh mover (seed 42, epoch 500) for the
+    baseline masks of three validation eyes of fold~2, drawn over the GA
+    lesion at the physical aspect ratio of the $5.94 \times 5.82$\,mm
+    window. Top row: the uniform $49 \times 1024$ grid; bottom row: the
+    moved mesh for the same mask. All 49 rows and every 21st column, plus
+    the last, are drawn, so every drawn node is a grid node and a drawn
+    cell measures about $0.12 \times 0.12$\,mm. The eyes are the lower
+    quartile, the median and the upper quartile of baseline lesion area
+    among the 16 validation eyes of fold~2: (a)~1.95\,mm$^2$,
+    (b)~7.79\,mm$^2$, (c)~10.24\,mm$^2$. Their edge gain is 2.65, 3.07 and
+    2.01 (1 for the uniform grid), and no cell of the three meshes is
+    folded. The meshes are in-sample, because the mesh mover was trained on
+    all 478 masks of the cohort, these three included. The hatched strip at
+    the bottom of (c) is a zero-padded row.}
   \label{fig:appendix:moved-mesh}
 \end{figure}
 

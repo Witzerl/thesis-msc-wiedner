@@ -83,9 +83,16 @@ This transform is standard for GA, because it removes the dependence of
 growth rates on baseline lesion size \citep{Feuer2013}. Over the 75
 eyes, the median square-root-area growth rate is 0.234\,mm per year. The
 interquartile range spans 0.153 to 0.340\,mm per year, and the 90th
-percentile is 0.473\,mm per year.
-% TODO: add a cohort-level baseline lesion-area distribution table
-% comparable to the one reported by Mai et al. (2024).
+percentile is 0.473\,mm per year. The baseline lesion area on the
+modelling grid ranges from 0.11 to 20.8\,mm$^2$, with a median of
+6.7\,mm$^2$ and an interquartile range of 2.37 to 9.45\,mm$^2$. Both
+distributions are shown in Appendix~\ref{app:dataset}
+(Figure~\ref{fig:appendix:cohort}).
+% Quantiles are order-statistic (nearest-rank) quantiles; linear
+% interpolation gives 0.157-0.337 / 0.461 mm per year and 2.41-9.42 mm^2.
+% Source: images/scripts/fig_appendix_cohort.py, 2026-10-01.
+% TODO: a baseline-characteristics table in the format of Mai et al. (2024)
+% (if wanted for the comparison in 5.5.1).
 
 Figure~\ref{fig:data:example-state} shows one visit of the cohort in the
 views used throughout this chapter.
@@ -208,9 +215,10 @@ The crop also has a measured cost for the pathology itself. A census
 over all 553 visits shows that the $49 \times 1024$ window cuts off real
 lesion area in 27.3\,\% of visits. It removes more than 5\,\% of the
 lesion in 6.0\,\% of visits, and 25.7\,\% of the lesion in the worst
-case. In addition, 31.1\,\% of the cropped lesions touch the crop
-border. Growth across that border is censored, and no missingness flag
-records it. The models are therefore trained on censored targets, and
+case. In addition, in 31.1\,\% of visits the lesion touches the edge of
+the imaged field inside the window: the border of the window or, for a
+padded visit, the edge of the scan itself. Growth across that edge is
+censored, and no missingness flag records it. The models are therefore trained on censored targets, and
 the change-region metrics at the one-year anchor under-measure
 progression for roughly one visit in five. The censoring also limits
 comparability with literature results computed over the whole field of

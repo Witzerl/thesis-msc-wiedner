@@ -1005,16 +1005,17 @@ Rollout NPZs exist only for two superseded runs (k-NN mean+max, dual branch), so
 figures need regenerated rollouts.
 
 Planned in the text (9 placeholders + 2 appendix chapters), in working order:
-- [ ] App. G `fig:appendix:moved-mesh` -- Python, autonomous (port `practical/scripts/fig_mesh.py`;
-  the poster's `fig_mesh_adaptation.png` is a synthetic lesion on a square domain, not reusable).
+- [x] App. G `fig:appendix:moved-mesh` -- done 2026-10-01 (`fig_appendix_moved_mesh.py`; eyes =
+  lower quartile / median / upper quartile of baseline area among fold-2 validation eyes).
 - [ ] App. D additional rollouts incl. failure cases -- Python, autonomous once the rollout
   pipeline below exists; failure cases chosen by a stated rule.
-- [ ] App. A cohort plots (visit intervals, visits per eye, baseline area, sqrt-area growth
-  rate, crop census) -- Python, autonomous from the raw scans.
+- [x] App. A cohort plots -- done 2026-10-01: `fig:appendix:cohort` (visits, intervals, baseline
+  area, growth rate) and `fig:appendix:crop` (native grids, lesion area lost); every cohort
+  number of Ch. 3 reproduced. Appendix A now has two short sections around them.
 - [ ] §5.2 `fig:experiments:rollout` -- Python, autonomous: regenerate fold-2 rollouts from
   `last.pt`, check that they reproduce the logged per-eye Dice, choose the eye by a stated rule.
-- [ ] §4.3.3 `fig:method:stencils` -- Python, autonomous (geometry only). Its TODO says "script
-  in the code repo"; it goes to `images/scripts/` instead.
+  (Running 2026-10-01; per-pixel floor row to be replaced by the k-NN graph network.)
+- [x] §4.3.3 `fig:method:stencils` -- done 2026-10-01 (`fig_method_stencils.py`).
 - [ ] §4.1 `fig:method:pipeline` -- schematic (TikZ draft), needs author review.
 - [ ] §3.1 `fig:data:example-state` -- Python from raw data; needs the author's decision whether
   a patient's SLO image may be printed.
@@ -1026,11 +1027,44 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
 - [ ] Not yet in the text: GA progression stages from the poster (`poster/figs/eye_stage_1-4.png`),
   e.g. in §1.1 or §2.1.2 -- placement to be decided.
 
-Proposed data figures for Chapter 5 (not in the text; add only after author approval): arm
-overview per fold (§5.2), reach ladder (§5.3.2), growth-region Dice by horizon with Mai (§5.3,
-§5.5.1), capacity curves (§5.4.3, T-FEN skew rows pending), predicted vs true growth rate
-(§5.5.1), solver swap (§5.5.1), T-FEN free-running error Galerkin vs skew (§5.5.2), training
-curves with the late-epoch window (§5.1.3).
+- [x] Chapter 5 data figures (author approved all eight, 2026-10-01), all in the text with a
+  referencing sentence, every plotted value checked against the text: `fig:experiments:curves`
+  (§5.1.3 + §5.4.2), `:arms-folds` (§5.2), `:reach` (§5.3.2), `:horizon` (§5.3.3/§5.3.4, with
+  Mai), `:capacity` (§5.4.3), `:swap` and `:tfen-stability` (§5.5), `:growth-rate` (§5.6.1).
+- [ ] TODO: switch `fig_experiments_capacity.py` to `TFEN_FORM = 'skew'` together with the
+  table rows once width-192 and depth-8 skew are complete.
+
+Text corrections made while building the figures (2026-10-01), each verified against the run
+records and documented in a LaTeX comment at the place:
+- Reach table/text: the ±35 geometry keeps the spacing (pitch 7, 32 neighbours); the ±42 one
+  keeps 20 neighbours (pitch 14). The text had "same number of neighbours" for ±35.
+- "31.1 % of the cropped lesions touch the crop border" (§2.1.6, §3.3, §6.3) -> in 31.1 % of
+  the visits (172/553) the lesion touches the edge of the imaged field inside the window
+  (window border or, for padded visits, the scan edge). True crop-edge contact alone: 28.4 %.
+- §5.1.3: epoch-to-epoch sd "0.02 to 0.10" -> "about 0.01 to 0.05" (late epochs, per fold,
+  Table 5.1 arms 0.005-0.047). Learning-rate reductions take effect from epochs 5 and 20
+  (0-based), not "after epoch 5" (also fixed in §4.5).
+- §5.3.4: k-NN first-year growth-region Dice 0.393 -> 0.397 (0.393 was the retired mean+max
+  arm). Also stale in the 2026-10-01 entry above and in SOLVER_FINAL_RUNS §9.20 (code repo).
+- §5.3.4: removed "whether its velocities stay within the stability limit has not been read
+  back" (the read-back exists, §5.5.2).
+- §5.4.2: the soft-Dice steadiness claim ("about three times") is carried by fold 4 (escape at
+  epoch 12); folds 0-3: 0.017 vs 0.013. Rewritten.
+- §5.4.3: four double-rounded cells fixed (0.520, 0.015, -0.020, -0.090; text 0.520);
+  "does not train on any fold" -> "trains poorly"; "about a quarter" -> "between about a sixth
+  and a third"; the width-192 divergence is no longer attributed to the Galerkin crop-edge
+  defect, because the skew form fails on the same folds 1 and 4 (Dice 0.054 / 0.028, NaN
+  training loss; folds 3-4 at 29 of 30 epochs).
+- §5.6.1 Table 5.6: bootstrap intervals r [0.22, 0.56] -> [0.20, 0.57], AUC10 [0.52, 0.91] ->
+  [0.53, 0.91], AUC15 [0.53, 0.86] -> [0.53, 0.85] (no percentile bootstrap reproduced the old
+  ones). Also stale in the "#20" entry above. Added: 14 of the 15 fastest eyes are
+  under-predicted (median predicted/true 0.50).
+- §3.1: baseline-area range/median/IQR added with a pointer to Appendix A; quantiles are
+  nearest-rank (linear interpolation gives 0.157-0.337 / 0.461 for the growth rate).
+- Not changed, for the reporting-scheme pass: the reach table caption counts folds "with the
+  sign of the mean" but its numbers count folds where the variant is higher (known TODO);
+  ±35 per eye is t = -2.8 (19/75), "under the floor" holds for the fold-paired instrument only.
+- Pre-existing, not from this work: "Float too large for page by 79.7pt" in Appendix E.
 
 ### Assets that now exist and should be reused
 
