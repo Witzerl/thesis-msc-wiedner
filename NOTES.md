@@ -266,7 +266,7 @@ wrong / to change". The author asked for no shortening yet; cuts wait for a late
   next to Vogl (2021) — Bogunović (2017) predicts drusen regression, so it is cited only in
   §2.5; the cRORA criteria in §2.1.2 now cite the primary source Sadda (2018) next to Vallino;
   the opening sentence of §1.1 now cites Wong (2014). Only Huang1991 remains uncited.
-- [ ] TODO: §1.2 cites Vogl (2021) for "earlier deep-learning work on AMD, which predicts when
+- [x] (author 2026-09-26: "it's fine", Vogl2021 stays) TODO: §1.2 cites Vogl (2021) for "earlier deep-learning work on AMD, which predicts when
   an eye will convert to a later disease stage". Vogl (2021) is a topographic GA progression
   analysis, not a conversion model; check whether it belongs in that sentence.
 - [x] 2026-09-26: repaired six broken `\ref` commands in the §1.5 outline (committed in
@@ -369,7 +369,7 @@ Being worked through one item at a time.
 - [x] (2026-09-27: §4.5.1 describes the option and states it is off in every reported run) TODO (from #32): §4.7 Training (still unwritten) must describe the optional pad-position
   loss masking (`--exclude_pad_nodes`) and state whether any reported run uses it, since
   §3.3 now points there (inline `% TODO` in 03-data.tex).
-- [ ] TODO (from #33): §6.4 Future Work — find a better cropping / spatial pre-processing than
+- [x] (resolved in ce6bf3e: §6.4 "Spatial pre-processing"; the author check of its wording is in prompts/open.txt section 5) TODO (from #33): §6.4 Future Work — find a better cropping / spatial pre-processing than
   the fixed 49×1024 centre crop (inline `% TODO` in 06-discussion.tex).
 
 ### Author's tablet review of §3.4–§4.3 (2026-09-27)

@@ -14,6 +14,9 @@ its items were resolved later and are listed in section 6.
 Merged 2026-10-01 with the open items of the author review of 3.4-4.2 (tablet review v3,
 19 marks, commit aed045c, 2026-09-27; the same chat session that later produced the [s27]
 commits). Those items are marked [rev]; section 9 is the overview of what is left from it.
+Merged 2026-10-01 with the open items of the session of 2026-09-26/27 (tablet review v2 of
+2.2-3.4, 33 marks, commits 44f1cfa ... 2e2c42b; bibliography passes fb5755d, ef9c5ca,
+b075de7). Those items are marked [s26]; section 10 is the overview of what is left from it.
 
 
 1. RUNS ON THE CLUSTER -> WHERE THEIR RESULT GOES
@@ -165,6 +168,35 @@ skew capacity points -> FEN_final_w96ftp7rk4d45skew (0.5428).
     [rev] Also stale in THESIS_STRUCTURE.md: 3.5 still says the two age encodings "are
     later measured (5.4, negative results)" -- the 3.5 pointer to 5.4 was cut in review #4
     and the covariate ablation is commented out in 5.4.
+[ ] [s26] Paper archive (pdfs/): of the 58 references cited in the text, only 15 have a PDF,
+    and 3 of those do not follow the <Key>.pdf convention (2202.03376v3_MPPDE.pdf ->
+    Brandstetter2022, 2312.05583v2_MMPDE.pdf -> Hu2024, Trincao2024 stored with the
+    accent). 43 are missing (Gao2019 is uncited and left out); the four [s27] references
+    above add four more once they are in the bib.
+      Freely available (32): Gilmer2017, Ronneberger2015, Li2021, LiuSchiaffini2024,
+        Lienen2022, Chen2018, Pfaff2021, SanchezGonzalez2020, Lam2023 (arXiv preprint),
+        Lu2021 (arXiv), Gupta2023, Ott2021, Krishnapriyan2023, Battaglia2018, Ba2016,
+        Ioffe2015, Liu2018, Wu2018, BarSinai2019, Kochkov2021, Wong2014,
+        SchmidtErfurth2018, Bogunovic2017, Mai2024, Salvi2025, Courant1943, Courant1928,
+        Runge1895, Kutta1901, LangtangenMardal2019 (Springer open access), JiangShu1996
+        (NASA/ICASE report version), Scarselli2009 (university repository copy).
+      Books / paywalled, via the JKU library only (11): LeVeque2007, LeVeque2002,
+        Bartels2016, Butcher1987, Hairer1993, Trefethen2000, GottliebOrszag1977,
+        HuangRussell2011, Liu1994, Sadda2018, Feuer2013.
+    Proposed (not yet approved -- downloads need an explicit go-ahead): clinical papers to
+    pdfs/GA/<Key>.pdf, all methods / numerics papers to a new pdfs/Methods/<Key>.pdf;
+    misnamed files copied (not moved) to their key names, since notes may link the old
+    names. Optional: a .bib and .md next to each, as in pdfs/GA/.
+[ ] [s26] references.bib: Brandstetter2022 and Hu2024 are still typed as arXiv preprints
+    ("journal = arXiv preprint ..."), but both are ICLR papers (2022 and 2024), and Hu2024
+    carries year = 2023, so Appendix G.1 prints "Hu et al. (2023)". Fix both entries
+    (NOTES "Bibliography" has the year item since 2026-09-26; never done).
+[ ] [s26] Huang1991 (origin of OCT, Science 254:1178-1181): the only reference with a
+    "% TODO: cite" marker that is not cited anywhere (02-background l. ~249, 2.1.3).
+    Decide: cite it in the first OCT sentence (add bib entry) or delete the marker.
+[ ] [s26] 2.1.6 still states the ~2 % constant-spacing check (02-background l. ~475). The
+    same paragraph was removed from 3.1 in review #27, and 6.3 now carries it
+    (06-discussion l. ~234). Decide whether 2.1.6 keeps it or points to 6.3.
 
 
 3. VERIFICATION (open)
@@ -194,6 +226,10 @@ skew capacity points -> FEN_final_w96ftp7rk4d45skew (0.5428).
 [ ] [ce6] 6.2 quotes the canonical model's growth-region Dice beyond one year as "about
     0.60 to 0.66" (= 0.600 / 0.634 / 0.655 from 5.3.4, SOLVER_FINAL_RUNS 9.19a); covered
     by the general re-check above, listed here because it is a new place the numbers appear.
+[ ] [s26] Salvi2025 bib entry carries initials only ("Salvi, A." ...; first names not found
+    in the sources checked 2026-09-26). Fill them from the paper's title page once the PDF
+    is archived. (Sadda2018, Lam2023, Battaglia2018 list the first authors + "others" on
+    purpose.)
 
 
 4. CODE-SIDE (masterthesis-docker; not editable from the thesis session)
@@ -234,6 +270,11 @@ skew capacity points -> FEN_final_w96ftp7rk4d45skew (0.5428).
     - Ch. 7 uses one bullet list (the four ingredients); the rest is prose.
     - Kurzfassung: new translation of the revised English text (decimal commas,
       "Rahmen" for framework, "Change-Region-Dice").
+[ ] [s26] The text written in the 2.2-3.4 review has not been read back by the author (review
+    v3 started at 3.4): the new 2.2 opening (option C), the 2.2 locality sentence (#4), the
+    "Finite elements." paragraph (#9), the rewritten "splitter field" sentence (#14), and the
+    method-origin paragraph at the end of Related Work (2.4, #23; it lost its graph U-Net
+    sentence in review v3 and now points to 4.3).
 
 
 6. RESOLVED (for the record)
@@ -273,6 +314,17 @@ skew capacity points -> FEN_final_w96ftp7rk4d45skew (0.5428).
     trajectory memory is discussed in 6.3 (only the stale 4.2 comment remains, section 2);
     the 6.3 TODO added in review #11 was replaced by that paragraph; the graph U-Net is
     gone from every uncommented line of the .tex files.
+[x] [s26] Resolved from the 2.2-3.4 review (all 33 marks applied, 44f1cfa / 2e2c42b):
+    #1-#23 (2.2 opening, locality, citations replaced, FEM paragraph, graph U-Net sentence,
+    MM-PDE background to Appendix G.1, method-origin paragraph); #24-#30 (3.1 / 3.2 cuts;
+    3.7 without the 100-identifier universe); #31 bold; #32 pad-loss pointer (4.5.1 says
+    "off in every reported run", [s27]); #33 better cropping (6.4 "Spatial
+    pre-processing", [ce6]); #27 the ~2 % spacing check now in 6.3 ([ce6]).
+    Bibliography: 63 entries at the time, every cited key checked against the publisher
+    record; Wong2014 / SchmidtErfurth2018 / Sadda2018 citations added where the text needed
+    them; six broken \ref in the 1.5 outline repaired. Vogl2021 in the 1.2 conversion
+    sentence: kept (author, 2026-09-26: "it's fine"). Thesis PDF rebuilt and checked
+    2026-09-27 (69 pages then, no undefined citations or references).
 
 
 7. OVERVIEW: WHAT IS LEFT FROM THE CH. 6/7/ABSTRACT SESSION ONLY  [ce6]
@@ -370,3 +422,27 @@ No run needed:
 
 Order: the two deletions any time; shrinkage together with the 6.3 item after 7875537
 is in; the rest rides along with the items it is filed under.
+
+
+10. OVERVIEW: WHAT IS LEFT FROM THE 2026-09-26/27 SESSION ONLY  [s26]
+---------------------------------------------------------------------
+(tablet review v2 of 2.2-3.4, 33 marks, all applied; bibliography passes; commits
+44f1cfa, 2e2c42b, fb5755d, ef9c5ca, b075de7)
+
+Cluster runs from this session: none. It edited text, the bibliography and NOTES only,
+so no open item here waits for a run and no job ID belongs to it.
+
+No run needed:
+  [ ] Paper archive: 43 cited references without a PDF, 3 misnamed; 32 freely
+      downloadable, 11 via the JKU library; layout pdfs/GA + pdfs/Methods, <Key>.pdf --
+      waiting for the author's go-ahead (section 2)
+  [ ] references.bib: Brandstetter2022 / Hu2024 as ICLR papers, Hu2024 year 2023 -> 2024
+      (section 2)
+  [ ] Huang1991: cite in 2.1.3 or delete the marker (section 2)
+  [ ] 2.1.6 vs 6.3: the ~2 % spacing check stated twice (section 2)
+  [ ] Salvi2025: full first names (section 3)
+  [ ] Author read-back of the new 2.2 / 2.4 text (section 5)
+
+Order: bib fixes and the two small decisions any time; the archive once approved (the
+four [s27] references first added to the bib, so they are downloaded in the same pass);
+Salvi's first names from the archived PDF.
