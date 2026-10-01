@@ -1203,7 +1203,10 @@ worked through one item at a time.
   The next two paragraphs open "For the framework, …" / "For the operator, …"; the separate
   closing take-away was folded into "What separates operators is reach". FNO "with and
   without a local path" dropped from the operator list. German mirrored.
-- [ ] #5 §1.2 "and is tested in this thesis" (covariates) -- "is it though".
+- [x] #5 §1.2 "and is tested in this thesis" (covariates) -- "is it though". Clause removed
+  2026-10-02 (the covariate ablation is commented out; §6.3 calls their value unsettled).
+- [x] Abstract (EN/DE): growth-speed sentence (r 0.40) removed at the author's request
+  (2026-10-02); the author accepts the abstract as it now stands.
 - [ ] #6 §1.3 "organised around a single question" -- "a single" circled, "?".
 - [ ] #7 §2.2.2 "which holds the rate constant over the step" -- "is this not why we have a
   linear line, [?] speed?" (reading uncertain).
