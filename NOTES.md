@@ -221,6 +221,9 @@ wrong / to change". The author asked for no shortening yet; cuts wait for a late
   lesion and the retinal layers around it." §1.2 cRORA claim fixed 2026-09-25 ("captures the GA
   lesion itself"). Still to fix: §2.1.5 CAM/cRORA
   mask definition; add the provenance as a plain dataset fact in §3.1.
+  2026-10-01 (later): §3.1 provenance paragraph added (hedged, TODO to confirm) and the §2.1.2
+  "cRORA endpoint" sentence fixed; 2.1.5 comment reduced to the layer provenance. Item done
+  apart from the supervisor confirmation.
   2026-10-01 status: §2.1.5 done (2026-09-25). Still open: §3.1 provenance sentence; and a
   further instance found while merging prompts/open.txt -- §2.1.2 "The thesis state tensor
   encodes only the cRORA endpoint, as channel~0" (02-background l. ~215). Overview of this

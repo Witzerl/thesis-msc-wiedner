@@ -212,11 +212,10 @@ outer retinal atrophy), which is essentially the same lesion at a
 smaller spatial scale, i.e.\ the same OCT pattern below the
 250\,\textmu{}m size threshold; iRORA progresses to cRORA in
 approximately 93\,\% of cases within twenty-four months, with a median
-conversion time of fourteen months \citep{Vallino2024}. The thesis
-state tensor encodes only the cRORA endpoint, as channel~0; iRORA is
-implicit in the surrounding layer channels but is not represented as a
-separate disease label, a scoping decision discussed
-in~\S\ref{sec:discussion:limitations}.
+conversion time of fourteen months \citep{Vallino2024}. Channel~0 of
+the state tensor used in this thesis marks the GA lesion as a binary
+mask (\S\ref{sec:background:ga-oct:state-rep}); iRORA is not represented
+as a separate label.
 
 The principal direct OCT signatures of an established GA lesion ---
 the visual fingerprints by which the disease is identified on a B-scan
@@ -403,16 +402,14 @@ tractability of the models introduced in the subsequent chapters.
 This subsection describes \emph{what} the eleven channels of the state
 tensor are, in structural terms, and \emph{why} retaining all of them
 is clinically motivated. The operational details of how the channels
-are produced from the raw OCT volumes in the MUW cohort ---
-segmentation pipeline, grading protocol, software stack --- are
-deferred to~\S\ref{sec:data:dataset} and are not relied upon
-in the rest of this chapter.
-% TODO: confirm with supervisor the exact provenance of channel 0
-% (manual clinical grading vs trained segmentation network vs
-% combination) and of channels 1-10 (which layer-segmentation
-% algorithm, which boundary list, which post-processing) before
-% drafting Chapter 3.1; the present subsection is written to be
-% agnostic of those details.
+were produced in the MUW cohort are deferred
+to~\S\ref{sec:data:dataset} and are not relied upon in the rest of
+this chapter.
+% TODO: confirm with supervisor the provenance of channels 1-10 (which
+% layer-segmentation algorithm, which boundary list, which
+% post-processing); Mai et al. (2024) do not describe it. Channel 0 is
+% stated in Section 3.1 (FAF grading registered to the OCT grid, per
+% Mai et al. 2024).
 
 The first channel of the state tensor is a binary \emph{GA mask} on the
 en-face grid: an indicator function that takes value one inside the GA

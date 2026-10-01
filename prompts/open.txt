@@ -253,7 +253,7 @@ skew capacity points -> FEN_final_w96ftp7rk4d45skew (0.5428).
     explicitly through local stencils and adaptive meshes" (01-introduction l. ~134-139).
     Mesh adaptation is Appendix G now; reword around locality / reach (or point to
     Appendix G). Raised 2026-09-25, author said "I can remember"; not done.
-[ ] [r25] 3.1: state where the GA mask comes from, as a plain dataset fact (author
+[x] (done 2026-10-01: new paragraph in 3.1 after the inclusion rule, hedged + TODO to confirm) [r25] 3.1: state where the GA mask comes from, as a plain dataset fact (author
     decision 2026-09-25: in 3.1, NOT in the Background): GA outlined manually on FAF by
     certified graders of the Vienna Reading Center ("well-demarcated areas with a
     significantly decreased or extinguished degree of autofluorescence"), registered
@@ -261,14 +261,14 @@ skew capacity points -> FEN_final_w96ftp7rk4d45skew (0.5428).
     annotation (Mai et al. 2024, PMC11000109, Methods). The repo agrees: mask_oct equals
     the SLO/FAF-frame mask_global sampled through T_mask (IoU ~1.0 on all 553 visits).
     03-data.tex 3.1 currently only lists the FAF image among the files (l. ~44).
-[ ] [r25] 2.1.2 still ties channel 0 to cRORA: "The thesis state tensor encodes only the
+[x] (done 2026-10-01: "Channel 0 ... marks the GA lesion as a binary mask (2.1.5); iRORA is not represented as a separate label"; the dead pointer to 6.3 removed -- 6.3 never discussed iRORA) [r25] 2.1.2 still ties channel 0 to cRORA: "The thesis state tensor encodes only the
     cRORA endpoint, as channel~0; iRORA is implicit in the surrounding layer channels ..."
     (02-background l. ~215). Same definition mismatch already fixed in 1.2 ("captures the
     GA lesion") and 2.1.5 (neutral mask definition): the mask is a FAF-defined GA
     annotation, not an OCT cRORA segmentation. Reword, e.g. "Channel 0 of the state tensor
     marks the GA lesion; iRORA is not represented as a separate label". Found while
     merging this list (2026-10-01).
-[ ] [r25] 2.1.5 TODO comment "confirm with supervisor the exact provenance of channel 0
+[x] (done 2026-10-01: comment now asks only for the layer provenance; "produced from the raw OCT volumes" -> "were produced") [r25] 2.1.5 TODO comment "confirm with supervisor the exact provenance of channel 0
     ... and of channels 1-10" (02-background l. ~410): channel 0 is answered by Mai et al.
     (2024); the layer provenance (algorithm, boundary list, post-processing) is still
     unknown -- Mai is silent on it. Shrink the comment to the layer part; same question as
@@ -284,7 +284,7 @@ skew capacity points -> FEN_final_w96ftp7rk4d45skew (0.5428).
     but asked for NO cuts during the review; the cuts the author approved explicitly
     (2.1.3 platforms, 2.1.4 projection strategies, 2.1.5 caveats) were applied, none are
     pending. A dedicated shortening pass is still to come.
-[ ] [r25] SECURITY: the git remote 'origin' still has a GitHub personal access token in its
+[x] (2026-10-01: URL reset by the author, push via credential manager works; author to confirm the old token is revoked on GitHub) [r25] SECURITY: the git remote 'origin' still has a GitHub personal access token in its
     URL (.git/config, plain text). Revoke the token on GitHub, use Git Credential Manager,
     then:  git remote set-url origin https://github.com/Witzerl/thesis-msc-wiedner.git
 
@@ -294,7 +294,7 @@ skew capacity points -> FEN_final_w96ftp7rk4d45skew (0.5428).
 [ ] Re-check every number changed on 2026-09-29 and 2026-10-01 (k-NN arms switched to
     mean aggregation; one-hop / per-pixel / Delta t / seed-7 values; T-FEN skew numbers).
     List of old -> new values in NOTES.md.
-[ ] Width-32 U-Net per eye: -0.0453 +/- 0.0113 (this session) vs -0.0469 +/- 0.0090
+[x] (moot 2026-10-01: width-32 U-Net removed everywhere in cc2c864) Width-32 U-Net per eye: -0.0453 +/- 0.0113 (this session) vs -0.0469 +/- 0.0090
     (SOLVER_FINAL_RUNS 9.18 / 9.6d).
 [ ] 5.4.2: the 31.8x gradient ratio of the monotonic penalty -- in which setting was it
     measured (F2 audit)? Confirm or state the setting.
@@ -627,9 +627,9 @@ CLAUDE.md and README.md only, so no open item here waits for a run and no job ID
 to it. (The Mai et al. fact check was a literature check, not a run.)
 
 Still open (checked against the current .tex on 2026-10-01):
-  [ ] 2.1.2 "cRORA endpoint, as channel 0" -- factual, small reword (section 2)
-  [ ] 3.1 FAF origin of the mask as a dataset fact (section 2)
-  [ ] 2.1.5 provenance TODO comment: keep only the layer part (section 2)
+  [x] 2.1.2 "cRORA endpoint, as channel 0" -- factual, small reword (section 2)
+  [x] 3.1 FAF origin of the mask as a dataset fact (section 2)
+  [x] 2.1.5 provenance TODO comment: keep only the layer part (section 2)
   [ ] 1.3 "spatially adaptive ... adaptive meshes" (section 2)
   [ ] Provenance sentence (clinical partner) -> 1.4 or start of Ch. 4 (section 2)
   [ ] 1.4 Contributions keep / rewrite / remove (= [ce6] item, section 2)
@@ -637,7 +637,7 @@ Still open (checked against the current .tex on 2026-10-01):
   [ ] Confirm the FAF origin + layer provenance with the supervisors (section 3)
   [ ] Author read-back of the rewritten Ch. 1 / 2.1 text, incl. the covariate sentence
       (section 5)
-  [ ] SECURITY: token in the git remote URL (section 2) -- do this first
+  [x] SECURITY: token in the git remote URL (section 2) -- do this first
 
 Order: the token now; the three factual items (2.1.2, 3.1, 2.1.5 comment) together in one
 small pass, since they are the same fact; 1.3 wording any time; the provenance sentence

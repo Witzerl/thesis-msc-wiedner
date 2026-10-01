@@ -47,6 +47,20 @@ frame. Only the OCT-grid mask and the layer array are required. An eye
 is included if at least two of its visits carry both, which guarantees
 at least one transition. All 75 eyes meet this condition.
 
+The GA mask was not segmented on the OCT.
+\citet{Mai2024}, who describe the same cohort, report that GA was
+outlined manually on the fundus-autofluorescence image by certified
+graders of the Vienna Reading Center, as well-demarcated areas of
+markedly decreased or absent autofluorescence. The outline was then
+registered automatically to the near-infrared image that is aligned with
+the OCT, which yields the en-face annotation on the OCT grid. The data
+agree with this: the OCT-grid mask coincides with the SLO-frame mask
+mapped through the recorded transform, with an intersection over union
+of at least 0.9995 on all 553 visits.
+% TODO: the FAF origin of the mask is inferred from Mai et al. (2024)
+% and the IoU check; confirm with the MUW data provider together with
+% the device model and the layer-segmentation provenance.
+
 The native en-face grids are not uniform. The 553 visits have 67
 distinct grid shapes, with 38 to 66 rows and 961 to 1719 columns. The
 shape is constant across the visits of one eye but differs between eyes.
