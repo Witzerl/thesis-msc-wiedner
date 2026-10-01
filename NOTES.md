@@ -1196,6 +1196,13 @@ worked through one item at a time.
   spacing, ±0.011 mm k-NN hop vs ~0.07 mm front advance; stencil +0.064; transport +0.062;
   the two carrying these properties are the two highest). Dropped: the spectral / local-path
   sentence, "the largest effect", "the same deficit". English fits on one page again.
+  Follow-up (author, 2026-10-02): a headline paragraph now comes before the two answers --
+  the framework and its operators forecast individual lesions; strongest operator 0.54 ± 0.04
+  at one year (persistence 0); its growth-region Dice above 0.5 in every year since baseline,
+  also beyond 3 y (Table 5.7: 0.519 / 0.602 / 0.633 / 0.611); growth speed weaker (r 0.40).
+  The next two paragraphs open "For the framework, …" / "For the operator, …"; the separate
+  closing take-away was folded into "What separates operators is reach". FNO "with and
+  without a local path" dropped from the operator list. German mirrored.
 - [ ] #5 §1.2 "and is tested in this thesis" (covariates) -- "is it though".
 - [ ] #6 §1.3 "organised around a single question" -- "a single" circled, "?".
 - [ ] #7 §2.2.2 "which holds the rate constant over the step" -- "is this not why we have a

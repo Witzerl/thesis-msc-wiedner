@@ -18,14 +18,21 @@
 % along a row, Fig. 4.2); spectral / local-path sentence dropped. "Plain
 % mean squared error" = ANISOGNN_final_dilmean_plainmse (no mask weighting
 % and no soft-Dice), Section 5.4.2.
+% 2026-10-02 (author): headline paragraph added before the two answers.
+% "Strongest operator" = energy-conserving T-FEN, 0.5428 +- 0.0401 (Table
+% 5.1); "Dice on the newly atrophic region stays above 0.5 in every year" =
+% growth-region Dice per year since baseline, Table 5.7 (0.519 / 0.602 /
+% 0.633 / 0.611 for 0-1 / 1-2 / 2-3 / >3 y). Growth rate r 0.40, 5.6.1 and
+% Appendix E. FNO local path dropped from the operator list (no longer
+% used in the results paragraph).
 
 \cleardoubleoddpage%  Make sure to start abstract on a new odd page
 \begin{abstract*}
 Geographic Atrophy (GA), the advanced atrophic form of age-related macular
 degeneration, is a lesion of lost retinal tissue that grows slowly and
-cannot be reversed. Forecasting how the lesion of an individual eye will
-change is difficult because visits are irregularly spaced, each eye has
-few of them, and cohorts are small.
+cannot be reversed. Forecasting the lesion of an individual eye is
+difficult because visits are irregularly spaced, each eye has few of
+them, and cohorts are small.
 
 This thesis asks what such a forecast needs: what kind of framework, and
 what kind of operator inside it. Each visit is represented as an
@@ -38,39 +45,39 @@ persistence, and all operators are trained with one pushforward curriculum
 measured in elapsed days and one loss. Only the operator $f_\theta$
 changes between experiments. It was filled in turn, at matched parameter
 counts, with operators from four families: message-passing graph networks
-on two neighbourhood graphs, a U-Net, Fourier Neural Operators with and
-without a local path, and Finite Element Networks with and without a
-learned transport term. They were compared by five-fold cross-validation
+on two neighbourhood graphs, a U-Net, Fourier Neural Operators, and
+Finite Element Networks with and without a learned transport term. They were compared by five-fold cross-validation
 on 75 eyes of 51 patients from the Medical University of Vienna, using
 the change-region Dice at one year.
 
-Every operator with spatial context learned to forecast change; a
-per-pixel model without it reproduced persistence exactly. The loss has
-to emphasise the lesion mask: trained with a plain mean squared error,
-the model learned no change at all, and a soft-Dice term added about
-0.05. Neither fourth-order Runge--Kutta integration in place of a single
-Euler step nor scaling the operators from about a quarter to four times
-their size improved the forecast.
+Together, the framework and its operators forecast how the lesion of an
+individual eye evolves. The strongest operator reaches a change-region
+Dice of $0.54 \pm 0.04$ (mean $\pm$ standard deviation over five folds)
+at one year, where a forecast of no change scores zero, and its Dice on
+the newly atrophic region stays above 0.5 in every year of follow-up,
+even beyond three years. The overall growth speed of an eye is
+predicted less well (correlation 0.40 with the true rates).
 
-The three strongest operators come from three different families, a
-Finite Element Network, a graph network and a U-Net, and reach a
-change-region Dice of $0.54 \pm 0.04$, $0.53 \pm 0.05$ and
-$0.50 \pm 0.06$ (mean $\pm$ standard deviation over five folds; zero for
-persistence). What separates the operators is how far one update
-reaches. The pixel spacing across B-scans is about 21 times larger than
-along them, so a neighbourhood graph built on pixel indices reaches only
-about 0.01\,mm along a B-scan per step, while the lesion front moves
-about 0.07\,mm between visits. A dilated stencil that reaches about
-0.12\,mm in both directions raises the Dice by 0.064 at an identical
-parameter count, on all five folds. A learned transport term in the
-Finite Element Network makes up for the same shortfall by a different
+For the framework, every operator with spatial context learned to
+forecast change; a per-pixel model without it reproduced persistence
+exactly. The loss has to emphasise the lesion mask: trained
+with a plain mean squared error, the model learned no change at all, and
+a soft-Dice term added about 0.05. Neither a fourth-order Runge--Kutta
+step instead of an Euler step nor operators from a quarter to four times
+the size improved the forecast.
+
+For the operator, the family does not decide the result: the three
+strongest, a Finite Element Network, a graph network and a U-Net, reach
+0.54, 0.53 and 0.50. What separates operators is reach. The pixel spacing
+across B-scans is about 21 times larger than along them, so a
+neighbourhood graph built on pixel indices reaches only about 0.01\,mm
+along a B-scan per step, while the lesion front moves about 0.07\,mm
+between visits. A dilated stencil that
+reaches about 0.12\,mm in both directions raises the Dice by 0.064 at an
+identical parameter count, on all five folds. A learned transport term in
+the Finite Element Network makes up for the same shortfall by a different
 mechanism (+0.062 over the same network without it). The two operators
 that carry these properties are the two highest.
-
-The growth rate of an eye over its whole follow-up is predicted less well
-than where the lesion changes (correlation 0.40 with the true rates). For
-such forecasts, what matters is how far one update reaches compared with
-how far the disease moves between visits, not the family of the operator.
 \end{abstract*}
 
 %%
@@ -88,9 +95,9 @@ how far the disease moves between visits, not the family of the operator.
 Die Geographische Atrophie (GA), die fortgeschrittene atrophe Form der
 altersabhängigen Makuladegeneration, ist eine Läsion abgestorbenen
 Netzhautgewebes, die langsam wächst und sich nicht zurückbildet.
-Vorherzusagen, wie sich die Läsion eines einzelnen Auges verändern wird,
-ist schwierig, weil die Kontrollen in unregelmäßigen Abständen
-stattfinden, jedes Auge nur wenige davon hat und die Kohorten klein sind.
+Die Läsion eines einzelnen Auges vorherzusagen ist schwierig, weil die
+Kontrollen in unregelmäßigen Abständen stattfinden, jedes Auge nur wenige
+davon hat und die Kohorten klein sind.
 
 Diese Arbeit untersucht, was eine solche Vorhersage benötigt: welche Art
 von Rahmen und welche Art von Operator darin. Jede Kontrolle wird als
@@ -106,43 +113,43 @@ Pushforward-Curriculum und einer gemeinsamen Verlustfunktion trainiert.
 Zwischen den Experimenten ändert sich nur der Operator $f_\theta$. Er
 wurde nacheinander, bei abgeglichener Parameterzahl, mit Operatoren aus
 vier Familien besetzt: Message-Passing-Graph-Netzwerken auf zwei
-Nachbarschaftsgraphen, einem U-Net, Fourier Neural Operators mit und ohne
-lokalen Pfad sowie Finite-Elemente-Netzwerken mit und ohne gelernten
-Transportterm. Verglichen wurden sie mit fünffacher Kreuzvalidierung an
+Nachbarschaftsgraphen, einem U-Net, Fourier Neural Operators sowie
+Finite-Elemente-Netzwerken mit und ohne gelernten Transportterm. Verglichen wurden sie mit fünffacher Kreuzvalidierung an
 75 Augen von 51 Patienten der Medizinischen Universität Wien, anhand des
 Dice-Koeffizienten der veränderten Region (Change-Region-Dice) nach einem
 Jahr.
 
-Jeder Operator mit räumlichem Kontext lernte, Veränderung vorherzusagen;
-ein Modell, das jedes Pixel für sich betrachtet, reproduzierte exakt die
-Persistenz. Die Verlustfunktion muss die Läsionsmaske betonen: Mit einem
-einfachen mittleren quadratischen Fehler trainiert, lernte das Modell
-keinerlei Veränderung, und ein Soft-Dice-Term brachte etwa 0,05. Weder eine
-Runge--Kutta-Integration vierter Ordnung anstelle eines einzelnen
-Euler-Schritts noch die Skalierung der Operatoren von etwa einem Viertel
-bis zum Vierfachen ihrer Größe verbesserte die Vorhersage.
+Zusammen sagen der Rahmen und seine Operatoren voraus, wie sich die Läsion
+eines einzelnen Auges entwickelt. Der stärkste Operator erreicht nach
+einem Jahr einen Change-Region-Dice von $0{,}54 \pm 0{,}04$ (Mittelwert
+$\pm$ Standardabweichung über fünf Folds), während eine Vorhersage ohne
+Veränderung null erreicht, und sein Dice auf der neu atrophierten Region
+bleibt in jedem Jahr der Beobachtung über 0,5, auch nach mehr als drei
+Jahren. Die Wachstumsgeschwindigkeit eines Auges insgesamt wird
+schlechter vorhergesagt (Korrelation 0,40 mit den tatsächlichen Raten).
 
-Die drei stärksten Operatoren stammen aus drei verschiedenen Familien, ein
-Finite-Elemente-Netzwerk, ein Graph-Netzwerk und ein U-Net, und erreichen
-einen Change-Region-Dice von $0{,}54 \pm 0{,}04$, $0{,}53 \pm 0{,}05$ und
-$0{,}50 \pm 0{,}06$ (Mittelwert $\pm$ Standardabweichung über fünf Folds;
-null für Persistenz). Was die Operatoren unterscheidet, ist, wie weit ein
-einzelnes Update reicht. Der Pixelabstand quer zu den B-Scans ist etwa
-21-mal größer als entlang der B-Scans, daher reicht ein auf Pixelindizes
-gebauter Nachbarschaftsgraph pro Schritt entlang eines B-Scans nur etwa
-0,01\,mm weit, während sich die Läsionsgrenze zwischen zwei Kontrollen um
-etwa 0,07\,mm bewegt. Ein gedehnter Stencil, der in beide Richtungen etwa
+Für den Rahmen gilt: Jeder Operator mit räumlichem Kontext lernte,
+Veränderung vorherzusagen; ein Modell, das jedes Pixel für sich
+betrachtet, reproduzierte exakt die Persistenz. Die Verlustfunktion muss
+die Läsionsmaske betonen: Mit einem einfachen mittleren quadratischen
+Fehler trainiert, lernte das Modell keinerlei Veränderung, und ein
+Soft-Dice-Term brachte etwa 0,05. Weder ein Runge--Kutta-Schritt vierter
+Ordnung anstelle eines Euler-Schritts noch Operatoren von einem Viertel
+bis zum Vierfachen der Größe verbesserten die Vorhersage.
+
+Für den Operator entscheidet nicht die Familie über das Ergebnis: Die drei
+stärksten, ein Finite-Elemente-Netzwerk, ein Graph-Netzwerk und ein U-Net,
+erreichen 0,54, 0,53 und 0,50. Was die Operatoren unterscheidet, ist ihre
+Reichweite. Der Pixelabstand quer zu den B-Scans ist etwa 21-mal größer
+als entlang der B-Scans, daher reicht ein auf Pixelindizes gebauter
+Nachbarschaftsgraph pro Schritt entlang eines B-Scans nur etwa 0,01\,mm
+weit, während sich die Läsionsgrenze zwischen zwei Kontrollen um etwa
+0,07\,mm bewegt. Ein gedehnter Stencil, der in beide Richtungen etwa
 0,12\,mm weit reicht, hebt den Dice bei identischer Parameterzahl um
 0,064, auf allen fünf Folds. Ein gelernter Transportterm im
 Finite-Elemente-Netzwerk gleicht dasselbe Defizit über einen anderen
 Mechanismus aus (+0,062 gegenüber demselben Netzwerk ohne diesen Term).
 Die beiden Operatoren mit diesen Eigenschaften sind die zwei stärksten.
-
-Die Wachstumsrate eines Auges über die gesamte Beobachtungszeit wird
-schlechter vorhergesagt als der Ort der Veränderung (Korrelation 0,40 mit
-den tatsächlichen Raten). Für solche Vorhersagen zählt, wie weit ein
-einzelnes Update reicht im Vergleich dazu, wie weit sich die Erkrankung
-zwischen zwei Kontrollen bewegt, und nicht die Familie des Operators.
 \end{abstract*}
 \end{otherlanguage}
 
