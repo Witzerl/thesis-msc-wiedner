@@ -35,10 +35,8 @@ A fourth-order Runge--Kutta step in place of one Euler step changed
 nothing measurable, over a local and over a global operator
 (\S\ref{sec:experiments:ablations:time}). The multiplication of the
 operator output by $\Delta t$ is, on the mask channel, a change of
-parameterisation rather than additional knowledge.
-% TODO: state the result of the Delta t-multiplication ablation on the
-% canonical network (ANISOGNN_final_dilmean_nodts, queued 2026-10-01) here
-% and in 5.4.1; the sentence above is the argument, not the measurement.
+parameterisation rather than additional knowledge, and removing it does
+not change the result.
 What the framework needs, in short, is that the length of the interval
 reaches the operator and that everything else is held fixed.
 
@@ -69,6 +67,11 @@ survey is consistent with it. The coincidence of two routes is suggestive
 rather than a proof of mechanism, but it is a more specific statement
 than any ranking of architectures.
 
+% TODO (author decision, 2026-10-01): the seed-7 FNO / hybrid runs do NOT
+% replicate this paragraph -- at seed 7 the 3x3 local path adds nothing to the
+% FNO (-0.006) and the hybrid lies below the U-Net (-0.019, 0/5 folds). What
+% holds at both seeds: the FNO alone does not reach the U-Net at the anchor.
+% Rewrite once decided (see 5.3.3).
 Global and local context behave as separable ingredients. The FNO, which
 sees the whole grid in every layer but has no local path, lies below the
 U-Net at the one-year anchor, and a $3 \times 3$ local path of 800
@@ -272,6 +275,11 @@ about mesh adaptation is drawn from it.
 % seed-7 matched transport control, Delta t-multiplication and loss-term
 % ablations on the canonical network, T-FEN capacity points in skew form.
 % Fill Chapter 5 and revise Sections 6.1 and 6.3 once they are read out.
+% 2026-10-01: all in except w192 / depth-8 skew; Chapter 5 filled. Open for
+% 6.1/6.3 (author decision): T-FEN > U-Net replicated; global + local not
+% replicated at seed 7; the soft-Dice term raises the score (-0.050 without
+% it) and plain MSE never leaves the copy-input collapse -- 6.1 "Where
+% modelling effort pays" is currently silent on the objective.
 
 
 \section{Future Work}

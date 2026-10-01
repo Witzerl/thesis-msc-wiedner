@@ -319,14 +319,19 @@ network against the U-Net gives $\Delta = +0.021 \pm 0.017$~SE at seed 42
 and only $+0.008 \pm 0.008$ at seed 7, both under the mixed floor of 0.020.
 At seed 7, the graph network reads $0.5279 \pm 0.0419$ and the U-Net
 0.5199. The T-FEN against the U-Net gives $\Delta = +0.0383 \pm 0.0134$~SE
-(5/5) and per eye $+0.0383 \pm 0.0075$ (51/75, $t = 5.1$), above the mixed
-floor at seed 42. For the earlier form of the T-FEN, a seed-42 lead over the
-U-Net of this kind halved at seed 7, so this one is not read as established
-before its seed-7 replication.
-% TODO: seed-7 skew-form T-FEN (FEN_final_w96ftp7rk4d45skews7, queued
-% 2026-10-01): decide whether T-FEN > U-Net is established or the three
-% highest arms remain indistinguishable; update this paragraph, Section 5.3.5
-% and the headline wording accordingly.
+(5/5) and per eye $+0.0383 \pm 0.0075$ (51/75, $t = 5.1$) at seed 42, and
+$+0.0246 \pm 0.0073$~SE (5/5) and per eye $+0.0255 \pm 0.0074$ (52/75,
+$t = 3.4$) at seed 7. The lead is smaller at the second seed but present on
+every fold at both, so the T-FEN lies above the U-Net. Against the
+dilated-stencil network, the T-FEN is higher by $+0.0165 \pm 0.0021$~SE
+(5/5) and per eye $+0.0152 \pm 0.0048$ (49/75, $t = 3.1$) at seed 7, close
+to its seed-42 value: a small but consistent lead, at the noise level.
+% TODO (author decision, 2026-10-01): the seed-7 skew T-FEN replicates the
+% lead over the U-Net (seed 42 +0.038, seed 7 +0.025) and shows a consistent
+% +0.016 to +0.017 over the stencil at both seeds (seed 7: 5/5 folds, per-eye
+% t 3.1). Decide how this changes the headline "the strongest arms of
+% different classes are indistinguishable" in 5.2/5.3.5, 6.1, Ch. 7 and both
+% abstracts. The sentence above is the factual minimum.
 
 The T-FEN reported here uses the energy-conserving form of its transport
 operator (\S\ref{sec:method:family:fen}). Its first version, with the
@@ -376,11 +381,13 @@ reads 0.0000 on every fold, identical to persistence. With one round, the
 one-hop floor reads $0.4515 \pm 0.0243$. With two rounds, the $k$-NN arm
 reads $0.4623 \pm 0.0361$. One round against two gives
 $\Delta = -0.0108 \pm 0.0061$~SE (1/5), under the paired floor, and per eye
-$-0.0122 \pm 0.0051$ (33/75, $t = -2.4$). The second round thus adds about
-0.01, consistently in direction but not established.
+$-0.0122 \pm 0.0051$ (33/75, $t = -2.4$). At seed 7 the one-hop floor
+reads $0.4687 \pm 0.0253$ and lies level with the two-round arm
+($+0.0036 \pm 0.0049$~SE, 2/5; per eye $+0.0029$, 40/75). The second round
+thus adds at most about 0.01, and not reproducibly.
 
 A single ring of neighbours therefore buys almost everything the graph
-network on this graph achieves, and the second ring adds little. Every
+network on this graph achieves, and the second ring adds little or nothing. Every
 point of change-region Dice comes from spatial context. One possible reason
 why the second ring adds so little is where its extra reach lies: on the
 index-space graph it extends mostly across rows, and only about 0.01\,mm
@@ -496,12 +503,25 @@ instrument. The two instruments disagree here, which is why both are
 always quoted. The hybrid against the U-Net gives
 $\Delta = -0.0061 \pm 0.0108$~SE and per eye $-0.0089$ (33/75): a tie.
 
-Global spectral support alone therefore does not reproduce the result of
-the U-Net, whereas global support with a minimal local path does. Global
-context and local detail are separable ingredients, and both are needed.
-Two architecturally unrelated constructions that combine them --- the
-multiscale pyramid of the U-Net and the FNO with a local path --- arrive at
-the same level at matched capacity.
+At seed 7 this pattern does not repeat. The FNO against the U-Net gives
+$\Delta = -0.0136 \pm 0.0105$~SE (2/5) and per eye $-0.0172 \pm 0.0104$
+(27/75), in the same direction as at seed 42 but under the floor. The local
+path no longer helps: the hybrid against the FNO gives
+$-0.0057 \pm 0.0105$~SE (3/5) and per eye $-0.0054$ (35/75). And the hybrid
+lies below the U-Net, by $-0.0193 \pm 0.0051$~SE on all five folds and per
+eye $-0.0227 \pm 0.0091$ (26/75, $t = -2.5$). Both operators with global
+support stay above the $k$-NN graph network at seed 7, by $+0.041$ (FNO)
+and $+0.036$ (hybrid).
+
+What holds at both seeds is therefore that global spectral support alone
+does not reach the U-Net at the one-year anchor. That a minimal local path
+closes this gap rests on seed 42 alone; at seed 7 it does not, and the
+claim is not established.
+% TODO (author decision, 2026-10-01): the seed-7 FNO / hybrid runs do not
+% replicate "global context and local detail are separable and both needed"
+% (the hybrid ties the U-Net only at seed 42). This ingredient is named in
+% 5.3 intro, 5.3.5, 6.1, Ch. 7, both abstracts (and possibly 1.4). Decide how
+% to restate it there. Values: thesis_numbers.py pair, 2026-10-01.
 
 \subsection{An Explicit Transport Term}
 \label{sec:experiments:ingredients:transport}
@@ -512,37 +532,39 @@ without its transport head, at the same width
 heads are zero-initialised, so both arms start as the same function. The
 difference is $\Delta = +0.0618 \pm 0.0040$~SE (5/5) and per eye
 $+0.0640 \pm 0.0058$ (68/75, $t = 11.0$). The effect is established on
-both instruments. With the earlier Galerkin form of the transport operator
-the difference was about the same, $+0.0527 \pm 0.0065$~SE (5/5) at seed
-42 and $+0.0495 \pm 0.0081$~SE (5/5) at seed 7, so the effect does not
-depend on the form of the operator.
-% TODO: seed-7 value for the energy-conserving form once
-% FEN_final_w96ftp7rk4d45skews7 is in.
+both instruments. At seed 7, against the free-form network of the same
+seed, it is $+0.0897 \pm 0.0142$~SE (5/5) and per eye
+$+0.0878 \pm 0.0071$ (71/75, $t = 12.4$). With the earlier Galerkin form of
+the transport operator the difference was of the same order,
+$+0.0527 \pm 0.0065$~SE at seed 42 and $+0.0758 \pm 0.0092$~SE at seed 7
+(both 5/5), so the effect does not depend on the form of the operator.
+% Seed-7 values: thesis_numbers.py pair, 2026-10-01, against
+% FEN_final_w96Frk4d45s7. The previously quoted seed-7 Galerkin value
+% (+0.0495) used the seed-42 free-form control and is superseded.
 
 This control, however, is not parameter-matched: the T-FEN has
 68\,503 parameters and the free-form control 34\,785, a factor of 1.97.
 Part of the gain could therefore come from the extra parameters. A second
 control closes this gap. It widens the free-form network to a width of
 139, which gives 68\,282 parameters, level with the T-FEN
-(\S\ref{sec:method:family:params}). On fold 4 this control does not train:
-its training error rises from the first epoch instead of falling, and it
-reads 0.047 at the anchor, in two separate attempts, while the width-96
-control trains normally on the same fold (0.501). Fold 4 is therefore
-excluded from this comparison. On folds 0 to 3, the T-FEN against the
-matched control gives $\Delta = +0.0716 \pm 0.0094$~SE (4/4) and per eye
-$+0.0737 \pm 0.0063$ (59/63, $t = 11.7$). This reproduces the unmatched
-difference on the same folds ($+0.0631$), and the extra width bought the
-free-form network nothing there ($-0.0084 \pm 0.0053$~SE, 0/4). The
-transport effect is therefore not a matter of parameter count. Including
-the failed fold, the difference would read $+0.159$, which only reflects the
-failure.
-% TODO (author review v4 #32, 2026-10-01): a seed-7 run of the matched
-% control (FEN_final_w139Frk4d45s7, all five folds) is queued to test whether
-% the fold-4 failure is seed-specific. If fold 4 trains at seed 7, add the
-% seed-7 comparison against the seed-7 T-FEN (FEN_final_w96ftp7rk4d45s7) and
-% revise the fold-4 sentence. Numbers above verified 2026-10-01 against
+(\S\ref{sec:method:family:params}). At seed 42, this control does not train
+on fold 4: its training error rises from the first epoch instead of
+falling, and it reads 0.047 at the anchor, in two separate attempts, while
+the width-96 control trains normally on the same fold (0.501). On folds 0
+to 3, the T-FEN against the matched control gives
+$\Delta = +0.0716 \pm 0.0094$~SE (4/4) and per eye $+0.0737 \pm 0.0063$
+(59/63, $t = 11.7$). At seed 7 the matched control trains on every fold,
+including fold 4 (0.442), so the failure was specific to one seed. There,
+the T-FEN against the matched control gives $+0.0762 \pm 0.0105$~SE (5/5)
+and per eye $+0.0750 \pm 0.0062$ (73/75, $t = 12.2$). The extra width moves
+the free-form network by little at either seed ($-0.0084$ on folds 0 to 3
+at seed 42, $+0.0135$ at seed 7, both under the floor). The transport
+effect is therefore not a matter of parameter count.
+% Seed-7 values: thesis_numbers.py pair, 2026-10-01 (w139 s7 folds 0.4652,
+% 0.4468, 0.5351, 0.4521, 0.4418). Seed-42 values verified 2026-10-01 against
 % solver_results.csv (superseded fold-4 attempt skipped) and SOLVER_FINAL_RUNS
-% section 9.18.
+% section 9.18. Including the failed seed-42 fold the difference would read
+% +0.159, which only reflects the failure.
 
 Where the transport term acts can be seen in the first year. In the
 growth-region Dice between baseline and one year, the free-form FEN reads
@@ -622,13 +644,12 @@ the canonical dilated-stencil network.
 \paragraph{Is the multiplication by $\Delta t$ needed?}
 In the first test, the multiplication was removed, so the update became
 $u_t + f_\theta(u_t, \Delta t, z)$, while $\Delta t$ remained an input of
-the operator.
-% TODO: insert the result on the canonical dilated-stencil network here
-% (ANISOGNN_final_dilmean_nodts against ANISOGNN_final_dilmean, queued
-% 2026-10-01): "The change-region Dice does not change (...)". If it is not
-% a null, rewrite this paragraph and the conclusion of the subsection. The
-% text below assumes a null. (The k-NN run of this ablation is deliberately
-% not reported, author 2026-10-01.)
+the operator. The change-region Dice does not change: $-0.0006$ on average
+($\pm 0.0061$~SE, higher on 2 of 5 folds) and per eye $-0.0028 \pm 0.0037$
+(30/75).
+% Values: thesis_numbers.py pair ANISOGNN_final_dilmean_nodts
+% ANISOGNN_final_dilmean, 2026-10-01 (arm 0.5252 +/- 0.0425 vs 0.5258).
+% The k-NN run of this ablation is deliberately not reported (author).
 The reason lies in the mask channel. Its two values are a fixed distance
 apart in normalised units, $-0.602$ and $+1.660$
 (\S\ref{sec:data:normalization}). At a pixel that changes between two
@@ -687,29 +708,44 @@ Almost every pixel of the mask stays the same between two visits. With an
 unweighted mean squared error, a model can therefore reach a low loss by
 copying its input, which predicts no change at all and scores 0 on the
 change-region Dice. The collapse counter of~\S\ref{sec:experiments:protocol:metrics}
-detects this.
-% TODO: insert the result of ANISOGNN_final_dilmean_plainmse (mask weight 1,
-% no soft-Dice) against ANISOGNN_final_dilmean (queued 2026-10-01): late-epoch
-% change-region Dice, both instruments, the collapse counter per epoch and
-% the epoch at which the run leaves the collapse (if it does).
+detects this. Trained with a plain, unweighted mean squared error and no
+soft-Dice term, the network falls into this collapse and never leaves it
+within the 30 epochs: its change-region Dice is 0 on every fold and at
+every epoch, and at the last epoch 74 of the 75 validation eyes have a
+prediction identical to their baseline mask. The objective, not the
+operator, decides whether the model learns any change at all.
 
 \paragraph{What does the soft-Dice term add?}
-% TODO: insert the result of ANISOGNN_final_dilmean_nodice (mask weight 5,
-% no soft-Dice) against ANISOGNN_final_dilmean (queued 2026-10-01): late-epoch
-% change-region Dice (both instruments), the epoch of escape from the
-% collapse, the epoch-to-epoch standard deviation of the metric, and the raw
-% mask RMSE (calibration stretch of the soft-Dice term, see 4.5.1; raw values
-% only within this comparison). Expected reading, to be confirmed or
-% replaced: the weighting, not the soft-Dice term, avoids the collapse, and
-% the soft-Dice term buys an earlier escape and a steadier metric rather
-% than a higher score.
+With the mask weighting kept and only the soft-Dice term removed, the
+network does leave the collapse, but late: on the five folds, its
+change-region Dice first rises above 0 at epochs 2, 8, 3, 7 and 12, against
+epoch 0 with the full objective. It also ends lower, by $-0.050$ on average
+($\pm 0.017$~SE, lower on all five folds) and per eye $-0.046 \pm 0.009$
+(lower on 56 of 75 eyes, $t = -5.1$), and it is less steady: the
+standard deviation of its late-epoch Dice from one epoch to the next is
+about three times that of the full objective (0.043 against 0.015). The
+weighting is therefore what lets the model escape the collapse, and the
+soft-Dice term adds an immediate escape, a steadier metric and a higher
+score. Its cost is the stretch of the raw mask regression described
+in~\S\ref{sec:method:training:loss}: the raw mask error of the free-running
+rollout is about twice as large with the term as without it (1.10 against
+0.51). It does not change any thresholded metric.
+% Values: thesis_numbers.py pair ANISOGNN_final_dilmean_{plainmse,nodice}
+% ANISOGNN_final_dilmean, 2026-10-01; escape epochs, late sd and raw
+% rollout_mask_rmse (late-epoch means) read from metrics.jsonl. plainmse:
+% arm 0.0000, n_identical_to_bootstrap at epoch 29 = 20/12/15/15/12. nodice:
+% arm 0.4762 +/- 0.0631 vs 0.5258. These replace the older fold-2 loss
+% ladder, which read the soft-Dice term as not raising the score.
 
 \paragraph{Would a monotonic-growth penalty help?}
 Atrophic tissue does not regenerate, so a penalty on any decrease of the
 mask where the previous state is atrophic is a natural prior. It is
-implemented (\S\ref{sec:method:training:loss}) but switched off.
-% TODO: insert the result of ANISOGNN_final_dilmean_mono2 (penalty weight 2.0)
-% against ANISOGNN_final_dilmean (queued 2026-10-01), both instruments.
+implemented (\S\ref{sec:method:training:loss}) but switched off. With the
+penalty at weight 2.0, the change-region Dice is $-0.0036$ on average
+($\pm 0.0037$~SE, higher on 2 of 5 folds) and per eye $-0.0042 \pm 0.0034$
+(34/75): no measurable effect, so the simpler objective is kept.
+% Values: thesis_numbers.py pair ANISOGNN_final_dilmean_mono2
+% ANISOGNN_final_dilmean, 2026-10-01 (arm 0.5221 +/- 0.0432).
 Two arguments speak against the penalty independently of its effect on the
 score. Under the pushforward curriculum
 (\S\ref{sec:method:training:curriculum}), the previous state on an unrolled
@@ -805,6 +841,11 @@ quarter of the original size.
 % w96d8...skew against the skew 1x twin FEN_final_w96ftp7rk4d45skew (0.5428)
 % -- and drop the Galerkin footnote and the Galerkin sentence below. If the
 % width-192 or depth-8 skew runs still fail to train, say so.
+% Status 2026-10-01: w48 skew in -- 0.5434 +/- 0.0363, vs skew w96 +0.0006
+% +/- 0.0026 SE (3/5), per eye -0.0003 +/- 0.0020 (37/75), stable 5/5
+% (params 20,455, ratio 0.30). w192 skew (folds 3-4 at 29/30 epochs) and
+% depth-8 skew (folds 2-4 running) not complete; replace all four rows
+% together once both are in.
 % Source: masterthesis-docker SOLVER_FINAL_RUNS section 9.18 (capacity study,
 % 2026-09-30); every value re-computed 2026-10-01 from solver_results.csv and
 % the per-eye records. One deviation: the width-32 U-Net per eye reads
@@ -1089,7 +1130,9 @@ operator (Equation~\ref{eq:method:fen-skew}), identical in every other
 respect, at seed 42 on all five folds. It passes the stability criterion on
 every fold, with a largest late-epoch error of 2.32 on the mask channel and
 1.13 on the layer channels (Table~\ref{tab:experiments:tfen-stability}).
-Its accuracy is at least as good: $0.5428 \pm 0.0401$ against
+The replication at seed 7 passes on every fold as well, with a largest
+error of 2.63 on the mask channel and 1.11 on the layer channels. Its
+accuracy is at least as good: $0.5428 \pm 0.0401$ against
 $0.5337 \pm 0.0453$ for the Galerkin form, higher on all five folds, by
 $+0.009$, which is under the noise level. The gain sits where the defect
 was: on lesions that touch the crop border the change-region Dice rises
@@ -1117,8 +1160,9 @@ the stability criterion, which the run passes, and an evaluation step of
 % Source: SOLVER_FINAL_RUNS section 9.19b (fold 0, 2026-10-01). Consequence
 % recorded there: the learned velocity map may be quoted if the rollout is
 % evaluated at a 30-day step; the thesis does not interpret it.
-% TODO: seed-7 run of the skew-form T-FEN (FEN_final_w96ftp7rk4d45skews7,
-% queued 2026-10-01); the stability result above is seed 42 only.
+% Seed 7: FEN_final_w96ftp7rk4d45skews7, thesis_numbers.py stability,
+% 2026-10-01: mask 20/20 and layer 20/20 on every fold; max mask
+% 1.65/2.03/2.41/1.63/2.63, max layer 1.07/0.914/1.11/0.833/1.02.
 
 \begin{table}[t]
   \centering

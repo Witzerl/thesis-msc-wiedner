@@ -25,6 +25,11 @@ How time enters the update mattered less than that it enters: a
 higher-order Runge--Kutta step bought nothing over a single Euler step.
 
 \paragraph{The operator.}
+% TODO (author decision, 2026-10-01): seed 7 replicates the skew T-FEN's
+% lead over the U-Net (+0.038 seed 42, +0.025 seed 7, 5/5 folds at both) and
+% shows +0.016/+0.017 over the stencil at both seeds; "lie close together"
+% and "architecture class does not decide" need a decision. The global + local
+% bullet below is not replicated at seed 7 (see 5.3.3).
 The architecture class does not decide the outcome. The three strongest
 operators come from three unrelated classes --- a finite-element network,
 a graph network and a U-Net --- and lie close together, at a

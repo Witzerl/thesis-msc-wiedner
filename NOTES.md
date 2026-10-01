@@ -588,7 +588,7 @@ Being worked through one item at a time.
   same folds +0.0532; w139 − w96 −0.0084 ± 0.0053 (0/4); with the failed fold +0.150. The 1.97×
   caveat is dropped (§5.3.4, §5.3.5); §4.3.6/§4.3.8/Table 4.2 "pending" TODOs removed. Verified
   against the CSV (superseded f4 attempt skipped) and SOLVER_FINAL_RUNS §9.18.
-- [ ] TODO (#32 follow-up): seed-7 matched control `FEN_final_w139Frk4d45s7` (5 folds) to be
+- [x] (2026-10-01: in -- fold 4 trains at seed 7; §5.3.4 filled) TODO (#32 follow-up): seed-7 matched control `FEN_final_w139Frk4d45s7` (5 folds) to be
   queued 2026-10-01 — tests whether the fold-4 failure is seed-specific; add the seed-7
   comparison against `FEN_final_w96ftp7rk4d45s7` and revise the fold-4 sentence (inline TODO).
 - [x] 2026-10-01 **Capacity study written up** as new §5.4.3 "Capacity" (`sec:experiments:
@@ -631,7 +631,7 @@ Being worked through one item at a time.
   "the effect does not depend on the form"); horizon profiles inserted (§9.19a); §5.3.5 no longer
   claims "indistinguishable from the U-Net"; capacity table T-FEN points marked Galerkin;
   §5.5 intro reworded; Mai section r range 0.33–0.47. **Resolves review #26, #28, #38.**
-- [ ] TODO (T-FEN, pending): seed-7 skew run `FEN_final_w96ftp7rk4d45skews7` (5 folds, command
+- [x] (2026-10-01: in -- §5.2, §5.3.4, §5.5.2 filled; headline decision open, see below) TODO (T-FEN, pending): seed-7 skew run `FEN_final_w96ftp7rk4d45skews7` (5 folds, command
   given 2026-10-01) → T-FEN vs U-Net (established or tie), §5.2, §5.3.5, headline wording,
   seed-7 transport value (§5.3.4). Courant read-back of the skew checkpoints (needs `last.pt`)
   before the velocity map is quotable. Verify the §9.19a horizon values against the mai/ records.
@@ -669,7 +669,7 @@ Being worked through one item at a time.
   TODO (#34). Corrected my own draft: the RK4 arm is autonomous (no Δt input) and still ties,
   so the text says "the interval must reach the operator", not "Δt as an input is necessary"
   (2026-10-01).
-- [ ] TODO (#33 follow-up): `ANISOGNN_final_dilmean_nodts` queued 2026-10-01 (author) — fill the
+- [x] (2026-10-01: null, §5.4.1 + §6.1 filled) TODO (#33 follow-up): `ANISOGNN_final_dilmean_nodts` queued 2026-10-01 (author) — fill the
   §5.4.1 Δt-multiplication result on the canonical stencil (both instruments); if not a null,
   rewrite the paragraph and the subsection's conclusion.
 - [x] #35/#36 §5.4.2 "The Objective" rewritten like §5.4.1 (2026-10-01): purpose (the objective
@@ -723,14 +723,39 @@ Being worked through one item at a time.
   control.
 - [ ] TODO (optional): solver-swap on the skew T-FEN at fold 2 (common fold with the graph
   networks) and on the seed-7 skew T-FEN.
-- [ ] TODO (#35 follow-up): fill §5.4.2 once `dilmean_plainmse`, `dilmean_nodice`,
+- [x] (2026-10-01: filled) TODO (#35 follow-up): fill §5.4.2 once `dilmean_plainmse`, `dilmean_nodice`,
   `dilmean_mono2` are in (queued 2026-10-01).
-- [ ] 2026-10-01 seed-7 runs queued (author): `FEN_final_w96Frk4d45s7` (free-form, fixes the
+- [x] (2026-10-01: all in, read out in SOLVER_FINAL_RUNS §9.22) 2026-10-01 seed-7 runs queued (author): `FEN_final_w96Frk4d45s7` (free-form, fixes the
   mixed-seed seed-7 transport value +0.0495, which used the seed-42 free-form control),
   `FNO_final_w5s7`, `FNO_final_w5k3s7` (global+local ingredient has no replication),
   `MPPDE_final_l1means7` (optional, locality ladder); plus earlier: skew T-FEN s7 and
   T-FEN capacity points in skew form (w48, w192, d8). Read out with the usual integrity checks
   and fill the Appendix E seed-7 table of the reporting scheme.
+- [x] 2026-10-01 **Batch readout** (11 of 13 arrays; `thesis_numbers.py`, anchor reproduced;
+  written to the code repo as SOLVER_FINAL_RUNS **§9.22**, not committed there). Filled into
+  Chapter 5: §5.2 (skew T-FEN s7 vs U-Net +0.0246 ± 0.0073 (5/5) / +0.0255 (52/75, t 3.4); vs
+  stencil +0.0165 ± 0.0021 (5/5) / +0.0152 (49/75, t 3.1)); §5.3.1 (one-hop s7 level with two
+  rounds, +0.0036 -> "adds at most ~0.01, not reproducibly"); §5.3.3 (seed-7 FNO / hybrid: hybrid −
+  FNO −0.0057, hybrid − U-Net −0.0193 (0/5), FNO − U-Net −0.0136 -> the local-path claim rests on
+  seed 42 only, "not established"); §5.3.4 (transport at seed 7 vs same-seed free-form +0.0897
+  (5/5) / +0.0878 (71/75); Galerkin s7 +0.0758 replaces the mixed-seed +0.0495; w139 s7 trains on
+  every fold incl. f4 (0.4418), T-FEN − matched +0.0762 (5/5) / +0.0750 (73/75)); §5.4.1 (nodts
+  −0.0006 ± 0.0061, per eye −0.0028: null); §5.4.2 (plainmse 0.0000, never escapes, 74/75 eyes
+  identical to baseline; nodice −0.0496 ± 0.0172 (0/5) / −0.0460 (19/75, t −5.1), escape epochs
+  2/8/3/7/12, late sd 0.043 vs 0.015, raw mask RMSE 0.51 vs 1.10; mono2 −0.0036 / −0.0042: null);
+  §5.5.2 (skew s7 stable 5/5, max mask 2.63, layer 1.11). §6.1 l. 40 TODO closed (Δt null).
+  Capacity: w48 skew 0.5434 (= w96 skew, +0.0006), stable 5/5 -- rows replaced only once w192 /
+  depth-8 skew are complete.
+- [ ] **Author decisions from the batch (2026-10-01)** -- inline TODOs in 5.2, 5.3.3, 6.1, Ch. 7,
+  abstract: (a) the skew T-FEN lies above the U-Net at both seeds and +0.016/+0.017 above the
+  stencil at both -- "the strongest arms of different classes are indistinguishable" / "lie close
+  together" / "architecture class does not decide" need rewording or scoping; (b) the global +
+  local ingredient does not replicate at seed 7 -- it is named in 5.3 intro, 5.3.5, 6.1, Ch. 7,
+  abstracts (and possibly 1.4); (c) the soft-Dice term raises the score and plain MSE never
+  learns change -- 6.1 "Where modelling effort pays" / Ch. 7 are silent on the objective.
+- [ ] Still running: `FEN_final_w192ftp7rk4d45skew` (f3, f4 at 29/30), `FEN_final_w96d8ftp7rk4d45skew`
+  (f2-f4) -> capacity table T-FEN rows (all four together).
+- [x] Code-side request "SOLVER_FINAL_RUNS readout for the four mean twins" done there (§9.21).
 - [ ] TODO (code repo, not editable from here): add a SOLVER_FINAL_RUNS.md readout for the
   four mean twins (aggrmeans7, l1mean, nodtsmean, pxmean), so the numbers above have a source
   entry there; re-mirror THESIS_FRAMEWORK.md afterwards.

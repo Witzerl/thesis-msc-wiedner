@@ -30,6 +30,30 @@ day: [s25] reworked 2.2.)
 
 1. RUNS ON THE CLUSTER -> WHERE THEIR RESULT GOES
 -------------------------------------------------
+STATUS 2026-10-01 (read out with thesis_numbers.py; SOLVER_FINAL_RUNS section 9.22 in the
+code repo, not committed there; NOTES.md "Batch readout"):
+  [x] 7875520  w139 s7          IN  fold 4 trains at seed 7 (0.442) -> 5.3.4 filled
+  [x] 7875525  skew T-FEN s7    IN  stable 5/5; vs U-Net +0.025 (5/5), vs stencil +0.017 (5/5)
+                                    -> 5.2, 5.3.4, 5.5.2 filled; HEADLINE DECISION OPEN (sec. 2)
+  [x] 7875528  w48 skew         IN  0.5434 = w96 skew (+0.0006); stable 5/5 -> capacity row
+                                    waits for 7875529/30 (all four T-FEN rows replaced together)
+  [ ] 7875529  w192 skew        RUNNING (f3, f4 at 29/30 epochs)
+  [ ] 7875530  depth-8 skew     RUNNING (f2-f4)
+  [x] 7875532  free-form s7     IN  transport s7 vs same-seed control +0.090 (skew), +0.076
+                                    (Galerkin; replaces the mixed-seed +0.0495) -> 5.3.4 filled
+  [x] 7875533  FNO s7           IN  FNO - U-Net -0.014 (2/5) -> 5.3.3 filled
+  [x] 7875534  FNO+3x3 s7       IN  local path -0.006 (null), hybrid - U-Net -0.019 (0/5):
+                                    the global + local claim does NOT replicate -> 5.3.3 filled,
+                                    DECISION OPEN (sec. 2)
+  [x] 7875535  one-hop s7       IN  +0.004 vs two rounds -> 5.3.1 "adds at most ~0.01, not
+                                    reproducibly"
+  [x] 7875536  dilmean_nodts    IN  -0.0006 (null) -> 5.4.1 + 6.1 l. 40 filled
+  [x] 7875537  dilmean_mono2    IN  -0.0036 (null) -> 5.4.2 filled
+  [x] 7875538  dilmean_nodice   IN  -0.050 (0/5), per eye t -5.1; escape epochs 2-12; sd 3x
+                                    -> 5.4.2 filled (soft-Dice RAISES the score)
+  [x] 7875539  dilmean_plainmse IN  0.0000, never escapes the collapse -> 5.4.2 filled
+  (job IDs marked * below were inferred; all experiment names matched runs on disk)
+
 Job IDs marked * are inferred from the submission order, not from a squeue line.
 Durations: minimum epoch time x 30 epochs + ~25 % overhead, per fold.
 
@@ -104,6 +128,14 @@ skew capacity points -> FEN_final_w96ftp7rk4d45skew (0.5428).
 
 2. WRITING (open)
 -----------------
+[ ] AUTHOR DECISIONS from the 2026-10-01 batch (inline TODOs in 5.2, 5.3.3, 6.1, Ch. 7,
+    abstract): (a) skew T-FEN above the U-Net at both seeds (+0.038 / +0.025, 5/5 each)
+    and +0.016/+0.017 above the stencil at both -- reword or scope "the strongest arms of
+    different classes are indistinguishable" / "lie close together" / "architecture class
+    does not decide the outcome"; (b) the global + local ingredient is not replicated at
+    seed 7 -- named in 5.3 intro, 5.3.5, 6.1, Ch. 7, abstracts, maybe 1.4; (c) the
+    soft-Dice term raises the score and plain MSE never learns change -- 6.1 "Where
+    modelling effort pays" and Ch. 7 are silent on the objective.
 [ ] Chapter 5 reporting pass (review #23/#25/#31; scheme agreed 2026-10-01, author to
     review once more): seed 42 in the text, one sentence "repeated with a second seed,
     every conclusion held", results in words ("higher by 0.064, on all five folds and on
@@ -138,7 +170,8 @@ skew capacity points -> FEN_final_w96ftp7rk4d45skew (0.5428).
     spatial GA progression forecasts (inline TODO l. ~195); currently "no established
     threshold is known to the author".
 [ ] [ce6] After the runs of section 1: one pass over 6.1 / 6.3 / Ch. 7 / both abstracts
-    (inline TODOs 06-discussion l. ~40 and ~283, 00-abstract l. 8). Do it together with the
+    (inline TODOs 06-discussion l. ~283, 00-abstract l. 8; l. ~40 done 2026-10-01: Delta t
+    null filled in). Do it together with the
     Chapter 5 reporting pass, so the wording ("higher by ... on k of 5 folds") matches.
 [ ] [ce6] If the border/interior split (item above) is dropped for good, 6.3 must still say
     it was computed and not reported -- it currently does; if it is reported, change 6.3.
@@ -292,9 +325,9 @@ skew capacity points -> FEN_final_w96ftp7rk4d45skew (0.5428).
 
 4. CODE-SIDE (masterthesis-docker; not editable from the thesis session)
 ------------------------------------------------------------------------
-[ ] SOLVER_FINAL_RUNS: add a read-out for the mean-aggregation twins (aggrmeans7, l1mean,
+[x] (done code-side, SOLVER_FINAL_RUNS 9.21) SOLVER_FINAL_RUNS: add a read-out for the mean-aggregation twins (aggrmeans7, l1mean,
     nodtsmean, pxmean) -- the thesis numbers were computed here.
-[ ] SOLVER_FINAL_RUNS 9.20 is out of date on the queue: it says there is no seed-7
+[x] (moot 2026-10-01: the runs are in and read out in 9.22) SOLVER_FINAL_RUNS 9.20 is out of date on the queue: it says there is no seed-7
     free-form FEN and that dilmean_plainmse / _nodice / _mono2 are not queued -- all are
     queued (section 1). Read the seed-7 transport effect against the seed-7 free-form run.
 [ ] SOLVER_FINAL_RUNS 9.19a says the Galerkin T-FEN failed on "3/5" folds at seed 42; its
