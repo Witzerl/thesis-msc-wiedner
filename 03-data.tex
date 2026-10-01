@@ -193,7 +193,7 @@ in~\S\ref{sec:background:ga-oct:muw}.
 The resulting window spans $49 \times 0.12118$\,mm by
 $1024 \times 0.00568$\,mm, or about $5.938 \times 5.816$\,mm, and holds
 50\,176 grid positions. The spacing between B-scans is \textbf{21.335
-times larger} than the spacing along them. The grid is therefore strongly
+times larger} than the spacing between A-scans. The grid is therefore strongly
 anisotropic: moving by one row covers about the same physical distance
 as moving by 21 columns. This property matters for every
 spatial operator applied to the grid and is taken up again in
@@ -249,7 +249,7 @@ they are computed on the cropped and padded states, the padded zeros
 contribute to each channel's mean and standard deviation
 (\S\ref{sec:data:spatial}).
 
-The canonical scheme is a z-score,
+The normalisation is a z-score,
 \[
   x' \;=\; \frac{x - \mu_c}{\sigma_c},
 \]
@@ -355,7 +355,7 @@ upper bound: the metric is taken at the first rollout step whose
 cumulative time reaches about 347 days. For 68 of the 75 eyes, this is
 exactly 360 days. The remaining 7 eyes (9.3\,\%) are scored at 450 to
 720 days, where the true change region is 1.3 to 1.7 times larger.
-This is accepted on purpose; \citet{Mai2024} likewise score every follow-up
+This is accepted deliberately. \citet{Mai2024} likewise score every follow-up
 visit by its time since baseline, in yearly bins, and not at a fixed horizon.
 The evaluation protocol is defined in~\S\ref{sec:experiments:protocol}.
 

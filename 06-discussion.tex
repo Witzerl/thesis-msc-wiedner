@@ -67,7 +67,7 @@ the index-space graph reaches about two columns along a row. Two unrelated
 constructions close this gap: the dilated stencil, which lets one hop
 reach 21 columns, and the transport term of the T-FEN, which moves the
 state along a learned velocity. Each is established against its own
-control, and the two end up indistinguishable from each other. Both point
+control, and the two are indistinguishable from each other. Both point
 to the same deficit: a mismatch between how far one update can see and
 how far the disease moves between two observations. This is the
 situation that the stability condition of \citet{Courant1928} describes
@@ -248,8 +248,7 @@ touches the edge of the imaged field inside the window, so its growth
 across that edge is censored, in the training
 targets and in the metrics, without any flag. Larger windows would trade
 this for up to 35\,\% zero padding and about $1.9\times$ as many grid
-positions, and about 19\,\% of lesions would touch the border anyway
-because they reach the edge of the scan itself. On the 54 eyes whose
+positions, and about 19\,\% of lesions would still touch the border because they reach the edge of the scan itself. On the 54 eyes whose
 lesion does not touch the crop border, the arms keep the order of
 Table~\ref{tab:experiments:arms} (\S\ref{sec:experiments:main-results}).
 

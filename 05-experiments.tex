@@ -50,7 +50,7 @@ computed and logged, but no RMSE value is used as evidence in this chapter.
 
 The headline metric is the change-region Dice at the one-year anchor. All
 predicted and ground-truth masks are binarised at the physical threshold of
-0.5, mapped into normalised space in the same way as in the loss. Let $b$
+0.5, which is mapped into normalised space in the same way as in the loss. Let $b$
 be the thresholded mask at the baseline visit, the first visit of the
 rollout, $p$ the thresholded prediction at the anchor and $y$ the
 thresholded ground truth at the anchor. The predicted and the true change
@@ -657,12 +657,12 @@ established.
 
 This comparison pairs the T-FEN with the same finite-element network
 without its transport head, at the same width
-(\S\ref{sec:method:family:fen}). The ablation is purely additive: both
+(\S\ref{sec:method:family:fen}). The ablation is additive: both
 heads are zero-initialised, so both arms start as the same function. The
 T-FEN is higher by 0.062 on average, on all five folds and on 68 of the 75
 eyes. With the earlier Galerkin form of the transport operator the
 difference was of the same order, 0.053, again on all five folds, so the
-effect does not depend on the form of the operator.
+effect does not depend on the form of the transport operator.
 % Seed-7 values (tab:appendix:seeds): thesis_numbers.py pair, 2026-10-01,
 % against FEN_final_w96Frk4d45s7. The previously quoted seed-7 Galerkin value
 % (+0.0495) used the seed-42 free-form control and is superseded.
@@ -815,8 +815,7 @@ The reason lies in the mask channel. Its two values are a fixed distance
 apart in normalised units, $-0.602$ and $+1.660$
 (\S\ref{sec:data:normalization}). At a pixel that changes between two
 visits, the scaled update therefore has to produce exactly that distance
-divided by $\Delta t$, whatever the interval, and the operator simply
-learns to divide by $\Delta t$ internally. The multiplication is a change
+divided by $\Delta t$, whatever the interval, and the operator learns to divide by $\Delta t$ internally. The multiplication is a change
 of parameterisation, not additional knowledge. It is kept because it makes
 the prediction fall back to the current state as $\Delta t$ approaches zero
 (\S\ref{sec:method:dt-residual}), and because it is the form MP-PDE uses
@@ -1304,7 +1303,7 @@ does not decide the accuracy.
     for Figure~\ref{fig:experiments:swap}: the solver-swap test against the step size.}}
   \caption[The solver-swap test against the step size.]{%
     The solver-swap test of Table~\ref{tab:experiments:swap} against the
-    integration step. Each trained model is re-evaluated without retraining
+    integration step. Each trained model is re-evaluated, without retraining,
     with explicit Euler (solid, filled circles) or classical RK4 (dotted,
     open squares) at a changed step. The step is given relative to the step
     used in training (one step over the visit interval for the graph
@@ -1622,7 +1621,7 @@ runs used
 one NVIDIA RTX A6000 GPU and 30 epochs. The cost figures support
 order-of-magnitude statements only.
 
-On this scale, the U-Net is the cheapest spatial operator at 21~s per
+Within this precision, the U-Net is the cheapest spatial operator at 21~s per
 epoch, about $0.23\times$ the 91~s of the canonical dilated-stencil graph
 network. The FNO takes 23~s and the FNO with a $3 \times 3$ local path
 29~s. The graph networks on the index-space graph take 76~s ($k = 12$)

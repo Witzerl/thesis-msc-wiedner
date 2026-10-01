@@ -1103,10 +1103,25 @@ English abstract, Ch. 1-7 and App. A-G were reviewed; the German Kurzfassung was
   below as an arm of the comparison."). §3.7 "revisited in §5.1" was already gone (c6b9d48).
   Still open from this list: the Fig. 2.2 caption mapping strata onto the ten channels (figure is
   a placeholder), "canonical" with several meanings, "canonical fold" undefined.
-- [ ] Status of all 544 review items on 2026-10-02 (quoted text checked against the current
-  sources): 465 unchanged (240 medium, 225 low), 49 partly changed, 28 gone, 2 fixed by the
-  comment fix. All 15 high items are closed. Of the 465 open ones, 128 are flow items (83
-  medium), the rest clarity and tone polish.
+- [x] (superseded by the entry below) Status of all 544 review items on 2026-10-02, before the
+  one-word pass: 465 unchanged, 49 partly changed, 28 gone, 2 fixed by the comment fix.
+- [x] 2026-10-02 one-word pass (41 edits, wording only, build clean, verified in the PDF text):
+  16 review items whose suggestion differs by one or two words (1.43, 2a.26, 2b.1, 3.17, 3.23,
+  3.33, 4c.2, 4c.25, 5a.6, 5b.20, 5d.12, 5d.39, 6-7.10, 6-7.37, G.38, G.42), plus 25 emphatic
+  adverbs removed (naturally, actually, materially, precisely, essentially, fundamentally x7,
+  inherently, reliably, strictly, purely, simply, entirely x3, Intuitively, Crucially,
+  inevitably). Kept on purpose: WENO ("essentially non-oscillatory"), "purely imaginary",
+  "timed precisely enough", "essentially the same lesion" (a hedge), "change actually
+  happened" (true vs predicted), "purely global" (= global only), "clearly exceeds" (the
+  criterion) and "clearly above zero" (interval excludes zero). The two "cut the sentence"
+  items (4a.4, 5b.26) are left for the author.
+- [ ] Status of all 544 review items after the one-word pass: **fixed 32** (15 high, 4 medium,
+  13 low; incl. 4a.7 "arm" now defined); **partly addressed 21** (adverb removed, rest of the
+  rewrite still open: 1.20, 1.25, 1.36, 2a.13, 2a.16, 2b.23, 2b.27, 2b.29, 2b.30, 2b.35, 2b.42,
+  4a.10, 5b.19, 5c.5, G.1, G.3, G.4, G.5, G.6, G.8, G.9); **changed since the review, mostly by
+  the author's own passes, 64** (37 medium, 27 low; check whether still needed); **open 427**
+  (219 medium, 208 low). Open medium by kind: 81 flow, 59 clarity+tone, 48 clarity, 31 tone
+  only. Status per item: session scratchpad `category_final.json` (not in the repo).
 - [ ] Contradictions and dead pointers found (review S4, S5, S9, S22): §1.2 promises the
   covariates are "tested in this thesis" (the test is commented out, §6.3 says unsettled);
   layer channels "not auxiliary" (§2.1.5) vs "auxiliary targets" (§3.2, §4.2.2, §4.5.1); the Fig.

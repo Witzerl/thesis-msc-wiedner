@@ -72,7 +72,7 @@ that avenue.
 \section{Problem Statement}
 \label{sec:introduction:problem}
 
-Predicting GA progression from imaging is naturally framed as a
+Predicting GA progression from imaging is framed as a
 \emph{spatiotemporal forecasting} task on the en-face projection of optical
 coherence tomography (OCT) volumes. For each eye, longitudinal imaging yields
 a sequence of macula-centred grids on which the lesion outline and the
@@ -89,7 +89,7 @@ that a model has to deal with. First, follow-up visits are
 between patients and between consecutive visits of the same patient. There
 is no shared temporal origin across eyes, which rules out methods that
 assume a fixed sampling rate or a common $t = 0$. Second, the underlying
-disease state is naturally \emph{multi-channel}: the binary lesion mask
+disease state is \emph{multi-channel}: the binary lesion mask
 captures the GA lesion itself, while the surrounding ten retinal layer
 boundaries describe the retinal structure in which the atrophy is embedded.
 Both information sources are relevant because prognostic biomarkers
@@ -159,7 +159,7 @@ GA, where the governing equation is unknown and only a few dozen patients
 are available for training, these assumptions are likely to matter more
 than model size.
 
-Which of them GA progression actually requires cannot be decided by
+Which of them GA progression requires cannot be decided by
 testing a single architecture: if one model succeeds, the reason may be
 its operator, its size, or the setup around it. This thesis therefore
 separates the two. The setup --- how elapsed time enters the prediction,
@@ -223,7 +223,7 @@ that fill its one free component. Chapter~\ref{ch:experiments} addresses the
 second part by comparing these models on equal terms.
 Chapter~\ref{ch:discussion} discusses what the results mean clinically and
 methodologically, together with their limitations, and
-Chapter~\ref{ch:conclusion} concludes. The appendix reports an additional
+Chapter~\ref{ch:conclusion} concludes. Appendix~\ref{app:mm-pde} reports an additional
 experiment with an adaptive moving mesh.
 
 

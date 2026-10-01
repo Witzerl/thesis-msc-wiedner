@@ -106,7 +106,7 @@ literature follow directly from this geography: a lesion is called
 \emph{subfoveal} if it overlaps the fovea (i.e.\ it directly threatens
 high-acuity vision) and \emph{extrafoveal} otherwise. As discussed
 in~\S\ref{sec:introduction:motivation}, whether a lesion is subfoveal or
-extrafoveal materially changes its clinical significance even if its
+extrafoveal changes its clinical significance even if its
 total area is the same.
 
 A second piece of anatomy is internal rather than positional: the
@@ -127,7 +127,7 @@ together with the lesion mask (\S\ref{sec:background:ga-oct:state-rep}).
 
 The remaining subsections build on this vocabulary. \S\ref{sec:background:ga-oct:disease}
 describes how GA appears on OCT; \S\ref{sec:background:ga-oct:oct}
-explains what an OCT volume actually is and how it is acquired;
+explains what an OCT volume is and how it is acquired;
 \S\ref{sec:background:ga-oct:enface} describes the projection from
 3D OCT volume to the 2D en-face grid that the model operates on;
 \S\ref{sec:background:ga-oct:state-rep} defines the eleven channels of
@@ -201,7 +201,7 @@ disruption of the RPE band of at least 250\,\textmu{}m; and \emph{(c)}
 overlying photoreceptor degeneration, all in the absence of an RPE tear.
 Put differently, cRORA is the OCT-readable definition of an established
 atrophic lesion, which can arise with or without macular neovascularisation
-(the wet form of AMD), and \emph{GA is precisely the subset of cRORA that
+(the wet form of AMD), and \emph{GA is the subset of cRORA that
 arises in eyes without macular neovascularisation}. The CAM framework
 also recognises a precursor stage, \emph{iRORA} (incomplete RPE and
 outer retinal atrophy), which is essentially the same lesion at a
@@ -228,7 +228,7 @@ higher than in the surrounding intact tissue. This is the same optical
 effect that makes GA appear bright on summed-voxel en-face projections,
 discussed in~\S\ref{sec:background:ga-oct:enface}.
 \emph{(iii)} \emph{RPE--Bruch's-membrane (BM) thickening} is
-concentrated immediately around the lesion margin --- essentially, the
+concentrated immediately around the lesion margin --- the
 narrow ring of tissue just outside the lesion is measurably thicker
 than tissue further from the lesion --- and is thought to reflect, at
 least in part, basal-laminar deposits accumulated in the diseased tissue;
@@ -358,8 +358,7 @@ the GA extent through the hypertransmission signature
 \label{sec:background:ga-oct:enface}
 
 The full OCT volume of a GA eye is too large and too redundant to be
-modelled at native voxel resolution. The clinical literature therefore
-works with an \emph{en-face} image instead: a two-dimensional map of the
+modelled at native voxel resolution. The clinical literature works with an \emph{en-face} image instead: a two-dimensional map of the
 retina seen from the front, as in a fundus photograph, in which every pixel
 corresponds to one A-scan of the volume and summarises what lies along it
 \citep{Pilotto2015,Chu2022,Yehoshua2011,Vallino2024}. The present work
@@ -496,7 +495,7 @@ in~\S\ref{sec:data:splits}.
 
 The approach of this thesis treats GA progression the way a numerical
 solver treats a partial differential equation (PDE): the state is held
-on a grid and advanced step by step by a local update rule. The later
+on a grid and advanced step by step by an update rule. The later
 chapters therefore use the vocabulary of numerical solvers throughout.
 The update of the framework is one explicit Euler step in residual form
 (Chapter~\ref{ch:method}). The operators placed in it are learned
@@ -775,8 +774,7 @@ four respects, which is why the thesis adopts it.
     returns the current state as $\Delta t \to 0$, starts from the
     right default.
   \item \textbf{Irregular steps.} The intervals between visits differ
-    from eye to eye and visit to visit. A solver step is naturally
-    parameterised by $\Delta t$, so the step can be the real interval
+    from eye to eye and visit to visit. A solver step is parameterised by $\Delta t$, so the step can be the real interval
     rather than a fixed one.
 \end{itemize}
 
@@ -805,7 +803,7 @@ solvers learn the update operator $\mathcal{A}$ of
 trajectory. Note that when the step size $\Delta t$ is fixed
 by the dataset, the explicit dependence on it is usually suppressed in
 the notation. This thesis cannot suppress it because clinical
-observation intervals are fundamentally irregular.
+observation intervals are irregular.
 
 Neural operators take several structural forms. Finite-dimensional
 variants are bound to the specific grid geometry they were trained on.
@@ -817,13 +815,12 @@ network global spatial support in a single layer.
 Alternatively, DeepONet \citep{Lu2021} factorises the operator into
 a branch network that encodes the input function and a trunk network
 that encodes the continuous query coordinate. A standard limitation
-applies to both variants: the trained operator is inherently tied to
+applies to both variants: the trained operator is tied to
 the equation family it was trained on, and extrapolation beyond the
-temporal horizon seen during training is reliably poor.
+temporal horizon seen during training is poor.
 
 The autoregressive framing is the natural fit for clinical
-longitudinal data. Each visit-to-visit transition fundamentally
-constitutes one step. Furthermore, there is no shared temporal origin
+longitudinal data. Each visit-to-visit transition constitutes one step. Furthermore, there is no shared temporal origin
 ($t = 0$) across patients, making a direct time-dependent mapping
 ill-posed. Finally, the required prediction horizon is set by the
 clinic rather than by the model, which necessitates a system that can
@@ -867,7 +864,7 @@ architecture with skip connections and a multi-scale receptive field.
 Although originally introduced for biomedical image segmentation, it
 serves as a standard strong surrogate baseline in the neural-PDE
 literature \citep{Gupta2023}.
-Surrogate architectures also vary fundamentally in their spatial
+Surrogate architectures also vary in their spatial
 context. Global spectral operators, such as the Fourier Neural
 Operator, contrast directly with local convolutional or
 message-passing operators. Hybrid architectures combine these
@@ -921,7 +918,7 @@ The closest prior work on the specific prediction task addressed here
 is by \citet{Mai2024}, who predicted individual GA progression from a
 single baseline OCT on a larger GA cohort (184 eyes of 100 patients) of the
 same MUW clinic. The
-input regime, however, is fundamentally different. While that prior
+input regime, however, is different. While that prior
 work operates directly on raw OCT volumes, the present thesis consumes
 pre-segmented lesion masks and layer surfaces. This difference must be
 kept in mind whenever the approaches are compared.

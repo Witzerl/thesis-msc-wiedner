@@ -104,7 +104,7 @@ trajectory so far.
 Two reasons support this design. First, the clinical sequences are short,
 with five to thirteen visits per eye (\S\ref{sec:data:dataset}). Using
 several past visits as input would leave fewer visits available as
-prediction targets. Second, the framework predicts strictly one step at a
+prediction targets. Second, the framework predicts one step at a
 time. Some neural PDE solvers, such as MP-PDE, predict several future
 steps in one forward pass (temporal bundling,
 \S\ref{sec:background:neural-pde}), but not all of the operators compared here
@@ -959,7 +959,7 @@ backbone.
 Every window carries two patient-level covariates, the age of the patient
 at the start visit and the sex. Their extraction and encoding are described
 in~\S\ref{sec:data:covariates}. This section describes how they enter the
-operators. Both covariates are graph-level quantities: a visit has one
+operators. Both covariates are global quantities: a visit has one
 value of each, and that value is shared by all $50\,176$ grid positions.
 Along the trajectory of one eye, the sex is constant and the age advances
 only with the elapsed time. Because the covariates carry no spatial
@@ -1209,7 +1209,7 @@ The framework is implemented in Python with PyTorch 2.4.1 and CUDA 12.1
 % pytorch-2.4.1-cu121-cudnn9-runtime.sif on 2026-10-01 (2.4.1+cu121, 2.6.1).
 All dependencies are pinned in a fixed container image. Every reported run
 was trained on a single NVIDIA RTX A6000 GPU on a cluster managed by
-Slurm, and the five folds of an experiment are submitted together as a job
+Slurm, and the five folds of an experiment were submitted together as a job
 array.
 
 The windows of each fold are precomputed once before training. This step
