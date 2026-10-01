@@ -1025,10 +1025,19 @@ attribution was checked through the MP-PDE text.
   cohort relates to the 184-eye cohort of Mai et al. (2024); the thesis now says "a larger
   cohort of the same clinic" everywhere. The device and mask provenance TODOs in 03-data.tex
   stay open.
-- [ ] TODO: second verification pass over the ~75 reworded sentences (agents V1-V4) was
-  running when this entry was written; record the result here and fix what it finds.
-- [ ] TODO: `python literature/_tools/update_ledger.py --apply` once the verification is
-  done, so that ledger ids, lines and hub notes follow the new text.
+- [x] Verification pass over the 76 reworded sentences that have a local source (4 agents):
+  66 fully supported, 10 leftovers, 9 of them fixed in a last round (Wong "projected" instead
+  of "lived", Vallino "largely relied" dropped, "segmentation" not "automatic segmentation"
+  for Chu, INL "thickness", FEN "finite-element discretisation with learned dynamics",
+  Bogunovic predicts drusen regression, Mai device hedged as in Ch. 3, "field of view" in the
+  three Mai captions, "definitions of Mai as far as specified"). The corrected wording of
+  these 9 follows the agents' own suggested fixes and was not run through the check again.
+  Not changed: Vallino "largely preserved" (Boyer, co-cited, has the exact wording) and Lad
+  "Until 2023" (the year comes from the approvals in the next sentence).
+- [x] Ledger and hub notes updated (`update_ledger.py --apply`, then the verified verdicts of
+  this pass written into the 91 changed or new entries): 165 SUPPORTED, 10 PARTLY (the
+  decisions above to leave a gloss or origin citation as it is), 14 PENDING (sources not on
+  disk). Backup of the previous ledger state in the session scratchpad only.
 - [ ] Optional primary sources, not in `references.bib`, that now stand behind a secondary
   statement: Corradetti et al. 2021 (iRORA 93 %), Zhang et al. 2022 (RPE-BM distance plus
   ORL thickness, 62 %), Vogl et al. 2023 Ophthalmol Retina 7:4-13 (topographic GA

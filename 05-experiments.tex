@@ -738,8 +738,9 @@ stability is examined in~\S\ref{sec:experiments:validity:tfen}.
     graph network, the T-FEN, the U-Net (width 5) and the FNO; the bins
     hold 149, 149, 109 and 71 follow-up visits. The dashed line gives the
     values reported by \citet{Mai2024} on a larger cohort of the same clinic;
-    inputs, field of
-    view and evaluated visits differ, so the line is a reference, not a
+    inputs, the area over
+    which lesions are measured (a fixed crop here) and the evaluated visits
+    differ, so the line is a reference, not a
     head-to-head comparison (\S\ref{sec:experiments:qualitative:mai}).
     \emph{(b)}~The first-year bin alone, on the same scale: the three
     operators whose single step reaches less far than the per-visit front
@@ -1468,8 +1469,8 @@ the stability criterion, which the run passes, and an evaluation step of
 \citet{Mai2024} predict GA growth on a larger MUW cohort from a single
 baseline OCT volume, with a Neural ODE integrated by RK4. Besides Dice
 scores, their evaluation uses two eye-level measures of growth speed,
-which the Dice scores do not capture. Both are computed here in the same
-way.
+which the Dice scores do not capture. Both are computed here following the
+definitions of \citet{Mai2024}, as far as these are specified.
 
 The growth rate of an eye is the change of the square root of its lesion
 area per year, $(\sqrt{A_{\text{last}}} - \sqrt{A_{\text{base}}}) / T$,
@@ -1499,8 +1500,9 @@ Table~\ref{tab:experiments:mai} lists the result.
     eye's whole follow-up with the square-root transform; the canonical
     model is pooled over the 75 validation eyes of the five folds, with
     95\,\% bootstrap intervals and, for the AUC, the number of eyes above
-    the cut-off. The two studies differ in cohort size, input and field of
-    view (see text), so the values are an anchor, not a head-to-head
+    the cut-off. The two studies differ in cohort size, input and the area
+    over which lesions are measured (see text), so the values are an anchor,
+    not a head-to-head
     comparison.}
   \label{tab:experiments:mai}
   \small
@@ -1589,7 +1591,8 @@ speed, where the mask helps less, the model of \citet{Mai2024} is ahead.
     time since baseline, against Table~2 of \citet{Mai2024}. Values of this
     thesis: mean over the follow-up visits in each bin and over the late
     epochs, pooled over the five folds, seed 42. Number of visits per bin in
-    brackets. The inputs, the field of view and the evaluated visits
+    brackets. The inputs, the area over which lesions are measured (a fixed
+    crop here) and the evaluated visits
     differ between the studies (see text), so the values are not a
     head-to-head comparison.}
   \label{tab:experiments:mai-bins}

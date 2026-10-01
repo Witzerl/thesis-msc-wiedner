@@ -353,7 +353,7 @@ A single OCT volume shows both the lesion and the retinal layers around it.
 The lesion itself is
 visible on the B-scan as a region of outer-retinal layer dropout with
 choroidal hypertransmission; the surrounding retinal layer geometry is
-recoverable from the same volume by automatic segmentation; and the
+recoverable from the same volume by segmentation; and the
 choroidal slab beneath Bruch's membrane provides an additional view of
 the GA extent through the hypertransmission signature
 \citep{Vallino2024,Chu2022}. No cross-modality fusion is required.
@@ -430,8 +430,8 @@ only inside the lesion itself. RPE--Bruch's-membrane thickening at the
 square-root enlargement rate at $r = 0.595$ \citep{Chu2022}; outer
 retinal layer thinning, in particular of the outer nuclear layer and
 of the RPE-photoreceptor complex, accelerates in the months preceding
-macular-atrophy conversion \citep{Vogl2021}; and the inner nuclear
-layer in the retina immediately adjacent to a GA lesion correlates
+macular-atrophy conversion \citep{Vogl2021}; and the thickness of the
+inner nuclear layer in the retina immediately adjacent to a GA lesion correlates
 with the yearly progression rate at Spearman $r = 0.48$
 \citep{Ebneter2016}. \citet{Vallino2024} further report that
 RPE-to-Bruch's-membrane distance combined with outer-retinal-layer
@@ -448,9 +448,9 @@ multi-channel state propagates through the network.
 The dataset used throughout the thesis is the GA cohort of the Medical
 University of Vienna (MUW), a longitudinal collection of macula-centred
 OCT volumes acquired in routine clinical practice.
-The cohort comprises 553 volume scans over 75 eyes, acquired, as in the MUW
-study of \citet{Mai2024}, with a Heidelberg Spectralis spectral-domain OCT
-device. Lateral pixel counts
+The cohort comprises 553 volume scans over 75 eyes, acquired with a
+Heidelberg Engineering device, which in the MUW study of \citet{Mai2024}
+was a Spectralis spectral-domain OCT. Lateral pixel counts
 vary per eye across the 553 visits, ranging from 38 to 66 B-scans by 961
 to 1719 A-scans, giving 67 distinct native shapes in total. No visit has
 a native dimension of $49 \times 1024$. Instead, $49 \times 1024$ is the
@@ -877,8 +877,8 @@ to capture high-frequency details more effectively
 \citep{LiuSchiaffini2024}.
 Finite Element Networks \citep{Lienen2022} adopt a different
 numerical perspective, building the neural update directly from a
-learned finite-element discretisation and, in their transport variant,
-carrying an explicit transport (advection) term.
+finite-element discretisation with learned dynamics and, in their transport
+variant, carrying an explicit transport (advection) term.
 Finally, because a residual step resembles one explicit Euler step, a
 Neural-ODE reading is sometimes applied \citep{Chen2018}. Under
 this interpretation, a higher-order integrator such as a Runge--Kutta
@@ -906,8 +906,9 @@ geographic atrophy progression divide broadly into cohort-level risk
 models and spatial-progression models.
 \citet{SchmidtErfurth2018} reported on the prediction of individual
 disease conversion in intermediate AMD using artificial intelligence.
-\citet{Bogunovic2017} demonstrated the machine learning of
-intermediate-AMD progression based on OCT imaging. For the conversion of
+\citet{Bogunovic2017} used machine learning to predict the regression of
+individual drusen, a sign of disease activity, in intermediate AMD from OCT
+imaging. For the conversion of
 intermediate AMD to macular atrophy or neovascularisation,
 \citet{Vogl2021} provided a topographic analysis of the retinal and
 choroidal layer changes that precede it. \citet{Vallino2024} noted that
