@@ -1,0 +1,227 @@
+OPEN ITEMS -- session of 2026-09-29 to 2026-10-01 (review v4 of Ch. 4-5, pp. 30-57)
+=====================================================================================
+Status as of 2026-10-01 09:00, after commits 7f93ab9 (this session) and ce6bf3e
+(other session: 5.6 Cost, Ch. 6, Ch. 7, abstracts). Full detail: NOTES.md, section
+"Author's tablet review of 4.3-5.5 (2026-09-29)".
+Merged 2026-10-01 with the open items of the Ch. 6/7/abstract session (commits 714a87e
+prompt, ce6bf3e draft + audit). Those items are marked [ce6] below; section 7 is the
+overview of what is left from that session alone.
+
+
+1. RUNS ON THE CLUSTER -> WHERE THEIR RESULT GOES
+-------------------------------------------------
+Job IDs marked * are inferred from the submission order, not from a squeue line.
+Durations: minimum epoch time x 30 epochs + ~25 % overhead, per fold.
+
+Job        Run (experiment name)                 Per fold  Fills
+---------  ------------------------------------  --------  ---------------------------------------------
+7875520*   FEN_final_w139Frk4d45s7               ~2.5 h    5.3.4: does fold 4 of the matched free-form
+           (matched free-form control, seed 7)             control train at seed 7? seed-7 matched
+                                                           transport comparison; fold-4 sentence
+                                                           [ce6] 6.3 "Unfinished replications";
+                                                           Ch. 7 transport bullet ("+0.072 ... on the
+                                                           four folds on which that control trained")
+7875525    FEN_final_w96ftp7rk4d45skews7         ~4 h      5.2 + 5.3.5 + abstract headline: T-FEN vs
+           (skew T-FEN, seed 7)                            U-Net (lead or tie) and vs stencil;
+                                                           5.3.4 seed-7 transport effect;
+                                                           5.5.2 stability at seed 7; Appendix E
+                                                           [ce6] abstract (TODO l. 8, "three strongest
+                                                           ... 0.50 to 0.54"); Ch. 7 "The operator"
+                                                           ("lie close together"); 6.1 "three highest
+                                                           arms ... lie close together"; 6.3
+                                                           "Unfinished replications"
+7875528    FEN_final_w48ftp7rk4d45skew           ~2.7 h    5.4.3 capacity table, T-FEN 1/4x row (skew)
+                                                           [ce6] 6.3 "Unfinished replications"
+7875529    FEN_final_w192ftp7rk4d45skew          ~6.5 h    5.4.3 capacity table, T-FEN 4x row (skew)
+                                                           [ce6] 6.1 + Ch. 7 "capacity not a lever in
+                                                           any of the four classes"; 6.3
+7875530    FEN_final_w96d8ftp7rk4d45skew         ~6 h      5.4.3 capacity table, T-FEN depth-8 row (skew)
+                                                           [ce6] same as 7875529
+7875532*   FEN_final_w96Frk4d45s7                ~2 h      5.3.4 + Appendix E: seed-7 transport effect
+           (free-form FEN, seed 7)                         against a SEED-7 control (the current seed-7
+                                                           value +0.0495 uses the seed-42 control)
+7875533*   FNO_final_w5s7                        ~15 min   Appendix E: seed-7 FNO (global + local
+                                                           ingredient, 5.3.3)
+7875534*   FNO_final_w5k3s7                      ~20 min   Appendix E: seed-7 FNO + 3x3 (5.3.3)
+7875535*   MPPDE_final_l1means7                  ~25 min   Appendix E: seed-7 locality ladder (5.3.1),
+           (one-hop floor, seed 7; optional)               the "second round adds ~0.01" reading
+7875536*   ANISOGNN_final_dilmean_nodts          ~1 h      5.4.1 "Is the multiplication by Delta t
+                                                           needed?" (placeholder) + 6.1 line ~40
+                                                           [ce6] 6.1 "The framework" (inline TODO
+                                                           l. 40: sentence is the argument, not the
+                                                           measurement); Ch. 7 "The framework" ("How
+                                                           time enters the update mattered less ...");
+                                                           6.3 "Unfinished replications"
+7875537    ANISOGNN_final_dilmean_mono2          ~1 h      5.4.2 "Would a monotonic-growth penalty help?"
+                                                           [ce6] 6.3 (shrinkage paragraph, "one reason
+                                                           why no monotonic-growth constraint")
+7875538    ANISOGNN_final_dilmean_nodice         ~1 h      5.4.2 "What does the soft-Dice term add?"
+                                                           (escape epoch, epoch-to-epoch sd, raw mask
+                                                           RMSE for the calibration stretch)
+                                                           [ce6] 6.3 "Unfinished replications"
+7875539    ANISOGNN_final_dilmean_plainmse       ~1 h      5.4.2 "Is the weighting of the mask channel
+                                                           needed?" (collapse counter, escape epoch)
+                                                           [ce6] 6.3 "Unfinished replications"
+           (7875537-39 together: if any loss term turns out to matter, add one sentence to
+           6.1 "Where modelling effort pays" and to Ch. 7 "What did not matter" -- both are
+           currently silent on the objective on purpose)
+
+Total ~125 GPU-h; at ~7 GPUs ~18-20 h wall time. The queue runs by job ID, so
+7875529/7875530 (~63 GPU-h) run before all the cheap arrays. To get the text-relevant
+runs first:   scontrol hold 7875529 7875530   ...later:   scontrol release 7875529 7875530
+
+Read-out for every run: 30/30 epochs, one run dir per fold, args.json diff against its
+twin = experiment + the intended knob only, logged parameter count; fold-paired from
+solver_results.csv (superseded rows skipped) + per-eye (SOLVER_FINAL_RUNS 9.8b instrument,
+or thesis_numbers.py of 9.20, which self-checks against the same anchor).
+Twins: *s7 runs -> their seed-42 runs; dilmean_* -> ANISOGNN_final_dilmean;
+skew capacity points -> FEN_final_w96ftp7rk4d45skew (0.5428).
+
+
+2. WRITING (open)
+-----------------
+[ ] Chapter 5 reporting pass (review #23/#25/#31; scheme agreed 2026-10-01, author to
+    review once more): seed 42 in the text, one sentence "repeated with a second seed,
+    every conclusion held", results in words ("higher by 0.064, on all five folds and on
+    70 of 75 eyes"), one noise level "about 0.02" instead of 0.036/0.016/0.020, SE / t /
+    LOFO in an Appendix E table, 5.1.4 cut to ~1/2 page. Do it AFTER the runs above, so each
+    number is rewritten once.
+[ ] 4.3.7: explain the RK4 setting plainly (Euler vs RK4; "autonomous" = Delta t input set
+    to zero, the update is not zero; why the wrapper exists: FEN integrator,
+    integration-order test, continuous-time question). Inline TODO at 4.3.7.
+[ ] 5.5.1 (Mai comparison): compare growth-region Dice per horizon bin with Mai Table 2
+    (0.25 / 0.38 / 0.38 / 0.37); the old note "our growth-region Dice is higher" is
+    unverified. Optional: appendix table of r / AUC for all arms (values in NOTES).
+[ ] Check Chapters 5-6 for metrics mentioned without a plain description (author rule).
+[ ] Appendix E: seed-7 table + full statistics per comparison (needs section 1).
+[ ] Appendix F: run identity (moved from 4.6; inline TODO).
+[ ] Figure 4.2 (stencils, index-space diamond vs dilated stencil), spec extended with the
+    two-round reach (+/-4 vs +/-42 columns); render by script from grid spacing + offsets.
+[ ] Border vs interior split (5.1.2 variants commented out): report once (5.2 sentence or
+    Appendix E) or leave out for good. 6.3 currently says it was computed but not reported.
+[ ] Optional: solver-swap on the skew T-FEN at fold 2 (common fold with the graph
+    networks) and on the seed-7 skew T-FEN.
+[ ] [ce6] 5.5 Qualitative Analysis: the section intro (per-eye rollouts, success cases,
+    failure modes: atypical progression, sparse schedules, short vs long Delta t,
+    border-censored lesions) is still an empty TODO, and Figure 5.1 (fig:experiments:
+    rollout) is a placeholder. 6.2 points to the failure cases (inline TODO l. ~206).
+    Needs the final-epoch rollout exports (practical/scripts/fig_rollout.py, port to
+    images/scripts/ per style/README.md). No new run needed.
+[ ] [ce6] 1.4 Contributions: still the stale pre-survey list ("TODO: maybe remove" in the
+    heading). Decide keep/rewrite/remove; if rewritten, align it with Ch. 7 and the abstract
+    (ingredients, the framework, the nulls). Not covered by the final-chapters prompt.
+[ ] [ce6] 6.2 "Reliable horizon": literature check for a clinically meaningful threshold for
+    spatial GA progression forecasts (inline TODO l. ~195); currently "no established
+    threshold is known to the author".
+[ ] [ce6] After the runs of section 1: one pass over 6.1 / 6.3 / Ch. 7 / both abstracts
+    (inline TODOs 06-discussion l. ~40 and ~283, 00-abstract l. 8). Do it together with the
+    Chapter 5 reporting pass, so the wording ("higher by ... on k of 5 folds") matches.
+[ ] [ce6] If the border/interior split (item above) is dropped for good, 6.3 must still say
+    it was computed and not reported -- it currently does; if it is reported, change 6.3.
+[ ] 04-method.tex: stale TODO comments to clean up -- l. ~301 (theta_PDE, now in 6.1),
+    l. ~1230 ("cost convention -> TODO in Section 5.7", now in 5.6), l. ~97 (trajectory
+    memory, now in 6.3/6.4).
+
+
+3. VERIFICATION (open)
+----------------------
+[ ] Re-check every number changed on 2026-09-29 and 2026-10-01 (k-NN arms switched to
+    mean aggregation; one-hop / per-pixel / Delta t / seed-7 values; T-FEN skew numbers).
+    List of old -> new values in NOTES.md.
+[ ] Width-32 U-Net per eye: -0.0453 +/- 0.0113 (this session) vs -0.0469 +/- 0.0090
+    (SOLVER_FINAL_RUNS 9.18 / 9.6d).
+[ ] 5.4.2: the 31.8x gradient ratio of the monotonic penalty -- in which setting was it
+    measured (F2 audit)? Confirm or state the setting.
+[ ] [ce6] 6.3: quantify the local shrinkage of the reference masks between visits
+    (fraction of visit pairs with net/local shrinkage, area) -- inline TODO l. ~245; the
+    text currently says "has not been quantified". Post-hoc analysis on the masks, no
+    training run.
+[ ] [ce6] 6.2 quotes the canonical model's growth-region Dice beyond one year as "about
+    0.60 to 0.66" (= 0.600 / 0.634 / 0.655 from 5.3.4, SOLVER_FINAL_RUNS 9.19a); covered
+    by the general re-check above, listed here because it is a new place the numbers appear.
+
+
+4. CODE-SIDE (masterthesis-docker; not editable from the thesis session)
+------------------------------------------------------------------------
+[ ] SOLVER_FINAL_RUNS: add a read-out for the mean-aggregation twins (aggrmeans7, l1mean,
+    nodtsmean, pxmean) -- the thesis numbers were computed here.
+[ ] SOLVER_FINAL_RUNS 9.20 is out of date on the queue: it says there is no seed-7
+    free-form FEN and that dilmean_plainmse / _nodice / _mono2 are not queued -- all are
+    queued (section 1). Read the seed-7 transport effect against the seed-7 free-form run.
+[ ] SOLVER_FINAL_RUNS 9.19a says the Galerkin T-FEN failed on "3/5" folds at seed 42; its
+    own table gives 4/5 (folds 0, 1, 2, 4). The thesis uses 4/5 at seed 42, 7/10 overall.
+[ ] THESIS_FRAMEWORK.md: both copies (code repo + thesis mirror) identical but stale since
+    2026-09-17; update code-side and re-mirror.
+
+
+5. FOR THE AUTHOR TO REVIEW
+---------------------------
+[ ] 5.4.3 Capacity (written directly, not via external draft + audit).
+[ ] The Chapter 5 reporting scheme (section 2, first item).
+[ ] Chapter 4 as a whole after the restructure.
+[ ] The rewritten 5.4.1 (time handling), 5.4.2 (objective), 5.5.1 (solver-swap, criteria
+    C1/C2), 5.5.2 (T-FEN, two operator forms) and the 4.3.6 definition of "unstable".
+[ ] [ce6] 5.6 Computational Cost, Chapter 6, Chapter 7, English abstract, German
+    Kurzfassung (externally drafted, audited and partly rewritten; list of corrections in
+    NOTES.md). Points worth a look:
+    - 6.1 links the reach/transport result to the CFL condition (Courant1928) as
+      "consistent with", not as proof -- check you are happy with that framing.
+    - 6.1/6.2 name the missing eye-specific conditioning (theta_PDE slot) as a *possible*
+      cause of the growth-speed gap; untested.
+    - 6.4 "Spatial pre-processing" replaces the old review #33 TODO (inline TODO l. ~336:
+      check it says what you intended).
+    - Ch. 7 uses one bullet list (the four ingredients); the rest is prose.
+    - Kurzfassung: new translation of the revised English text (decimal commas,
+      "Rahmen" for framework, "Change-Region-Dice").
+
+
+6. RESOLVED (for the record)
+----------------------------
+[x] All 38 review marks handled (#23/#25/#31 deferred into the reporting pass).
+[x] Mean+max removed; k-NN / one-hop / per-pixel arms on mean aggregation; seed-7 mean
+    twins in (aggrmeans7, l1mean, nodtsmean, pxmean) -- 2026-10-01.
+[x] Matched free-form control w139 (seed 42): fold 4 does not train; folds 0-3 reported.
+[x] Skew T-FEN is the reported T-FEN; stable 5/5; passes the solver-swap test; Courant
+    read-back done (residual removed by a 30-day evaluation step).
+[x] Capacity study written up (5.4.3).
+[x] Horizon values (FNO vs U-Net beyond one year; near-term bin) from SOLVER_FINAL_RUNS 9.20.
+[x] Resolved by the other session (ce6bf3e): cost convention + RK4 cost (5.6); Chapter 6
+    items theta_PDE, predictions between visits (regulariser + RK4 arm), "good at where,
+    weaker at how fast", covariates unsettled, crop censoring, trajectory memory.
+[x] [ce6] Also resolved there: layer encoder as future work (6.4, old 4.4 TODO); better
+    cropping (6.4, review #33); Ch. 7 and both abstracts written (were empty TODOs); 5.6
+    states that inference time and memory were not measured (old 5.7 TODO "inference time
+    per rollout step, memory" closed by saying so); the external-draft errors (31.1 % of
+    lesions not visits, +0.062 vs +0.072 transport controls, 4.8x not general, Mai et al.
+    not a "baseline", unsupported "results" of pending runs) fixed before commit.
+
+
+7. OVERVIEW: WHAT IS LEFT FROM THE CH. 6/7/ABSTRACT SESSION ONLY  [ce6]
+-----------------------------------------------------------------------
+Waiting for a run (all already queued, see section 1 for the full "Fills" column):
+
+  Run / job                                   Text that changes
+  ------------------------------------------  ------------------------------------------
+  FEN_final_w96ftp7rk4d45skews7   (7875525)   abstract headline + TODO l. 8; Ch. 7 "The
+                                              operator"; 6.1 "three highest arms"; 6.3
+  ANISOGNN_final_dilmean_nodts    (7875536*)  6.1 inline TODO l. 40; Ch. 7 "The framework"
+  ANISOGNN_final_dilmean_plainmse (7875539)   6.3; 6.1 / Ch. 7 only if a loss term matters
+  ANISOGNN_final_dilmean_nodice   (7875538)   6.3; 6.1 / Ch. 7 only if a loss term matters
+  ANISOGNN_final_dilmean_mono2    (7875537)   6.3 (shrinkage / no-constraint paragraph)
+  FEN_final_w139Frk4d45s7         (7875520*)  6.3; Ch. 7 transport bullet ("four folds")
+  FEN_final_w48 / w192 / w96d8 ...skew        6.3; "capacity not a lever in any of the four
+                  (7875528 / 29 / 30)         classes" in 6.1 and Ch. 7 if a skew point
+                                              changes the reading
+  Not needed for Ch. 6/7/abstract: 7875532 (free-form FEN s7), 7875533/34 (FNO s7),
+  7875535 (one-hop s7) -- they only feed 5.3 / Appendix E.
+
+No run needed:
+  [ ] 5.5 Qualitative Analysis + Figure 5.1 (rollout strip); then the 6.2 link (TODO l. ~206)
+  [ ] 1.4 Contributions: keep / rewrite / remove
+  [ ] 6.2 literature check: clinical Dice threshold (TODO l. ~195)
+  [ ] 6.3 quantify ground-truth shrinkage (TODO l. ~245; mask analysis only)
+  [ ] Author review: 5.6, Ch. 6, Ch. 7, abstract, Kurzfassung (points in section 5)
+
+Order that avoids rewriting twice: runs in -> Chapter 5 reporting pass -> one pass over
+6.1 / 6.3 / Ch. 7 / abstracts (remove the "Unfinished replications" items that are done)
+-> Kurzfassung re-translated from the final English abstract.
