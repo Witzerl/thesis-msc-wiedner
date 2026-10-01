@@ -409,65 +409,385 @@ evolving clinical data is the question this appendix tests.
 \section{The Moving-Mesh Extension for GA}
 \label{app:mm-pde:extension}
 
-% Moved here from Chapter 4 (former \S4.4, "The Moving-Mesh Extension as a
-% Tested Hypothesis") on 2026-09-27; the text is still to be written.
-% TODO: DMM + dual branch, framed as a hypothesis the design was built to
-% measure. The alpha gate (zero-initialised) is the instrument; alpha -> 0
-% was a pre-registered reportable outcome. res_cut is NOT part of the
-% framework and must not be described as a component.
+% Drafted 2026-10-01 by an external LLM from prompts/PROMPT_appendix_G.md,
+% audited against THESIS_FRAMEWORK.md (sections 3, 5, 6.3, 7.5) and
+% DMM_HPSEARCH_NATIVE.md (code repo); corrections listed in NOTES.md.
+This section describes how the moving-mesh solver of \citet{Hu2024}
+(\S\ref{app:mm-pde:background}) was adapted to GA forecasting. A data-free
+mesh mover and a dual-branch graph network were built on top of the fixed
+framework of \S\ref{sec:method:framework}. The extension was built in full
+and evaluated over five folds, and it gave no measurable gain over the
+uniform grid. For this reason it is reported in this appendix rather than
+in the main text.
+
+The experiment was designed as a measurement. A learnable scalar gate,
+initialised to zero, decides how much of the correction computed on the
+moved mesh enters the prediction, so its trajectory shows whether the
+correction is used at all. A parameter-matched bypass control runs the
+same machinery on the uniform grid, which separates the effect of the
+mesh geometry from the effect of the extra parameters.
+\S\ref{app:mm-pde:dmm} describes the mesh mover, \S\ref{app:mm-pde:dual}
+the dual-branch composition, \S\ref{app:mm-pde:mesh-quality} the quality of
+the meshes, and \S\ref{app:mm-pde:result} the result.
 
 \subsection{Data-Free Mesh Mover for GA}
 \label{app:mm-pde:dmm}
 
-% TODO: physics loss (Monge--Amp\`ere + boundary + convexity), sampling,
-% monitor function. The monitor is a plain scalar monitor on the Gaussian-
-% blurred mask; the DMM trains and is applied on the native (49, 1024) grid.
-% The Frobenius-norm multi-channel monitor and the 256^2 SLO path are
-% superseded -- historical steps only, never the design. Pretrained, frozen.
+The mesh mover reads only channel~0, the binary GA mask, on the native
+$49 \times 1024$ grid. At the first step of a rollout this is the observed
+segmentation. At later steps it is the model's own predicted mask,
+denormalised and thresholded back to binary, so the mesh follows the
+predicted lesion exactly as it would in deployment. The network branches
+on the uniform and on the moved mesh still process all eleven channels;
+only the mesh mover reads the mask alone. An earlier version was trained
+on a square $256 \times 256$ mask sampled from the fundus image; it was
+replaced by the native grid, which removes a resize round trip during
+the rollout.
+
+The architecture follows the DeepONet form \citep{Lu2021} as adapted
+by~\citet{Hu2024}. A convolutional branch encodes the mask with three
+stride-2 convolutions ($1 \to 16 \to 32 \to 64$ channels), adaptive
+average pooling to $4 \times 4$ and a linear layer to a 512-dimensional
+latent vector; because of the pooling it accepts any grid size. A trunk
+network, a tanh multilayer perceptron with widths 2, 32 and 512, reads
+the continuous coordinate $\xi \in [0,1]^2$. A head maps the concatenated
+branch and trunk outputs to the scalar potential $\phi$ through widths
+1024, 512, 512 and 1, one layer deeper than the base head. The moved mesh
+is $x(\xi) = \xi + \nabla\phi(\xi)$, computed by automatic differentiation.
+The mesh mover has $1\,394\,273$ parameters. They are frozen during solver
+training and excluded from the optimiser.
+
+The monitor differs from the one of \S\ref{app:mm-pde:background}. It is a
+scalar,
+\begin{equation}
+  M \;=\; 1 + \log\!\Big(1 + \frac{\lVert \nabla u \rVert}
+  {\alpha_{\text{scale}}\, \bar g + \epsilon}\Big),
+  \label{eq:appendix:monitor}
+\end{equation}
+where $u$ is the mask after a Gaussian blur, $\bar g$ the mean gradient
+magnitude over the grid, $\alpha_{\text{scale}} = 0.1$ and
+$\epsilon = 10^{-10}$. The gradient is taken in the unit-square
+computational coordinate, which gives the two axes their correct relative
+weight on the anisotropic grid. Two parts of this monitor were needed. The
+blur ($\sigma = 1.0$\,px) is applied for the monitor only; the branch
+always sees the raw binary mask. A binary mask has a step at the lesion
+edge, and without the blur the first GA run diverged to NaN. On the native
+grid, the unblurred monitor no longer diverges but leaves the mesh almost
+unmoved (\S\ref{app:mm-pde:mesh-quality}). The logarithm bounds the ratio
+between the peak of the monitor at the sharp lesion ring and its bulk
+value, so the equidistribution target stays reachable. Two further ideas
+were tested and left out: a blur kernel stretched along the columns to
+match the physical spacing, which gave no gain ($p = 0.95$) and folded the
+mesh intermittently, and a penalty on the Jacobian determinant, which made
+folding worse.
+
+The loss has three terms with weights 1, 1000 and 1. The first is the
+Monge--Amp\`ere equidistribution residual at sampled interior points,
+$\operatorname{MSE}\big(M(\xi + \nabla\phi)\,\det(I + \nabla^2\phi) /
+\bar M,\ 1\big)$: the monitor at the moved point times the change of cell
+volume should be the same everywhere. The second is a soft boundary term
+that penalises the normal derivative of $\phi$ on the four edges, so that
+boundary nodes stay on the boundary. The third penalises negative diagonal
+entries of the Hessian of $\phi$, an early sign of folding. This term
+stays close to zero throughout training; validity is enforced instead when
+a checkpoint is selected, by requiring zero folded cells. The last-layer
+L-BFGS refinement of \citet{Hu2024} was not used.
+
+Each iteration samples 5 masks and 1000 points per mask, 90\,\% of them in
+proportion to the monitor and 10\,\% uniformly. The mesh mover was trained
+on all 478 masks of the cohort, the start mask of every training window of
+all 75 eyes. Because it never sees a future state, this leaks no label,
+and it makes the same mesh mover in-distribution for every fold. It was
+trained with Adam, learning rate $2 \times 10^{-4}$, weight decay
+$10^{-5}$, for 500 epochs, with the learning rate multiplied by 0.2 at
+epochs 333 and 467. The configuration was selected from a 55-run search on
+the native grid. Quality improved with the number of epochs up to 500. The
+two largest levers were the extra head layer and the sharper blur of
+$\sigma = 1$ instead of 2, and they helped only together. The branch
+architecture made no measurable difference across five variants; the
+pooled branch is kept because it accepts any grid size.
+Table~\ref{tab:appendix:dmm-config} summarises the configuration.
+
+\begin{table}[t]
+  \centering
+  \caption[Configuration of the data-free mesh mover.]{%
+    Configuration of the data-free mesh mover used by the dual-branch
+    model (canonical checkpoint of the 55-run search on the native grid).}
+  \label{tab:appendix:dmm-config}
+  \small
+  \begin{tabular}{l p{0.62\textwidth}}
+    \toprule
+    Component & Setting \\
+    \midrule
+    Input & Channel 0 only (binary GA mask), native $49 \times 1024$ grid \\
+    Branch & Convolutions $1 \to 16 \to 32 \to 64$, pooling to
+      $4 \times 4$, linear to 512 \\
+    Trunk & Tanh MLP, widths 2, 32, 512 \\
+    Head & MLP, widths 1024, 512, 512, 1 \\
+    Monitor & Scalar, Gaussian blur $\sigma = 1.0$\,px,
+      $\alpha_{\text{scale}} = 0.1$, log compression \\
+    Loss weights & 1 (equidistribution), 1000 (boundary), 1 (convexity) \\
+    Sampling & 5 masks $\times$ 1000 points, 90\,\% by monitor,
+      10\,\% uniform \\
+    Optimiser & Adam, learning rate $2 \times 10^{-4}$, weight decay
+      $10^{-5}$ \\
+    Schedule & 500 epochs, learning rate $\times 0.2$ at epochs 333 and
+      467 \\
+    Training data & All 478 masks of the cohort \\
+    Parameters & $1\,394\,273$, frozen during solver training \\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
 \subsection{Dual-Branch Composition}
 \label{app:mm-pde:dual}
 
-% TODO: uniform branch returns the full next state; moved branch returns a
-% pure Delta-t delta; ItpNet interpolation renormalised to sum to one; the
-% learnable scalar gate alpha. Both branches use the same network class as
-% the graph operator of Section 4.3.2.
-% TODO (moved from Chapter 4, 2026-09-27): the decoder's final layer is NOT
-% zero-initialised on the correction branch (the alpha gate supplies the
-% zero start; zero-init on both would deadlock the gradients).
-% TODO (moved from Chapter 4, 2026-09-27): the moved-mesh nodes lie off the
-% lattice, where the dilated stencil is undefined, so the correction branch
-% builds its own k-NN graph on the moved positions (in index space).
-% TODO (moved from Chapter 4, 2026-09-27): the Runge--Kutta wrapper applies
-% to single-branch models only; the grid operators and the FEN run as
-% single-branch models, so the U-Net is compared with the single-branch
-% graph operator, not with the dual branch.
-% TODO: ItpNet pretraining at epoch 0 with its own optimiser (moved out of
-% Section 4.7).
+The dual-branch model predicts
+\begin{equation}
+  \hat u_{t+\Delta t} \;=\; u_t + \Delta t\, f_\theta(u_t)
+  \;+\; \alpha \cdot \tilde I\big[\Delta t\, g_\theta(u_t)\big],
+  \label{eq:appendix:dual}
+\end{equation}
+where $f_\theta$ runs on the uniform grid and $g_\theta$ on the moved mesh.
+The uniform branch alone gives the full next state, $u_t + \Delta t\,
+f_\theta$. The correction branch gives a pure increment scaled by
+$\Delta t$, which the interpolation $\tilde I$ carries back to the uniform
+grid. Both branches are the graph network of \S\ref{sec:method:mppde},
+with two message-passing rounds of width 64.
+
+% TODO: cite Bachlechner2021 (ReZero, UAI 2021) once added to references.bib
+The gate $\alpha$ is a learnable scalar initialised to zero, the ReZero
+construction of Bachlechner et al. (2021). At the start the dual model is
+therefore exactly the uniform branch alone, and the correction has to earn
+its weight. The gate also fixes the scale of the correction: the loss
+constrains only the sum of the two branches, which could otherwise grow
+large and cancel each other. The gate has its own optimiser group without
+weight decay and its own gradient-clipping group. Unlike every operator of
+the main text, the decoder of the correction branch is not
+zero-initialised. If both the decoder and $\alpha$ started at zero, the
+gradients of both would be exactly zero, a deadlock from which the branch
+could never activate; the gate alone supplies the zero start.
+
+The moved nodes lie off the lattice, where the dilated stencil of
+\S\ref{sec:method:graph} is not defined. The correction branch therefore
+builds its own $k$-nearest-neighbour graph ($k = 12$) on the moved
+positions, searched in index space, that is, with the coordinates divided
+by the grid spacing. A search in physical millimetres would return only
+neighbours from the same row on this grid. That was the case in the
+implementation until 6 August 2026; dual-branch results from before that
+date are not used.
+
+The interpolation is a learned network (ItpNet). For each query point, a
+tanh multilayer perceptron with widths 26, 128, 64 and 12 and a linear
+output turns the coordinates of its 12 nearest source points into 12
+weights. Two independent copies are used: one interpolates all eleven
+channels from the uniform grid to the moved mesh, as the input of the
+correction branch, and the other carries the correction back. The weights
+of the return direction are renormalised to sum to one at each point, with
+a sign-preserving floor of 0.1 on the denominator, which bounds the gain
+at 10; the floor is active at about 12.6\,\% of the points. ItpNet is
+pretrained at epoch 0 for 25 passes with its own AdamW optimiser
+\citep{Loshchilov2019}, on the round trip uniform $\to$ moved $\to$ uniform,
+which should return the input unchanged. The pretraining uses the
+channel-weighted mean squared error only, because the soft-Dice term would
+push the operator away from the identity it is meant to learn; the
+gradients are clipped and the gate is disabled.
+
+The mesh is recomputed from the current state at every step. A mesh built
+at the start of a multi-step window would no longer match the lesion at
+the later steps. The dual-branch model therefore predicts one step at a
+time. In the main text, one-step prediction is motivated by the short
+visit sequences (\S\ref{sec:method:framework}); this is a second,
+mesh-specific reason.
+
+Gradients are clipped to a norm of 1.0 separately in five groups: the
+uniform branch, the correction branch, the ItpNet weights, the gate
+$\alpha$ and the layer encoder; the mesh mover is frozen. Under one joint
+clip, the large gradients of ItpNet, with a median of $10^3$ to $10^4$ in
+the dual runs against about 1 for the uniform branch, would have throttled
+the uniform branch.
+
+The dual-branch model has $175\,663$ trainable parameters against
+$75\,339$ for the single-branch model in the configuration of the five-fold
+runs, about $100\,000$ more for the second network and ItpNet. With the
+dilated stencil the counts are $159\,279$ and $67\,147$. The frozen mesh
+mover is not counted. The bypass control loads the same mesh mover, runs
+the second network and the full ItpNet round trip, but places the
+correction branch on the uniform grid instead of the moved mesh. It is
+parameter-identical to the dual model and differs from it only in the
+mesh geometry. The Runge--Kutta wrapper of \S\ref{sec:method:family:rk},
+the dense operators and the finite-element networks are single-branch
+models only, so they are compared with the single-branch graph network and
+not with the dual branch.
 
 \section{Moving Mesh Quality}
 \label{app:mm-pde:mesh-quality}
 
-% Moved here from Chapter 5 (former \S5.5) on 2026-09-27; still to be written.
-% TODO: the DMM judged on its own terms, independent of whether the dual
-% branch helped: equidistribution CoV, tangled-cell counts, geometric
-% quality, capacity/overfitting behaviour across branch architectures and
-% seeds (native-grid canonical checkpoint; metrics in-sample, see
-% THESIS_FRAMEWORK.md). Visualise example moved meshes overlaid on sample
-% states. This licenses reading the null as "the correction branch did not
-% engage" rather than "the mesh was bad".
+The mesh mover was judged on its own terms, independently of the
+prediction. Four metrics were used. All of them depend only on the mask
+and use the same reference for every run. The number of tangled cells
+counts the mesh cells with a non-positive signed area, that is, folds. The
+edge gain asks whether nodes move to the lesion border: the border is
+widened to a band of half-width 0.02 of the domain, normalised to a grid
+mean of 1, and averaged at the moved node positions. The unmoved mesh
+scores exactly 1, and a higher value means more nodes on the border. The
+reference coefficient of variation, \texttt{cov\_ref}, is the standard
+deviation divided by the mean of the cell areas weighted by one fixed
+reference monitor, the equidistribution measure of
+\citet{HuangRussell2011}; lower is more even. The determinant margin,
+\texttt{det\_min}, is the minimum of $\det(I + \nabla^2\phi)$ over random
+points. A positive value means that the map does not fold anywhere, not
+only at the grid nodes.
 
-% TODO: remaining Appendix G content (THESIS_STRUCTURE.md): the result (dual - bypass =
-% -0.0001 +- 0.0060, scoped as the correction branch's failure to
-% optimise), and the ~10x cost.
-% TODO: state here why the moving mesh also requires one-step prediction:
-% the mesh is computed from a single state, so a mesh built at the start
-% of a multi-step window would no longer reflect the lesion at the later
-% steps (moved from \S4.2, author review #13, 2026-09-27).
-% TODO: state which channels each part of the moving-mesh extension uses:
-% the mesh mover reads only the mask channel to compute the moved mesh,
-% while the network branch on the moved mesh still processes all eleven
-% channels (moved from \S4.2.2, author review #19, 2026-09-27).
+\begin{table}[t]
+  \centering
+  \caption[Quality of the moved meshes.]{%
+    Quality of the meshes of the canonical mesh mover at epoch 500, on two
+    pools of 16 masks: head-16, the first 16 masks, which cover few eyes,
+    and spread-16, spread over the eyes of the cohort. Edge gain as mean
+    $\pm$ sd over three seeds; the other columns are three-seed means. All
+    values are in-sample, because the mesh mover is trained on every mask
+    of the cohort. The two pools are not comparable with each other.}
+  \label{tab:appendix:mesh-quality}
+  \small
+  \begin{tabular}{l c c c c}
+    \toprule
+    Pool & Edge gain & Tangled cells & \texttt{cov\_ref} & \texttt{det\_min} \\
+    \midrule
+    head-16   & $1.9854 \pm 0.0580$ & 0 & 0.313 & 0.203 \\
+    spread-16 & $2.6307 \pm 0.0607$ & 0 & 0.311 & 0.115 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Table~\ref{tab:appendix:mesh-quality} gives the result. No mesh folds: the
+number of tangled cells is zero on every scored mask, at every seed and
+every scored epoch. The values are in-sample and say nothing about
+generalisation to unseen lesions. The two pools are not comparable with
+each other, because edge gain and the determinant margin depend on the
+masks scored; the spread pool is the unbiased one. On that pool, the
+configuration before the head and blur changes reaches an edge gain of
+2.24, the same mesh mover without blur 1.34, and without the logarithmic
+compression 0.94, below the unmoved mesh. The seed spread of the selected
+configuration, a standard deviation of about 0.06, is the largest in the
+search. One choice is unverified. The boundary weight of 1000 was kept
+although a weight of 100 scored higher on edge gain, by 0.029 on head-16
+and 0.105 on spread-16; it was rejected on a lesion-specificity check that
+was computed only on the biased head-16 pool.
+
+The mesh mover thus produces valid meshes without folds that concentrate
+nodes on the lesion border. The null result of \S\ref{app:mm-pde:result}
+can therefore not be explained by a broken mesh.
+
+% TODO: produce Figure fig:appendix:moved-mesh -- the moved mesh (every
+% k-th grid line) over the GA mask of two or three representative eyes, at
+% the physical aspect ratio (about 5.94 x 5.82 mm), next to the uniform grid.
+\begin{figure}[t]
+  \centering
+  \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering Placeholder for
+    Figure~\ref{fig:appendix:moved-mesh}. See accompanying
+    \texttt{\% TODO} for the intended content.}}
+  \caption[Moved meshes of representative eyes.]{%
+    Meshes moved by the canonical mesh mover for representative eyes,
+    drawn over the GA mask at the physical aspect ratio, with the uniform
+    grid for comparison. Every $k$-th grid line is shown.}
+  \label{fig:appendix:moved-mesh}
+\end{figure}
+
+\section{Result}
+\label{app:mm-pde:result}
+
+The single-branch model, the dual-branch model and the bypass control were
+compared over the five folds at seed 42, with the evaluation protocol of
+the main text (\S\ref{sec:experiments:protocol:stats}). All three arms use
+the earlier $k$-nearest-neighbour graph network with mean and maximum
+aggregation. This is neither the canonical dilated stencil nor the
+$k$-nearest-neighbour arm of Table~\ref{tab:experiments:arms}, which uses
+mean aggregation and reads 0.4623. Table~\ref{tab:appendix:dual-result}
+lists the arms.
+
+\begin{table}[t]
+  \centering
+  \caption[Single branch, dual branch and bypass control.]{%
+    Change-region Dice at the one-year anchor, mean $\pm$ sd over the five
+    folds, seed 42. All arms use the earlier $k$-nearest-neighbour graph
+    network with mean and maximum aggregation, not the configurations of
+    Table~\ref{tab:experiments:arms}. Cost is the minimum epoch time over
+    the folds and supports order-of-magnitude statements only.}
+  \label{tab:appendix:dual-result}
+  \small
+  \begin{tabular}{l c r r}
+    \toprule
+    Arm & Dice & Parameters & Epoch time \\
+    \midrule
+    Single branch & $0.4515 \pm 0.0429$ & $75\,339$ & 75\,s \\
+    Dual branch (moving mesh) & $0.4501 \pm 0.0326$ & $175\,663$ & 759\,s \\
+    Bypass control (uniform grid) & $0.4503 \pm 0.0324$
+      & $175\,663$ & 718\,s \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+% Values: THESIS_FRAMEWORK.md section 5.1 and 7.5 (T4); epoch times from the
+% arm table of PROJECT_CONTEXT.md section 6.
+
+The dual branch gives no measurable gain. Against the bypass control the
+fold-paired difference is $-0.0001 \pm 0.0060$~SE (higher on 3 of 5 folds)
+and per eye $+0.0001 \pm 0.0038$ (33 of 75 eyes). This is the tightest null
+result of the project: its standard error is less than half the
+difference of 0.016 that a five-fold paired mean must exceed. Against the
+single branch the difference is $-0.0013 \pm 0.0086$~SE (3 of 5 folds) and
+per eye $-0.0018 \pm 0.0064$ (32 of 75). The dual branch costs about ten
+times the training time per epoch of the single branch.
+
+The gate $\alpha$ never opens, with or without the moving mesh. In every
+fold of both arms it moves from zero to exactly $\pm 0.0020$ in the first
+step, one optimiser step from the zero start, as designed. It then peaks
+at 0.058 to 0.093 in the dual branch and at 0.031 to 0.101 in the bypass
+control, averages 0.009 to 0.024 and 0.005 to 0.023 in absolute value,
+and ends near zero in every fold. The range of the bypass control
+encloses that of the dual branch, and the largest peak of either arm,
+0.1005, belongs to a bypass fold.
+
+A probe on the trained dual model shows why the gate stays shut. The
+gradient that reaches the correction branch is proportional to $\alpha$:
+its norm is 0 at $\alpha = 0$, 0.0034 at $\alpha = 0.002$ and 1.799 at
+$\alpha = 1$, against about 2.09 for the uniform branch. At the
+$|\alpha| \approx 0.02$ that the runs reach, the correction branch receives
+a learning signal about 60 times weaker than the uniform branch. A gate
+that starts at zero thus gives the branch almost no signal to learn from,
+and an untrained branch gives the gate no reason to open.
+
+Three further runs on fold 2 tested this reading, and none of them opened
+the branch. Without the gate, with the decoder zero-initialised instead,
+the change-region Dice falls to 0.3148 against 0.4878 for the gated dual
+model, a loss of 0.173, about five times the single-fold noise floor of
+0.036; the gradient of the correction branch is still zero at the median.
+The gate therefore protects the prediction from an untrained correction
+that would otherwise be added at full weight. Without weight decay on the
+correction branch and ItpNet, the Dice is 0.0092 higher than its
+counterpart, under the single-fold floor; $\alpha$ peaks lower (0.058
+against 0.067), and the parameters of the correction branch grow rather
+than shrink, so weight decay is not what keeps the gate shut. On the
+dilated stencil, the dual model reads 0.5754 against 0.6060 for its own
+single-branch counterpart, a difference of $-0.031$ (per eye
+$-0.0305 \pm 0.0086$, 3 of 16 eyes), at roughly nine times the cost. The
+stencil's own gain carries over to the dual model, but the correction
+branch does not engage, however strong the uniform branch is.
+
+The finding is therefore that the gated correction branch did not
+engage --- with the moving mesh or with the uniform grid in its place,
+with or without weight decay, with or without the gate --- and that the
+dual-branch model gave no measurable gain at about ten times the cost.
+This is a statement about this implementation. It says nothing about
+whether mesh adaptation could help GA forecasting, because the bypass
+control behaves the same without any mesh. Before the runs, $\alpha \to 0$
+had been fixed as a reportable outcome that would mean that mesh
+adaptation does not help. The bypass control, which was part of the same
+design, showed that this reading is not valid. \citet{Hu2024} report that
+their dual branch improves on the uniform grid on their benchmarks; why
+the correction branch does not engage here is not explained by these
+experiments.
+
 
 \section{Outlook}
 \label{app:mm-pde:outlook}

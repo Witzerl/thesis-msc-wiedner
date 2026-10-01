@@ -223,7 +223,7 @@ tab:appendix:border-interior, Huang1991 in the bib); build clean:
     Paszke2019 (PyTorch, NeurIPS 2019, arXiv:1912.01703; l. ~1194),
     Fey2019 (PyTorch Geometric, ICLR 2019 RLGM workshop, arXiv:1903.02428; l. ~1196).
     Add the entries, switch the text to \citep/\citet, delete the markers.
-[ ] [s27] Appendix G (moving mesh) is still a skeleton apart from G.1 (background). Open
+[x] (done 2026-10-01: G.2-G.4 drafted externally from prompts/PROMPT_appendix_G.md, audited and spliced; open: Bachlechner2021 cite, Figure fig:appendix:moved-mesh) [s27] Appendix G (moving mesh) is still a skeleton apart from G.1 (background). Open
     TODOs in 91-appendix.tex: G.2 DMM for GA (physics loss, native-grid scalar monitor,
     pretrained + frozen) and dual-branch composition (uniform branch full state, moved
     branch Delta-t delta, ItpNet renormalised, alpha gate); four facts moved there from
@@ -533,7 +533,7 @@ of it is in and written up (5.4.3). What still runs from that plan:
 
 No run needed:
   [x] Bibliography: Milletari2016, Loshchilov2019, Paszke2019, Fey2019 (section 2)
-  [ ] Appendix G content: G.2 DMM + dual branch, G.3 mesh quality, result + cost (section 2)
+  [x] Appendix G content: G.2 DMM + dual branch, G.3 mesh quality, result + cost (section 2)
   [ ] Figure 4.1 pipeline (section 2); Figure 4.2 stencils and Figure 5.1 rollout strip are
       already listed in section 2
   [x] 4.5.2: B > 0 feasibility restriction -- code check (section 3)

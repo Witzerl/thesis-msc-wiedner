@@ -342,7 +342,22 @@ Being worked through one item at a time.
   closing sentence about "how a monitor function should be defined over a multi-channel
   state tensor … deferred to Chapter 4" was dropped (superseded design: the monitor is a
   scalar on the blurred mask) and replaced by "…is the question this appendix tests."
-- [ ] TODO: Appendix G still needs the rest of its content (inline `% TODO` at its end): DMM
+- [x] 2026-10-01: Appendix G G.2-G.4 written (external draft from prompts/PROMPT_appendix_G.md,
+  audited against THESIS_FRAMEWORK.md §3, §5, §6.3, §7.5 and DMM_HPSEARCH_NATIVE.md). Corrections:
+  build-breaking paste damage (row ends, lost \, before units, unescaped _ and % in 	exttt);
+  "Adam \citep{Loshchilov2019}" (the DMM used plain Adam; AdamW cite kept for ItpNet only);
+  "the lower boundary weight failed a lesion-specificity check" (it was a tie on the biased pool);
+  ItpNet pretraining described as an identity "on the uniform grid" (it is the round trip).
+  Added from the fact sheet: the era sentence (mean+max k-NN 0.4515, not the 0.4623 arm), per-eye
+  values, "tightest null", ReZero author-year, the 2026-08-06 edge fix, v2 parameter counts,
+  pool definitions, the probe explanation and the fold-2 probe details. Added from the sources:
+  the L-BFGS refinement was not used; the GA monitor is scalar and log-compressed (unlike G.1).
+- [ ] TODO (Appendix G): cite **Bachlechner2021** (ReZero, UAI 2021) -- `% TODO: cite` marker in G.2.2.
+- [ ] TODO (Appendix G): produce Figure `fig:appendix:moved-mesh` (moved mesh over the GA mask,
+  2-3 eyes, physical aspect ratio, uniform grid alongside).
+- [ ] Author to review Appendix G (G.1 was not touched; it still contains "Crucially" and
+  "entirely", and describes the original paper's matrix monitor).
+- [x] (superseded by the entry above) TODO: Appendix G still needs the rest of its content (inline `% TODO` at its end): DMM
   for GA, dual branch + α gate, the null result with its scope, mesh-quality study, ~10×
   cost. Chapters 4 and 5 still contain the MM-PDE sections to be moved ("The Moving-Mesh
   Extension as a Tested Hypothesis" §4.5, "Moving Mesh Quality" §5.5).
