@@ -69,8 +69,13 @@ predictive probabilities of GA development over time. This thesis pursues
 that avenue.
 
 
-\section{Problem Statement}
+\section{Aim of the Thesis}
 \label{sec:introduction:problem}
+% Restructure 2026-10-12 (supervisor review 1): first paragraph of the
+% former Problem Statement, then the setup paragraph and the research
+% question of the former "Why Neural PDE Solvers?". The data properties and
+% the PDE argument moved to Background, Modelling Approach.
+% TODO: bridge sentences between the moved paragraphs.
 
 Predicting GA progression from imaging is framed as a
 \emph{spatiotemporal forecasting} task on the en-face projection of optical
@@ -83,81 +88,6 @@ earlier work on AMD, which predicts or characterises the conversion of an eye
 to a later disease stage \citep{SchmidtErfurth2018, Vogl2021}. The output here is not a single risk
 score but a complete map of the lesion at the next visit.
 
-The clinical reality of OCT follow-up imposes three properties on the data
-that a model has to deal with. First, follow-up visits are
-\emph{irregularly spaced} in time and the spacing varies substantially
-between patients and between consecutive visits of the same patient. There
-is no shared temporal origin across eyes, which rules out methods that
-assume a fixed sampling rate or a common $t = 0$. Second, the underlying
-disease state is \emph{multi-channel}: the binary lesion mask
-captures the GA lesion itself, while the surrounding ten retinal layer
-boundaries describe the retinal structure in which the atrophy is embedded.
-Both information sources are relevant because prognostic biomarkers
-documented in the clinical literature, such as RPE--Bruch's-membrane
-thickening \citep{Chu2022} and thinning of the outer retinal layers
-\citep{Vallino2024}, are not contained in the lesion mask alone. Third, every patient carries \emph{covariates}, in particular age and
-sex. Age is strongly associated with the risk of developing the disease
-(\S\ref{sec:introduction:motivation}), and the evidence on sex is mixed;
-whether either also helps to forecast where and how fast a lesion grows is
-not established.
-
-Meeting these requirements is not only a question of the model itself but
-also of how the model is used. A typical image-to-image model maps one image
-to another; on its own, it has no notion of elapsed time and no built-in way
-to advance a state from one visit to the next. These properties have to come
-from a framework around the model, one that conditions the prediction on
-$\Delta t$ and rolls the state forward visit by visit. The next section
-motivates such a framework, which borrows several of its techniques from
-neural partial differential equation (PDE) solvers. Which model should sit
-inside it is a separate question.
-
-
-\section{Why Neural PDE Solvers?}
-\label{sec:introduction:why-pde}
-
-GA expansion is, to a first approximation, a process of \emph{local boundary
-dynamics}. \citet{Yehoshua2011} found that the enlargement rate of the square
-root of the lesion area does not depend on the baseline lesion size, which is
-what is expected if the radius of a GA lesion grows at a roughly constant rate
-while its enclosed area scales quadratically: writing $A(t)$ for the lesion
-area and $r(t)$ for an effective radius,
-\begin{equation}
-  \frac{\mathrm{d}r}{\mathrm{d}t} \approx \mathrm{const.}
-  \quad\Longleftrightarrow\quad
-  \sqrt{A(t)/\pi} \;=\; r_0 + v\, t,
-  \label{eq:intro:boundary-growth}
-\end{equation}
-which is consistent with the data within a clinical follow-up horizon of six
-months to slightly over two years \citep{Yehoshua2011}; the square-root
-enlargement rate has been re-used in subsequent biomarker work
-\citep{Chu2022}. The interior of the lesion is already atrophic and the
-exterior is healthy; both are quasi-static, and all dynamics are
-concentrated at the active boundary. This is the structural fingerprint of
-a system governed by a temporal partial differential equation with strong
-spatial localisation.
-
-The same boundary, however, does not advance uniformly in all directions.
-GA growth is \emph{anisotropic}: lesions progress faster towards the retinal
-periphery than towards the fovea, peak progression rate occurs at
-approximately one millimetre from the foveal centre when the lesion grows
-foveally, and in eyes treated monthly with pegcetacoplan progression towards
-the fovea was slowed more than progression towards the periphery
-\citep{Singh2025}. The forward operator that maps the present state
-to the future state is therefore \emph{local}, but its reach must match
-the distance the front moves between two visits, which differs between
-directions --- properties that classical solvers build in explicitly
-through the size and shape of their stencils.
-
-Neural PDE solvers turn these classical ideas into learned models.
-Instead of discretising a known equation, they learn from data an operator
-that maps the current state of a system, and the time that elapses, to its
-next state. The literature offers many such operators, and they differ
-mainly in their built-in assumptions: how far a single prediction can look
-across the domain, whether it works on a regular grid or on a graph, and
-whether physical terms such as transport are represented explicitly. For
-GA, where the governing equation is unknown and only a few dozen patients
-are available for training, these assumptions are likely to matter more
-than model size.
 
 Which of them GA progression requires cannot be decided by
 testing a single architecture: if one model succeeds, the reason may be
@@ -172,6 +102,7 @@ risk analyses \citep{Vallino2024}, every model in this comparison forecasts
 the lesion of an individual eye directly on the imaging state; the closest
 forecasts of this kind are discussed in
 Section~\ref{sec:background:related-work}.
+
 
 \paragraph{Research question.}
 \label{par:introduction:research-question}
@@ -193,6 +124,12 @@ operator that maps one visit to the next. Chapter~\ref{ch:method}
 develops a framework that answers the first part and leaves the operator
 as its only free component. Chapter~\ref{ch:experiments} then answers the
 second by comparing different operators within that framework.
+
+
+\section{Contributions}
+\label{sec:introduction:contributions}
+% TODO (supervisor review 1, M5): rewrite as a bullet list: what was
+% achieved, what is novel, why it is valuable.
 
 What the thesis delivers follows from this design. It provides a
 $\Delta t$-conditioned framework for irregular visit schedules in which
@@ -225,6 +162,7 @@ Chapter~\ref{ch:discussion} discusses what the results mean clinically and
 methodologically, together with their limitations, and
 Chapter~\ref{ch:conclusion} concludes. Appendix~\ref{app:mm-pde} reports an additional
 experiment with an adaptive moving mesh.
+
 
 
 %%

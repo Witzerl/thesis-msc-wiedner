@@ -1339,6 +1339,49 @@ worked through one item at a time.
   "the weighting of the mask channel decided" -> "whether the loss emphasised the mask decided"
   (the plain-MSE run removed weighting and soft-Dice).
 
+### Supervisor review 1 (Dmitrii Lachinov, 2026-10-12)
+
+First official review, `main-thesis_dl_rev1.pdf` (build of 2026-10-02): 28 PDF comments, all on
+the abstract and Chapters 1–3 (pp. 2–34). Consolidated list, matched against the AI editorial
+review: `reviews/supervisor-rev1-2026-10-12.md`. To be worked through chapter by chapter.
+His e-mail of the same day: the rest of the review follows next week; the abstract must be
+polished to near perfection; do a prerequisite audit (every medical term defined before use);
+opening chapter = medical background → PDEs and solvers (no GA) → motivation → formal problem
+statement with notation and equations → outline; no question in headings ("Why Neural PDE
+Solvers?"); contributions back as bullet points. He offers a meeting.
+- [ ] Ask the supervisor: "neural solver" (PDF) vs "parametric neural operator" (e-mail).
+- [x] 2026-10-12 restructure of Ch. 1-3 (author approved; plan and figure in
+  `reviews/structure-proposal-2026-10-12.md`), moves only, no wording changed, verified by a
+  line-multiset check (only headings differ) and a clean build (112 pages, no new warnings).
+  Introduction and Background stay separate chapters. Ch. 1: Clinical Motivation / Aim of the
+  Thesis / Contributions / Outline. Ch. 2: Medical Background (Eye Anatomy, Retinal Imaging with
+  the en-face paragraph, Geographic Atrophy) / PDEs and Numerical Solvers / Neural PDE Solvers
+  (former 2.2.4 now opens it) / Related Work / Modelling Approach and Problem Statement (2.5.1 =
+  former 1.2 data properties + 1.3 PDE argument + 2.2.5; 2.5.2 placeholder). Former 2.1.5 and
+  2.1.6 appended to 3.2 and 3.1. All labels kept. Defaults taken for the open choices: problem
+  statement at the end of Ch. 2, drugs stay in 1.1, research question in Ch. 1, Related Work
+  before the problem statement.
+- [ ] Wording pass after the restructure (inline `% TODO (restructure 2026-10-12)` markers):
+  Ch. 2 opener and the 2.1 roadmaps (02 l. 16, 130-138) still describe the old order; 2.2 opener
+  still about GA; bridge into 2.3; 2.5 opener; 2.5.1 "The next section motivates ..." and a
+  self-reference to its own section; de-duplicate the moved blocks in 3.1/3.2 (Ch. 3 now refers to
+  itself in l. 225, 300, 482); Aim/Contributions bridges and bullets; 06-discussion l. 97
+  ("Chapter 1 leads one to expect") now points at an argument that sits in 2.5.1.
+- [ ] Write 2.5.2 Problem Statement (supervisor M3.4).
+- [ ] Decisions first: "framework" → "methodology", "operator" → "neural solver" (thesis-wide);
+  restructure Introduction + Background (background as subsections of the introduction, problem
+  statement and motivation after it, §2.2.5 merged with §1.3); §2.1 order anatomy → imaging → GA;
+  §2.1.5–§2.1.6 into Chapter 3.
+- [ ] Abstract: rewrite to the supervisor's three-part structure (EN + DE).
+- [ ] Ch. 1: two-sentence split + both US-approved drugs (pegcetacoplan, avacincaptad pegol, not
+  EU); variable growth rate as the motivation; simplify the setup sentence; literature check before
+  claiming Δt-conditioning as a contribution. §1.1 closing paragraph: "well written", keep.
+- [ ] Ch. 2: heading "Eye anatomy"; GA section wording; Related Work expanded into subsections.
+- [ ] Ch. 3: microns for spacings; cite the Iowa layer segmentation; patients per fold; strike-out
+  on "The data agree with this:"; supervisor confirms the cohort is Mai's cohort with tighter
+  registration and cleaner segmentations (resolves the §2.4 cohort TODO, update every "larger
+  cohort" mention).
+
 ### Assets that now exist and should be reused
 
 - **The Practical Work report** (`masterthesis-docker/practical/`) was handed in

@@ -23,6 +23,8 @@
 
 Several originally-planned contributions are **measured nulls** and must be written up as negative results rather than contributions: mesh adaptation / the dual branch, patient covariates, the learned surrogate encoder, parameter count, time-integration order, and every GNN-internal knob. See `NOTES.md` → "Code-side sync (2026-09-17)" for the binding vocabulary rules, and `THESIS_FRAMEWORK.md` §7.5 for every number with its instrument and caveat.
 
+**Revision 2026-10-12 (supervisor review 1, author-approved).** Chapters 1–3 reordered; the sections below keep their old numbers as content specs. Ch. 1: 1.1 Clinical Motivation, 1.2 Aim of the Thesis (research question), 1.3 Contributions (to become bullets), 1.4 Outline. Ch. 2: 2.1 Medical Background (Eye Anatomy → Retinal Imaging → Geographic Atrophy), 2.2 PDEs and Numerical Solvers (no GA), 2.3 Neural PDE Solvers, 2.4 Related Work, 2.5 Modelling Approach and Problem Statement (motivation from the former §1.2/§1.3/§2.2.5, then a formal problem statement with the thesis notation). The former §2.1.5 (state representation) and §2.1.6 (cohort) are in Ch. 3. No question marks in headings. See `reviews/supervisor-rev1-2026-10-12.md`.
+
 **Narrative Constraint:** This thesis must strictly follow the "Hour-Glass" model:
 1. **Introduction:** Start broad (general context) -> narrow down to the specific research gap and question.
 2. **Methods & Results:** Maximum technical depth and specificity.

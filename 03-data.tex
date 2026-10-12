@@ -135,6 +135,61 @@ views used throughout this chapter.
 \end{figure}
 
 
+% MOVED 2026-10-12 from Background 2.1.6 (supervisor review 1, SV-2.5).
+% TODO: de-duplicate against the text above (AI review R1, R2, T3).
+\label{sec:background:ga-oct:muw}
+
+The dataset used throughout the thesis is the GA cohort of the Medical
+University of Vienna (MUW), a longitudinal collection of macula-centred
+OCT volumes acquired in routine clinical practice.
+The cohort comprises 553 volume scans over 75 eyes, acquired with a
+Heidelberg Engineering device, which in the MUW study of \citet{Mai2024}
+was a Spectralis spectral-domain OCT. Lateral pixel counts
+vary per eye across the 553 visits, ranging from 38 to 66 B-scans by 961
+to 1719 A-scans, giving 67 distinct native shapes in total. No visit has
+a native dimension of $49 \times 1024$. Instead, $49 \times 1024$ is the
+modelling grid, reached by a symmetric centre-crop or zero-pad operation,
+and never by resampling (\S\ref{sec:data:spatial}). Pixel spacing is
+treated as constant across the cohort at approximately
+$[0.12118,\, 0.003867,\, 0.00568]$\,mm in the $(x, z, y)$ directions,
+because the scans were resampled upstream to one gold-standard spacing.
+The resulting fixed physical window is approximately
+$5.94 \times 5.82$\,mm.
+This is an assumption whose limits are stated
+in~\S\ref{sec:discussion:limitations}. The ratio between the two in-plane spacings is
+roughly 21:1. This extreme anisotropy is a direct consequence of the
+clinical acquisition protocol and is reflected in several architectural
+choices in Chapter~\ref{ch:method}.
+
+The 6\,mm window is a standard in the literature. \citet{Pilotto2015}
+explicitly exclude eyes whose GA extends beyond a $6 \times 6$\,mm
+fovea-centred square. The same window is used by \citet{Yehoshua2011}
+($200 \times 200$ raster at 30\,\textmu{}m / pixel lateral) and by
+\citet{Chu2022} (Zeiss PLEX Elite 9000 swept-source OCT, $6 \times 6$\,mm scan
+window with 1536 axial pixels and 500 A-lines per B-scan), and it
+serves as the de-facto analysis area for GA OCT studies. However,
+measured on the present cohort, this window is not lossless. It cuts
+real lesion area in 27.3 per cent of visits. The cut removes more than
+5 per cent of the lesion in 6.0 per cent of visits, reaching a
+worst-case loss of 25.7 per cent. Furthermore, in 31.1 per cent of the
+visits the lesion touches the edge of the imaged field inside the window,
+meaning that growth across that edge is censored without a missingness
+flag. A detailed treatment of
+the spatial grid is deferred to~\S\ref{sec:data:spatial}.
+
+For each eye in the cohort, the dataset comprises a sequence of
+follow-up visits at irregular calendar intervals, each visit
+contributing one eleven-channel en-face state. Patient-level
+covariates --- in particular age and biological sex --- accompany the
+imaging sequence; the operational details of how they are extracted
+and encoded are described in~\S\ref{sec:data:covariates}. Because GA
+is often bilateral (39\,\% of the patients in one OCT cohort
+\citep{Yehoshua2011}) and the two eyes of a patient show a high degree of
+concordance \citep{Boyer2017}, the dataset is split at the patient
+level rather than the eye level, as motivated
+in~\S\ref{sec:data:splits}.
+
+
 \section{State Representation}
 \label{sec:data:state}
 
@@ -173,6 +228,60 @@ column, not only inside the lesion. The layer geometry is therefore kept
 in full rather than reduced to the lesion mask alone. How the channels
 are processed by the models is described
 in~\S\ref{sec:method:multichannel}.
+
+
+% MOVED 2026-10-12 from Background 2.1.5 (supervisor review 1, SV-2.5).
+% TODO: de-duplicate against the text above (AI review R3).
+\label{sec:background:ga-oct:state-rep}
+
+This subsection describes \emph{what} the eleven channels of the state
+tensor are, in structural terms, and \emph{why} retaining all of them
+is clinically motivated. The operational details of how the channels
+were produced in the MUW cohort are deferred
+to~\S\ref{sec:data:dataset} and are not relied upon in the rest of
+this chapter.
+% TODO: confirm with supervisor the provenance of channels 1-10 (which
+% layer-segmentation algorithm, which boundary list, which
+% post-processing); Mai et al. (2024) do not describe it. Channel 0 is
+% stated in Section 3.1 (FAF grading registered to the OCT grid, per
+% Mai et al. 2024).
+
+The first channel of the state tensor is a binary \emph{GA mask} on the
+en-face grid: an indicator function that takes value one inside the GA
+lesion and zero outside it. The only properties of channel~0 that this
+chapter relies upon are that it is binary and that it is aligned to the
+same en-face grid as the layer channels.
+
+The remaining ten channels are \emph{retinal layer boundary depth
+maps}: at every pixel of the en-face grid, the value of channel
+$c \in \{1, \dots, 10\}$ is the axial position of one anatomical layer
+boundary in the underlying OCT B-scan. Concretely, fixing a pixel of
+the en-face grid selects a single A-scan in the OCT volume, and channel
+$c$ at that pixel records how deep along that A-scan the $c$-th
+anatomical layer-boundary surface lies. Stacking all ten channels
+therefore reconstructs the full vertical retinal architecture of the
+eye on the same horizontal grid as the lesion mask. The ten boundaries are ordered from the most superficial
+to the deepest (\S\ref{sec:data:state}).
+
+The clinical motivation for retaining all ten layer-boundary channels
+alongside the binary mask is that documented prognostic biomarkers for
+GA progression live throughout the full vertical retinal column, not
+only inside the lesion itself. RPE--Bruch's-membrane thickening at the
+0--300\,\textmu{}m rim around the GA boundary correlates with annual
+square-root enlargement rate at $r = 0.595$ \citep{Chu2022}; outer
+retinal layer thinning, in particular of the outer nuclear layer and
+of the RPE-photoreceptor complex, accelerates in the months preceding
+macular-atrophy conversion \citep{Vogl2021}; and the thickness of the
+inner nuclear layer in the retina immediately adjacent to a GA lesion correlates
+with the yearly progression rate at Spearman $r = 0.48$
+\citep{Ebneter2016}. \citet{Vallino2024} further report that
+RPE-to-Bruch's-membrane distance combined with outer-retinal-layer
+thickness jointly predicts approximately 62\,\% of the annual GA
+progression, while outer-retinal-layer thickness alone contributes only
+6\,\%. The layer channels therefore carry information on the growth
+rate that the mask alone cannot provide. \S\ref{sec:method:multichannel} returns to how this
+multi-channel state propagates through the network.
+
 
 
 \section{Spatial Standardisation and its Measured Cost}

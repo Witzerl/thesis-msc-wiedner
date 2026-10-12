@@ -5,8 +5,11 @@
 \label{ch:background}
 
 
-\section{Geographic Atrophy and OCT Imaging}
+\section{Medical Background}
 \label{sec:background:ga-oct}
+% TODO (restructure 2026-10-12): the roadmap below still lists the old
+% order and the state-representation and cohort subsections, which moved
+% to Chapter 3. Rewrite as: anatomy, imaging, GA.
 
 This section provides the imaging-side background needed to motivate
 the state representation used throughout the remainder of the thesis.
@@ -23,7 +26,8 @@ introduces the small set of anatomical terms that recur throughout the
 work, and the subsequent subsections build the imaging substrate on
 top of that vocabulary.
 
-\subsection{A short anatomy primer}
+
+\subsection{Eye Anatomy}
 \label{sec:background:ga-oct:anatomy}
 
 % TODO: produce Figure fig:bg:eye-anatomy --- a two-panel anatomy
@@ -134,112 +138,12 @@ explains what an OCT volume is and how it is acquired;
 the state tensor; and \S\ref{sec:background:ga-oct:muw} describes the
 MUW longitudinal cohort.
 
-\subsection{Geographic Atrophy on OCT}
-\label{sec:background:ga-oct:disease}
 
-% TODO: produce Figure fig:bg:retinal-anatomy --- a two-panel
-% schematic for readers without a clinical background:
-% (left) labelled cross-section through a healthy macula showing the
-% principal retinal layers from ILM at the top through RNFL, GCL+IPL,
-% INL+OPL, ONL, photoreceptor IS/OS bands (including the ellipsoid
-% zone), RPE, and Bruch's membrane, with the choriocapillaris
-% immediately beneath; (right) a representative OCT B-scan through a
-% GA-affected macula highlighting the dropout of the outer-retinal
-% layers within the lesion and the corresponding choroidal
-% hypertransmission signature beneath. Mirror the channel ordering of
-% the eleven-channel state tensor used in the thesis.
-\begin{figure}[t]
-  \centering
-  \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering\itshape Placeholder for
-    Figure~\ref{fig:bg:retinal-anatomy}: schematic cross-section of a
-    healthy macula (left) versus a GA-affected macula on OCT (right).
-    See accompanying \texttt{\% TODO} for the intended content.}}
-  \caption[Retinal anatomy and the OCT signature of geographic atrophy.]{%
-    Anatomy of the macular retina and the OCT signature of geographic
-    atrophy. \emph{Left}: schematic cross-section through a healthy
-    macula, labelling the principal retinal layers from the inner
-    limiting membrane (ILM) at the top --- through the retinal nerve
-    fibre layer, the ganglion-cell and inner-plexiform layers, the inner
-    nuclear and outer plexiform layers, the outer nuclear layer, and the
-    photoreceptor inner- and outer-segment bands including the ellipsoid
-    zone --- down to the retinal pigment epithelium (RPE) and Bruch's
-    membrane (BM), with the choriocapillaris immediately beneath. The
-    same set of anatomical strata corresponds to the ten layer-boundary
-    channels of the eleven-channel state tensor introduced in
-    \S\ref{sec:background:ga-oct:state-rep}. \emph{Right}: a
-    representative OCT B-scan through a GA-affected macula. Inside the
-    lesion the outer-retinal complex is missing and a brighter signal
-    appears in the choroid beneath the lesion (the
-    \emph{choroidal hypertransmission} signature, item~(ii) in the
-    text below).}
-  \label{fig:bg:retinal-anatomy}
-\end{figure}
-
-The retina is a thin, layered tissue at the back of the eye that
-converts incoming light into neural signals;
-Figure~\ref{fig:bg:retinal-anatomy} (left) sketches its principal
-anatomical strata in the macula. Geographic atrophy is the disease in
-which a stack of three tightly coupled \emph{outer}-retinal layers ---
-the retinal pigment epithelium (RPE), the photoreceptor outer segments
-that sit just above the RPE, and the choriocapillaris (a dense capillary
-bed) immediately below the RPE --- die together in a localised patch of
-the macula \citep{Boopathiraj2024,Boyer2017}. These three layers are
-anatomically interdependent: the RPE supports the photoreceptors, and
-the choriocapillaris supplies both. In other words, atrophy of one
-layer entrains the degeneration of the others, so the resulting lesion
-appears on imaging as a sharply delineated patch in which the entire
-outer-retinal complex is missing rather than as the loss of a single
-isolated layer.
-
-What this end-stage lesion looks like on OCT has been formalised by an
-international consensus group, the Classification of Atrophy Meetings
-(CAM), under the term \emph{complete RPE and outer retinal atrophy}
-(cRORA) \citep{Sadda2018, Vallino2024}. cRORA is identified by three concurrent
-OCT features: \emph{(a)} a region of choroidal hypertransmission of at
-least 250\,\textmu{}m in diameter; \emph{(b)} co-located attenuation or
-disruption of the RPE band of at least 250\,\textmu{}m; and \emph{(c)}
-overlying photoreceptor degeneration, all in the absence of an RPE tear.
-Put differently, cRORA is the OCT-readable definition of an established
-atrophic lesion, which can arise with or without macular neovascularisation
-(the wet form of AMD), and \emph{GA is the subset of cRORA that
-arises in eyes without macular neovascularisation}. The CAM framework
-also recognises a precursor stage, \emph{iRORA} (incomplete RPE and
-outer retinal atrophy), which is essentially the same lesion at a
-smaller spatial scale, i.e.\ the same OCT pattern below the
-250\,\textmu{}m size threshold; in one retrospective study of
-intermediate-AMD eyes, 93\,\% of iRORA lesions progressed to cRORA within
-twenty-four months, with a median conversion time of fourteen months
-\citep{Vallino2024}. Channel~0 of
-the state tensor used in this thesis marks the GA lesion as a binary
-mask (\S\ref{sec:background:ga-oct:state-rep}); iRORA is not represented
-as a separate label.
-
-The principal direct OCT signatures of an established GA lesion ---
-the visual fingerprints by which the disease is identified on a B-scan
---- are the following \citep{Boopathiraj2024,Yehoshua2011,Vallino2024}.
-\emph{(i)} The outer-retinal layers are missing: the photoreceptor
-inner-segment / outer-segment junction (the \emph{ellipsoid zone}) and
-the RPE band drop out of the B-scan, leaving a structurally collapsed
-column where intact retina used to be.
-\emph{(ii)} \emph{Choroidal hypertransmission} appears beneath the
-lesion: because pigmented RPE no longer absorbs the probe beam, light
-penetrates deeper into the choroid, and the column-summed signal is
-higher than in the surrounding intact tissue. This is the same optical
-effect that makes GA appear bright on summed-voxel en-face projections,
-discussed in~\S\ref{sec:background:ga-oct:enface}.
-\emph{(iii)} \emph{RPE--Bruch's-membrane (BM) thickening} is
-concentrated immediately around the lesion margin --- the
-narrow ring of tissue just outside the lesion is measurably thicker
-than tissue further from the lesion --- and is thought to reflect, at
-least in part, basal-laminar deposits accumulated in the diseased tissue;
-the thickness of this rim correlates significantly with the eye's subsequent
-annual square-root lesion enlargement rate \citep{Chu2022}.
-The first two signatures delineate the lesion itself. The third is a
-predictive biomarker located at the lesion boundary and motivates
-encoding the surrounding layer geometry in addition to the lesion mask.
-
-\subsection{Optical Coherence Tomography of the Macula}
+\subsection{Retinal Imaging}
 \label{sec:background:ga-oct:oct}
+% TODO (restructure 2026-10-12, supervisor M3.1): add a few sentences on
+% SLO and FAF as imaging modalities; fix the pointer to the former 2.1.4
+% (en-face maps are now the last paragraph of this subsection).
 
 % TODO: produce Figure fig:bg:oct-acquisition --- a four-panel
 % schematic showing how an OCT volume is built up from one-dimensional
@@ -354,7 +258,8 @@ choroidal slab beneath Bruch's membrane provides an additional view of
 the GA extent through the hypertransmission signature
 \citep{Vallino2024,Chu2022}. No cross-modality fusion is required.
 
-\subsection{From OCT volumes to en-face projections}
+
+\paragraph{From OCT volumes to en-face maps.}
 \label{sec:background:ga-oct:enface}
 
 The full OCT volume of a GA eye is too large and too redundant to be
@@ -385,113 +290,120 @@ reported in the recent literature \citep{Chu2022,Vogl2021,Vallino2024}. By const
 problem to a per-step two-dimensional one, which matters for the
 tractability of the models introduced in the subsequent chapters.
 
-\subsection{The eleven-channel state representation}
-\label{sec:background:ga-oct:state-rep}
 
-This subsection describes \emph{what} the eleven channels of the state
-tensor are, in structural terms, and \emph{why} retaining all of them
-is clinically motivated. The operational details of how the channels
-were produced in the MUW cohort are deferred
-to~\S\ref{sec:data:dataset} and are not relied upon in the rest of
-this chapter.
-% TODO: confirm with supervisor the provenance of channels 1-10 (which
-% layer-segmentation algorithm, which boundary list, which
-% post-processing); Mai et al. (2024) do not describe it. Channel 0 is
-% stated in Section 3.1 (FAF grading registered to the OCT grid, per
-% Mai et al. 2024).
+\subsection{Geographic Atrophy}
+\label{sec:background:ga-oct:disease}
+% TODO (restructure 2026-10-12): the opening sentence defines the retina a
+% third time (AI review R4, 2a.9); drop it, the anatomy now comes first.
 
-The first channel of the state tensor is a binary \emph{GA mask} on the
-en-face grid: an indicator function that takes value one inside the GA
-lesion and zero outside it. The only properties of channel~0 that this
-chapter relies upon are that it is binary and that it is aligned to the
-same en-face grid as the layer channels.
+% TODO: produce Figure fig:bg:retinal-anatomy --- a two-panel
+% schematic for readers without a clinical background:
+% (left) labelled cross-section through a healthy macula showing the
+% principal retinal layers from ILM at the top through RNFL, GCL+IPL,
+% INL+OPL, ONL, photoreceptor IS/OS bands (including the ellipsoid
+% zone), RPE, and Bruch's membrane, with the choriocapillaris
+% immediately beneath; (right) a representative OCT B-scan through a
+% GA-affected macula highlighting the dropout of the outer-retinal
+% layers within the lesion and the corresponding choroidal
+% hypertransmission signature beneath. Mirror the channel ordering of
+% the eleven-channel state tensor used in the thesis.
+\begin{figure}[t]
+  \centering
+  \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering\itshape Placeholder for
+    Figure~\ref{fig:bg:retinal-anatomy}: schematic cross-section of a
+    healthy macula (left) versus a GA-affected macula on OCT (right).
+    See accompanying \texttt{\% TODO} for the intended content.}}
+  \caption[Retinal anatomy and the OCT signature of geographic atrophy.]{%
+    Anatomy of the macular retina and the OCT signature of geographic
+    atrophy. \emph{Left}: schematic cross-section through a healthy
+    macula, labelling the principal retinal layers from the inner
+    limiting membrane (ILM) at the top --- through the retinal nerve
+    fibre layer, the ganglion-cell and inner-plexiform layers, the inner
+    nuclear and outer plexiform layers, the outer nuclear layer, and the
+    photoreceptor inner- and outer-segment bands including the ellipsoid
+    zone --- down to the retinal pigment epithelium (RPE) and Bruch's
+    membrane (BM), with the choriocapillaris immediately beneath. The
+    same set of anatomical strata corresponds to the ten layer-boundary
+    channels of the eleven-channel state tensor introduced in
+    \S\ref{sec:background:ga-oct:state-rep}. \emph{Right}: a
+    representative OCT B-scan through a GA-affected macula. Inside the
+    lesion the outer-retinal complex is missing and a brighter signal
+    appears in the choroid beneath the lesion (the
+    \emph{choroidal hypertransmission} signature, item~(ii) in the
+    text below).}
+  \label{fig:bg:retinal-anatomy}
+\end{figure}
 
-The remaining ten channels are \emph{retinal layer boundary depth
-maps}: at every pixel of the en-face grid, the value of channel
-$c \in \{1, \dots, 10\}$ is the axial position of one anatomical layer
-boundary in the underlying OCT B-scan. Concretely, fixing a pixel of
-the en-face grid selects a single A-scan in the OCT volume, and channel
-$c$ at that pixel records how deep along that A-scan the $c$-th
-anatomical layer-boundary surface lies. Stacking all ten channels
-therefore reconstructs the full vertical retinal architecture of the
-eye on the same horizontal grid as the lesion mask. The ten boundaries are ordered from the most superficial
-to the deepest (\S\ref{sec:data:state}).
+The retina is a thin, layered tissue at the back of the eye that
+converts incoming light into neural signals;
+Figure~\ref{fig:bg:retinal-anatomy} (left) sketches its principal
+anatomical strata in the macula. Geographic atrophy is the disease in
+which a stack of three tightly coupled \emph{outer}-retinal layers ---
+the retinal pigment epithelium (RPE), the photoreceptor outer segments
+that sit just above the RPE, and the choriocapillaris (a dense capillary
+bed) immediately below the RPE --- die together in a localised patch of
+the macula \citep{Boopathiraj2024,Boyer2017}. These three layers are
+anatomically interdependent: the RPE supports the photoreceptors, and
+the choriocapillaris supplies both. In other words, atrophy of one
+layer entrains the degeneration of the others, so the resulting lesion
+appears on imaging as a sharply delineated patch in which the entire
+outer-retinal complex is missing rather than as the loss of a single
+isolated layer.
 
-The clinical motivation for retaining all ten layer-boundary channels
-alongside the binary mask is that documented prognostic biomarkers for
-GA progression live throughout the full vertical retinal column, not
-only inside the lesion itself. RPE--Bruch's-membrane thickening at the
-0--300\,\textmu{}m rim around the GA boundary correlates with annual
-square-root enlargement rate at $r = 0.595$ \citep{Chu2022}; outer
-retinal layer thinning, in particular of the outer nuclear layer and
-of the RPE-photoreceptor complex, accelerates in the months preceding
-macular-atrophy conversion \citep{Vogl2021}; and the thickness of the
-inner nuclear layer in the retina immediately adjacent to a GA lesion correlates
-with the yearly progression rate at Spearman $r = 0.48$
-\citep{Ebneter2016}. \citet{Vallino2024} further report that
-RPE-to-Bruch's-membrane distance combined with outer-retinal-layer
-thickness jointly predicts approximately 62\,\% of the annual GA
-progression, while outer-retinal-layer thickness alone contributes only
-6\,\%. The layer channels therefore carry information on the growth
-rate that the mask alone cannot provide. \S\ref{sec:method:multichannel} returns to how this
-multi-channel state propagates through the network.
+What this end-stage lesion looks like on OCT has been formalised by an
+international consensus group, the Classification of Atrophy Meetings
+(CAM), under the term \emph{complete RPE and outer retinal atrophy}
+(cRORA) \citep{Sadda2018, Vallino2024}. cRORA is identified by three concurrent
+OCT features: \emph{(a)} a region of choroidal hypertransmission of at
+least 250\,\textmu{}m in diameter; \emph{(b)} co-located attenuation or
+disruption of the RPE band of at least 250\,\textmu{}m; and \emph{(c)}
+overlying photoreceptor degeneration, all in the absence of an RPE tear.
+Put differently, cRORA is the OCT-readable definition of an established
+atrophic lesion, which can arise with or without macular neovascularisation
+(the wet form of AMD), and \emph{GA is the subset of cRORA that
+arises in eyes without macular neovascularisation}. The CAM framework
+also recognises a precursor stage, \emph{iRORA} (incomplete RPE and
+outer retinal atrophy), which is essentially the same lesion at a
+smaller spatial scale, i.e.\ the same OCT pattern below the
+250\,\textmu{}m size threshold; in one retrospective study of
+intermediate-AMD eyes, 93\,\% of iRORA lesions progressed to cRORA within
+twenty-four months, with a median conversion time of fourteen months
+\citep{Vallino2024}. Channel~0 of
+the state tensor used in this thesis marks the GA lesion as a binary
+mask (\S\ref{sec:background:ga-oct:state-rep}); iRORA is not represented
+as a separate label.
 
-\subsection{The MUW longitudinal GA cohort}
-\label{sec:background:ga-oct:muw}
-
-The dataset used throughout the thesis is the GA cohort of the Medical
-University of Vienna (MUW), a longitudinal collection of macula-centred
-OCT volumes acquired in routine clinical practice.
-The cohort comprises 553 volume scans over 75 eyes, acquired with a
-Heidelberg Engineering device, which in the MUW study of \citet{Mai2024}
-was a Spectralis spectral-domain OCT. Lateral pixel counts
-vary per eye across the 553 visits, ranging from 38 to 66 B-scans by 961
-to 1719 A-scans, giving 67 distinct native shapes in total. No visit has
-a native dimension of $49 \times 1024$. Instead, $49 \times 1024$ is the
-modelling grid, reached by a symmetric centre-crop or zero-pad operation,
-and never by resampling (\S\ref{sec:data:spatial}). Pixel spacing is
-treated as constant across the cohort at approximately
-$[0.12118,\, 0.003867,\, 0.00568]$\,mm in the $(x, z, y)$ directions,
-because the scans were resampled upstream to one gold-standard spacing.
-The resulting fixed physical window is approximately
-$5.94 \times 5.82$\,mm.
-This is an assumption whose limits are stated
-in~\S\ref{sec:discussion:limitations}. The ratio between the two in-plane spacings is
-roughly 21:1. This extreme anisotropy is a direct consequence of the
-clinical acquisition protocol and is reflected in several architectural
-choices in Chapter~\ref{ch:method}.
-
-The 6\,mm window is a standard in the literature. \citet{Pilotto2015}
-explicitly exclude eyes whose GA extends beyond a $6 \times 6$\,mm
-fovea-centred square. The same window is used by \citet{Yehoshua2011}
-($200 \times 200$ raster at 30\,\textmu{}m / pixel lateral) and by
-\citet{Chu2022} (Zeiss PLEX Elite 9000 swept-source OCT, $6 \times 6$\,mm scan
-window with 1536 axial pixels and 500 A-lines per B-scan), and it
-serves as the de-facto analysis area for GA OCT studies. However,
-measured on the present cohort, this window is not lossless. It cuts
-real lesion area in 27.3 per cent of visits. The cut removes more than
-5 per cent of the lesion in 6.0 per cent of visits, reaching a
-worst-case loss of 25.7 per cent. Furthermore, in 31.1 per cent of the
-visits the lesion touches the edge of the imaged field inside the window,
-meaning that growth across that edge is censored without a missingness
-flag. A detailed treatment of
-the spatial grid is deferred to~\S\ref{sec:data:spatial}.
-
-For each eye in the cohort, the dataset comprises a sequence of
-follow-up visits at irregular calendar intervals, each visit
-contributing one eleven-channel en-face state. Patient-level
-covariates --- in particular age and biological sex --- accompany the
-imaging sequence; the operational details of how they are extracted
-and encoded are described in~\S\ref{sec:data:covariates}. Because GA
-is often bilateral (39\,\% of the patients in one OCT cohort
-\citep{Yehoshua2011}) and the two eyes of a patient show a high degree of
-concordance \citep{Boyer2017}, the dataset is split at the patient
-level rather than the eye level, as motivated
-in~\S\ref{sec:data:splits}.
+The principal direct OCT signatures of an established GA lesion ---
+the visual fingerprints by which the disease is identified on a B-scan
+--- are the following \citep{Boopathiraj2024,Yehoshua2011,Vallino2024}.
+\emph{(i)} The outer-retinal layers are missing: the photoreceptor
+inner-segment / outer-segment junction (the \emph{ellipsoid zone}) and
+the RPE band drop out of the B-scan, leaving a structurally collapsed
+column where intact retina used to be.
+\emph{(ii)} \emph{Choroidal hypertransmission} appears beneath the
+lesion: because pigmented RPE no longer absorbs the probe beam, light
+penetrates deeper into the choroid, and the column-summed signal is
+higher than in the surrounding intact tissue. This is the same optical
+effect that makes GA appear bright on summed-voxel en-face projections,
+discussed in~\S\ref{sec:background:ga-oct:enface}.
+\emph{(iii)} \emph{RPE--Bruch's-membrane (BM) thickening} is
+concentrated immediately around the lesion margin --- the
+narrow ring of tissue just outside the lesion is measurably thicker
+than tissue further from the lesion --- and is thought to reflect, at
+least in part, basal-laminar deposits accumulated in the diseased tissue;
+the thickness of this rim correlates significantly with the eye's subsequent
+annual square-root lesion enlargement rate \citep{Chu2022}.
+The first two signatures delineate the lesion itself. The third is a
+predictive biomarker located at the lesion boundary and motivates
+encoding the surrounding layer geometry in addition to the lesion mask.
 
 
 \section{Partial Differential Equations and Numerical Solvers}
 \label{sec:background:pde-solvers}
+% TODO (restructure 2026-10-12, supervisor M3.2): no GA in this section.
+% The opener ("The approach of this thesis treats GA ...") and its roadmap
+% (neural solvers, why the structure fits GA) need rewriting; the en-face
+% grid sentence in the stencils subsection names this thesis.
 
 The approach of this thesis treats GA progression the way a numerical
 solver treats a partial differential equation (PDE): the state is held
@@ -707,7 +619,13 @@ field'' that seeks one method for all of them. And accuracy is expensive: fine
 features need fine grids, the CFL condition then forces small steps, and
 the cost grows faster than the resolution.
 
-\subsection{Neural solvers that keep the mechanisms}
+
+\section{Neural PDE Solvers and Surrogate Architectures}
+\label{sec:background:neural-pde}
+% Restructure 2026-10-12: the former 2.2.4 "Neural solvers that keep the
+% mechanisms" opens this section (learned solvers introduced once, AI
+% review T8/S17). TODO: bridge into "Neural PDE solvers broadly separate".
+
 \label{sec:background:pde-solvers:neural}
 
 Every mechanism above is a function from a neighbourhood of grid values
@@ -750,48 +668,6 @@ its errors can accumulate from step to step;
 \S\ref{sec:background:neural-pde} discusses this problem and its
 remedies.
 
-\subsection{Why this structure suits GA progression}
-\label{sec:background:pde-solvers:ga}
-
-GA progression has no known governing equation. Its data are not a
-densely simulated trajectory but a few observed states per eye
-(\S\ref{sec:background:ga-oct:muw}). A classical solver is therefore not
-an option, but the structure it is built from matches the problem in
-four respects, which is why the thesis adopts it.
-\begin{itemize}
-  \item \textbf{A state on a fixed grid.} Every visit is represented on
-    the same uniform en-face grid (\S\ref{sec:background:ga-oct:state-rep}),
-    so the state is exactly the vector of grid values $u^{k}$ that a
-    solver advances.
-  \item \textbf{Change driven by the neighbourhood.} GA is modelled as
-    growing at the margin of the lesion \citep{Yehoshua2011}, while its
-    atrophic interior and the surrounding retina change little
-    (\S\ref{sec:introduction:why-pde}). Whether a pixel becomes atrophic
-    depends on what surrounds it --- the situation a stencil is designed
-    for.
-  \item \textbf{Slow change.} Consecutive visits differ in a small part
-    of the grid. The residual form, which predicts only the change and
-    returns the current state as $\Delta t \to 0$, starts from the
-    right default.
-  \item \textbf{Irregular steps.} The intervals between visits differ
-    from eye to eye and visit to visit. A solver step is parameterised by $\Delta t$, so the step can be the real interval
-    rather than a fixed one.
-\end{itemize}
-
-These are reasons to expect the structure to fit, not evidence that it
-does. They also leave open what kind of spatial operator should compute
-the update. The CFL argument suggests that an operator applied once per
-visit has to see at least as far as the lesion front moves between
-visits, and on the anisotropic en-face grid that distance is very
-different when counted in pixels along each axis. Whether a local
-stencil, a global operator or a combination of both is needed is
-therefore not assumed here. \S\ref{sec:background:neural-pde} introduces
-the operator families that are candidates for this role, and
-Chapter~\ref{ch:experiments} compares them.
-
-
-\section{Neural PDE Solvers and Surrogate Architectures}
-\label{sec:background:neural-pde}
 
 Neural PDE solvers broadly separate into two paradigms. Neural
 operators learn a continuous map
@@ -951,6 +827,147 @@ learned vector field uses the classical methods of \citet{Runge1895}
 and \citet{Kutta1901}, and the reading of a network as the right-hand side of an
 ordinary differential equation follows the Neural ODEs of \citet{Chen2018}. How each of these is adapted to the GA setting is described
 in~\S\ref{sec:method:family}.
+
+
+\section{Modelling Approach and Problem Statement}
+\label{sec:background:approach}
+% TODO (restructure 2026-10-12): section opener.
+
+
+\subsection{Choice of the Modelling Approach}
+\label{sec:introduction:why-pde}
+\label{sec:background:pde-solvers:ga}
+% Restructure 2026-10-12 (supervisor review 1): collected from the former
+% 1.2 Problem Statement (data properties, framework), 1.3 Why Neural PDE
+% Solvers? (local growth, anisotropy, neural solvers) and 2.2.5 Why this
+% structure suits GA progression. TODO: merge the overlap (margin growth
+% appears twice), remove "The next section motivates ...", bridge sentences,
+% one sentence on the 21:1 pixel spacing as the form of the reach question.
+
+The clinical reality of OCT follow-up imposes three properties on the data
+that a model has to deal with. First, follow-up visits are
+\emph{irregularly spaced} in time and the spacing varies substantially
+between patients and between consecutive visits of the same patient. There
+is no shared temporal origin across eyes, which rules out methods that
+assume a fixed sampling rate or a common $t = 0$. Second, the underlying
+disease state is \emph{multi-channel}: the binary lesion mask
+captures the GA lesion itself, while the surrounding ten retinal layer
+boundaries describe the retinal structure in which the atrophy is embedded.
+Both information sources are relevant because prognostic biomarkers
+documented in the clinical literature, such as RPE--Bruch's-membrane
+thickening \citep{Chu2022} and thinning of the outer retinal layers
+\citep{Vallino2024}, are not contained in the lesion mask alone. Third, every patient carries \emph{covariates}, in particular age and
+sex. Age is strongly associated with the risk of developing the disease
+(\S\ref{sec:introduction:motivation}), and the evidence on sex is mixed;
+whether either also helps to forecast where and how fast a lesion grows is
+not established.
+
+
+Meeting these requirements is not only a question of the model itself but
+also of how the model is used. A typical image-to-image model maps one image
+to another; on its own, it has no notion of elapsed time and no built-in way
+to advance a state from one visit to the next. These properties have to come
+from a framework around the model, one that conditions the prediction on
+$\Delta t$ and rolls the state forward visit by visit. The next section
+motivates such a framework, which borrows several of its techniques from
+neural partial differential equation (PDE) solvers. Which model should sit
+inside it is a separate question.
+
+
+GA expansion is, to a first approximation, a process of \emph{local boundary
+dynamics}. \citet{Yehoshua2011} found that the enlargement rate of the square
+root of the lesion area does not depend on the baseline lesion size, which is
+what is expected if the radius of a GA lesion grows at a roughly constant rate
+while its enclosed area scales quadratically: writing $A(t)$ for the lesion
+area and $r(t)$ for an effective radius,
+\begin{equation}
+  \frac{\mathrm{d}r}{\mathrm{d}t} \approx \mathrm{const.}
+  \quad\Longleftrightarrow\quad
+  \sqrt{A(t)/\pi} \;=\; r_0 + v\, t,
+  \label{eq:intro:boundary-growth}
+\end{equation}
+which is consistent with the data within a clinical follow-up horizon of six
+months to slightly over two years \citep{Yehoshua2011}; the square-root
+enlargement rate has been re-used in subsequent biomarker work
+\citep{Chu2022}. The interior of the lesion is already atrophic and the
+exterior is healthy; both are quasi-static, and all dynamics are
+concentrated at the active boundary. This is the structural fingerprint of
+a system governed by a temporal partial differential equation with strong
+spatial localisation.
+
+
+The same boundary, however, does not advance uniformly in all directions.
+GA growth is \emph{anisotropic}: lesions progress faster towards the retinal
+periphery than towards the fovea, peak progression rate occurs at
+approximately one millimetre from the foveal centre when the lesion grows
+foveally, and in eyes treated monthly with pegcetacoplan progression towards
+the fovea was slowed more than progression towards the periphery
+\citep{Singh2025}. The forward operator that maps the present state
+to the future state is therefore \emph{local}, but its reach must match
+the distance the front moves between two visits, which differs between
+directions --- properties that classical solvers build in explicitly
+through the size and shape of their stencils.
+
+
+Neural PDE solvers turn these classical ideas into learned models.
+Instead of discretising a known equation, they learn from data an operator
+that maps the current state of a system, and the time that elapses, to its
+next state. The literature offers many such operators, and they differ
+mainly in their built-in assumptions: how far a single prediction can look
+across the domain, whether it works on a regular grid or on a graph, and
+whether physical terms such as transport are represented explicitly. For
+GA, where the governing equation is unknown and only a few dozen patients
+are available for training, these assumptions are likely to matter more
+than model size.
+
+
+GA progression has no known governing equation. Its data are not a
+densely simulated trajectory but a few observed states per eye
+(\S\ref{sec:background:ga-oct:muw}). A classical solver is therefore not
+an option, but the structure it is built from matches the problem in
+four respects, which is why the thesis adopts it.
+\begin{itemize}
+  \item \textbf{A state on a fixed grid.} Every visit is represented on
+    the same uniform en-face grid (\S\ref{sec:background:ga-oct:state-rep}),
+    so the state is exactly the vector of grid values $u^{k}$ that a
+    solver advances.
+  \item \textbf{Change driven by the neighbourhood.} GA is modelled as
+    growing at the margin of the lesion \citep{Yehoshua2011}, while its
+    atrophic interior and the surrounding retina change little
+    (\S\ref{sec:introduction:why-pde}). Whether a pixel becomes atrophic
+    depends on what surrounds it --- the situation a stencil is designed
+    for.
+  \item \textbf{Slow change.} Consecutive visits differ in a small part
+    of the grid. The residual form, which predicts only the change and
+    returns the current state as $\Delta t \to 0$, starts from the
+    right default.
+  \item \textbf{Irregular steps.} The intervals between visits differ
+    from eye to eye and visit to visit. A solver step is parameterised by $\Delta t$, so the step can be the real interval
+    rather than a fixed one.
+\end{itemize}
+
+These are reasons to expect the structure to fit, not evidence that it
+does. They also leave open what kind of spatial operator should compute
+the update. The CFL argument suggests that an operator applied once per
+visit has to see at least as far as the lesion front moves between
+visits, and on the anisotropic en-face grid that distance is very
+different when counted in pixels along each axis. Whether a local
+stencil, a global operator or a combination of both is needed is
+therefore not assumed here. \S\ref{sec:background:neural-pde} introduces
+the operator families that are candidates for this role, and
+Chapter~\ref{ch:experiments} compares them.
+
+
+\subsection{Problem Statement}
+\label{sec:background:problem}
+% TODO (supervisor review 1, M3.4): formal problem statement with the
+% notation used later: visits at irregular times on the anisotropic lattice,
+% C = 11 channels, the learned update and rollout, the research question
+% in that notation. Notation now spread over 2.2.2, 3.2 and 4.2.1.
+
+\textit{[Formal problem statement to be written.]}
+
+
 
 
 %%
