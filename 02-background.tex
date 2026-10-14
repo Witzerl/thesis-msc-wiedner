@@ -911,16 +911,16 @@ problem formally, in the notation used in the remaining chapters
 % Solvers? (local growth, anisotropy, neural solvers) and 2.2.5 Why this
 % structure suits GA progression; bridged 2026-10-13 (author sign-off).
 
-The clinical reality of OCT follow-up imposes three properties on the data
-that a model has to deal with. First, follow-up visits are
+Clinical OCT follow-up gives the data three properties that a model must
+handle. First, follow-up visits are
 \emph{irregularly spaced} in time and the spacing varies substantially
-between patients and between consecutive visits of the same patient. There
-is no shared temporal origin across eyes, which rules out methods that
-assume a fixed sampling rate or a common $t = 0$. Second, the underlying
-disease state is \emph{multi-channel}: the binary lesion mask
-captures the GA lesion itself, while the surrounding ten retinal layer
-boundaries describe the retinal structure in which the atrophy is embedded.
-Both information sources are relevant because prognostic biomarkers
+between patients and between consecutive visits of the same patient.
+Irregular spacing rules out methods that assume a fixed sampling rate, and
+the lack of a shared temporal origin across eyes rules out methods that
+assume a common $t = 0$. Second, the disease state is
+\emph{multi-channel}: a binary mask marks the GA lesion, and ten retinal
+layer boundaries describe the retinal structure in which the atrophy lies.
+The layer channels are relevant because prognostic biomarkers
 documented in the clinical literature, such as RPE--Bruch's-membrane
 thickening \citep{Chu2022} and thinning of the outer retinal layers
 \citep{Vallino2024}, are not contained in the lesion mask alone. Third, every patient carries \emph{covariates}, in particular age and
@@ -930,12 +930,11 @@ whether either also helps to forecast where and how fast a lesion grows is
 not established.
 
 
-Meeting these requirements is not only a question of the model itself but
-also of how the model is used. A typical image-to-image model maps one image
+Handling these properties depends on the model and on how it is used. A typical image-to-image model maps one image
 to another; on its own, it has no notion of elapsed time and no built-in way
-to advance a state from one visit to the next. These properties have to come
-from a framework around the model, one that conditions the prediction on
-$\Delta t$ and rolls the state forward visit by visit. Such a framework
+to advance a state from one visit to the next. Both abilities have to be
+supplied by a framework around the model that conditions the prediction
+on $\Delta t$ and advances the state from one visit to the next. Such a framework
 can borrow several of its techniques from numerical and neural PDE
 solvers, as the remainder of this subsection explains. Which model should
 sit inside it is a separate question.
@@ -943,10 +942,10 @@ sit inside it is a separate question.
 
 GA expansion is, to a first approximation, a process of \emph{local boundary
 dynamics}. \citet{Yehoshua2011} found that the enlargement rate of the square
-root of the lesion area does not depend on the baseline lesion size, which is
-what is expected if the radius of a GA lesion grows at a roughly constant rate
-while its enclosed area scales quadratically: writing $A(t)$ for the lesion
-area and $r(t)$ for an effective radius,
+root of the lesion area does not depend on the baseline lesion size. This is
+what is expected if the radius of a GA lesion grows at a roughly constant
+rate while its enclosed area scales quadratically. With $A(t)$ the lesion
+area and $r(t)$ an effective radius,
 \begin{equation}
   \frac{\mathrm{d}r}{\mathrm{d}t} \approx \mathrm{const.}
   \quad\Longleftrightarrow\quad
@@ -958,29 +957,28 @@ months to slightly over two years \citep{Yehoshua2011}; the square-root
 enlargement rate has been re-used in subsequent biomarker work
 \citep{Chu2022}. The interior of the lesion is already atrophic and the
 exterior is healthy; both are quasi-static, and all dynamics are
-concentrated at the active boundary. This is the structural fingerprint of
-a system governed by a temporal partial differential equation with strong
-spatial localisation.
+concentrated at the active boundary. Such behaviour is characteristic of
+a system governed by a temporal PDE with strong spatial localisation.
 
 
 The same boundary, however, does not advance uniformly in all directions.
 GA growth is \emph{anisotropic}: lesions progress faster towards the retinal
-periphery than towards the fovea, peak progression rate occurs at
-approximately one millimetre from the foveal centre when the lesion grows
-foveally, and in eyes treated monthly with pegcetacoplan progression towards
-the fovea was slowed more than progression towards the periphery
-\citep{Singh2025}. The forward operator that maps the present state
-to the future state is therefore \emph{local}, but its reach must match
-the distance the front moves between two visits, which differs between
-directions --- properties that classical solvers build in explicitly
-through the size and shape of their stencils.
+periphery than towards the fovea, and growth towards the fovea peaks at
+approximately one millimetre from the fovea \citep{Singh2025}. In eyes
+treated monthly with pegcetacoplan, progression towards the fovea was
+slowed more than progression towards the periphery \citep{Singh2025}. The
+forward operator that maps the present state to the future state is
+therefore \emph{local}, but its reach must match the distance the front
+moves between two visits, and this distance differs between directions.
+Classical solvers build such properties in explicitly through the size and
+shape of their stencils.
 
 
-GA progression has no known governing equation. Its data are not a
-densely simulated trajectory but a few observed states per eye
-(\S\ref{sec:background:ga-oct:muw}). A classical solver is therefore not
-an option, but the structure it is built from matches the problem in
-four respects, which is why the thesis adopts it.
+GA progression has no known governing equation, and its data are a few
+observed states per eye (\S\ref{sec:background:ga-oct:muw}) instead of a
+densely simulated trajectory. A classical solver therefore cannot be used.
+The structure such a solver is built from, however, matches the problem in
+four respects, and the thesis adopts it for these reasons.
 \begin{itemize}
   \item \textbf{A state on a fixed grid.} Every visit is represented on
     the same uniform en-face grid (\S\ref{sec:background:ga-oct:state-rep}),
@@ -992,12 +990,12 @@ four respects, which is why the thesis adopts it.
     depends on what surrounds it, which is the situation a stencil is
     designed for.
   \item \textbf{Slow change.} Consecutive visits differ in a small part
-    of the grid. The residual form, which predicts only the change and
-    returns the current state as $\Delta t \to 0$, starts from the
-    right default.
+    of the grid. The residual form predicts only the change and returns
+    the current state as $\Delta t \to 0$; its default, the unchanged
+    state, suits data that change slowly.
   \item \textbf{Irregular steps.} The intervals between visits differ
-    from eye to eye and visit to visit. A solver step is parameterised by $\Delta t$, so the step can be the real interval
-    rather than a fixed one.
+    from eye to eye and visit to visit. A solver step is parameterised by $\Delta t$, so each step can use the
+    actual interval between two visits instead of a fixed one.
 \end{itemize}
 
 
@@ -1012,12 +1010,12 @@ are available for training, these assumptions are likely to matter more
 than model size.
 
 
-These are reasons to expect the structure to fit, not evidence that it
-does. They also leave open what kind of spatial operator should compute
+These four points motivate the structure but are not evidence that it
+fits. They also leave open what kind of spatial operator should compute
 the update. The CFL argument suggests that an operator applied once per
 visit has to see at least as far as the lesion front moves between
-visits, and on the anisotropic en-face grid that distance is very
-different when counted in pixels along each axis: the spacing between
+visits. On the anisotropic en-face grid, this distance corresponds to very
+different numbers of pixels along the two axes: the spacing between
 B-scans is about 21 times larger than the spacing between A-scans
 (\S\ref{sec:data:spatial}), so a neighbourhood that is symmetric in pixels
 is strongly lopsided in millimetres. Whether a local
