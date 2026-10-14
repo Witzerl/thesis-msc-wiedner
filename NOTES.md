@@ -1421,6 +1421,13 @@ Solvers?"); contributions back as bullet points. He offers a meeting.
   given names Kenta Yoshida and Anthony Gigon (the search agent's BibTeX had them wrong). "Remains
   sparse" replaced by a sourced statement (PDE models and neural surrogates exist where the equation
   is known; no learned solver on clinical images without a known equation for GA).
+- [ ] TODO (author, 2026-10-14, inline in §3.3): rethink the pad positions in the loss. Every
+  reported run trains on them at full weight (`exclude_pad_nodes` False; only the unreported fold-2
+  ladder runs MPPDE_L5_nopad_f2 / MPPDE_L7_combo_f2 used it). Options: drop the mention of the
+  option in §3.3 and §4.5.1, or run the exclusion on the canonical stencil (5 folds) and report it.
+  Note: "pad nodes" also include within-scan positions with all-zero layers (figure-plan finding).
+- [x] 2026-10-14 §3.3 worklist pass (3.15, 3.18-3.21) and §3.4 (3.22, 3.24): "canonical fold" in
+  §3.4/§3.5 replaced by "fold~2" (it is the fold whose statistics are quoted as the example).
 - [ ] Library papers for Related Work (no local copy, not cited yet): **Anegondi2023** (Ophthalmol
   Retina 7:243, doi 10.1016/j.oret.2022.08.018), **Pfau2019** (Retina 39:1527), **Niu2016**
   (Ophthalmology 123:1737), **Zhang2021** (Med Image Anal 68:101893, time factors in GA forecasting).

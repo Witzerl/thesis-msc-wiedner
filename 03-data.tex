@@ -253,6 +253,9 @@ and $-2.94$ standard deviations, which is an extreme value. The training
 loss can optionally exclude the pad positions, but no reported run does so
 (\S\ref{sec:method:training}). The models are therefore trained to
 reproduce this value at full weight.
+% TODO (author, 2026-10-14): rethink the pad positions in the loss. No reported
+% run excludes them, so either drop the mention of the option here (and in
+% 4.5.1) or run the exclusion on the canonical stencil (5 folds) and report it.
 % Checked 2026-10-14 against solver_results.csv (code repo): cfg_exclude_pad_nodes
 % is False for every final-era run of every reported arm; only the two fold-2
 % loss-ladder runs MPPDE_L5_nopad_f2 and MPPDE_L7_combo_f2 used it.
@@ -289,8 +292,7 @@ discussed as a limitation (\S\ref{sec:discussion:limitations}).
 After spatial standardisation, each channel is normalised. The
 statistics are computed per channel over the training visits of the
 current fold only, and are then applied to every visit, including the
-validation visits. No validation data enters the statistics. Because
-they are computed on the cropped and padded states, the padded zeros
+validation visits. Because they are computed on the cropped and padded states, the padded zeros
 contribute to each channel's mean and standard deviation
 (\S\ref{sec:data:spatial}).
 
@@ -303,12 +305,11 @@ deviation of channel~$c$. A vanishing standard deviation is replaced by
 one to avoid division by zero.
 
 The binary mask is z-scored in the same way as the layer channels. On
-the canonical fold, the background value 0 maps to $-0.602$ and the
-foreground value 1 maps to $+1.660$. The binarisation threshold of 0.5
-maps to $+0.529$. Two consequences follow. First, the normalised mask
-has a hard step at the lesion edge. Second, evaluation maps every
-threshold into normalised space rather than mapping the prediction back
-to the original scale, and this mapping must be applied consistently.
+fold~2, the background value 0 maps to $-0.602$, the foreground value 1
+maps to $+1.660$, and the binarisation threshold of 0.5 maps to $+0.529$.
+The normalised mask therefore has a hard step at the lesion edge.
+Evaluation maps every threshold into normalised space rather than mapping
+the prediction back to the original scale.
 
 
 \section{Patient-Level Covariates}
@@ -330,7 +331,7 @@ window carries the age at its own start visit, that is, the baseline age
 plus the elapsed years. The z-score statistics for this mode are
 computed over all training window-start ages. Since there is one start
 age per window, the final visit of each training eye does not enter
-them. On the canonical fold this gives 378 ages, with a mean of 77.653
+them. On fold~2 this gives 378 ages, with a mean of 77.653
 years and a standard deviation of 7.220 years.
 
 In the per-visit mode, the age covariate advances along a rollout. This
