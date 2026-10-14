@@ -1190,6 +1190,15 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
   `fig:bg:eye-anatomy` -- illustrations, generated with the author. The retinal-anatomy caption
   names layer strata and maps them to the ten channels, which the 2026-09-25 decision forbids
   (boundary names unknown); a real B-scan is not in the repository.
+- [ ] **Illustrations via LLM (author, 2026-10-14; check when the illustrations are made):**
+  Figs. 2.1-2.3 (eye anatomy, retinal layers, OCT acquisition) to be drawn by an LLM for a uniform
+  look, with the author checking the anatomy. Rules: (1) the LLM writes figure *code* (TikZ / SVG /
+  matplotlib with `style/` colours), no image generator; script in `images/scripts/`; (2) check
+  against one named reference figure and say "schematic, after X" in the caption; (3) a close copy of
+  one published figure is an adaptation: "adapted from X" + licence check; (4) Fig. 2.2 must not map
+  layers onto the ten channels, and a drawn B-scan is labelled as a schematic, not shown as data;
+  (5) check JKU rules on declaring AI-generated figures (ask the supervisor). Supervisor SV-2.3
+  allows licensed third-party images as an alternative.
 - [ ] Not yet in the text: GA progression stages from the poster (`poster/figs/eye_stage_1-4.png`),
   e.g. in §1.1 or §2.1.2 -- placement to be decided.
 

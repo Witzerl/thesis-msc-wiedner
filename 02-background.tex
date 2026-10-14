@@ -60,37 +60,36 @@ the forecasting of GA and states the problem formally.
     at which the optic nerve exits the eye.
     \emph{Right:} en-face view of the fundus, i.e.\ the inside of the
     back of the eye seen along the optical axis. The fovea sits
-    roughly at the centre of the macula; the macula itself is
-    sub-divided into the foveola (innermost), parafovea, and
-    perifovea, in concentric rings of increasing radius. The dashed
+    roughly at the centre of the macula, which is sub-divided into
+    concentric zones of increasing radius: the foveola, fovea,
+    parafovea and perifovea. The dashed
     square indicates the
     $6 \times 6$\,mm fovea-centred OCT scanning window used in this
     thesis (\S\ref{sec:background:ga-oct:muw}).}
   \label{fig:bg:eye-anatomy}
 \end{figure}
 
-The eye, sketched in Figure~\ref{fig:bg:eye-anatomy} (left), can be
-thought of as a biological camera. Light enters at the front through
+Figure~\ref{fig:bg:eye-anatomy} (left) shows the eye in cross-section.
+Light enters at the front through
 the \emph{cornea} and \emph{lens}, traverses the gel-filled vitreous
 body, and is focused onto the \emph{retina} --- a thin
 neural-tissue lining at the back of the eye that converts the
 incoming light pattern into electrical signals. Those signals leave
 the eye via the \emph{optic nerve}, which exits the retina at a
 specific anatomical landmark called the \emph{optic-nerve head} (ONH,
-also called the \emph{optic disc}). Behind the retina, two further
-layers --- the \emph{choroid} (a richly vascularised tissue, of which
-the \emph{choriocapillaris} is the innermost capillary bed) and the
-\emph{sclera} (the white, mechanically rigid outer shell) --- support
-and supply the retina from beneath.
+also called the \emph{optic disc}). Behind the retina lie two further
+layers that support and supply it from beneath: the \emph{choroid}, a
+richly vascularised tissue whose innermost capillary bed is the
+\emph{choriocapillaris}, and the \emph{sclera}, the white, mechanically
+rigid outer shell.
 
 The retina is not uniform across its surface. A small disc-shaped
 region near the posterior pole, the \emph{macula}, is specialised for
 high-acuity central vision, while the rest of the retina handles
 peripheral vision at lower resolution. The macula has a diameter of
 roughly five to six millimetres and is the only part of the retina
-that GA ever affects clinically; for that reason, the OCT scanning
-window used throughout the thesis is centred on the macula and
-covers a $6 \times 6$\,mm field
+that GA affects clinically. The OCT scanning window used throughout
+the thesis is therefore centred on the macula and covers a $6 \times 6$\,mm field
 (\S\ref{sec:background:ga-oct:muw}). Within the macula, four
 concentric anatomical zones are conventionally distinguished, in
 order of increasing radius from the centre: the \emph{foveola}, the
@@ -107,8 +106,7 @@ in~\S\ref{sec:introduction:motivation}, whether a lesion is subfoveal or
 extrafoveal changes its clinical significance even if its
 total area is the same.
 
-A second piece of anatomy is internal rather than positional: the
-retina is itself a \emph{layered} tissue, with several distinct
+The retina is also a \emph{layered} tissue, with several distinct
 strata stacked vertically from the front (closest to the vitreous
 body) to the back (closest to the choroid). The principal layers, in
 order from inner to outer, are the inner limiting membrane, the
@@ -135,9 +133,6 @@ Chapter~\ref{ch:data}.
 
 \subsection{Retinal Imaging}
 \label{sec:background:ga-oct:oct}
-% TODO (restructure 2026-10-12, supervisor M3.1): add a few sentences on
-% SLO and FAF as imaging modalities; fix the pointer to the former 2.1.4
-% (en-face maps are now the last paragraph of this subsection).
 
 % TODO: produce Figure fig:bg:oct-acquisition --- a four-panel
 % schematic showing how an OCT volume is built up from one-dimensional
@@ -188,32 +183,30 @@ Chapter~\ref{ch:data}.
     three-dimensional \emph{OCT volume} (the physical scan window of
     the MUW cohort spans approximately $6 \times 6$\,mm laterally).
     \emph{(d)} Projecting the volume along its axial direction onto
-    the fundus plane yields the two-dimensional en-face image on
-    which the modelling pipeline operates
-    (\S\ref{sec:background:ga-oct:enface}); a GA lesion appears
-    inside the en-face image as a region with a different signal
-    intensity than the surrounding healthy retina.}
+    the fundus plane yields a two-dimensional en-face image, in which
+    a GA lesion appears as a region with a different signal intensity
+    than the surrounding healthy retina. The modelling pipeline
+    operates on en-face maps on this grid
+    (\S\ref{sec:background:ga-oct:enface}).}
   \label{fig:bg:oct-acquisition}
 \end{figure}
 
 Optical Coherence Tomography (OCT), introduced by \citet{Huang1991},
-produces micrometre-resolution cross-sectional images of the retina, in much the same way that
-ultrasound produces them for soft tissue --- except that low-coherence
-near-infrared light replaces sound. Concretely, the system shines a
-weak probe beam into the eye and measures how strongly each
-\emph{depth} along the path of the beam reflects light back. That
-depth-versus-reflectivity profile is then displayed as a single column
-of pixels in the output image, with intensity encoding reflectivity
-and the vertical position of each pixel encoding depth. Resolving the
-depth dimension requires a small piece of optical engineering, because
-near-infrared light from a single short pulse cannot be timed
-precisely enough on a per-layer basis with conventional electronics.
-The standard solution is interferometric: the source light is split
-into two beams (Figure~\ref{fig:bg:oct-acquisition}(a)), one of which
---- the \emph{sample arm} --- is sent into the eye and reflected back
-from the various retinal layers, while the other --- the
-\emph{reference arm} --- is sent to a known mirror and reflected back
-unchanged. The two returning beams are then recombined and produce an
+produces micrometre-resolution cross-sectional images of the retina.
+The principle is analogous to ultrasound imaging of soft tissue, with
+low-coherence near-infrared light in place of sound. A weak probe beam is
+directed into the eye, and the strength of the light reflected back from
+each \emph{depth} along its path is measured. This depth-versus-reflectivity
+profile is called an \emph{A-scan}. It is displayed as a single column of
+pixels, with intensity encoding reflectivity and vertical position
+encoding depth. Resolving the depth dimension requires an optical
+technique, because conventional electronics cannot time near-infrared
+light from a single short pulse precisely enough to separate individual
+layers. The standard solution is interferometry. The source light is
+split into two beams (Figure~\ref{fig:bg:oct-acquisition}(a)): the
+\emph{sample arm} is sent into the eye and reflected back from the
+various retinal layers, and the \emph{reference arm} is sent to a known
+mirror and reflected back unchanged. The two returning beams are then recombined and produce an
 interference pattern, and the spectrum of that pattern (in
 spectral-domain OCT) encodes the depth at which each reflection in
 the eye occurred. Standard signal processing then recovers the
@@ -227,16 +220,30 @@ through the retina, called a \emph{B-scan}
 directions yields a three-dimensional \emph{OCT volume}
 (Figure~\ref{fig:bg:oct-acquisition}(c)), in which each voxel records
 the reflectivity of one small block of tissue. The MUW cohort uses an
-acquisition protocol that produces volumes with a physical footprint of
-approximately $6 \times 6$\,mm laterally; how the varying native voxel
-grids are reduced to the standard two-dimensional modelling grid used in
-the rest of the thesis is the subject of~\S\ref{sec:background:ga-oct:enface}.
+acquisition protocol that produces volumes with a lateral footprint of
+approximately $6 \times 6$\,mm. How such a volume is summarised as a
+two-dimensional en-face image is described below, and how the varying
+native grids are brought to one modelling grid in~\S\ref{sec:data:spatial}.
+
+Two further imaging modalities are used alongside OCT. Scanning laser
+ophthalmoscopy (SLO) scans a laser point by point across the fundus and
+records the reflected light, giving a sharp two-dimensional image of the
+retinal surface.
+% TODO: cite a textbook source for the SLO principle.
+The OCT device used for the cohort records a near-infrared reflectance
+image of this kind together with each volume, aligned with the OCT scans
+\citep{Mai2024}. Fundus autofluorescence (FAF) imaging records the
+natural fluorescence of lipofuscin, a breakdown product of photoreceptor
+outer segments that accumulates in the RPE. Where the RPE is lost, the
+signal is lost, so GA appears as a dark area with high-contrast borders,
+and FAF has become the gold standard for detecting and measuring GA area
+\citep{Boopathiraj2024}.
 
 OCT is preferred over fundus autofluorescence (FAF), the other common
 imaging modality for GA, for three reasons given by \citet{Vallino2024}: it
 shows each retinal layer in cross-section and so permits layer-wise
 quantitative analysis, it detects atrophy earlier in its natural history,
-and it remains reliable near the fovea, where blue-light FAF struggles.
+and it remains reliable near the fovea, where blue-light FAF is less reliable.
 OCT-based area measurements are also reproducible and consistent with FAF:
 \citet{Pilotto2015} report inter-reader intraclass correlation coefficients
 of 0.97--0.98 for en-face OCT at the outer-retinal level and find the
@@ -250,7 +257,7 @@ choroidal hypertransmission; the surrounding retinal layer geometry is
 recoverable from the same volume by segmentation; and the
 choroidal slab beneath Bruch's membrane provides an additional view of
 the GA extent through the hypertransmission signature
-\citep{Vallino2024,Chu2022}. No cross-modality fusion is required.
+\citep{Vallino2024,Chu2022}.
 
 
 \paragraph{From OCT volumes to en-face maps.}
@@ -272,17 +279,12 @@ the GA lesion as a binary mask, and, for each of ten retinal layer
 boundaries, its depth along every A-scan (\S\ref{sec:data:dataset}). These
 maps are the imaging input the models in this thesis receive.
 
-The choice of en-face rather than B-scan as the modelling substrate is
-motivated by a methodologically important caveat documented by
-\citet{Vallino2024}: a lesion classified as iRORA on a single horizontal
-B-scan can in fact be part of a larger cRORA lesion that is only fully
-visible in the en-face slab. The en-face representation is therefore
-the more complete view of the GA extent and is the substrate on which
-quantitative growth-rate metrics and layer-thickness analyses are
-reported in the recent literature \citep{Chu2022,Vogl2021,Vallino2024}. By construction, the
-2D en-face grid also reduces a per-step three-dimensional forward
-problem to a per-step two-dimensional one, which matters for the
-tractability of the models introduced in the subsequent chapters.
+The en-face representation is also the view on which quantitative
+growth-rate metrics and layer-thickness analyses are reported in the
+recent literature \citep{Chu2022,Vogl2021,Vallino2024}. The en-face grid
+also reduces the forward problem of each step from three dimensions to
+two, which matters for the tractability of the models in the following
+chapters.
 
 
 \subsection{Geographic Atrophy}
@@ -362,7 +364,11 @@ smaller spatial scale, i.e.\ the same OCT pattern below the
 250\,\textmu{}m size threshold; in one retrospective study of
 intermediate-AMD eyes, 93\,\% of iRORA lesions progressed to cRORA within
 twenty-four months, with a median conversion time of fourteen months
-\citep{Vallino2024}. Channel~0 of
+\citep{Vallino2024}. Working on en-face maps rather than on single
+B-scans is also supported by a caveat documented by \citet{Vallino2024}:
+a lesion classified as iRORA on a single horizontal B-scan can be part of
+a larger cRORA lesion that is fully visible only in the en-face slab.
+Channel~0 of
 the state tensor used in this thesis marks the GA lesion as a binary
 mask (\S\ref{sec:background:ga-oct:state-rep}); iRORA is not represented
 as a separate label.
