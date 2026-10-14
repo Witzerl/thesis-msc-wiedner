@@ -1400,7 +1400,12 @@ Solvers?"); contributions back as bullet points. He offers a meeting.
   restructure Introduction + Background (background as subsections of the introduction, problem
   statement and motivation after it, §2.2.5 merged with §1.3); §2.1 order anatomy → imaging → GA;
   §2.1.5–§2.1.6 into Chapter 3.
-- [ ] Abstract: rewrite to the supervisor's three-part structure (EN + DE).
+- [ ] **Abstract: deferred (author, 2026-10-14) until the rest of the thesis is settled**, so it is
+  written once. Then rewrite to the supervisor's three-part structure (EN + DE); he calls it the most
+  important part.
+- [ ] **Worklist for Ch. 1-3** (2026-10-14): `reviews/worklist-ch1-3-2026-10-14.md` -- supervisor
+  items and the still-open AI-review items in one list, by current section (15 supervisor points,
+  119 AI items: 65 medium, 54 low; 23 AI items resolved by the restructure and bridges).
 - [ ] Ch. 1: two-sentence split + both US-approved drugs (pegcetacoplan, avacincaptad pegol, not
   EU); variable growth rate as the motivation; simplify the setup sentence; literature check before
   claiming Δt-conditioning as a contribution. §1.1 closing paragraph: "well written", keep.
