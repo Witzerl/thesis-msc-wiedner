@@ -1366,6 +1366,10 @@ Solvers?"); contributions back as bullet points. He offers a meeting.
   Background were deliberately kept as separate chapters (author's preference); his ordering is
   followed inside them: medical background (anatomy -> imaging -> GA) -> PDEs without GA -> neural
   solvers -> related work -> motivation and formal problem statement at the end of Ch. 2.
+  (3) Drugs, patient management and the need for predictive methods stay in §1.1 (Clinical
+  Motivation) rather than in the medical background of §2.1, as his outline suggested (author,
+  2026-10-14); ask whether that is fine. (4) Ask about JKU rules for declaring AI-generated
+  figures (the anatomy schematics are planned as LLM-drawn code figures).
 - [ ] 2.5.2: include the formal definition of "operator" (wording agreed 2026-10-13, see
   `reviews/supervisor-rev1-2026-10-12.md`).
 - [x] 2026-10-12 restructure of Ch. 1-3 (author approved; plan and figure in
