@@ -1430,6 +1430,7 @@ Solvers?"); contributions back as bullet points. He offers a meeting.
   solver-swap test (§5.5.1; fold 2 for the graph networks, fold 0 for the T-FEN), the T-FEN
   Courant read-back (§5.5.2, fold 0) and the three probe runs of Appendix G (fold 2). The first
   two are post-hoc evaluations of existing checkpoints (no training); the probes are training runs.
+- [x] 2026-10-14 §3.6 worklist pass (3.28-3.33).
 - [x] 2026-10-14 §3.5 worklist pass (3.26, 3.27; "canonical setting" -> "which every reported run
   uses").
 - [x] 2026-10-14 §3.3 worklist pass (3.15, 3.18-3.21) and §3.4 (3.22, 3.24): "canonical fold" in

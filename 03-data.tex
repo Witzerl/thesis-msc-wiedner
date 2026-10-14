@@ -350,15 +350,12 @@ The longitudinal sequences are split into transition windows. For each
 eye, the visits are sorted by day in study, and every pair of
 consecutive visits forms one window. Window~$i$ consists of the state at
 visit~$i$, the state at visit~$i+1$, and the interval $\Delta t$ between
-them. Each window holds exactly one transition; this is a fixed
-commitment of the framework, not a configuration option. $\Delta t$ is
+them. Each window holds exactly one transition. This is fixed by the
+framework and cannot be changed by configuration. $\Delta t$ is
 stored in years, computed as the gap in days divided by 365, so a gap of
 180 days gives $\Delta t = 0.4932$. Each window also stores the raw gap
 in days, the two covariates and the position of the window within its
 eye. Over the cohort this gives 478 windows.
-
-The distribution of the intervals between consecutive visits is given in
-Table~\ref{tab:data:intervals}.
 
 \begin{table}[t]
   \centering
@@ -381,25 +378,27 @@ Table~\ref{tab:data:intervals}.
   \end{tabular}
 \end{table}
 
-Three properties of this schedule shape the rest of the pipeline. First,
-every interval is a multiple of the 90-day acquisition grid, and the
-most common interval is 180 days. Second, the short 90-day intervals are
+Table~\ref{tab:data:intervals} gives the distribution of the intervals
+between consecutive visits. Three properties of this schedule shape the
+rest of the pipeline. First, every interval is a multiple of 90 days, and
+the most common interval, 180 days, is the base of the time budget used
+in training (\S\ref{sec:method:training}). Second, the short 90-day intervals are
 concentrated in a small subgroup: all 67 of them belong to 10 eyes from
-7 patients. A training scheme restricted to intervals shorter than the
-modal 180 days would therefore learn from this densely imaged subgroup
+7 patients. A training scheme restricted to the 90-day intervals would therefore learn from this densely imaged subgroup
 alone.
 
 Third, the schedule limits how far an eye can be rolled forward during
-training, where several visits are chained within a fixed time budget
-(\S\ref{sec:method:training}). With a budget of 90 days, none of the 75
-eyes can chain two visits. With 360 days, 74 of the 75 eyes reach at
-least one autoregressive step. With 540 days, 68 eyes reach at least two
-steps, and with 720 days, 73 eyes do.
+training, because the training curriculum chains visits within a fixed
+time budget (\S\ref{sec:method:training}). With a budget of 90 days, none
+of the 75 eyes can chain two visits, so no step is unrolled. With 360
+days, 74 of the 75 eyes reach at least one unrolled step. With 540 days,
+68 eyes reach at least two, and with 720 days, 73 eyes do.
 
-The same schedule also shapes the evaluation. The one-year anchor has no
-upper bound: the metric is taken at the first rollout step whose
-cumulative time reaches about 347 days. For 68 of the 75 eyes, this is
-exactly 360 days. The remaining 7 eyes (9.3\,\%) are scored at 450 to
+Beyond training, the schedule also affects the evaluation. The
+change-region metrics of Chapter~\ref{ch:experiments} are taken at a
+one-year anchor, the first rollout step whose cumulative time reaches
+about 347 days. This anchor has no upper bound. For 68 of the 75 eyes, it
+falls at exactly 360 days. The remaining 7 eyes (9.3\,\%) are scored at 450 to
 720 days, where the true change region is 1.3 to 1.7 times larger.
 This is accepted deliberately. \citet{Mai2024} likewise score every follow-up
 visit by its time since baseline, in yearly bins, and not at a fixed horizon.
