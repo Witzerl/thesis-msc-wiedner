@@ -10,7 +10,9 @@
 \label{sec:background:ga-oct:muw}
 
 The data used in this thesis is a longitudinal cohort of eyes with
-Geographic Atrophy, provided by the Medical University of Vienna (MUW).
+Geographic Atrophy, provided by the Medical University of Vienna (MUW). The data are drawn
+from the GA cohort described by \citet{Mai2024}, with tighter registration
+bounds and cleaner segmentations.
 It was acquired in routine clinical practice at a single clinical site
 in Vienna. The sample unit throughout is the individual eye. The cohort
 contains 75 eyes, which together contribute 553 visits, where a visit is
@@ -24,10 +26,8 @@ three years.
 The acquisition setting recorded in the data is the same for all 553
 visits. The vendor is logged as Heidelberg Engineering and the protocol
 as a volume scan in ART mode.
-\citet{Mai2024}, who describe a larger GA cohort from the same MUW clinic,
-report that it was acquired on a Spectralis device.
-% TODO: confirm the device model (Heidelberg Spectralis) with the MUW
-% data provider; it is currently an inference from Mai et al. (2024).
+For this cohort, \citet{Mai2024} report acquisition on a Spectralis
+device.
 
 The 75 eyes come from 51 patients: 24 patients contribute both eyes and
 27 contribute a single eye. Of the 75 eyes, 47 belong to female and 28 to
@@ -49,8 +49,7 @@ is included if at least two of its visits carry both, which guarantees
 at least one transition. All 75 eyes meet this condition.
 
 The GA mask was not segmented on the OCT.
-\citet{Mai2024}, who describe a larger GA cohort from the same clinic,
-report that GA was
+For this cohort, \citet{Mai2024} report that GA was
 outlined manually on the fundus-autofluorescence image by certified
 graders of the Vienna Reading Center, as well-demarcated areas of
 markedly decreased or absent autofluorescence. The outline was then

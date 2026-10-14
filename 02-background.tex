@@ -720,8 +720,7 @@ Beyond graph networks, several distinct architecture families are used
 as PDE surrogates.
 The U-Net \citep{Ronneberger2015} is an encoder-decoder
 architecture with skip connections and a multi-scale receptive field.
-Although originally introduced for biomedical image segmentation, it
-serves as a standard strong surrogate baseline in the neural-PDE
+It serves as a standard strong surrogate baseline in the neural-PDE
 literature \citep{Gupta2023}.
 The architectures also differ in their spatial context: global
 spectral operators such as the Fourier Neural Operator couple all grid
@@ -771,11 +770,13 @@ predictive probabilities of GA development over time, which positions
 OCT as a candidate predictive substrate for structural endpoints.
 
 The closest prior work on the specific prediction task addressed here
-% TODO: confirm with the supervisor how the 75-eye cohort of this thesis
-% relates to the 184-eye cohort of Mai et al. (2024).
+% Cohort relation confirmed by the supervisor (review 1, 2026-10-12): same
+% cohort, with tighter registration bounds and cleaner segmentations.
 is by \citet{Mai2024}, who predicted individual GA progression from a
-single baseline OCT on a larger GA cohort (184 eyes of 100 patients) of the
-same MUW clinic. The
+single baseline OCT on the MUW GA cohort (184 eyes of 100 patients). The
+data of this thesis are drawn from the same cohort, with tighter
+registration bounds and cleaner segmentations (75 eyes of 51 patients,
+\S\ref{sec:data:dataset}). The
 input regime, however, is different. While that prior
 work operates directly on raw OCT volumes, the present thesis consumes
 pre-segmented lesion masks and layer surfaces. This difference must be
@@ -796,8 +797,8 @@ learning with the inductive biases of PDE solvers.
 The application of neural PDE solvers to biomedical problems remains
 sparse.
 
-The architectures that fill the operator slot of
-Chapter~\ref{ch:method} originate in different lines of work. The
+The architectures used as the operator in Chapter~\ref{ch:method}
+originate in different lines of work. The
 graph solvers build on the graph neural network model of
 \citet{Scarselli2009} and the message-passing formulation of \citet{Gilmer2017},
 adapted to autoregressive PDE solving by \citet{Brandstetter2022}. The U-Net was introduced
