@@ -402,11 +402,7 @@ The update of the framework is one explicit Euler step in residual form
 stencils, global spectral methods and finite elements. The experiments
 ask how far one update reaches, whether a higher-order time integrator
 helps, and when a step becomes unstable (Chapter~\ref{ch:experiments}).
-This section introduces these mechanisms. It covers how
-space is discretised (\S\ref{sec:background:pde-solvers:stencils}), how
-the state is stepped in time (\S\ref{sec:background:pde-solvers:time}),
-and the strengths and limits of this design
-(\S\ref{sec:background:pde-solvers:limits}).
+This section introduces these mechanisms.
 
 A \emph{temporal} PDE describes a field $u(t, x)$ that changes over time
 $t$ at every point $x$ of a spatial domain $\mathcal{X} \subset
@@ -421,8 +417,8 @@ where $u: [0, T] \times \mathcal{X} \to \mathbb{R}^n$ has $n$ components
 and $F$ is the law of the process. Because $F$ involves only $u$ and
 its derivatives at $x$, and derivatives are local quantities, the rate
 of change at a point depends only on the field in an arbitrarily small
-neighbourhood of it. This locality is what the stencils of
-\S\ref{sec:background:pde-solvers:stencils} exploit. Together with an
+neighbourhood of it. The stencils of
+\S\ref{sec:background:pde-solvers:stencils} exploit this locality. Together with an
 initial condition $u(0, x) = u^{0}(x)$ and a condition on the domain
 boundary, \eqref{eq:bg:temporal-pde} determines $u(t, \cdot)$ for all
 $t > 0$. Closed-form solutions exist only in special cases, so the
@@ -432,6 +428,8 @@ derivatives by operations on grid values
 (\S\ref{sec:background:pde-solvers:stencils}), and it then advances the
 grid values in discrete time steps
 (\S\ref{sec:background:pde-solvers:time}).
+\S\ref{sec:background:pde-solvers:limits} then summarises the strengths
+and limits of this design.
 
 \subsection{Discretising space: stencils}
 \label{sec:background:pde-solvers:stencils}
@@ -491,14 +489,14 @@ dynamics inside this discretisation.
 A fixed stencil that straddles a sharp front produces spurious
 oscillations next to it. Weighted essentially non-oscillatory (WENO)
 schemes avoid this by computing several candidate estimates on shifted
-sub-stencils and combining them with weights that depend on how smooth
-the data are in each sub-stencil, so that sub-stencils crossing the
-front receive almost no weight \citep{Liu1994, JiangShu1996}. The
-stencil thereby becomes a non-linear function of its input. This is the
-mechanism closest to what a learned operator does.
+sub-stencils. The estimates are combined with weights that depend on how
+smooth the data are in each sub-stencil, so that sub-stencils crossing
+the front receive almost no weight \citep{Liu1994, JiangShu1996}. The
+stencil thereby becomes a non-linear function of its input, which makes
+WENO the classical mechanism closest to what a learned operator does.
 
 \paragraph{Global methods.}
-Pseudospectral methods compute derivatives in Fourier space instead: the
+Pseudospectral methods compute derivatives in Fourier space instead of from a neighbourhood: the
 field is transformed, each mode is multiplied by $(i\omega)^n$, and the
 result is transformed back. The derivative at every point then depends
 on all grid values. The accuracy is excellent for smooth solutions on
@@ -508,18 +506,18 @@ periodic domains, but the method breaks down for non-smooth solutions
 \paragraph{Locality and reach.}
 Stencil methods are \emph{local}: the rate of change of a cell is
 computed from a small neighbourhood, so one evaluation of $f$ moves
-information by at most one stencil radius. How far that is in physical
-units is set by the width of the stencil and by the grid spacing. The
+information by at most one stencil radius. This distance, the
+\emph{reach} of the stencil, is set in physical units by the width of the
+stencil and by the grid spacing. The
 contrast between local stencils and global methods reappears in the
 neural architectures of~\S\ref{sec:background:neural-pde}.
 
 \subsection{Stepping in time}
 \label{sec:background:pde-solvers:time}
 
-Once every spatial derivative is replaced by a stencil, the solver is
-left with a function $f$ that maps the current grid values to a rate of
-change for every cell. The spatial part of the problem is then settled,
-and the remaining task is to advance the grid in time using this rate.
+The stencils of \S\ref{sec:background:pde-solvers:stencils} reduce the
+spatial part of the problem to the rate function $f$; the grid then has
+to be advanced in time with this rate.
 The two parts are independent: the same $f$ can be combined with any
 time-stepping scheme, and the choice of scheme does not change how $f$
 is computed.
@@ -550,9 +548,9 @@ Two properties decide whether such an update is usable. The first is
 reproduce the exact solution,
 $\lim_{\Delta t \to 0} \lVert \mathcal{A}(\Delta t, u^{0}) - u(\Delta t) \rVert = 0$
 \citep{Brandstetter2022}. An update written as the current state plus
-$\Delta t$ times a rate, as in~\eqref{eq:bg:euler}, returns the current
-state at $\Delta t = 0$ by construction; this is called the
-\emph{residual} form. The second is \emph{stability}: errors made in one
+$\Delta t$ times a rate, as in~\eqref{eq:bg:euler}, is said to be in
+\emph{residual} form; it returns the current state at $\Delta t = 0$
+whatever the rate. The second is \emph{stability}: errors made in one
 step must not grow from step to step. For explicit schemes this bounds
 the step size.
 The Courant--Friedrichs--Lewy (CFL) condition \citep{Courant1928}
@@ -563,7 +561,7 @@ step may not carry information further than the stencil reaches,
   \label{eq:bg:cfl}
 \end{equation}
 with a constant $C_{\max}$ of order one that depends on the scheme.
-Seen the other way round, a stencil used with a given step must be wide
+Equivalently, a stencil used with a given step must be wide
 enough to cover the distance the solution moves during that step.
 
 % TODO: produce Figure fig:bg:solver-path -- the classical computational
@@ -596,15 +594,15 @@ behaviour, convergence to the true solution can be proven for broad
 classes of problems as the grid is refined \citep{LeVeque2002}, and no
 training data are needed.
 
-Their limits follow from the same design. The equation $F$ must be
-known, including its coefficients: the solver computes what $F$
-prescribes and nothing else. Good schemes are hand-crafted for each
+Their limits follow from the same design. The equation $F$, including its
+coefficients, must be known, because the solver can only compute what
+$F$ prescribes. Good schemes are hand-crafted for each
 class of equation. Following \citet{Bartels2016}, \citet{Brandstetter2022}
 describe the field of numerical methods as a ``splitter field'' that
 builds a dedicated solver for each sub-problem, rather than a ``lumper
-field'' that seeks one method for all of them. And accuracy is expensive: fine
-features need fine grids, the CFL condition then forces small steps, and
-the cost grows faster than the resolution.
+field'' that seeks one method for all of them. Accuracy is also expensive. Fine
+features need fine grids, the CFL condition then forces small time steps,
+and the cost grows faster than the resolution.
 
 
 \section{Neural PDE Solvers and Surrogate Architectures}
