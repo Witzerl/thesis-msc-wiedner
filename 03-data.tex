@@ -319,19 +319,19 @@ Each transition window, a pair of consecutive visits of one eye
 (\S\ref{sec:data:temporal}), is accompanied by two patient-level
 covariates, age and sex.
 They come from a clinical covariates table with 187 rows, which covers
-the wider study cohort and all 75 eyes used here. The table is keyed per
+the wider study cohort and all 75 eyes used here. The table has one row per
 eye, so a patient who contributes two eyes appears in two rows with the
 same age and sex. Sex is encoded as 0 for female and 1 for male. A
 missing value is imputed with the male fraction of the training split.
 
 Age is z-scored with training statistics. Two encodings are implemented.
 In the baseline mode, each eye keeps its baseline age for all of its
-windows. In the per-visit mode, which is the canonical setting, each
+windows. In the per-visit mode, which every reported run uses, each
 window carries the age at its own start visit, that is, the baseline age
 plus the elapsed years. The z-score statistics for this mode are
-computed over all training window-start ages. Since there is one start
-age per window, the final visit of each training eye does not enter
-them. On fold~2 this gives 378 ages, with a mean of 77.653
+computed over the start-visit ages of all training windows. Because each
+window contributes only the age at its start visit, the final visit of
+each training eye does not enter them. On fold~2 this gives 378 ages, with a mean of 77.653
 years and a standard deviation of 7.220 years.
 
 In the per-visit mode, the age covariate advances along a rollout. This
