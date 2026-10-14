@@ -1370,7 +1370,7 @@ Solvers?"); contributions back as bullet points. He offers a meeting.
   Motivation) rather than in the medical background of §2.1, as his outline suggested (author,
   2026-10-14); ask whether that is fine. (4) Ask about JKU rules for declaring AI-generated
   figures (the anatomy schematics are planned as LLM-drawn code figures).
-- [ ] 2.5.2: include the formal definition of "operator" (wording agreed 2026-10-13, see
+- [x] (done 2026-10-14) 2.5.2: include the formal definition of "operator" (wording agreed 2026-10-13, see
   `reviews/supervisor-rev1-2026-10-12.md`).
 - [x] 2026-10-12 restructure of Ch. 1-3 (author approved; plan and figure in
   `reviews/structure-proposal-2026-10-12.md`), moves only, no wording changed, verified by a
@@ -1389,7 +1389,13 @@ Solvers?"); contributions back as bullet points. He offers a meeting.
   self-reference to its own section; de-duplicate the moved blocks in 3.1/3.2 (Ch. 3 now refers to
   itself in l. 225, 300, 482); Aim/Contributions bridges and bullets; 06-discussion l. 97
   ("Chapter 1 leads one to expect") now points at an argument that sits in 2.5.1.
-- [ ] Write 2.5.2 Problem Statement (supervisor M3.4).
+- [x] 2026-10-14 2.5.2 Problem Statement written (supervisor M3.4; author approved the draft in chat):
+  visits and intervals, state tensor on the anisotropic lattice, covariates, the residual update
+  (Eq. `eq:bg:problem-update`), the agreed definition of "operator", the rollout, the evaluation
+  target, and the research question in this notation.
+- [ ] **Author review of 2.5.2** (inline `% TODO (author review)`).
+- [ ] Follow-up (Ch. 4): 4.2.1 still defines the same update (Eq. `eq:method:residual-update`);
+  make it refer back to `eq:bg:problem-update` when Chapter 4 is revised.
 - [x] 2026-10-13 bridges after the restructure (author sign-off per change): Ch. 2 opener, 2.1.1
   roadmap, 2.2 opener without GA, en-face sentence generalised, 2.3 bridges, 2.5 opener, 2.5.1
   reordered (bullets before the neural-solver paragraph) with the 21:1 sentence, Aim of the Thesis
