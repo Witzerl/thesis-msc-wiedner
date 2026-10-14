@@ -1424,7 +1424,8 @@ Solvers?"); contributions back as bullet points. He offers a meeting.
 - [ ] Library papers for Related Work (no local copy, not cited yet): **Anegondi2023** (Ophthalmol
   Retina 7:243, doi 10.1016/j.oret.2022.08.018), **Pfau2019** (Retina 39:1527), **Niu2016**
   (Ophthalmology 123:1737), **Zhang2021** (Med Image Anal 68:101893, time factors in GA forecasting).
-- [ ] Manual downloads for SV-3.4 (PMC blocks scripts; NIH author manuscripts, free in a browser):
+- [x] (2026-10-14: filed, text extracted, quotes in `literature/_scratch/final/`, all PASS;
+  enters the ledger with the pending `update_ledger.py --apply` batch) Manual downloads for SV-3.4 (PMC blocks scripts; NIH author manuscripts, free in a browser):
   Li2006 PMC2646122 -> `pdfs/Methods/Li2006.pdf`, Garvin2009 PMC2911837 -> `pdfs/Methods/Garvin2009.pdf`,
   Abramoff2010 PMC3131209 -> `pdfs/Methods/Abramoff2010.pdf`. Then extract text and ledger entries
   for the §3.2 Iowa sentence (currently PENDING).

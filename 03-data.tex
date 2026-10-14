@@ -161,9 +161,7 @@ The layer boundaries were segmented with the Iowa Reference Algorithms
 City, IA) \citep{Li2006,Garvin2009,Abramoff2010}.
 % TODO (supervisor review 1, SV-3.4): the Iowa software segments eleven
 % surfaces, the data hold ten boundary maps; ask the supervisor which ten
-% (and their names). Local PDFs of Li2006, Garvin2009, Abramoff2010 still
-% missing (PMC blocks scripted downloads), so their ledger entries are
-% PENDING.
+% (and their names).
 
 The tensor is assembled per visit from the two required files. The
 stored mask, which has the values 0 and 255, is thresholded above 127.
@@ -221,9 +219,9 @@ symmetric centre crop is applied when the native size is at least the
 target size, and a symmetric zero-pad is applied when it is smaller.
 Both cases are common: 149 of the 553 visits are padded along the rows,
 because they have fewer than 49 rows, and 115 are padded along the
-columns. Cropping and padding are used instead of resampling for two
-reasons. They introduce no interpolation artefacts, and they keep the
-stored pixel spacing identical across the cohort by construction.
+columns. Cropping and padding are used instead of resampling because they
+introduce no interpolation artefacts and keep the stored pixel spacing
+identical across the cohort.
 
 The resulting window spans $49 \times 121.18$\,\textmu{}m by
 $1024 \times 5.68$\,\textmu{}m, or about $5.938 \times 5.816$\,mm, and holds
@@ -244,16 +242,20 @@ serves as the de-facto analysis area for GA OCT studies.
 
 Zero-padding raises a less obvious problem. Physically, a zero means
 ``no signal'': a mask value of 0 means not atrophic, and a layer depth
-of 0 is the top of the volume, above the retina. The models, however, do
-not see raw values. Cropping and padding run before the normalisation
+of 0 is the top of the volume, above the retina. Zero also cannot serve
+as a sentinel that marks padding, because real layer values range from
+$-14$ to $499$ and so include zero. The models, however, do not see raw
+values. Cropping and padding run before the normalisation
 statistics are computed (\S\ref{sec:data:normalization}), so the padded
 zeros enter the per-channel mean and standard deviation. After
 normalisation, the zero fill of the layer channels sits between $-2.35$
-and $-2.94$ standard deviations, which is an extreme value. No reported
-run excludes the pad positions from the loss (\S\ref{sec:method:training}),
-so the models are trained to reproduce this value at full weight. Zero
-also cannot serve as a sentinel that marks padding, because real layer values range from $-14$
-to $499$ and so include zero.
+and $-2.94$ standard deviations, which is an extreme value. The training
+loss can optionally exclude the pad positions, but no reported run does so
+(\S\ref{sec:method:training}). The models are therefore trained to
+reproduce this value at full weight.
+% Checked 2026-10-14 against solver_results.csv (code repo): cfg_exclude_pad_nodes
+% is False for every final-era run of every reported arm; only the two fold-2
+% loss-ladder runs MPPDE_L5_nopad_f2 and MPPDE_L7_combo_f2 used it.
 
 The crop also has a measured cost for the pathology itself. A census
 over all 553 visits shows that the $49 \times 1024$ window cuts off real
@@ -262,20 +264,20 @@ lesion in 6.0\,\% of visits, and 25.7\,\% of the lesion in the worst
 case. In addition, in 31.1\,\% of visits the lesion touches the edge of
 the imaged field inside the window: the border of the window or, for a
 padded visit, the edge of the scan itself. Growth across that edge is
-censored, and no missingness flag records it. The models are therefore trained on censored targets, and
-the change-region metrics at the one-year anchor under-measure
+not observed (it is censored), and no flag in the data marks it. The models
+are therefore trained on censored targets, and the change-region metrics at
+the one-year anchor (\S\ref{sec:experiments:protocol}) under-measure
 progression for roughly one visit in five. The censoring also limits
 comparability with literature results computed over the whole field of
 view.
 
-The window was nevertheless kept on purpose. Larger windows reduce the
+The $49 \times 1024$ window was nevertheless kept deliberately. Larger windows reduce the
 truncation, but they require up to 35\,\% zero-padding and about 1.9
 times as many grid positions. They also cannot remove the problem: for
 about 19\,\% of lesions, border contact is unavoidable with any window,
 because those lesions reach the edge of the scan itself. The censoring
 therefore remains in the data and in the reported metrics, and it is
-discussed as a limitation (\S\ref{sec:discussion:limitations}). The
-training loss can optionally exclude pad positions.
+discussed as a limitation (\S\ref{sec:discussion:limitations}).
 % TODO (author review v4 #19, 2026-09-30): the evaluation variants
 % (border-touching vs interior split, pad-masked metric) were commented out
 % of 5.1.2; restore this pointer if they are reinstated.
