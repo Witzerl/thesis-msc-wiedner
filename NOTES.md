@@ -1369,7 +1369,9 @@ Solvers?"); contributions back as bullet points. He offers a meeting.
   (3) Drugs, patient management and the need for predictive methods stay in §1.1 (Clinical
   Motivation) rather than in the medical background of §2.1, as his outline suggested (author,
   2026-10-14); ask whether that is fine. (4) Ask about JKU rules for declaring AI-generated
-  figures (the anatomy schematics are planned as LLM-drawn code figures).
+  figures (the anatomy schematics are planned as LLM-drawn code figures). (5) Layer segmentation:
+  the Iowa Reference Algorithms segment eleven surfaces, the data hold ten boundary maps -- which
+  ten, and their names? (§3.2 now cites the Iowa software as he suggested.)
 - [x] (done 2026-10-14) 2.5.2: include the formal definition of "operator" (wording agreed 2026-10-13, see
   `reviews/supervisor-rev1-2026-10-12.md`).
 - [x] 2026-10-12 restructure of Ch. 1-3 (author approved; plan and figure in
@@ -1422,6 +1424,10 @@ Solvers?"); contributions back as bullet points. He offers a meeting.
 - [ ] Library papers for Related Work (no local copy, not cited yet): **Anegondi2023** (Ophthalmol
   Retina 7:243, doi 10.1016/j.oret.2022.08.018), **Pfau2019** (Retina 39:1527), **Niu2016**
   (Ophthalmology 123:1737), **Zhang2021** (Med Image Anal 68:101893, time factors in GA forecasting).
+- [ ] Manual downloads for SV-3.4 (PMC blocks scripts; NIH author manuscripts, free in a browser):
+  Li2006 PMC2646122 -> `pdfs/Methods/Li2006.pdf`, Garvin2009 PMC2911837 -> `pdfs/Methods/Garvin2009.pdf`,
+  Abramoff2010 PMC3131209 -> `pdfs/Methods/Abramoff2010.pdf`. Then extract text and ledger entries
+  for the §3.2 Iowa sentence (currently PENDING).
 - [ ] **Ledger recheck after the 2026-10-12..14 rewording:** 45 `CHANGED SENTENCE (recheck)` and 16
   `NEW (unchecked)` entries (existing keys whose sentences changed in Ch. 1-3, plus the EMA pages and
   Mai2024 in §1.1/§2.1.2/§3.1). Needs the Phase 4 check (`literature/_tools/README.md`, step 3).

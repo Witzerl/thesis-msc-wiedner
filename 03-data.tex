@@ -4,6 +4,20 @@
 \chapter{Data and Preprocessing}
 \label{ch:data}
 
+This chapter describes the data on which every operator in this thesis is
+trained and evaluated. Section~\ref{sec:data:dataset} introduces the MUW
+cohort: its eyes and patients, the files each visit provides and the
+origin of the lesion mask. Section~\ref{sec:data:state} defines the
+eleven-channel state tensor built from these files, and
+Section~\ref{sec:data:spatial} explains how native grids of different
+sizes are brought to one common grid and what this costs.
+Sections~\ref{sec:data:normalization} and~\ref{sec:data:covariates}
+describe the normalisation of the channels and the patient covariates.
+Section~\ref{sec:data:temporal} turns the visits of an eye into training
+windows with irregular intervals, and Section~\ref{sec:data:splits}
+describes the patient-level cross-validation. Together, these steps
+produce the input that the framework of Chapter~\ref{ch:method} receives.
+
 
 \section{Dataset}
 \label{sec:data:dataset}
@@ -137,12 +151,19 @@ distributions are shown in Appendix~\ref{app:dataset}
 \label{sec:data:state}
 \label{sec:background:ga-oct:state-rep}
 
-The state of an eye at each visit is an eleven-channel tensor, so
-$C = 11$. Channel~0 holds the binary GA mask. Channels~1--10 hold the
-ten layer-boundary depth maps, ordered from the most superficial
-boundary to the deepest. Channel~0 is both the prediction target and the
-clinical deliverable. The layer channels supply structural context and
-serve as auxiliary prediction targets.
+The state of an eye at a visit is a tensor with $C = 11$ channels.
+Channel~0 holds the binary GA mask, which is both the prediction target and
+the clinical deliverable. Channels~1--10 hold the ten layer-boundary depth
+maps, ordered from the most superficial boundary to the deepest. They
+supply structural context and serve as auxiliary prediction targets.
+The layer boundaries were segmented with the Iowa Reference Algorithms
+(Retinal Image Analysis Lab, Iowa Institute for Biomedical Imaging, Iowa
+City, IA) \citep{Li2006,Garvin2009,Abramoff2010}.
+% TODO (supervisor review 1, SV-3.4): the Iowa software segments eleven
+% surfaces, the data hold ten boundary maps; ask the supervisor which ten
+% (and their names). Local PDFs of Li2006, Garvin2009, Abramoff2010 still
+% missing (PMC blocks scripted downloads), so their ledger entries are
+% PENDING.
 
 The tensor is assembled per visit from the two required files. The
 stored mask, which has the values 0 and 255, is thresholded above 127.
@@ -161,10 +182,8 @@ where 0 is the top of the scan volume and 496 its nominal depth.
 
 % TODO: obtain the anatomical names of the ten layer-boundary surfaces
 % from the MUW segmentation-pipeline documentation.
-% TODO: confirm with supervisor the provenance of channels 1-10 (which
-% layer-segmentation algorithm, which boundary list, which
-% post-processing); Mai et al. (2024) do not describe it. Supervisor
-% review 1 (SV-3.4): cite the Iowa reference algorithms.
+% Provenance of channels 1-10: Iowa Reference Algorithms (supervisor
+% review 1, SV-3.4); boundary list and post-processing still to confirm.
 
 Retinal thickness, the distance between the deepest and the shallowest
 boundary, is not computed anywhere in this pipeline. It could be
@@ -174,13 +193,14 @@ an input.
 All ten layer channels are kept next to the mask because documented
 prognostic biomarkers for GA progression are found throughout the
 vertical retinal column, not only inside the lesion itself.
-RPE--Bruch's-membrane thickening at the
-0--300\,\textmu{}m rim around the GA boundary correlates with annual
-square-root enlargement rate at $r = 0.595$ \citep{Chu2022}; outer
-retinal layer thinning, in particular of the outer nuclear layer and
-of the RPE-photoreceptor complex, accelerates in the months preceding
-macular-atrophy conversion \citep{Vogl2021}; and the thickness of the
-inner nuclear layer in the retina immediately adjacent to a GA lesion correlates
+At the 0--300\,\textmu{}m rim around the GA boundary, the
+RPE--Bruch's-membrane thickening described
+in~\S\ref{sec:background:ga-oct:disease} correlates with the annual
+square-root enlargement rate at $r = 0.595$ \citep{Chu2022}. Outer retinal
+layer thinning, in particular of the outer nuclear layer and of the
+RPE-photoreceptor complex, accelerates in the months preceding
+macular-atrophy conversion \citep{Vogl2021}. The thickness of the inner
+nuclear layer in the retina immediately adjacent to a GA lesion correlates
 with the yearly progression rate at Spearman $r = 0.48$
 \citep{Ebneter2016}. \citet{Vallino2024} further report that
 RPE-to-Bruch's-membrane distance combined with outer-retinal-layer
