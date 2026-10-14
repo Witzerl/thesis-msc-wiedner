@@ -9,12 +9,11 @@
 \label{sec:data:dataset}
 \label{sec:background:ga-oct:muw}
 
-The data used in this thesis is a longitudinal cohort of eyes with
-Geographic Atrophy, provided by the Medical University of Vienna (MUW). The data are drawn
-from the GA cohort described by \citet{Mai2024}, with tighter registration
-bounds and cleaner segmentations.
-It was acquired in routine clinical practice at a single clinical site
-in Vienna. The sample unit throughout is the individual eye. The cohort
+The data used in this thesis comes from a longitudinal cohort of eyes with
+Geographic Atrophy and was provided by the Medical University of Vienna
+(MUW). It is drawn from the GA cohort described by \citet{Mai2024}, with
+tighter registration bounds and cleaner segmentations, and was acquired in
+routine clinical practice at a single site in Vienna. The sample unit throughout is the individual eye. The cohort
 contains 75 eyes, which together contribute 553 visits, where a visit is
 one OCT acquisition. Ordering the visits of each eye in time yields 478
 visit-to-next-visit intervals ($553 - 75$). The number of visits per eye
@@ -32,46 +31,48 @@ device.
 The 75 eyes come from 51 patients: 24 patients contribute both eyes and
 27 contribute a single eye. Of the 75 eyes, 47 belong to female and 28 to
 male patients. Age at baseline ranges from 60.7 to 88.0 years, with a
-mean of 76.4 years over the eyes. Ages are decimal values computed from
-the date of birth to the baseline visit, not hand-entered integers.
+mean of 76.4 years over the eyes. Ages are decimal values, computed from
+the date of birth to the baseline visit.
 
 The data does not contain the raw three-dimensional OCT volumes.
 Instead, each visit provides a set of registered two-dimensional en-face
-derivatives. The first is a binary GA mask on the native OCT en-face
+maps derived from them. The first is a binary GA mask on the native OCT en-face
 grid, stored as an image with the values 0 and 255. The second is an
 array of layer-boundary depth maps of shape (rows, columns, 10), stored
 as 16-bit integers in units of axial pixels. Each visit further provides
-a GA mask, a scanning laser ophthalmoscopy (SLO) fundus image and a
-fundus-autofluorescence image, all in the SLO reference frame, together
-with two files of coordinate transforms between the OCT and the SLO
-frame. Only the OCT-grid mask and the layer array are required. An eye
+a scanning laser ophthalmoscopy (SLO) fundus image, a
+fundus-autofluorescence image and a second GA mask, all three in the SLO
+reference frame, together with two files of coordinate transforms between
+the OCT and the SLO frame. Only the OCT-grid mask and the layer array are
+required by the pipeline. An eye
 is included if at least two of its visits carry both, which guarantees
 at least one transition. All 75 eyes meet this condition.
 
-The GA mask was not segmented on the OCT.
+Although it is stored on the OCT grid, the GA mask was not segmented on
+the OCT.
 For this cohort, \citet{Mai2024} report that GA was
 outlined manually on the fundus-autofluorescence image by certified
 graders of the Vienna Reading Center, as well-demarcated areas of
 markedly decreased or absent autofluorescence. The outline was then
 registered automatically to the near-infrared image that is aligned with
-the OCT, which yields the en-face annotation on the OCT grid. The data
-agree with this: the OCT-grid mask coincides with the SLO-frame mask
-mapped through the recorded transform, with an intersection over union
-of at least 0.9995 on all 553 visits.
+the OCT, which yields the en-face annotation on the OCT grid.
+Figure~\ref{fig:data:example-state} shows one visit as the SLO fundus
+image with the OCT field of view, the GA mask on the modelling grid and a
+layer-boundary depth map.
 % TODO: the FAF origin of the mask is inferred from Mai et al. (2024)
 % and the IoU check; confirm with the MUW data provider together with
 % the device model and the layer-segmentation provenance.
 
-The native en-face grids are not uniform. The 553 visits have 67
+The native en-face grids do not all have the same size. The 553 visits have 67
 distinct grid shapes, with 38 to 66 rows and 961 to 1719 columns. The
 shape is constant across the visits of one eye but differs between eyes.
 The variation stems from the raw acquisitions, whose B-scan spacing
 ranged from 115 to 258\,\textmu{}m. Upstream of this work, the stored
-en-face arrays were resampled onto one gold-standard pixel spacing:
-0.12118\,mm between B-scans, 0.00568\,mm between A-scans, and
-0.003867\,mm per axial pixel. Pixel spacing is therefore treated as
-constant across the cohort, while pixel counts, and with them the
-physical extent of each native grid, differ between eyes.
+en-face arrays were resampled onto one common pixel spacing:
+121.18\,\textmu{}m between B-scans, 5.68\,\textmu{}m between A-scans, and
+3.867\,\textmu{}m per axial pixel. Pixel spacing is therefore treated as
+constant across the cohort. Pixel counts differ between eyes, and so does
+the physical extent of each native grid.
 
 % TODO: settle the constant-spacing assumption by obtaining the original
 % DICOM spacing fields from the data provider. (The paragraph stating it
@@ -79,9 +80,9 @@ physical extent of each native grid, differ between eyes.
 % 2026-09-26; the preceding paragraph still says spacing is "treated as"
 % constant, and the ~2 % check belongs in the Limitations, §6.3.)
 
-Lesion growth is summarised on the square-root area scale.
-This transform is used for GA, because it removes the dependence of
-growth rates on baseline lesion size \citep{Yehoshua2011,Feuer2013}. Over the 75
+Lesion growth is summarised as the yearly change in the square root of
+the lesion area, a transform used for GA because it removes the dependence
+of growth rates on baseline lesion size \citep{Yehoshua2011,Feuer2013}. Over the 75
 eyes, the median square-root-area growth rate is 0.234\,mm per year. The
 interquartile range spans 0.153 to 0.340\,mm per year, and the 90th
 percentile is 0.473\,mm per year. The baseline lesion area on the
@@ -94,9 +95,6 @@ distributions are shown in Appendix~\ref{app:dataset}
 % Source: images/scripts/fig_appendix_cohort.py, 2026-10-01.
 % TODO: a baseline-characteristics table in the format of Mai et al. (2024)
 % (if wanted for the comparison in 5.5.1).
-
-Figure~\ref{fig:data:example-state} shows one visit of the cohort in the
-views used throughout this chapter.
 
 % TODO: produce Figure fig:data:example-state --- three panels for one
 % representative visit, all generated from files that exist in the
@@ -129,8 +127,8 @@ views used throughout this chapter.
     is wide.
     \emph{(c)}~A layer-boundary depth map (one of channels~1--10) on the
     same grid, coloured by axial depth, with the lesion outline from (b)
-    overlaid. Panels (b) and (c) show the state tensor as the models
-    receive it.}
+    overlaid. Panels (b) and (c) show two of the eleven channels of the
+    state tensor on the modelling grid, before normalisation.}
   \label{fig:data:example-state}
 \end{figure}
 
@@ -207,8 +205,8 @@ columns. Cropping and padding are used instead of resampling for two
 reasons. They introduce no interpolation artefacts, and they keep the
 stored pixel spacing identical across the cohort by construction.
 
-The resulting window spans $49 \times 0.12118$\,mm by
-$1024 \times 0.00568$\,mm, or about $5.938 \times 5.816$\,mm, and holds
+The resulting window spans $49 \times 121.18$\,\textmu{}m by
+$1024 \times 5.68$\,\textmu{}m, or about $5.938 \times 5.816$\,mm, and holds
 50\,176 grid positions. The spacing between B-scans is \textbf{21.335
 times larger} than the spacing between A-scans. The grid is therefore strongly
 anisotropic: moving by one row covers about the same physical distance
