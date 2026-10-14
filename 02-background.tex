@@ -229,7 +229,7 @@ Two further imaging modalities are used alongside OCT. Scanning laser
 ophthalmoscopy (SLO) scans a laser point by point across the fundus and
 records the reflected light, giving a sharp two-dimensional image of the
 retinal surface.
-% TODO: cite a textbook source for the SLO principle.
+% TODO: add a textbook reference for the SLO principle.
 The OCT device used for the cohort records a near-infrared reflectance
 image of this kind together with each volume, aligned with the OCT scans
 \citep{Mai2024}. Fundus autofluorescence (FAF) imaging records the
@@ -753,49 +753,130 @@ Chapter~\ref{ch:experiments} isolates and measures them.
 
 \section{Related Work}
 \label{sec:background:related-work}
+% TODO (author review, 2026-10-14): Related Work expanded into subsections
+% (supervisor review 1, SV-2.7). Every new citation was checked against the
+% local PDF and entered in the citation ledger (literature/_ledger.md); the
+% wording still needs the author's review. Not included yet because no local
+% copy exists (JKU library): Anegondi2023 (Ophthalmol Retina, GA growth rate
+% from FAF/OCT), Pfau2019 (Retina, shape descriptors), Niu2016 (Ophthalmology,
+% pixel-wise GA growth prediction from OCT), Zhang2021 (Med Image Anal,
+% time-adaptive GA prediction with explicit time factors).
 
-Learning-based models for OCT-based age-related macular degeneration and
-geographic atrophy progression divide broadly into cohort-level risk
-models and spatial-progression models.
+Work related to this thesis falls into four groups: models that predict
+the risk or the rate of AMD and GA progression, models that forecast
+where a GA lesion will grow, models that forecast disease progression
+from irregularly sampled longitudinal data in general, and PDE-based
+models in biomedicine. The section closes with the origins of the
+architectures used as the operator in Chapter~\ref{ch:method}.
+
+\subsection{Predicting the Risk and Rate of Progression}
+\label{sec:background:related-work:rate}
+
+Learning-based models of AMD and GA progression on OCT fall broadly into
+models that predict a risk or a rate for each eye and models that
+predict where the lesion will grow.
 \citet{SchmidtErfurth2018} reported on the prediction of individual
 disease conversion in intermediate AMD using artificial intelligence.
 \citet{Bogunovic2017} used machine learning to predict the regression of
 individual drusen, a sign of disease activity, in intermediate AMD from OCT
-imaging. For the conversion of
-intermediate AMD to macular atrophy or neovascularisation,
-\citet{Vogl2021} provided a topographic analysis of the retinal and
-choroidal layer changes that precede it. \citet{Vallino2024} noted that
+imaging. \citet{Vogl2021} provided a topographic analysis of the retinal
+and choroidal layer changes that precede the conversion of intermediate
+AMD to macular atrophy or neovascularisation. \citet{Vallino2024} noted that
 artificial intelligence applied to OCT has the potential to provide
-predictive probabilities of GA development over time, which positions
-OCT as a candidate predictive substrate for structural endpoints.
+predictive probabilities of GA development over time.
 
-The closest prior work on the specific prediction task addressed here
+Deep-learning models have also been trained to predict the growth rate
+of GA in an individual eye. From OCT volumes, four different approaches
+reached a squared correlation of 0.33 to 0.35 between predicted and
+observed growth rate on a holdout set \citep{Yoshida2025}. For growth-rate
+models trained on FAF images, occlusion experiments showed that a rim of
+tissue around the lesion contributes more to the prediction than the
+lesion itself or the background \citep{Cluceru2024}.
+
+\subsection{Spatial Forecasting of GA Lesions}
+\label{sec:background:related-work:spatial}
+
+Closer to the task of this thesis are models that forecast the lesion
+itself. \citet{Gigon2021} predicted the progression of RORA from OCT
+en-face maps of layer thicknesses, mean reflectivity and drusen height in
+129 eyes of 119 patients. Their model gives each en-face pixel a
+probability of atrophy over time, from which a map of the time to
+conversion follows; the Dice score ranged from 0.73 to 0.80 for the total
+RORA area and from 0.46 to 0.72 for the growth region.
+\citet{Lachinov2024} encode each pixel of a baseline scan as a feature
+vector and evolve these vectors with a Neural ODE \citep{Chen2018} to any
+requested time point, using a fourth-order Runge--Kutta scheme. Their
+model was developed on 967 OCT volumes of 100 patients with GA and also
+applied to brain MRI in Alzheimer's disease. The Runge--Kutta-integrated
+operators of this thesis (\S\ref{sec:method:family:rk}) are related to
+this continuous-time formulation.
+
 % Cohort relation confirmed by the supervisor (review 1, 2026-10-12): same
 % cohort, with tighter registration bounds and cleaner segmentations.
+The closest prior work on the specific prediction task addressed here
 is by \citet{Mai2024}, who predicted individual GA progression from a
 single baseline OCT on the MUW GA cohort (184 eyes of 100 patients). The
 data of this thesis are drawn from the same cohort, with tighter
 registration bounds and cleaner segmentations (75 eyes of 51 patients,
-\S\ref{sec:data:dataset}). The
-input regime, however, is different. While that prior
-work operates directly on raw OCT volumes, the present thesis consumes
-pre-segmented lesion masks and layer surfaces. This difference must be
-kept in mind whenever the approaches are compared.
+\S\ref{sec:data:dataset}). The input regime, however, is different. That
+work operates directly on raw OCT volumes, whereas the present thesis
+uses pre-segmented lesion masks and layer surfaces, and this difference
+applies to every comparison between the two.
 As a precedent for dense convolutional architectures on this task,
-\citet{Salvi2025} predicted future GA growth using a two-dimensional
-U-Net on fundus autofluorescence images, a multi-scale spatial approach
-on an alternative modality.
+\citet{Salvi2025} predicted future GA growth with a two-dimensional
+U-Net on fundus autofluorescence images.
+
+On a finer scale, the border of a GA lesion advances at different local
+speeds. The lateral spread of GA was slowest at regular borders, at about
+63\,\textmu{}m per year, faster at irregular borders, at about
+91\,\textmu{}m per year, and fastest at splitting borders, at about
+183\,\textmu{}m per year \citep{Lindner2018}.
 
 Most of the clinical literature formulates prediction at cohort level,
 as a categorical time-to-conversion problem. The formulation used here
 instead requires a per-eye, per-time-step prediction of the full spatial
-next state. The thesis therefore combines applied medical-imaging deep
-learning with the inductive biases of PDE solvers.
-% TODO: check the literature for any prior application of neural PDE
-% solvers to biomedical disease progression or organ modelling. Add a
-% citation if one exists; otherwise note the absence explicitly.
-The application of neural PDE solvers to biomedical problems remains
-sparse.
+next state.
+
+\subsection{Forecasting from Irregularly Sampled Longitudinal Data}
+\label{sec:background:related-work:irregular}
+
+Irregular intervals between observations are a general property of
+longitudinal clinical data. Latent ODE and ODE-RNN models let a hidden
+state evolve in continuous time between observations and so handle
+arbitrary time gaps \citep{Rubanova2019}. For images, ImageFlowNet learns
+a multiscale latent representation and a flow field in it with a neural
+ODE or SDE, and forecasts image-level trajectories of disease
+progression. It was evaluated on FAF images of GA, on multiple sclerosis
+and on glioblastoma \citep{Liu2025ImageFlowNet}. In brain imaging,
+4D-DANI-Net generates subject-specific longitudinal MRI scans that mimic
+neurodegeneration in ageing and dementia \citep{Ravi2022}, and BrLP
+combines a latent diffusion model with an auxiliary model of regional
+volume changes to predict the evolution of individual 3-D brain MRIs
+\citep{Puglisi2024}. These models treat time continuously or condition
+on it; the operators of this thesis take the interval as an input to a
+single residual step (\S\ref{sec:background:approach}).
+
+\subsection{PDE-Based Models in Biomedicine}
+\label{sec:background:related-work:pde}
+
+Where the governing equation of a disease process is known, PDE models
+are fitted to individual patients. For glioblastoma, tumour growth
+models based on the Fisher--Kolmogorov equation are personalised with
+Bayesian inference from MRI and FET-PET scans to design radiotherapy
+plans \citep{Lipkova2019}. Learned components speed this up: a neural
+surrogate that replaces the numerical solver of such a tumour model is
+about 50 times faster \citep{Ezhov2022}, and a network that solves the
+inverse problem infers the patient-specific tumour cell distribution
+within minutes \citep{Ezhov2023}. Physics-informed machine learning in
+medical image analysis more broadly has been reviewed in a survey of
+over 80 papers \citep{Banerjee2025}. In all of these, the equation is
+known and the network learns to solve or invert it. Learned neural PDE
+solvers trained directly on longitudinal clinical images without a known
+equation have, to the author's knowledge, not been applied to GA and are
+rare in medical imaging.
+
+\subsection{Origins of the Operators}
+\label{sec:background:related-work:origins}
 
 The architectures used as the operator in Chapter~\ref{ch:method}
 originate in different lines of work. The

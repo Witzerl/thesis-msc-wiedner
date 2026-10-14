@@ -1402,7 +1402,24 @@ Solvers?"); contributions back as bullet points. He offers a meeting.
   "Operator" glossed at first use in 1.2. Build clean.
 - [x] SV-1.6 literature check: Delta t-conditioning is not new for GA. Contribution bullet now
   claims the architecture-independent framework instead.
-- [ ] TODO (Related Work, SV-2.7): cite **Lachinov2024** -- Lachinov, Chakravarty, Grechenig,
+- [ ] **Related Work rewritten 2026-10-14 (SV-2.7) -- author review pending** (inline `% TODO
+  (author review)` at the top of §2.4). Five subsections: risk and rate / spatial forecasting of GA /
+  irregular longitudinal data / PDE-based models in biomedicine / origins of the operators. 13 new
+  references (Lachinov2024, Yoshida2025, Cluceru2024, Gigon2021, Lindner2018, Rubanova2019,
+  Liu2025ImageFlowNet, Ravi2022, Puglisi2024, Lipkova2019, Ezhov2022, Ezhov2023, Banerjee2025);
+  PDFs in `pdfs/GA` and `pdfs/Methods` (8 are arXiv preprints, page numbers refer to those), text
+  extracted, hub notes written, every citation SUPPORTED in the ledger with a mechanically checked
+  quote. Found on the way: Cluceru2024 and the GA data of ImageFlowNet are FAF, not OCT; author
+  given names Kenta Yoshida and Anthony Gigon (the search agent's BibTeX had them wrong). "Remains
+  sparse" replaced by a sourced statement (PDE models and neural surrogates exist where the equation
+  is known; no learned solver on clinical images without a known equation for GA).
+- [ ] Library papers for Related Work (no local copy, not cited yet): **Anegondi2023** (Ophthalmol
+  Retina 7:243, doi 10.1016/j.oret.2022.08.018), **Pfau2019** (Retina 39:1527), **Niu2016**
+  (Ophthalmology 123:1737), **Zhang2021** (Med Image Anal 68:101893, time factors in GA forecasting).
+- [ ] **Ledger recheck after the 2026-10-12..14 rewording:** 45 `CHANGED SENTENCE (recheck)` and 16
+  `NEW (unchecked)` entries (existing keys whose sentences changed in Ch. 1-3, plus the EMA pages and
+  Mai2024 in §1.1/§2.1.2/§3.1). Needs the Phase 4 check (`literature/_tools/README.md`, step 3).
+- [x] (superseded by the rewrite above) TODO (Related Work, SV-2.7): cite **Lachinov2024** -- Lachinov, Chakravarty, Grechenig,
   Schmidt-Erfurth & Bogunovic, "Learning Spatio-Temporal Model of Disease Progression with
   NeuralODEs from Longitudinal Volumetric Data", IEEE TMI 43(3):1165-1179, 2024, arXiv:2211.04234
   (supervisor's own paper; the model behind Mai et al. 2024; GA, continuous time, RK4). And
