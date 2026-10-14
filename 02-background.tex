@@ -4,27 +4,21 @@
 \chapter{Background}
 \label{ch:background}
 
+This chapter provides the background on which the later chapters build.
+Section~\ref{sec:background:ga-oct} introduces the anatomy of the eye,
+the methods used to image the retina and the disease itself.
+Section~\ref{sec:background:pde-solvers} introduces partial differential
+equations and the numerical methods that solve them, and
+Section~\ref{sec:background:neural-pde} the neural PDE solvers, which
+replace parts of such a solver, or the whole update, with a neural
+network trained on data. Section~\ref{sec:background:related-work}
+reviews related work. Section~\ref{sec:background:approach} connects the
+two strands: it explains why the structure of a numerical solver suits
+the forecasting of GA and states the problem formally.
+
 
 \section{Medical Background}
 \label{sec:background:ga-oct}
-% TODO (restructure 2026-10-12): the roadmap below still lists the old
-% order and the state-representation and cohort subsections, which moved
-% to Chapter 3. Rewrite as: anatomy, imaging, GA.
-
-This section provides the imaging-side background needed to motivate
-the state representation used throughout the remainder of the thesis.
-The clinical framing established in Chapter~\ref{ch:introduction} is
-taken as read; the focus here is on \emph{which part of the eye} GA
-affects, on \emph{how} that part is imaged, on \emph{what is visible}
-in an OCT volume of a GA eye, and on \emph{which derived quantities}
-feed into the eleven-channel state tensor introduced
-in~\S\ref{sec:data:state}. Because the rest of this thesis is written
-for a primarily machine-learning audience, the present section is
-deliberately self-contained and aims to remain accessible to readers
-without prior clinical training:~\S\ref{sec:background:ga-oct:anatomy}
-introduces the small set of anatomical terms that recur throughout the
-work, and the subsequent subsections build the imaging substrate on
-top of that vocabulary.
 
 
 \subsection{Eye Anatomy}
@@ -129,14 +123,14 @@ layers (\S\ref{sec:background:ga-oct:disease}), and that the surrounding
 layer geometry, given as ten boundary depth maps, is passed to the model
 together with the lesion mask (\S\ref{sec:background:ga-oct:state-rep}).
 
-The remaining subsections build on this vocabulary. \S\ref{sec:background:ga-oct:disease}
-describes how GA appears on OCT; \S\ref{sec:background:ga-oct:oct}
-explains what an OCT volume is and how it is acquired;
-\S\ref{sec:background:ga-oct:enface} describes the projection from
-3D OCT volume to the 2D en-face grid that the model operates on;
-\S\ref{sec:background:ga-oct:state-rep} defines the eleven channels of
-the state tensor; and \S\ref{sec:background:ga-oct:muw} describes the
-MUW longitudinal cohort.
+The remaining subsections build on this vocabulary.
+\S\ref{sec:background:ga-oct:oct} outlines the technical side of retinal
+imaging, from the acquisition of an OCT volume to the 2D en-face maps
+that the model operates on. \S\ref{sec:background:ga-oct:disease}
+describes how GA appears in these OCT images. From this, the structure
+of the data follows: a binary lesion mask together with the geometry of
+the surrounding retinal layers, which will be further elaborated in
+Chapter~\ref{ch:data}.
 
 
 \subsection{Retinal Imaging}
@@ -400,27 +394,20 @@ encoding the surrounding layer geometry in addition to the lesion mask.
 
 \section{Partial Differential Equations and Numerical Solvers}
 \label{sec:background:pde-solvers}
-% TODO (restructure 2026-10-12, supervisor M3.2): no GA in this section.
-% The opener ("The approach of this thesis treats GA ...") and its roadmap
-% (neural solvers, why the structure fits GA) need rewriting; the en-face
-% grid sentence in the stencils subsection names this thesis.
-
-The approach of this thesis treats GA progression the way a numerical
-solver treats a partial differential equation (PDE): the state is held
-on a grid and advanced step by step by an update rule. The later
+The models in this thesis are built like numerical solvers for partial
+differential equations (PDEs): a state is held on a grid and advanced
+step by step by an update rule. The later
 chapters therefore use the vocabulary of numerical solvers throughout.
 The update of the framework is one explicit Euler step in residual form
 (Chapter~\ref{ch:method}). The operators placed in it are learned
 stencils, global spectral methods and finite elements. The experiments
 ask how far one update reaches, whether a higher-order time integrator
 helps, and when a step becomes unstable (Chapter~\ref{ch:experiments}).
-This section introduces these mechanisms and no more. It covers how
+This section introduces these mechanisms. It covers how
 space is discretised (\S\ref{sec:background:pde-solvers:stencils}), how
 the state is stepped in time (\S\ref{sec:background:pde-solvers:time}),
-the strengths and limits of this design
-(\S\ref{sec:background:pde-solvers:limits}), how neural solvers learn
-its parts (\S\ref{sec:background:pde-solvers:neural}), and why the
-structure fits GA progression (\S\ref{sec:background:pde-solvers:ga}).
+and the strengths and limits of this design
+(\S\ref{sec:background:pde-solvers:limits}).
 
 A \emph{temporal} PDE describes a field $u(t, x)$ that changes over time
 $t$ at every point $x$ of a spatial domain $\mathcal{X} \subset
@@ -455,9 +442,10 @@ centres $x_i$, and the solution is stored as one value per cell and
 time step, $u_i^{k} \approx u(t_k, x_i)$;\newline
 $u^{k} = (u_1^{k}, \dots, u_N^{k})$ denotes the whole grid. The simplest
 grid is a uniform one, a regular array of equal rectangular cells with
-constant spacings $\Delta x$ and $\Delta y$. The en-face grid of this
-thesis is of that type, with the particularity that the two spacings
-differ by a factor of about twenty (\S\ref{sec:data:spatial}).
+constant spacings $\Delta x$ and $\Delta y$. The two spacings
+need not be equal. On such an anisotropic grid, a stencil that is
+symmetric in grid indices reaches different physical distances along the
+two axes.
 
 \paragraph{Finite differences and finite volumes.}
 The finite difference method (FDM) replaces each spatial derivative by
@@ -624,11 +612,11 @@ the cost grows faster than the resolution.
 \label{sec:background:neural-pde}
 % Restructure 2026-10-12: the former 2.2.4 "Neural solvers that keep the
 % mechanisms" opens this section (learned solvers introduced once, AI
-% review T8/S17). TODO: bridge into "Neural PDE solvers broadly separate".
+% review T8/S17).
 
 \label{sec:background:pde-solvers:neural}
 
-Every mechanism above is a function from a neighbourhood of grid values
+Every mechanism of~\S\ref{sec:background:pde-solvers} is a function from a neighbourhood of grid values
 to a number: the stencil coefficients, the WENO weights, the rate that
 the time step applies. Any of them can be learned from data instead of
 derived from an equation, and much of the neural-solver literature does
@@ -664,12 +652,11 @@ equation is expensive to solve, known only approximately, or not known
 at all, and it can often run on coarser grids with larger steps. What it
 loses are the guarantees. A learned solver needs training data, has no
 convergence proof, and in a rollout it consumes its own predictions, so
-its errors can accumulate from step to step;
-\S\ref{sec:background:neural-pde} discusses this problem and its
-remedies.
+its errors can accumulate from step to step. This problem and its
+remedies are discussed later in this section.
 
-
-Neural PDE solvers broadly separate into two paradigms. Neural
+Learned solvers also differ in what they predict, and in this respect
+they separate into two paradigms. Neural
 operators learn a continuous map
 $M: [0, T] \times \mathcal{F} \to \mathcal{F}$ such that
 $M(t, u_0) = u(t)$, thereby predicting the solution at any arbitrary
@@ -831,7 +818,12 @@ in~\S\ref{sec:method:family}.
 
 \section{Modelling Approach and Problem Statement}
 \label{sec:background:approach}
-% TODO (restructure 2026-10-12): section opener.
+
+This section brings the clinical and the numerical background together.
+It first explains why the structure of a numerical solver suits the
+forecasting of GA (\S\ref{sec:introduction:why-pde}) and then states the
+problem formally, in the notation used in the remaining chapters
+(\S\ref{sec:background:problem}).
 
 
 \subsection{Choice of the Modelling Approach}
@@ -840,9 +832,7 @@ in~\S\ref{sec:method:family}.
 % Restructure 2026-10-12 (supervisor review 1): collected from the former
 % 1.2 Problem Statement (data properties, framework), 1.3 Why Neural PDE
 % Solvers? (local growth, anisotropy, neural solvers) and 2.2.5 Why this
-% structure suits GA progression. TODO: merge the overlap (margin growth
-% appears twice), remove "The next section motivates ...", bridge sentences,
-% one sentence on the 21:1 pixel spacing as the form of the reach question.
+% structure suits GA progression; bridged 2026-10-13 (author sign-off).
 
 The clinical reality of OCT follow-up imposes three properties on the data
 that a model has to deal with. First, follow-up visits are
@@ -868,10 +858,10 @@ also of how the model is used. A typical image-to-image model maps one image
 to another; on its own, it has no notion of elapsed time and no built-in way
 to advance a state from one visit to the next. These properties have to come
 from a framework around the model, one that conditions the prediction on
-$\Delta t$ and rolls the state forward visit by visit. The next section
-motivates such a framework, which borrows several of its techniques from
-neural partial differential equation (PDE) solvers. Which model should sit
-inside it is a separate question.
+$\Delta t$ and rolls the state forward visit by visit. Such a framework
+can borrow several of its techniques from numerical and neural PDE
+solvers, as the remainder of this subsection explains. Which model should
+sit inside it is a separate question.
 
 
 GA expansion is, to a first approximation, a process of \emph{local boundary
@@ -909,18 +899,6 @@ directions --- properties that classical solvers build in explicitly
 through the size and shape of their stencils.
 
 
-Neural PDE solvers turn these classical ideas into learned models.
-Instead of discretising a known equation, they learn from data an operator
-that maps the current state of a system, and the time that elapses, to its
-next state. The literature offers many such operators, and they differ
-mainly in their built-in assumptions: how far a single prediction can look
-across the domain, whether it works on a regular grid or on a graph, and
-whether physical terms such as transport are represented explicitly. For
-GA, where the governing equation is unknown and only a few dozen patients
-are available for training, these assumptions are likely to matter more
-than model size.
-
-
 GA progression has no known governing equation. Its data are not a
 densely simulated trajectory but a few observed states per eye
 (\S\ref{sec:background:ga-oct:muw}). A classical solver is therefore not
@@ -931,12 +909,11 @@ four respects, which is why the thesis adopts it.
     the same uniform en-face grid (\S\ref{sec:background:ga-oct:state-rep}),
     so the state is exactly the vector of grid values $u^{k}$ that a
     solver advances.
-  \item \textbf{Change driven by the neighbourhood.} GA is modelled as
-    growing at the margin of the lesion \citep{Yehoshua2011}, while its
-    atrophic interior and the surrounding retina change little
-    (\S\ref{sec:introduction:why-pde}). Whether a pixel becomes atrophic
-    depends on what surrounds it --- the situation a stencil is designed
-    for.
+  \item \textbf{Change driven by the neighbourhood.} As described above,
+    GA grows at the margin of the lesion, while its atrophic interior and
+    the surrounding retina change little. Whether a pixel becomes atrophic
+    depends on what surrounds it, which is the situation a stencil is
+    designed for.
   \item \textbf{Slow change.} Consecutive visits differ in a small part
     of the grid. The residual form, which predicts only the change and
     returns the current state as $\Delta t \to 0$, starts from the
@@ -946,14 +923,29 @@ four respects, which is why the thesis adopts it.
     rather than a fixed one.
 \end{itemize}
 
+
+Because the governing equation is unknown, the update has to be learned
+from data, as in the neural PDE solvers
+of~\S\ref{sec:background:neural-pde}. These solvers differ
+mainly in their built-in assumptions: how far a single prediction can look
+across the domain, whether it works on a regular grid or on a graph, and
+whether physical terms such as transport are represented explicitly. For
+GA, where the governing equation is unknown and only a few dozen patients
+are available for training, these assumptions are likely to matter more
+than model size.
+
+
 These are reasons to expect the structure to fit, not evidence that it
 does. They also leave open what kind of spatial operator should compute
 the update. The CFL argument suggests that an operator applied once per
 visit has to see at least as far as the lesion front moves between
 visits, and on the anisotropic en-face grid that distance is very
-different when counted in pixels along each axis. Whether a local
+different when counted in pixels along each axis: the spacing between
+B-scans is about 21 times larger than the spacing between A-scans
+(\S\ref{sec:data:spatial}), so a neighbourhood that is symmetric in pixels
+is strongly lopsided in millimetres. Whether a local
 stencil, a global operator or a combination of both is needed is
-therefore not assumed here. \S\ref{sec:background:neural-pde} introduces
+therefore not assumed here. \S\ref{sec:background:neural-pde} introduced
 the operator families that are candidates for this role, and
 Chapter~\ref{ch:experiments} compares them.
 

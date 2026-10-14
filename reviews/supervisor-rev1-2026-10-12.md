@@ -35,6 +35,15 @@ concern structure. Offers a meeting for questions.
 | M4 | Section name "Why Neural PDE Solvers?" is not good: **no questions in headings**. Something like "Choice of the modelling approach", to be improved. | Also check the other headings (§2.2.5 "Why this structure suits …", §5.4.2 run-in questions were already removed). |
 | M5 | **Contributions as bullet points**: what was achieved, what is novel, why it is valuable. | §1.4 Contributions was merged into §1.3 prose on 2026-10-01; reinstate as a bulleted list. Tie to SV-1.6 (Δt-conditioning novelty check). |
 
+**Decided 2026-10-13 (author):** "operator" is kept and defined once. Ch. 1.2: "In this thesis,
+this map is called the operator." §2.5.2 (to be written): "Throughout this thesis, the learned
+function $f_\theta$ is called the *operator*. The term is used in its general sense, a map from the
+state at one time to the state at a later time. It is not used in the narrower sense of the
+neural-operator literature (§2.3), where it denotes models such as the FNO or DeepONet that learn
+maps between function spaces. A U-Net and a graph network are operators in the first sense but not
+in the second." Introduction and Background stay separate chapters. **Both points go into the
+reply mail.**
+
 **Note on terminology:** in the mail he writes "parametric neural operator 𝒩", while the PDF
 comment says "neural solver, we are not necessarily dealing with operators". Ask which term he
 wants before the thesis-wide rename (SV-X2).

@@ -1350,6 +1350,15 @@ opening chapter = medical background → PDEs and solvers (no GA) → motivation
 statement with notation and equations → outline; no question in headings ("Why Neural PDE
 Solvers?"); contributions back as bullet points. He offers a meeting.
 - [ ] Ask the supervisor: "neural solver" (PDF) vs "parametric neural operator" (e-mail).
+- [ ] **Reply mail to the supervisor -- points to mention:** (1) "operator" is kept but now defined
+  once (first use in 1.2: "In this thesis, this map is called the operator"; formal definition in
+  2.5.2: general sense, a map from one state to a later one, not the narrow neural-operator sense of
+  FNO/DeepONet); ask whether that resolves his "neural solver" comment. (2) Introduction and
+  Background were deliberately kept as separate chapters (author's preference); his ordering is
+  followed inside them: medical background (anatomy -> imaging -> GA) -> PDEs without GA -> neural
+  solvers -> related work -> motivation and formal problem statement at the end of Ch. 2.
+- [ ] 2.5.2: include the formal definition of "operator" (wording agreed 2026-10-13, see
+  `reviews/supervisor-rev1-2026-10-12.md`).
 - [x] 2026-10-12 restructure of Ch. 1-3 (author approved; plan and figure in
   `reviews/structure-proposal-2026-10-12.md`), moves only, no wording changed, verified by a
   line-multiset check (only headings differ) and a clean build (112 pages, no new warnings).
@@ -1361,13 +1370,32 @@ Solvers?"); contributions back as bullet points. He offers a meeting.
   2.1.6 appended to 3.2 and 3.1. All labels kept. Defaults taken for the open choices: problem
   statement at the end of Ch. 2, drugs stay in 1.1, research question in Ch. 1, Related Work
   before the problem statement.
-- [ ] Wording pass after the restructure (inline `% TODO (restructure 2026-10-12)` markers):
+- [x] (done 2026-10-13/14, every change signed off by the author; see the next entries) Wording pass after the restructure (inline `% TODO (restructure 2026-10-12)` markers):
   Ch. 2 opener and the 2.1 roadmaps (02 l. 16, 130-138) still describe the old order; 2.2 opener
   still about GA; bridge into 2.3; 2.5 opener; 2.5.1 "The next section motivates ..." and a
   self-reference to its own section; de-duplicate the moved blocks in 3.1/3.2 (Ch. 3 now refers to
   itself in l. 225, 300, 482); Aim/Contributions bridges and bullets; 06-discussion l. 97
   ("Chapter 1 leads one to expect") now points at an argument that sits in 2.5.1.
 - [ ] Write 2.5.2 Problem Statement (supervisor M3.4).
+- [x] 2026-10-13 bridges after the restructure (author sign-off per change): Ch. 2 opener, 2.1.1
+  roadmap, 2.2 opener without GA, en-face sentence generalised, 2.3 bridges, 2.5 opener, 2.5.1
+  reordered (bullets before the neural-solver paragraph) with the 21:1 sentence, Aim of the Thesis
+  bridge, contributions as bullets.
+- [x] 2026-10-14 Ch. 3 de-duplication (author sign-off): the moved 2.1.6 block deleted from 3.1
+  except the 6 mm literature paragraph (now in 3.3, replacing its pointer) and the bilateral
+  evidence (now in 3.7); the moved 2.1.5 block deleted from 3.2 except the biomarker paragraph
+  (merged into the end of 3.2, opening reworded). Labels `sec:background:ga-oct:muw` and
+  `...:state-rep` now sit on 3.1 and 3.2. 6.1 pointers to Ch. 1/Ch. 2 now point to 2.5.1.
+  "Operator" glossed at first use in 1.2. Build clean.
+- [x] SV-1.6 literature check: Delta t-conditioning is not new for GA. Contribution bullet now
+  claims the architecture-independent framework instead.
+- [ ] TODO (Related Work, SV-2.7): cite **Lachinov2024** -- Lachinov, Chakravarty, Grechenig,
+  Schmidt-Erfurth & Bogunovic, "Learning Spatio-Temporal Model of Disease Progression with
+  NeuralODEs from Longitudinal Volumetric Data", IEEE TMI 43(3):1165-1179, 2024, arXiv:2211.04234
+  (supervisor's own paper; the model behind Mai et al. 2024; GA, continuous time, RK4). And
+  **ImageFlowNet** -- arXiv:2406.14794, 2024 (neural ODE/SDE image-level forecasting from
+  irregularly sampled scans, incl. GA). One sentence relating the RK4 arm to their Neural ODE
+  (2.4 or 6.1).
 - [ ] Decisions first: "framework" → "methodology", "operator" → "neural solver" (thesis-wide);
   restructure Introduction + Background (background as subsections of the introduction, problem
   statement and motivation after it, §2.2.5 merged with §1.3); §2.1 order anatomy → imaging → GA;

@@ -75,7 +75,6 @@ that avenue.
 % former Problem Statement, then the setup paragraph and the research
 % question of the former "Why Neural PDE Solvers?". The data properties and
 % the PDE argument moved to Background, Modelling Approach.
-% TODO: bridge sentences between the moved paragraphs.
 
 Predicting GA progression from imaging is framed as a
 \emph{spatiotemporal forecasting} task on the en-face projection of optical
@@ -89,19 +88,19 @@ to a later disease stage \citep{SchmidtErfurth2018, Vogl2021}. The output here i
 score but a complete map of the lesion at the next visit.
 
 
-Which of them GA progression requires cannot be decided by
+Such a forecast requires a model that maps the state at one visit to the
+state at a later one. In this thesis, this map is called the operator.
+Many architectures can serve as this model, among
+them the neural solvers for partial differential equations on which this
+thesis builds (Chapter~\ref{ch:background}). Which of them GA progression
+requires cannot be decided by
 testing a single architecture: if one model succeeds, the reason may be
 its operator, its size, or the setup around it. This thesis therefore
-separates the two. The setup --- how elapsed time enters the prediction,
+separates the model from the setup around it. The setup --- how elapsed time enters the prediction,
 how models are trained and how they are evaluated --- is fixed once, and
 the operator is the only part that changes. Architectures from different
-families can then be compared on equal terms. In contrast to clinical
-work based on cohort-level statistical atlases and
-time-to-conversion survival models \citep{Vogl2021} and on biomarker-based
-risk analyses \citep{Vallino2024}, every model in this comparison forecasts
-the lesion of an individual eye directly on the imaging state; the closest
-forecasts of this kind are discussed in
-Section~\ref{sec:background:related-work}.
+families can then be compared on equal terms. The closest forecasts of
+this kind are discussed in Section~\ref{sec:background:related-work}.
 
 
 \paragraph{Research question.}
@@ -128,19 +127,33 @@ second by comparing different operators within that framework.
 
 \section{Contributions}
 \label{sec:introduction:contributions}
-% TODO (supervisor review 1, M5): rewrite as a bullet list: what was
-% achieved, what is novel, why it is valuable.
+% SV-1.6 literature check (2026-10-13): Delta t-conditioning alone is not
+% new for GA (Lachinov et al., IEEE TMI 2024, Neural ODE; Mai et al. 2024;
+% ImageFlowNet 2024), so the bullet claims the architecture-independent
+% framework, not the conditioning.
 
-What the thesis delivers follows from this design. It provides a
-$\Delta t$-conditioned framework for irregular visit schedules in which
-operators from unrelated literatures can be compared on equal terms, and
-a controlled comparison of several operator classes on longitudinal OCT
-for GA. It identifies physical reach at the scale of the lesion front and
-an explicit transport term as two independent routes to the same deficit:
-a single update that cannot see as far as the lesion front moves between
-two visits. It also reports as results what did not help: larger models,
-a higher integration order, a monotonic-growth penalty and an extension
-with an adaptive moving mesh.
+The main contributions of this thesis are the following.
+\begin{itemize}
+  \item A framework for irregular visit schedules that is independent of
+    the architecture inside it: a $\Delta t$-scaled residual update, a
+    pushforward curriculum measured in elapsed days, and a shared loss and
+    evaluation. Operators from unrelated literatures are trained and
+    evaluated in it under identical conditions, so that a difference in
+    accuracy can be attributed to the model rather than to its training
+    setup.
+  \item A controlled comparison of several operator classes for
+    forecasting GA from longitudinal OCT, at matched parameter counts and
+    with five-fold cross-validation.
+  \item The identification of physical reach at the scale of the lesion
+    front and an explicit transport term as two independent routes to the
+    same deficit: a single update that cannot see as far as the lesion
+    front moves between two visits. This identifies the property a
+    forecasting model for GA has to provide.
+  \item Results on what did not help: larger models, a higher integration
+    order, a monotonic-growth penalty and an extension with an adaptive
+    moving mesh. These rule out directions that would otherwise appear
+    promising.
+\end{itemize}
 % Author decision (d), 2026-10-01: Section 1.4 "Contributions" merged into
 % this paragraph; its stale pre-survey bullets were deleted (nothing
 % referenced sec:introduction:contributions or eq:intro:dt-residual).
