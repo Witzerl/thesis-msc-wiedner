@@ -54,7 +54,7 @@ the forecasting of GA and states the problem formally.
     enters through the cornea and lens at the front, traverses the
     vitreous body, and falls on the retina at the back; the
     \emph{macula} is a small disc-shaped specialised region of the
-    retina near the posterior pole, and the \emph{fovea} is its
+    retina, and the \emph{fovea} is its
     centre, where photoreceptor density and visual acuity peak. The
     optic-nerve head (ONH, also called the optic disc) is the point
     at which the optic nerve exits the eye.
@@ -74,17 +74,20 @@ Light enters at the front through
 the \emph{cornea} and \emph{lens}, traverses the gel-filled vitreous
 body, and is focused onto the \emph{retina} --- a thin
 neural-tissue lining at the back of the eye that converts the
-incoming light pattern into electrical signals. Those signals leave
+incoming light pattern into electrical signals. The conversion takes
+place in the \emph{photoreceptors}, the light-sensitive cells of the
+retina. Those signals leave
 the eye via the \emph{optic nerve}, which exits the retina at a
 specific anatomical landmark called the \emph{optic-nerve head} (ONH,
 also called the \emph{optic disc}). Behind the retina lie two further
 layers that support and supply it from beneath: the \emph{choroid}, a
 richly vascularised tissue whose innermost capillary bed is the
 \emph{choriocapillaris}, and the \emph{sclera}, the white, mechanically
-rigid outer shell.
+rigid outer shell. The inside of the back of the eye, as seen through
+the pupil, is called the \emph{fundus}.
 
 The retina is not uniform across its surface. A small disc-shaped
-region near the posterior pole, the \emph{macula}, is specialised for
+region, the \emph{macula}, is specialised for
 high-acuity central vision, while the rest of the retina handles
 peripheral vision at lower resolution. The macula has a diameter of
 roughly five to six millimetres and is the only part of the retina
@@ -847,7 +850,8 @@ arbitrary time gaps \citep{Rubanova2019}. For images, ImageFlowNet learns
 a multiscale latent representation and a flow field in it with a neural
 ODE or SDE, and forecasts image-level trajectories of disease
 progression. It was evaluated on FAF images of GA, on multiple sclerosis
-and on glioblastoma \citep{Liu2025ImageFlowNet}. In brain imaging,
+and on glioblastoma, an aggressive brain tumour
+\citep{Liu2025ImageFlowNet}. In brain imaging,
 4D-DANI-Net generates subject-specific longitudinal MRI scans that mimic
 neurodegeneration in ageing and dementia \citep{Ravi2022}, and BrLP
 combines a latent diffusion model with an auxiliary model of regional

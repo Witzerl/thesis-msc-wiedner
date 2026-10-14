@@ -1430,6 +1430,13 @@ Solvers?"); contributions back as bullet points. He offers a meeting.
   solver-swap test (§5.5.1; fold 2 for the graph networks, fold 0 for the T-FEN), the T-FEN
   Courant read-back (§5.5.2, fold 0) and the three probe runs of Appendix G (fold 2). The first
   two are post-hoc evaluations of existing checkpoints (no training); the probes are training runs.
+- [x] 2026-10-14 M2 prerequisite audit (supervisor): term table `reviews/m2-term-table-2026-10-14.md`;
+  16 glosses applied in short sentences (AMD stages sourced to Vogl2021 + Boyer2017 drusen; macula,
+  fovea, AREDS, complement inhibitors, best-corrected visual acuity, sham, injections into the eye, OCT
+  and biomarkers defined in §1.1; layer boundaries in §1.2; photoreceptors and fundus in §2.1.1;
+  "posterior pole" dropped; glioblastoma glossed). §1.1 Yehoshua sentence now "one imaging cohort"
+  (OCT is defined later in §1.1). Rows 17-18 (low-coherence, basal-laminar deposits) left as they
+  are. New citations Vogl2021 / Boyer2017 in §1.1 enter the pending ledger recheck.
 - [x] 2026-10-14 §3.7 worklist pass (SV-3.5 patients per fold, 3.34-3.36); dead pointer to §5.1
   replaced ("one reason why arms are compared fold by fold"). Chapter 3 worklist complete.
 - [x] 2026-10-14 §3.6 worklist pass (3.28-3.33).
