@@ -263,7 +263,9 @@ arms reflects the operator, not the information it receives.
 
 The graph operator is the message-passing neural PDE solver (MP-PDE) of
 \citet{Brandstetter2022}, the learned-stencil solver introduced
-in~\S\ref{sec:background:pde-solvers:neural}. It supplies more than one arm
+in~\S\ref{sec:background:pde-solvers:neural}. It builds on the graph
+neural network model of \citet{Scarselli2009} and the message-passing
+formulation of \citet{Gilmer2017}. It supplies more than one arm
 of the survey: it is run on two different graphs
 (\S\ref{sec:method:graph}), and with fewer message-passing rounds it also
 provides the locality floors of~\S\ref{sec:method:family:floors}. Several
@@ -828,8 +830,9 @@ explicit Euler step: the operator is evaluated once, at the current state,
 and its output is applied over the whole interval $\Delta t$. A Runge--Kutta
 scheme evaluates the operator several times within the interval, at
 intermediate states, and combines the results. The classical fourth-order
-scheme (RK4), used in every reported run, evaluates it four times per step
-and takes a weighted average \citep{Butcher1987, Hairer1993}. The interval
+scheme (RK4) \citep{Runge1895,Kutta1901}, used in every reported run,
+evaluates it four times per step and takes a weighted average
+\citep{Butcher1987, Hairer1993}. The interval
 can also be split into several sub-steps, each of which is one RK4 step.
 The wrapper stores each scheme as a Butcher tableau. The sub-step length is
 set per graph, either as $h = \Delta t / n$ or from a physical step length

@@ -1430,6 +1430,14 @@ Solvers?"); contributions back as bullet points. He offers a meeting.
   solver-swap test (§5.5.1; fold 2 for the graph networks, fold 0 for the T-FEN), the T-FEN
   Courant read-back (§5.5.2, fold 0) and the three probe runs of Appendix G (fold 2). The first
   two are post-hoc evaluations of existing checkpoints (no training); the probes are training runs.
+- [x] 2026-10-15 Repetition (AI R1, R12, R17), author rule "state it once, elsewhere a pointer":
+  crop census only in §3.3 (§6.3, §6.4, App. A.2 now pointers without numbers; the larger-window
+  trade-off only in §3.3); Mai et al. caveats (input, cohort, follow-up, crop, visits) in full only in
+  §5.6.1 first paragraph (visits added there; second paragraph, three captions, §6.2 and Ch. 7 now
+  pointers or nothing; §2.4 keeps the description of their raw-OCT input); §2.4.5 "Origins of the
+  Operators" deleted (§2.4 intro now points to §2.3 and §4.3); Scarselli2009 + Gilmer2017 moved to the
+  §4.3.2 opening, Runge1895 + Kutta1901 to the RK4 sentence of §4.3.7 (ledger: these four citations
+  move with the pending recheck).
 - [x] 2026-10-14 M2 prerequisite audit (supervisor): term table `reviews/m2-term-table-2026-10-14.md`;
   16 glosses applied in short sentences (AMD stages sourced to Vogl2021 + Boyer2017 drusen; macula,
   fovea, AREDS, complement inhibitors, best-corrected visual acuity, sham, injections into the eye, OCT

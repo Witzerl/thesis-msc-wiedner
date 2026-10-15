@@ -769,8 +769,9 @@ Work related to this thesis falls into four groups: models that predict
 the risk or the rate of AMD and GA progression, models that forecast
 where a GA lesion will grow, models that forecast disease progression
 from irregularly sampled longitudinal data in general, and PDE-based
-models in biomedicine. The section closes with the origins of the
-architectures used as the operator in Chapter~\ref{ch:method}.
+models in biomedicine. The original papers of the architectures used as
+the operator are cited where each is introduced, in
+\S\ref{sec:background:neural-pde} and~\S\ref{sec:method:family}.
 
 \subsection{Predicting the Risk and Rate of Progression}
 \label{sec:background:related-work:rate}
@@ -823,8 +824,7 @@ data of this thesis are drawn from the same cohort, with tighter
 registration bounds and cleaner segmentations (75 eyes of 51 patients,
 \S\ref{sec:data:dataset}). The input regime, however, is different. That
 work operates directly on raw OCT volumes, whereas the present thesis
-uses pre-segmented lesion masks and layer surfaces, and this difference
-applies to every comparison between the two.
+uses pre-segmented lesion masks and layer surfaces.
 As a precedent for dense convolutional architectures on this task,
 \citet{Salvi2025} predicted future GA growth with a two-dimensional
 U-Net on fundus autofluorescence images.
@@ -878,24 +878,6 @@ known and the network learns to solve or invert it. Learned neural PDE
 solvers trained directly on longitudinal clinical images without a known
 equation have, to the author's knowledge, not been applied to GA and are
 rare in medical imaging.
-
-\subsection{Origins of the Operators}
-\label{sec:background:related-work:origins}
-
-The architectures used as the operator in Chapter~\ref{ch:method}
-originate in different lines of work. The
-graph solvers build on the graph neural network model of
-\citet{Scarselli2009} and the message-passing formulation of \citet{Gilmer2017},
-adapted to autoregressive PDE solving by \citet{Brandstetter2022}. The U-Net was introduced
-by \citet{Ronneberger2015} for biomedical image segmentation, the
-Fourier Neural Operator by \citet{Li2021}, and its extension with
-local kernels by \citet{LiuSchiaffini2024}. Finite Element Networks,
-including their transport term, go back to \citet{Lienen2022}. Fixed-step integration of a
-learned vector field uses the classical methods of \citet{Runge1895}
-and \citet{Kutta1901}, and the reading of a network as the right-hand side of an
-ordinary differential equation follows the Neural ODEs of \citet{Chen2018}. How each of these is adapted to the GA setting is described
-in~\S\ref{sec:method:family}.
-
 
 \section{Modelling Approach and Problem Statement}
 \label{sec:background:approach}
