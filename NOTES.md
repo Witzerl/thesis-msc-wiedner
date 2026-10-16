@@ -1580,9 +1580,30 @@ Solvers?"); contributions back as bullet points. He offers a meeting.
   Li2006 PMC2646122 -> `pdfs/Methods/Li2006.pdf`, Garvin2009 PMC2911837 -> `pdfs/Methods/Garvin2009.pdf`,
   Abramoff2010 PMC3131209 -> `pdfs/Methods/Abramoff2010.pdf`. Then extract text and ledger entries
   for the §3.2 Iowa sentence (currently PENDING).
-- [ ] **Ledger recheck after the 2026-10-12..14 rewording:** 45 `CHANGED SENTENCE (recheck)` and 16
+- [x] (done 2026-10-16, see the next entry) **Ledger recheck after the 2026-10-12..14 rewording:** 45 `CHANGED SENTENCE (recheck)` and 16
   `NEW (unchecked)` entries (existing keys whose sentences changed in Ch. 1-3, plus the EMA pages and
   Mai2024 in §1.1/§2.1.2/§3.1). Needs the Phase 4 check (`literature/_tools/README.md`, step 3).
+- [x] 2026-10-16 Ledger recheck done: all 44 NEW + 55 CHANGED entries checked. 78 entries over 34 keys went
+  through the Phase 4 workflow (9 batches, ledger agent + adversarial reviewer per paper, only the open
+  occurrences given to the agents; unchanged verified entries kept); 16 entries of the 2026-10-14 hand pass
+  carried over (same claim, quote passes verify_quotes; ImageFlowNet re-quoted); the two EMA pages checked by
+  hand (local copies of the EPAR pages saved as `pdfs/GA/EMA2024*.txt`, page of 2026-10-16). Hub notes created
+  for Abramoff2010, Garvin2009, Li2006, EMA2024Syfovre, EMA2024Izelvay; the three Iowa papers and the EMA pages
+  registered (page notes in `prep_phase4.py`). Three edited entries without a local copy (Scarselli2009 C117,
+  Butcher1987/Hairer1993 C134) are back to PENDING with their preliminary assessment, flagged for re-check.
+  Ledger now: 184 SUPPORTED, 14 PARTLY (3 deliberate: Courant1943, Paszke2019, Vallino2024 C020), 14 PENDING,
+  no NOT FOUND / CONTRADICTED / UNVERIFIED. Every quote passes verify_quotes on its page except the
+  transcriptions from scans without text layer (Kutta1901 C133, Liu1994 C048, Courant1928: NO-TEXT).
+- [ ] **Go through the 11 new PARTLY entries with the author, one at a time** (no thesis text changed yet):
+  C018 EMA pages ("approved only in the United States": the pages show only "not in the EU");
+  C016 Lad2023 ("Until 2023" not in Lad; kept on purpose on 2026-10-01, re-raised);
+  C039 Boopathiraj2024 + Boyer2017 ("tightly coupled ... die together", "outer segments": both say photoreceptors);
+  C043 Boopathiraj2024 + Yehoshua2011 + Vallino2024 (no source lists "three principal" signatures; sign (iii)
+  rests on Chu2022); C032 Pilotto2015 + Vallino2024 ("instead": both use en face alongside B-scans; the
+  pixel = A-scan definition rests on Yehoshua2011/Chu2022); C133 Runge1895 (RK4 is Kutta's; Runge's scheme is
+  third order). Also worth a look (SUPPORTED with a caveat): Mai2024 C015 is a secondary citation (range from
+  Fleckenstein et al. 2018); Feuer2013 C100/C153 limit "removes the dependence" to the AREDS lesion-size range;
+  SanchezGonzalez2020 C058 is particle-based while the sentence before speaks of "a grid or mesh".
 - [x] (superseded by the rewrite above) TODO (Related Work, SV-2.7): cite **Lachinov2024** -- Lachinov, Chakravarty, Grechenig,
   Schmidt-Erfurth & Bogunovic, "Learning Spatio-Temporal Model of Disease Progression with
   NeuralODEs from Longitudinal Volumetric Data", IEEE TMI 43(3):1165-1179, 2024, arXiv:2211.04234
