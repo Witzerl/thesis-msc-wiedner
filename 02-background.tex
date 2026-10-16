@@ -129,60 +129,32 @@ Chapter~\ref{ch:data}.
 \subsection{Retinal Imaging}
 \label{sec:background:ga-oct:oct}
 
-% TODO: produce Figure fig:bg:oct-acquisition --- a four-panel
-% schematic showing how an OCT volume is built up from one-dimensional
-% depth profiles, intended to anchor the geometric vocabulary
-% (A-scan, B-scan, volume, en-face) for ML readers without imaging
-% background:
-% (a) a sketch of the eye with a single near-infrared probe beam
-%     entering the cornea and reaching the retina; an inset graph
-%     shows the resulting depth-versus-reflectivity profile (= one
-%     A-scan), with characteristic peaks at the principal retinal
-%     layer interfaces.
-% (b) the same sketch with the beam scanned laterally along one
-%     axis, producing a stack of adjacent A-scans which when
-%     displayed side-by-side form a 2D cross-sectional image
-%     (= one B-scan).
-% (c) the beam now scanned in both lateral directions, producing
-%     a 3D rectangular cuboid of voxels (= one OCT volume) with the
-%     physical footprint explicitly annotated.
-% (d) the volume projected (e.g. by summing along the axial
-%     direction) onto its top face, yielding the 49 x 1024 en-face
-%     image used by the thesis (= the en-face projection of
-%     Section~2.1.4). A representative en-face image with a GA
-%     lesion visible as a brighter region can be shown next to the
-%     volume to make the projection step concrete.
+% Figure fig:bg:oct-acquisition: panel (a) generated with ChatGPT image
+% generation (prompts/PROMPT_fig_2_2_oct_acquisition_imagegen.md), raw file
+% kept unchanged in images/raw/; labels and the schematic A-scan curve, and
+% the whole of panel (b), drawn by images/scripts/fig_bg_oct_acquisition.py
+% (panel (b) uses the healthy layer drawing of Figure 2.3 as texture).
+% TODO: JKU declaration of AI-generated figures (supervisor asked).
 \begin{figure}[t]
   \centering
-  \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering\itshape Placeholder
-    for Figure~\ref{fig:bg:oct-acquisition}: four-panel schematic of
-    OCT acquisition geometry, going A-scan $\to$ B-scan $\to$ volume
-    $\to$ en-face projection. See accompanying \texttt{\% TODO} for
-    the intended content.}}
-  \caption[OCT acquisition geometry: A-scan, B-scan, volume,
-  en-face projection.]{%
-    OCT acquisition geometry, showing how a three-dimensional OCT
-    volume is built up from one-dimensional depth profiles and how
-    the two-dimensional en-face image used by the model relates to
-    that volume.
-    \emph{(a)} A single near-infrared probe beam enters the eye and
-    is reflected back from the various retinal and choroidal layers
-    along its path; the resulting depth-versus-reflectivity profile
-    is one \emph{A-scan}, and the bright bands in that profile
-    correspond to the principal layer interfaces.
-    \emph{(b)} Scanning the beam laterally along one direction
-    produces a sequence of A-scans whose side-by-side display forms
-    a two-dimensional cross-sectional image of the retina, called a
-    \emph{B-scan}.
-    \emph{(c)} Scanning in both lateral directions yields a
-    three-dimensional \emph{OCT volume} (the physical scan window of
-    the MUW cohort spans approximately $6 \times 6$\,mm laterally).
-    \emph{(d)} Projecting the volume along its axial direction onto
-    the fundus plane yields a two-dimensional en-face image, in which
-    a GA lesion appears as a region with a different signal intensity
-    than the surrounding healthy retina. The modelling pipeline
-    operates on en-face maps on this grid
-    (\S\ref{sec:background:ga-oct:enface}).}
+  \includegraphics[width=\textwidth]{images/fig_bg_oct_acquisition.pdf}
+  \caption[Measuring principle and scan geometry of OCT.]{%
+    Measuring principle and scan geometry of OCT (schematic).
+    \emph{(a)}~Light from the source is split by the beam splitter into a
+    reference arm, which is reflected by a mirror, and a sample arm,
+    which enters the eye and is reflected by the retina; both reflections
+    are recombined and recorded by the detector \citep{Huang1991}. For one
+    position of the beam this gives a depth profile of reflectivity, an
+    A-scan; the curve shown is schematic. \emph{(b)}~Moving the beam along
+    a line gives a B-scan (front face of the block), parallel lines give
+    the OCT volume (the block), and its top face is the en-face view, in
+    which a GA lesion appears as a patch. The lateral footprint of the
+    scans used in this thesis is approximately $6 \times 6$\,mm
+    (\S\ref{sec:background:ga-oct:muw}); depth is not to scale. Panel~(a)
+    was generated with an image-generation model (ChatGPT, OpenAI) and
+    checked by the author; its labels and the A-scan curve, and panel~(b),
+    were drawn by the author, the latter with the layer drawing of
+    Figure~\ref{fig:bg:retinal-anatomy} as texture.}
   \label{fig:bg:oct-acquisition}
 \end{figure}
 
@@ -211,9 +183,9 @@ A single A-scan is one column of one image. Scanning the probe beam
 laterally along one direction produces many adjacent A-scans, and
 displaying them side by side yields a two-dimensional cross-section
 through the retina, called a \emph{B-scan}
-(Figure~\ref{fig:bg:oct-acquisition}(b)). Scanning in both lateral
+(Figure~\ref{fig:bg:oct-acquisition}(b), front face). Scanning in both lateral
 directions yields a three-dimensional \emph{OCT volume}
-(Figure~\ref{fig:bg:oct-acquisition}(c)), in which each voxel records
+(Figure~\ref{fig:bg:oct-acquisition}(b)), in which each voxel records
 the reflectivity of one small block of tissue. The MUW cohort uses an
 acquisition protocol that produces volumes with a lateral footprint of
 approximately $6 \times 6$\,mm. How such a volume is summarised as a
@@ -262,7 +234,8 @@ The full OCT volume of a GA eye is too large and too redundant to be
 modelled at native voxel resolution. The clinical literature works with an \emph{en-face} image instead: a two-dimensional map of the
 retina seen from the front, as in a fundus photograph, in which every pixel
 corresponds to one A-scan of the volume and summarises what lies along it
-\citep{Pilotto2015,Chu2022,Yehoshua2011,Vallino2024}. The present work
+\citep{Pilotto2015,Chu2022,Yehoshua2011,Vallino2024}
+(Figure~\ref{fig:bg:oct-acquisition}(b), top face). The present work
 adopts the same convention.
 
 Several ways of forming the en-face image from the volume are used in the

@@ -1267,22 +1267,31 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
   Sadda2018, Chu2022, Boopathiraj2024) enter with the next `update_ledger.py --apply` run; Koksaldi2025
   and Nair2021 need their PDFs first.
 - [ ] Author to review Fig. 2.3 (label choice; whether "CC"/"BM" abbreviations are fine).
-- [ ] 2026-10-16 Fig. 2.2 status: panel (a) interferometer accepted (ChatGPT, backed up as
+- [x] 2026-10-16 Fig. 2.2 done (page 6): `images/scripts/fig_bg_oct_acquisition.py`. Panel (a) =
+  ChatGPT interferometer (`images/raw/fig_bg_oct_acquisition_raw_interferometer.png`) with labels
+  (light source, beam splitter, reference mirror, reference/sample arm, eye, detector) and a
+  schematic A-scan curve drawn in code; panel (b) = block in cabinet projection drawn in code,
+  textured with the Fig. 2.3 healthy strip: front face = B-scan, top face = en-face view with scan
+  lines and a lesion, orange line = A-scan, block = volume, footprint ~6 x 6 mm. Caption cites
+  Huang1991 and states which parts are AI-generated; §2.1.2 now refers to (b) front face / (b) /
+  (b) top face. The draft script and `prompts/HANDOFF_fig_2_2.md` are obsolete (handoff not needed,
+  done in the same session); the draft was removed.
+- [x] (done 2026-10-16, see below) 2026-10-16 Fig. 2.2 status: panel (a) interferometer accepted (ChatGPT, backed up as
   `images/raw/fig_bg_oct_acquisition_raw_interferometer.png`); panel (b) to be built in code
   (image models failed twice on the 3D geometry), prototype
   `images/scripts/fig_bg_oct_acquisition_block_draft.py`. Remaining work and context:
   `prompts/HANDOFF_fig_2_2.md`.
-- [ ] 2026-10-16 Fig. 2.2 (`fig:bg:oct-acquisition`) started: prompt
+- [x] (done 2026-10-16) 2026-10-16 Fig. 2.2 (`fig:bg:oct-acquisition`) started: prompt
   `prompts/PROMPT_fig_2_2_oct_acquisition_imagegen.md`. Plan changed to two drawn panels: (a) Michelson
   interferometer with the eye (A-scan plot added in code), (b) 3D retina block with A-scan line,
   B-scan slice, volume and en-face top face. The old panel (d) "projection" is dropped (no projection
   is computed; real en-face maps belong to §3.1). When done: text references to panels (b)/(c) in
   §2.1.2 and the caption must be rewritten for two panels; cite Huang1991.
-- [ ] §2.1.3 `fig:bg:oct-acquisition` -- illustration, generated
+- [x] (done 2026-10-16; the retinal-anatomy remark below is also resolved) §2.1.3 `fig:bg:oct-acquisition` -- illustration, generated
   with the author. The retinal-anatomy caption
   names layer strata and maps them to the ten channels, which the 2026-09-25 decision forbids
   (boundary names unknown); a real B-scan is not in the repository.
-- [ ] **Illustrations via LLM (author, 2026-10-14; check when the illustrations are made):**
+- [x] (2026-10-16: Figs. 2.1-2.3 done with ChatGPT image generation, not LLM-written code; AI note in each caption; JKU rule still open, see the Fig. 2.1 TODO) **Illustrations via LLM (author, 2026-10-14; check when the illustrations are made):**
   Figs. 2.1-2.3 (eye anatomy, retinal layers, OCT acquisition) to be drawn by an LLM for a uniform
   look, with the author checking the anatomy. Rules: (1) the LLM writes figure *code* (TikZ / SVG /
   matplotlib with `style/` colours), no image generator; script in `images/scripts/`; (2) check
@@ -1812,7 +1821,7 @@ Pulled from the code repository (`masterthesis-docker/NOTES.md` + `PROJECT_CONTE
   they actually lean on.
 - [x] (done 2026-10-16 with Wikimedia Commons images, see the Figure plan) TODO: produce Figure `fig:bg:eye-anatomy` placed in `02-background.tex` §2.1.1 -- two-panel anatomy reference for ML readers without clinical background: (left) sagittal cross-section of the human eye labelling cornea, lens, vitreous body, retina, fovea, optic-nerve head (ONH) / optic disc, optic nerve, choroid, sclera, with the macular region highlighted on the retina near the posterior pole; (right) en-face fundus view of the posterior pole labelling macula (~6 mm-wide central region), fovea (central pit), foveola (innermost ~0.35 mm of the fovea), parafovea (~0.5--1.5 mm eccentric ring), perifovea (~1.5--3 mm eccentric ring), and ONH / optic disc (~4 mm nasal to the fovea). Overlay the 6 x 6 mm OCT scanning window used by the thesis cohort as a dashed square centred on the fovea. Currently rendered as an `\fbox` placeholder pending a real graphic.
 - [ ] TODO: produce Figure `fig:bg:retinal-anatomy` placed in `02-background.tex` §2.1.2 (formerly §2.1.1) -- two-panel schematic for readers without a clinical background: (left) labelled cross-section through a healthy macula showing the principal retinal layers from ILM through RNFL, GCL+IPL, INL+OPL, ONL, photoreceptor IS/OS bands (including the ellipsoid zone), RPE, and Bruch's membrane, with the choriocapillaris immediately beneath; (right) a representative OCT B-scan through a GA-affected macula highlighting the dropout of the outer-retinal layers within the lesion and the corresponding choroidal hypertransmission signature beneath. Mirror the channel ordering of the eleven-channel state tensor used in the thesis. Currently rendered as an `\fbox` placeholder pending a real graphic.
-- [ ] TODO: produce Figure `fig:bg:oct-acquisition` placed in `02-background.tex` §2.1.3 -- four-panel schematic of OCT acquisition geometry intended to anchor the geometric vocabulary (A-scan, B-scan, volume, en-face) for ML readers without imaging background: (a) eye + single probe beam + inset depth-vs-reflectivity profile of one A-scan; (b) the same with the beam scanned laterally along one axis to form a B-scan; (c) the beam scanned in both lateral directions to form a 3D volume with the 6 x 6 mm physical footprint annotated (do NOT annotate a fixed voxel count -- native shapes vary per eye: 38-66 B-scans x 961-1719 A-scans, 67 distinct shapes); (d) the volume projected axially onto the fundus plane to yield the 49 x 1024 en-face image used by the model, with a representative GA lesion visible as a region of altered signal. Currently rendered as an `\fbox` placeholder pending a real graphic.
+- [x] (done 2026-10-16, two panels instead of four) TODO: produce Figure `fig:bg:oct-acquisition` placed in `02-background.tex` §2.1.3 -- four-panel schematic of OCT acquisition geometry intended to anchor the geometric vocabulary (A-scan, B-scan, volume, en-face) for ML readers without imaging background: (a) eye + single probe beam + inset depth-vs-reflectivity profile of one A-scan; (b) the same with the beam scanned laterally along one axis to form a B-scan; (c) the beam scanned in both lateral directions to form a 3D volume with the 6 x 6 mm physical footprint annotated (do NOT annotate a fixed voxel count -- native shapes vary per eye: 38-66 B-scans x 961-1719 A-scans, 67 distinct shapes); (d) the volume projected axially onto the fundus plane to yield the 49 x 1024 en-face image used by the model, with a representative GA lesion visible as a region of altered signal. Currently rendered as an `\fbox` placeholder pending a real graphic.
 - [ ] TODO: confirm with supervisor the exact provenance of the eleven state-tensor channels in the MUW cohort (mask: manual grading vs trained network vs combination; layer boundaries: which segmentation algorithm, which boundary list, which post-processing) before drafting `03-data.tex` §3.1. The §2.1.4 text is currently agnostic of those details so it does not need to be revisited once the answer is in hand.
 
 ### Chapter 3 - Data and Preprocessing (`03-data.tex`)
