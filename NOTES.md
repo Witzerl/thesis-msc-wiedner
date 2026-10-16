@@ -1248,7 +1248,7 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
 - [ ] Author to review Fig. 2.1 on page 5 (label choice: ciliary body, iris, cornea, lens, sclera,
   choroid, retina, vitreous body, macula, fovea, optic disc, optic nerve; foveola to perifovea,
   OCT window). The vessels leave the disc slightly nasal of its centre, which is anatomically normal.
-- [ ] 2026-10-16 Fig. 2.3 (`fig:bg:retinal-anatomy`) started, same route as Fig. 2.1: prompt
+- [x] (done 2026-10-16, see below) 2026-10-16 Fig. 2.3 (`fig:bg:retinal-anatomy`) started, same route as Fig. 2.1: prompt
   `prompts/PROMPT_fig_2_3_retina_layers_imagegen.md` (panel A healthy layers around the foveal pit,
   panel B the same strip with a GA lesion: RPE, photoreceptors, ELM/EZ and choriocapillaris lost,
   INL/OPL subsidence, hypertransmission column, thickened RPE rim at the margin), with a checklist.
@@ -1256,7 +1256,18 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
   Sadda2018 (p. 8, Fig. 2 legend); rim thickening after Chu2022. When the images are in: raw files
   to `images/raw/`, labels from measured anchors, caption with the AI note and these citations; the
   current caption sentence on the ten layer channels must not map strata onto channels.
-- [ ] §2.1.3 `fig:bg:oct-acquisition`, §2.1.2 `fig:bg:retinal-anatomy` -- illustrations, generated
+- [x] 2026-10-16 Fig. 2.3 done (page 9, `[tp]` so it stays next to §2.1.3): panel (a) healthy strip
+  (Downloads `Schematische Querschnittsdarstellung der Fovea.png`), panel (b) GA strip (`Retina mit
+  zentraler Atrophie.png`, from a fresh ChatGPT chat after five rounds in the old one kept extra
+  bands inside the lesion), both read-only in `images/raw/`. `images/scripts/fig_bg_retinal_anatomy.py`
+  adds the 16 layer labels (anchors from colour scans, see the script docstring) and the signs
+  (i)-(iii) of §2.1.3 plus "Bruch's membrane intact". Caption rewritten (abbreviations expanded, AI
+  note) and cites Abramoff2010, Sadda2018, Chu2022, Boopathiraj2024; text references now say "(a)".
+- [ ] Ledger: the new caption citations of Figs. 2.1 and 2.3 (Koksaldi2025, Nair2021, Abramoff2010,
+  Sadda2018, Chu2022, Boopathiraj2024) enter with the next `update_ledger.py --apply` run; Koksaldi2025
+  and Nair2021 need their PDFs first.
+- [ ] Author to review Fig. 2.3 (label choice; whether "CC"/"BM" abbreviations are fine).
+- [ ] §2.1.3 `fig:bg:oct-acquisition` -- illustration, generated
   with the author. The retinal-anatomy caption
   names layer strata and maps them to the ten channels, which the 2026-09-25 decision forbids
   (boundary names unknown); a real B-scan is not in the repository.
