@@ -1248,6 +1248,14 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
 - [ ] Author to review Fig. 2.1 on page 5 (label choice: ciliary body, iris, cornea, lens, sclera,
   choroid, retina, vitreous body, macula, fovea, optic disc, optic nerve; foveola to perifovea,
   OCT window). The vessels leave the disc slightly nasal of its centre, which is anatomically normal.
+- [ ] 2026-10-16 Fig. 2.3 (`fig:bg:retinal-anatomy`) started, same route as Fig. 2.1: prompt
+  `prompts/PROMPT_fig_2_3_retina_layers_imagegen.md` (panel A healthy layers around the foveal pit,
+  panel B the same strip with a GA lesion: RPE, photoreceptors, ELM/EZ and choriocapillaris lost,
+  INL/OPL subsidence, hypertransmission column, thickened RPE rim at the margin), with a checklist.
+  Layer order after Abramoff2010 (local, p. 2-3) plus EZ/IZ/ELM and the cRORA features after
+  Sadda2018 (p. 8, Fig. 2 legend); rim thickening after Chu2022. When the images are in: raw files
+  to `images/raw/`, labels from measured anchors, caption with the AI note and these citations; the
+  current caption sentence on the ten layer channels must not map strata onto channels.
 - [ ] §2.1.3 `fig:bg:oct-acquisition`, §2.1.2 `fig:bg:retinal-anatomy` -- illustrations, generated
   with the author. The retinal-anatomy caption
   names layer strata and maps them to the ten channels, which the 2026-09-25 decision forbids
