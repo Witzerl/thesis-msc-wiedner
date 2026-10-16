@@ -89,3 +89,54 @@ Afterwards (here): raws to `images/raw/`, labels (light source, beam splitter, r
 eye / sample arm, detector; A-scan, B-scan, volume, en-face, lateral and axial directions, ~6 mm
 footprint), the A-scan profile plotted in code, caption and text rewritten for two panels (the
 text now refers to panels (a)-(c)), AI note and the Huang1991 citation.
+
+---
+
+## Standalone prompts for a new chat (2026-10-16, second attempt)
+
+First attempt (one image with both panels): detector arrow pointed up, and the B-scan slice ran
+front-to-back while the scan lines ran left-to-right. The new prompts ask for two separate
+images and put the B-scan slice parallel to the front face, which is easier to draw correctly.
+Attach in the new chat: `Schematische Querschnittsdarstellung der Fovea.png` and
+`eye_cross_section_left_panel.png` (style references). Send Prompt A, then Prompt B.
+
+### Prompt A (new chat)
+
+```
+I am making a figure for a master thesis in medical image analysis. The two attached images are finished figures of the same thesis; please draw in exactly their style: flat colour fills, thin uniform dark grey-blue outlines, no shading gradients, no photorealism, no 3D effects, no shadows, pure white background, the same blues, rose and brown.
+
+Draw a simple optical diagram of how optical coherence tomography (OCT) measures one depth profile of the retina. Seen from above, wide canvas (16:9, at least 2400 px wide), generous empty white margins all around because labels will be added later.
+
+Layout (a plus-shaped arrangement around a beam splitter in the middle-left of the canvas):
+1. Left: a small rectangular box, the light source.
+2. Centre-left: a small transparent glass cube with one diagonal line from its bottom-left to its top-right corner, the beam splitter.
+3. Above the cube: a flat mirror, drawn as a short thick horizontal bar with short hatching lines on its top side (the back of the mirror).
+4. Right of the cube: an eye, drawn as a horizontal cross-section seen from above, like the attached eye but simpler: front of the eye (cornea, then lens) facing left towards the cube, the optic nerve leaving at the back slightly below the middle, the eye wall with thin blue and rose layers.
+5. Below the cube: a small rectangular box, the detector.
+
+Light beams: thin pale-red straight lines with small arrowheads.
+- Source to cube: arrowhead pointing right.
+- Cube to mirror: one line going up (arrowhead up) and next to it one line coming back down (arrowhead down).
+- Cube to eye: one line going right (arrowhead right) through the cornea and lens to the retina at the back of the eye, and next to it one line coming back left (arrowhead left).
+- Cube to detector: one or two lines going DOWN only, every arrowhead on this stretch points down into the detector. Nothing comes out of the detector.
+- Do not draw any line returning from the cube to the light source.
+
+Leave an empty white rectangle to the right of the detector, about three times as wide as the detector box, where a small graph will be added later.
+
+Absolutely no text, letters, numbers, labels, symbols, scale bars, legends or watermarks anywhere in the image.
+```
+
+### Prompt B (same new chat)
+
+```
+Same style as before. Now draw a separate image (4:3, at least 2400 px wide, generous white margins all around for labels): a schematic 3D block of retinal tissue that explains how an OCT scan is built up.
+
+1. The block: a flat rectangular block (cuboid), wider than deep and much wider than tall, seen from the front and slightly from above and from the right (simple isometric view), so that the FRONT face, the TOP face and the RIGHT face are visible.
+2. The front face and the right face show the retinal layers as horizontal bands, in the same colours and order as the attached layer strip: blue bands with round cells at the top, then rows of upright photoreceptor rods, then the brown pigment layer, then a rose band with blood vessels, then white at the bottom. Flat layers, no pit.
+3. The top face is a pale blue-grey surface. On it: about ten thin, evenly spaced parallel lines running from LEFT to RIGHT, i.e. parallel to the front edge of the block (the scan lines), and a faint darker irregular patch near the middle (a lesion seen from above).
+4. The B-scan: one vertical slice through the whole height of the block, PARALLEL TO THE FRONT FACE, positioned about one third of the way from the front to the back. Its top edge lies exactly on one of the scan lines. Draw it as a semi-transparent pale blue plane with a slightly darker outline, so the layers behind it remain visible.
+5. The A-scan: one bright orange vertical line, coming down from above the block, entering the top face at a point on that same scan line, and running straight down inside the slice all the way to the bottom face of the block.
+6. No axes, no arrows.
+
+Absolutely no text, letters, numbers, labels, symbols, scale bars, legends or watermarks anywhere in the image.
+```
