@@ -1267,6 +1267,12 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
   Sadda2018, Chu2022, Boopathiraj2024) enter with the next `update_ledger.py --apply` run; Koksaldi2025
   and Nair2021 need their PDFs first.
 - [ ] Author to review Fig. 2.3 (label choice; whether "CC"/"BM" abbreviations are fine).
+- [ ] 2026-10-16 Fig. 2.2 (`fig:bg:oct-acquisition`) started: prompt
+  `prompts/PROMPT_fig_2_2_oct_acquisition_imagegen.md`. Plan changed to two drawn panels: (a) Michelson
+  interferometer with the eye (A-scan plot added in code), (b) 3D retina block with A-scan line,
+  B-scan slice, volume and en-face top face. The old panel (d) "projection" is dropped (no projection
+  is computed; real en-face maps belong to §3.1). When done: text references to panels (b)/(c) in
+  §2.1.2 and the caption must be rewritten for two panels; cite Huang1991.
 - [ ] §2.1.3 `fig:bg:oct-acquisition` -- illustration, generated
   with the author. The retinal-anatomy caption
   names layer strata and maps them to the ten channels, which the 2026-09-25 decision forbids
