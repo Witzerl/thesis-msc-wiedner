@@ -31,11 +31,11 @@ from _common import IMAGES, panel_label, save, setup
 pal = setup()
 PAL = pal.PAL
 RAW = IMAGES / "raw"
-FS = 6.5
+FS = 5.5
 LEAD = dict(arrowstyle="-", lw=0.4, color=PAL["ink"], shrinkA=1.5, shrinkB=0)
 DOWNSAMPLE = 1600
 W, H = 2172, 724
-XL, XR = -330, W + 400            # label gutters left and right
+XL, XR = -250, W + 300            # label gutters left and right
 
 
 def load(name: str) -> np.ndarray:
@@ -71,7 +71,7 @@ def draw_healthy(ax):
     # short names on the drawing; the key next to the figure gives the full names
     inner = [("ILM", 102), ("RNFL", 118), ("GCL", 150), ("IPL", 185), ("INL", 221),
              ("OPL", 256), ("ONL", 308)]
-    for (name, y), yl in zip(inner, fan(-50, 500, len(inner))):
+    for (name, y), yl in zip(inner, fan(0, 470, len(inner))):
         label(ax, name, (130, y), (-40, yl), ha="right")
     # RPE 463-489, BM = light seam 491-494 under the dark RPE base, CC 495-516 (colour scan at
     # x 2030-2050); RPE, BM and CC dots placed after the author's check (2026-10-16) and
@@ -79,13 +79,13 @@ def draw_healthy(ax):
     outer = [("ELM", 356, 2040), ("IS", 384, 2040), ("EZ", 411, 2040), ("OS", 440, 2040),
              ("RPE", 478, 2060), ("BM", 492, 2010), ("CC", 505, 1960), ("Choroid", 560, 2040),
              ("Sclera", 622, 2040)]
-    for (name, y, x), yl in zip(outer, fan(110, 860, len(outer))):
+    for (name, y, x), yl in zip(outer, fan(170, 800, len(outer))):
         label(ax, name, (x, y), (W + 40, yl))
     label(ax, "Foveal pit", (1086, 227), (1086, -45), ha="center", va="bottom")
     ax.text(330, 55, "Vitreous", fontsize=FS, color=PAL["ink_2"], style="italic",
             ha="center", va="center")
     ax.set_xlim(XL, XR)
-    ax.set_ylim(900, -120)
+    ax.set_ylim(830, -100)
     ax.set_aspect("equal")
     ax.axis("off")
 
@@ -123,22 +123,22 @@ def draw_key(ax):
     for i, (ab, name) in enumerate(KEY):
         y = 0.92 - i * 0.92 / n
         ax.text(0.0, y, ab, fontsize=FS, fontweight="semibold", va="top", color=PAL["ink"])
-        ax.text(0.22, y, name, fontsize=FS, va="top", color=PAL["ink"])
+        ax.text(0.24, y, name, fontsize=FS, va="top", color=PAL["ink"])
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1)
     ax.axis("off")
 
 
 def main():
-    fig = plt.figure(figsize=(119 / 25.4, 80 / 25.4))
-    ax_a = fig.add_axes([0.0, 0.47, 0.70, 0.53])
-    ax_b = fig.add_axes([0.0, 0.0, 0.70, 0.45])
-    ax_k = fig.add_axes([0.73, 0.12, 0.27, 0.78])
+    fig = plt.figure(figsize=(127 / 25.4, 80 / 25.4))
+    ax_a = fig.add_axes([0.0, 0.47, 0.76, 0.53])
+    ax_b = fig.add_axes([0.0, 0.0, 0.76, 0.45])
+    ax_k = fig.add_axes([0.785, 0.17, 0.215, 0.70])
     draw_healthy(ax_a)
     draw_ga(ax_b)
     draw_key(ax_k)
-    fig.text(0.0, 1.0, "(a)", fontsize=9, fontweight="bold", va="top")
-    fig.text(0.0, 0.50, "(b)", fontsize=9, fontweight="bold", va="top")
+    fig.text(0.0, 1.0, "(a)", fontsize=8, fontweight="bold", va="top")
+    fig.text(0.0, 0.50, "(b)", fontsize=8, fontweight="bold", va="top")
     save(fig, "fig_bg_retinal_anatomy")
 
 
