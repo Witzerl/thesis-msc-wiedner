@@ -133,9 +133,9 @@ Chapter~\ref{ch:data}.
 % generation (prompts/PROMPT_fig_2_2_oct_acquisition_imagegen.md), raw file
 % kept unchanged in images/raw/; labels and the schematic A-scan curve, and
 % the whole of panel (b), drawn by images/scripts/fig_bg_oct_acquisition.py
-% (panel (b) uses the healthy layer drawing of Figure 2.3 as texture).
+% (panel (b) uses the healthy layer drawing of Figure 2.3 as the B-scan).
 % TODO: JKU declaration of AI-generated figures (supervisor asked).
-\begin{figure}[t]
+\begin{figure}[tp]
   \centering
   \includegraphics[width=\textwidth]{images/fig_bg_oct_acquisition.pdf}
   \caption[Measuring principle and scan geometry of OCT.]{%
@@ -145,16 +145,18 @@ Chapter~\ref{ch:data}.
     which enters the eye and is reflected by the retina; both reflections
     are recombined and recorded by the detector \citep{Huang1991}. For one
     position of the beam this gives a depth profile of reflectivity, an
-    A-scan; the curve shown is schematic. \emph{(b)}~Moving the beam along
-    a line gives a B-scan (front face of the block), parallel lines give
-    the OCT volume (the block), and its top face is the en-face view, in
-    which a GA lesion appears as a patch. The lateral footprint of the
-    scans used in this thesis is approximately $6 \times 6$\,mm
-    (\S\ref{sec:background:ga-oct:muw}); depth is not to scale. Panel~(a)
-    was generated with an image-generation model (ChatGPT, OpenAI) and
-    checked by the author; its labels and the A-scan curve, and panel~(b),
-    were drawn by the author, the latter with the layer drawing of
-    Figure~\ref{fig:bg:retinal-anatomy} as texture.}
+    A-scan; the curve shown is schematic. \emph{(b)}~From A-scan to
+    en-face view: A-scans recorded side by side along a line form a
+    B-scan, B-scans recorded along parallel lines form the OCT volume,
+    and the volume seen from the front of the eye is the en-face view, in
+    which every line marks the position of one B-scan and a GA lesion
+    appears as a patch. The highlighted A-scan, B-scan and line correspond
+    to each other. The lateral footprint of the scans used in this thesis
+    is approximately $6 \times 6$\,mm (\S\ref{sec:background:ga-oct:muw}).
+    Panel~(a) was generated with an image-generation model (ChatGPT,
+    OpenAI) and checked by the author; its labels and the A-scan curve,
+    and panel~(b), were drawn by the author, the latter with the layer
+    drawing of Figure~\ref{fig:bg:retinal-anatomy} as the B-scan.}
   \label{fig:bg:oct-acquisition}
 \end{figure}
 
@@ -183,7 +185,7 @@ A single A-scan is one column of one image. Scanning the probe beam
 laterally along one direction produces many adjacent A-scans, and
 displaying them side by side yields a two-dimensional cross-section
 through the retina, called a \emph{B-scan}
-(Figure~\ref{fig:bg:oct-acquisition}(b), front face). Scanning in both lateral
+(Figure~\ref{fig:bg:oct-acquisition}(b)). Scanning in both lateral
 directions yields a three-dimensional \emph{OCT volume}
 (Figure~\ref{fig:bg:oct-acquisition}(b)), in which each voxel records
 the reflectivity of one small block of tissue. The MUW cohort uses an
@@ -235,7 +237,7 @@ modelled at native voxel resolution. The clinical literature works with an \emph
 retina seen from the front, as in a fundus photograph, in which every pixel
 corresponds to one A-scan of the volume and summarises what lies along it
 \citep{Pilotto2015,Chu2022,Yehoshua2011,Vallino2024}
-(Figure~\ref{fig:bg:oct-acquisition}(b), top face). The present work
+(Figure~\ref{fig:bg:oct-acquisition}(b), right). The present work
 adopts the same convention.
 
 Several ways of forming the en-face image from the volume are used in the

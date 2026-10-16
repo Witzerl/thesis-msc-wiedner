@@ -1278,6 +1278,13 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
   Sadda2018, Chu2022, Boopathiraj2024) enter with the next `update_ledger.py --apply` run; Koksaldi2025
   and Nair2021 need their PDFs first.
 - [ ] Author to review Fig. 2.3 (label choice; whether "CC"/"BM" abbreviations are fine).
+- [x] 2026-10-16 Fig. 2.2 revised after author review (blurry block texture, leaders hidden under the
+  block faces, thick outline, A-scan/B-scan in the block not readable): panel (a) now full size on top
+  (native-resolution raw, labels drawn above everything, A-scan curve orange like the A-scan in (b));
+  panel (b) full width below is the sequence A-scan -> B-scan -> volume (stack of B-scans) -> en-face
+  view with one line per B-scan and a lesion, highlighted A-scan/B-scan/line corresponding, B-scans =
+  the Fig. 2.3 strip at native resolution. Caption (b) and the §2.1.2 references rewritten; float
+  `[tp]`, now page 7 (section starts page 6).
 - [x] 2026-10-16 Fig. 2.2 done (page 6): `images/scripts/fig_bg_oct_acquisition.py`. Panel (a) =
   ChatGPT interferometer (`images/raw/fig_bg_oct_acquisition_raw_interferometer.png`) with labels
   (light source, beam splitter, reference mirror, reference/sample arm, eye, detector) and a

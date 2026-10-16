@@ -164,3 +164,7 @@ Keep the geometry of the FIRST image exactly: the same block, the same viewing a
 
 Absolutely no text, letters, numbers, labels, symbols, scale bars, legends or watermarks anywhere in the image.
 ```
+
+**Not used (2026-10-16):** the author pointed out that a slice inside a textured block cannot be
+read; panel (b) became the sequence A-scan -> B-scan -> volume -> en-face view, drawn in code from
+the Fig. 2.3 strip (`images/scripts/fig_bg_oct_acquisition.py`). The reference script was removed.
