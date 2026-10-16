@@ -1232,7 +1232,7 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
   now follows these values: parafovea circle 2.3 mm (was 2.5, the Polyak/Wikipedia convention) and
   scale 4.36 mm (was 4.5). Sources disagree on the zones (Tschulakow et al. 2018, PeerJ, citing Hogan
   1971: fovea 1.8 mm, parafovea 2.3 mm), hence "approximate" in the caption.
-- [ ] Ledger for Koksaldi2025 / Nair2021: no local PDFs yet (PMC blocks scripted downloads). Download in
+- [x] (done 2026-10-16, see below) Ledger for Koksaldi2025 / Nair2021: no local PDFs yet (PMC blocks scripted downloads). Download in
   a browser: PMC12330045 -> `pdfs/GA/Koksaldi2025.pdf`, PMC7900853 -> `pdfs/GA/Nair2021.pdf`; then
   `extract_text.py`, hub notes and the Phase 4 check (literature/_tools/README.md, step 4).
 - [x] 2026-10-16 JKU rules on AI use checked (web + repo): no university-wide JKU rule found. Two
@@ -1263,7 +1263,18 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
   adds the 16 layer labels (anchors from colour scans, see the script docstring) and the signs
   (i)-(iii) of §2.1.3 plus "Bruch's membrane intact". Caption rewritten (abbreviations expanded, AI
   note) and cites Abramoff2010, Sadda2018, Chu2022, Boopathiraj2024; text references now say "(a)".
-- [ ] Ledger: the new caption citations of Figs. 2.1 and 2.3 (Koksaldi2025, Nair2021, Abramoff2010,
+- [x] 2026-10-16 Figure-caption citations verified: PDFs filed as `pdfs/GA/Koksaldi2025.pdf` and
+  `pdfs/GA/Nair2021.pdf` (from the author's Downloads), text extracted; hub notes `literature/Koksaldi2025.md`,
+  `literature/Nair2021.md` and concept note `Macular_Zones_and_Landmarks.md` written; both registered in
+  `_scratch/papers.json`. `update_ledger.py --apply` run (this also applied the pending re-indexing of
+  the 2026-10-12..14 rewording). The 8 caption entries C023 (Koksaldi2025), C024 (Nair2021), C025
+  (Huang1991), C036 (Abramoff2010, Sadda2018), C037 (Sadda2018, Chu2022), C038 (Boopathiraj2024) are
+  SUPPORTED with quotes that pass verify_quotes on the cited page. Fig. 2.3 caption reworded: "the
+  layers above it sink towards Bruch's membrane" -> "so the layers above it lie closer to Bruch's
+  membrane" (Sadda describes subsidence for iRORA only; ONL thinning is the cRORA criterion).
+  Ledger now 99 SUPPORTED, 44 NEW (unchecked), 55 CHANGED SENTENCE (recheck): those are the older
+  pending batch (Phase 4 check still to run).
+- [x] (done 2026-10-16, see below) Ledger: the new caption citations of Figs. 2.1 and 2.3 (Koksaldi2025, Nair2021, Abramoff2010,
   Sadda2018, Chu2022, Boopathiraj2024) enter with the next `update_ledger.py --apply` run; Koksaldi2025
   and Nair2021 need their PDFs first.
 - [ ] Author to review Fig. 2.3 (label choice; whether "CC"/"BM" abbreviations are fine).
