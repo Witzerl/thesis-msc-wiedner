@@ -35,7 +35,7 @@ FS = 6.5
 LEAD = dict(arrowstyle="-", lw=0.4, color=PAL["ink"], shrinkA=1.5, shrinkB=0)
 DOWNSAMPLE = 1600
 W, H = 2172, 724
-XL, XR = -960, W + 1060           # label gutters left and right
+XL, XR = -330, W + 400            # label gutters left and right
 
 
 def load(name: str) -> np.ndarray:
@@ -68,29 +68,24 @@ def fan(top, bottom, n):
 def draw_healthy(ax):
     ax.imshow(load("fig_bg_retinal_anatomy_raw_healthy.png"), extent=(0, W, H, 0),
               interpolation="none")
-    # full names with the abbreviation used in panel (b) and the text: inner retina in the left
-    # gutter (anchors on the flat left end), outer retina and choroid in the right gutter
-    inner = [("Inner limiting membrane (ILM)", 102), ("Retinal nerve fibre layer (RNFL)", 118),
-             ("Ganglion cell layer (GCL)", 150), ("Inner plexiform layer (IPL)", 185),
-             ("Inner nuclear layer (INL)", 221), ("Outer plexiform layer (OPL)", 256),
-             ("Outer nuclear layer (ONL)", 308)]
-    for (name, y), yl in zip(inner, fan(-40, 540, len(inner))):
-        label(ax, name, (130, y), (-60, yl), ha="right")
+    # short names on the drawing; the key next to the figure gives the full names
+    inner = [("ILM", 102), ("RNFL", 118), ("GCL", 150), ("IPL", 185), ("INL", 221),
+             ("OPL", 256), ("ONL", 308)]
+    for (name, y), yl in zip(inner, fan(-50, 500, len(inner))):
+        label(ax, name, (130, y), (-40, yl), ha="right")
     # RPE 463-489, BM = light seam 491-494 under the dark RPE base, CC 495-516 (colour scan at
     # x 2030-2050); RPE, BM and CC dots placed after the author's check (2026-10-16) and
     # staggered sideways so they stay apart in print
-    outer = [("External limiting membrane (ELM)", 356, 2040),
-             ("Photoreceptor inner segments (IS)", 384, 2040), ("Ellipsoid zone (EZ)", 411, 2040),
-             ("Photoreceptor outer segments (OS)", 440, 2040),
-             ("Retinal pigment epithelium (RPE)", 478, 2060), ("Bruch's membrane (BM)", 492, 2010),
-             ("Choriocapillaris (CC)", 505, 1960), ("Choroid", 560, 2040), ("Sclera", 622, 2040)]
-    for (name, y, x), yl in zip(outer, fan(150, 850, len(outer))):
-        label(ax, name, (x, y), (W + 60, yl))
+    outer = [("ELM", 356, 2040), ("IS", 384, 2040), ("EZ", 411, 2040), ("OS", 440, 2040),
+             ("RPE", 478, 2060), ("BM", 492, 2010), ("CC", 505, 1960), ("Choroid", 560, 2040),
+             ("Sclera", 622, 2040)]
+    for (name, y, x), yl in zip(outer, fan(110, 860, len(outer))):
+        label(ax, name, (x, y), (W + 40, yl))
     label(ax, "Foveal pit", (1086, 227), (1086, -45), ha="center", va="bottom")
     ax.text(330, 55, "Vitreous", fontsize=FS, color=PAL["ink_2"], style="italic",
             ha="center", va="center")
     ax.set_xlim(XL, XR)
-    ax.set_ylim(880, -130)
+    ax.set_ylim(900, -120)
     ax.set_aspect("equal")
     ax.axis("off")
 
@@ -111,14 +106,39 @@ def draw_ga(ax):
     ax.axis("off")
 
 
+KEY = [("ILM", "Inner limiting membrane"), ("RNFL", "Retinal nerve fibre layer"),
+       ("GCL", "Ganglion cell layer"), ("IPL", "Inner plexiform layer"),
+       ("INL", "Inner nuclear layer"), ("OPL", "Outer plexiform layer"),
+       ("ONL", "Outer nuclear layer"), ("ELM", "External limiting membrane"),
+       ("IS", "Photoreceptor inner segments"), ("EZ", "Ellipsoid zone"),
+       ("OS", "Photoreceptor outer segments"), ("RPE", "Retinal pigment epithelium"),
+       ("BM", "Bruch's membrane"), ("CC", "Choriocapillaris")]
+
+
+def draw_key(ax):
+    """Abbreviation key, top to bottom in the order of the layers."""
+    n = len(KEY)
+    ax.text(0.0, 1.0, "Layers, from the vitreous down", fontsize=FS, fontweight="semibold",
+            va="top", color=PAL["ink"])
+    for i, (ab, name) in enumerate(KEY):
+        y = 0.92 - i * 0.92 / n
+        ax.text(0.0, y, ab, fontsize=FS, fontweight="semibold", va="top", color=PAL["ink"])
+        ax.text(0.22, y, name, fontsize=FS, va="top", color=PAL["ink"])
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+    ax.axis("off")
+
+
 def main():
-    fig = plt.figure(figsize=(117 / 25.4, 64 / 25.4))
-    ax_a = fig.add_axes([0.0, 0.48, 1.0, 0.52])
-    ax_b = fig.add_axes([0.0, 0.0, 1.0, 0.45])
+    fig = plt.figure(figsize=(119 / 25.4, 80 / 25.4))
+    ax_a = fig.add_axes([0.0, 0.47, 0.70, 0.53])
+    ax_b = fig.add_axes([0.0, 0.0, 0.70, 0.45])
+    ax_k = fig.add_axes([0.73, 0.12, 0.27, 0.78])
     draw_healthy(ax_a)
     draw_ga(ax_b)
+    draw_key(ax_k)
     fig.text(0.0, 1.0, "(a)", fontsize=9, fontweight="bold", va="top")
-    fig.text(0.0, 0.47, "(b)", fontsize=9, fontweight="bold", va="top")
+    fig.text(0.0, 0.50, "(b)", fontsize=9, fontweight="bold", va="top")
     save(fig, "fig_bg_retinal_anatomy")
 
 

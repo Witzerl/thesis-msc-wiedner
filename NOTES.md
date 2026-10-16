@@ -1277,7 +1277,10 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
 - [x] (done 2026-10-16, see below) Ledger: the new caption citations of Figs. 2.1 and 2.3 (Koksaldi2025, Nair2021, Abramoff2010,
   Sadda2018, Chu2022, Boopathiraj2024) enter with the next `update_ledger.py --apply` run; Koksaldi2025
   and Nair2021 need their PDFs first.
-- [ ] Author to review Fig. 2.3 (label choice; whether "CC"/"BM" abbreviations are fine).
+- [x] (2026-10-16, author) Author to review Fig. 2.3 (label choice; whether "CC"/"BM" abbreviations are fine).
+  Outcome: short labels on the drawing plus an abbreviation key beside it; RPE/BM/CC dots moved onto
+  their measured bands. Caption panel (a) shortened to point to the key; C036 (Abramoff2010,
+  Sadda2018) re-verified, SUPPORTED.
 - [x] 2026-10-16 Fig. 2.2 revised after author review (blurry block texture, leaders hidden under the
   block faces, thick outline, A-scan/B-scan in the block not readable): panel (a) now full size on top
   (native-resolution raw, labels drawn above everything, A-scan curve orange like the A-scan in (b));
