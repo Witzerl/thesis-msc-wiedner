@@ -88,7 +88,9 @@ leader lines and the three GA signs are added in `images/scripts/` afterwards.
 >
 > Inside the lesion (the middle third of the strip):
 > 1. The **retinal pigment epithelium is completely missing**; Bruch's membrane is still
->    present as a thin line.
+>    present. Draw Bruch's membrane across the whole width as a **clearly visible thin dark
+>    line** directly under the brown pigment layer (in the attached image it is only a faint
+>    light seam), so that it is easy to see that it continues under the lesion.
 > 2. The **photoreceptors are gone**: the outer segments, the bright ellipsoid-zone line, the
 >    inner segments and the external limiting membrane all end at the lesion edges and are
 >    absent in between.
