@@ -35,7 +35,7 @@ FS = 6.5
 LEAD = dict(arrowstyle="-", lw=0.4, color=PAL["ink"], shrinkA=1.5, shrinkB=0)
 DOWNSAMPLE = 1600
 W, H = 2172, 724
-XL, XR = -330, W + 400            # gutters for the labels
+XL, XR = -60, W + 1080            # label column on the right
 
 
 def load(name: str) -> np.ndarray:
@@ -68,19 +68,28 @@ def fan(top, bottom, n):
 def draw_healthy(ax):
     ax.imshow(load("fig_bg_retinal_anatomy_raw_healthy.png"), extent=(0, W, H, 0),
               interpolation="none")
-    inner = [("ILM", 102), ("RNFL", 118), ("GCL", 150), ("IPL", 185), ("INL", 221),
-             ("OPL", 256), ("ONL", 308)]
-    for (name, y), yl in zip(inner, fan(30, 420, len(inner))):
-        label(ax, name, (150, y), (-40, yl), ha="right")
-    outer = [("ELM", 356), ("IS", 384), ("EZ", 411), ("OS", 440), ("RPE", 476), ("BM", 490),
-             ("CC", 514), ("Choroid", 560), ("Sclera", 622)]
-    for (name, y), yl in zip(outer, fan(250, 740, len(outer))):
-        label(ax, name, (2040, y), (W + 40, yl))
+    # one label column on the right, full name with the abbreviation used in panel (b) and the
+    # text; anchors on the flat right end of the strip (same heights as on the left).
+    # RPE, BM and CC dots placed by the author's check of the zoomed render (2026-10-16).
+    layers = [("Inner limiting membrane (ILM)", 102), ("Retinal nerve fibre layer (RNFL)", 118),
+              ("Ganglion cell layer (GCL)", 150), ("Inner plexiform layer (IPL)", 185),
+              ("Inner nuclear layer (INL)", 221), ("Outer plexiform layer (OPL)", 256),
+              ("Outer nuclear layer (ONL)", 308), ("External limiting membrane (ELM)", 356),
+              ("Photoreceptor inner segments (IS)", 384), ("Ellipsoid zone (EZ)", 411),
+              ("Photoreceptor outer segments (OS)", 440),
+              ("Retinal pigment epithelium (RPE)", 478), ("Bruch's membrane (BM)", 492),
+              ("Choriocapillaris (CC)", 505), ("Choroid", 560), ("Sclera", 622)]
+    # RPE 463-489, BM = light seam 491-494 under the dark RPE base, CC 495-516 (colour scan at
+    # x 2030-2050); the three close dots are staggered sideways so they stay apart in print
+    xs = {"Retinal pigment epithelium (RPE)": 2060, "Bruch's membrane (BM)": 2010,
+          "Choriocapillaris (CC)": 1960}
+    for (name, y), yl in zip(layers, fan(-110, 830, len(layers))):
+        label(ax, name, (xs.get(name, 2040), y), (W + 60, yl))
     label(ax, "Foveal pit", (1086, 227), (1086, -45), ha="center", va="bottom")
     ax.text(330, 55, "Vitreous", fontsize=FS, color=PAL["ink_2"], style="italic",
             ha="center", va="center")
     ax.set_xlim(XL, XR)
-    ax.set_ylim(770, -90)
+    ax.set_ylim(870, -150)
     ax.set_aspect("equal")
     ax.axis("off")
 
@@ -102,9 +111,9 @@ def draw_ga(ax):
 
 
 def main():
-    fig = plt.figure(figsize=(131.5 / 25.4, 98 / 25.4))
-    ax_a = fig.add_axes([0.0, 0.52, 1.0, 0.48])
-    ax_b = fig.add_axes([0.0, 0.0, 1.0, 0.52])
+    fig = plt.figure(figsize=(127 / 25.4, 89 / 25.4))
+    ax_a = fig.add_axes([0.0, 0.5, 1.0, 0.5])
+    ax_b = fig.add_axes([0.0, 0.0, 1.0, 0.5])
     draw_healthy(ax_a)
     draw_ga(ax_b)
     panel_label(ax_a, "(a)", x=0.03, y=0.95)
