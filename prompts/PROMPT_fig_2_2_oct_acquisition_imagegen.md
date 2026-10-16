@@ -140,3 +140,27 @@ Same style as before. Now draw a separate image (4:3, at least 2400 px wide, gen
 
 Absolutely no text, letters, numbers, labels, symbols, scale bars, legends or watermarks anywhere in the image.
 ```
+
+---
+
+## Prompt for redrawing panel (b) from a geometry reference (2026-10-16, third attempt)
+
+The code-drawn block had a blurry texture, thick outlines and leaders hidden under the faces, and the
+A-scan line crossing the top face read as wrong. New route: ChatGPT redraws an exact geometry
+reference at high quality. Attach, in this order:
+1. `images/_preview/fig_bg_oct_block_reference.png` (from `images/scripts/fig_bg_oct_block_reference.py`)
+2. `Schematische Querschnittsdarstellung der Fovea.png` (the healthy layer strip of Fig. 2.3)
+
+```
+I am making a figure for a master thesis in medical image analysis. The FIRST attached image is an exact geometry sketch drawn by me; the SECOND attached image is a finished illustration of the retinal layers from the same thesis. Please redraw the FIRST image as a clean, high-quality scientific illustration in the style of the SECOND image (flat colour fills, fine detail, thin uniform dark grey-blue outlines, no shading gradients, no photorealism, white background).
+
+Keep the geometry of the FIRST image exactly: the same block, the same viewing angle and tilt, the same proportions, the same position of every element. Output at least 2400 px wide, same aspect ratio as the first image.
+
+1. The block: replace the flat colour bands on the front face and on the right face by the detailed layers of the SECOND image, in exactly the same order and colours from top to bottom: blue bands with round cells, pale textured bands, the thick band of densely packed cells, the thin dark line, the pale photoreceptor rods, the thin bright white line, the darker blue rods, the brown pigment cells, the band of small capillaries, the rose band with large blood vessels, white at the bottom. Use only the flat outer parts of the second image: the layers are completely flat, with NO pit or dip anywhere. On the right face the layers run diagonally exactly as in the sketch and meet the front-face layers at the same heights at the front-right edge.
+2. The top face: pale blue-grey, with the same thin parallel lines running from left to right (parallel to the front edge) and the same darker irregular patch.
+3. The slice inside the block: a thin, semi-transparent pale blue glass plane, parallel to the front face, exactly where it is in the sketch. Its top edge lies on the top face as a slightly thicker solid blue line (one of the parallel lines); its other edges are inside the block and drawn as thin dashed blue lines, so the slice looks like it is seen through the block.
+4. The orange line: exactly as in the sketch, a solid orange arrow coming from above and pointing down onto the top face, ending in a small orange dot on the slice's top edge, continued inside the block as a dashed orange line straight down inside the slice to its bottom edge.
+5. All outlines thin (similar to the sketch), nothing thick or heavy.
+
+Absolutely no text, letters, numbers, labels, symbols, scale bars, legends or watermarks anywhere in the image.
+```
