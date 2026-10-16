@@ -1220,11 +1220,31 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
   fovea-to-disc distance (disc then ~2.0 x 2.5 mm). Output `images/fig_bg_eye_anatomy.pdf`, printed at
   135 mm. Caption rewritten (schematic, AI-generated, labels added by the author); the Commons
   images, their SOURCES.md and the two old panel PNGs were removed.
-- [ ] TODO (Fig. 2.1 inline): confirm with the supervisor how JKU wants AI-generated figures declared,
-  and check the image tool's terms; confirm the cross-section also came from ChatGPT (caption says so).
-- [ ] TODO (Fig. 2.1 inline): cite a standard source for the macular zone diameters and the ~4.5 mm
-  fovea-to-disc distance (candidates: Hogan, Alvarado & Weddell 1971, *Histology of the Human Eye*;
-  Polyak 1941, *The Retina*). Pending external citation.
+- [ ] TODO (Fig. 2.1 inline): JKU declaration of AI-generated figures -- supervisor asked, answer
+  pending; check the image tool's terms. Both drawings confirmed as ChatGPT (author, 2026-10-16).
+- [x] 2026-10-16 Fig. 2.1 sources added and cited in the caption: **Koksaldi2025** (Koksaldi, Kayabasi,
+  Karti & Saatci, "Clinical anatomy of the macula", Med Hypothesis Discov Innov Ophthalmol 14(2):17-27,
+  doi 10.51329/mehdiophthal1520, PMC12330045, CC BY-NC 4.0): macula lutea ~5.5 mm, fovea ~1.5 mm,
+  parafovea ~2.3 mm, foveola ~350 um, perifovea "the outermost anatomical region of the macula".
+  **Nair2021** (TVST 10(2):25, doi 10.1167/tvst.10.2.25, PMC7900853, CC BY 4.0): horizontal distance
+  fovea to disc centre 4359 um in right eyes (4248 left), healthy subjects, Spectralis/Cirrus OCT.
+  Bib entries checked against PubMed/Crossref; quotes checked in the Europe PMC full text. The figure
+  now follows these values: parafovea circle 2.3 mm (was 2.5, the Polyak/Wikipedia convention) and
+  scale 4.36 mm (was 4.5). Sources disagree on the zones (Tschulakow et al. 2018, PeerJ, citing Hogan
+  1971: fovea 1.8 mm, parafovea 2.3 mm), hence "approximate" in the caption.
+- [ ] Ledger for Koksaldi2025 / Nair2021: no local PDFs yet (PMC blocks scripted downloads). Download in
+  a browser: PMC12330045 -> `pdfs/GA/Koksaldi2025.pdf`, PMC7900853 -> `pdfs/GA/Nair2021.pdf`; then
+  `extract_text.py`, hub notes and the Phase 4 check (literature/_tools/README.md, step 4).
+- [x] 2026-10-16 JKU rules on AI use checked (web + repo): no university-wide JKU rule found. Two
+  institute-level policies, both business faculty: Institute of Strategic Management (27 May 2026) --
+  tool and purpose disclosed in the methods chapter, by activity (literature, data analysis,
+  arguments, writing support); Corporate Finance -- an AI-made figure or table gets a note in its
+  caption/footnote, AI chatbots are "documentation-required", the sworn declaration for master
+  theses follows the examinations office (the template notes it is now part of the submission
+  process). Fig. 2.1 already carries the note in the caption. Supervisor asked (author, 2026-10-16).
+- [ ] Decide (after the supervisor's answer) whether the thesis needs a general statement on AI tools
+  used (image generation for Figs. 2.1-2.3, writing and coding assistants), e.g. in the front matter
+  or the methods chapter.
 - [ ] Author to review Fig. 2.1 on page 5 (label choice: ciliary body, iris, cornea, lens, sclera,
   choroid, retina, vitreous body, macula, fovea, optic disc, optic nerve; foveola to perifovea,
   OCT window). The vessels leave the disc slightly nasal of its centre, which is anatomically normal.

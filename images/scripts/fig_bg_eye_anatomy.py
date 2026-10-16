@@ -12,9 +12,12 @@ macular zone circles, the 6 x 6 mm OCT window and the orientation words.
 All anchor coordinates are pixels of the raw images; they were measured on the images
 (colour scans across the eye wall, darkest point of the fovea, outline of the optic disc).
 
-Scale of the fundus panel: the fovea-to-optic-disc distance is taken as 4.5 mm (centre to
-centre, horizontal), which fixes the zone circles (diameters 0.35 / 1.5 / 2.5 / 5.5 mm)
-and the 6 x 6 mm window. The cross-section has no scale.
+Scale of the fundus panel: the horizontal distance from the fovea to the centre of the optic
+disc is set to 4.36 mm, the mean in healthy right eyes (Nair et al. 2021, TVST 10(2):25,
+Table 2: 4359 um). That fixes the zone circles and the 6 x 6 mm window. Zone diameters after
+Koksaldi et al. 2025 (Med Hypothesis Discov Innov Ophthalmol 14(2):17-27): foveola ~350 um,
+fovea ~1.5 mm, parafovea ~2.3 mm, macula lutea ~5.5 mm, the perifovea being its outermost
+region. The cross-section has no scale.
 
 Output: images/fig_bg_eye_anatomy.pdf (include at width=\\textwidth).
 """
@@ -96,8 +99,9 @@ def draw_cross_section(ax):
 # --------------------------------------------------------------------------------------
 FOVEA = (575.0, 609.0)        # darkest point of the macular spot
 DISC = (871.0, 603.0)         # centre of the cream disc outline (x 805-937, y 522-684)
-PX_PER_MM = (DISC[0] - FOVEA[0]) / 4.5
-ZONES_MM = {"foveola": 0.35, "fovea": 1.5, "parafovea": 2.5, "perifovea": 5.5}
+FOVEA_DISC_MM = 4.36          # Nair et al. (2021), right eyes, horizontal
+PX_PER_MM = (DISC[0] - FOVEA[0]) / FOVEA_DISC_MM
+ZONES_MM = {"foveola": 0.35, "fovea": 1.5, "parafovea": 2.3, "perifovea": 5.5}  # Koksaldi et al. (2025)
 
 
 def polar(r_mm, deg):
@@ -117,7 +121,7 @@ def draw_fundus(ax):
     # zones: anchors inside each zone at fanned angles, labels in the left gutter
     label(ax, "Macula", polar(2.75, 120), (90, 300), ha="right")
     label(ax, "Perifovea", polar(2.0, 145), (90, 450), ha="right")
-    label(ax, "Parafovea", polar(1.0, 165), (90, 580), ha="right")
+    label(ax, "Parafovea", polar(0.95, 165), (90, 580), ha="right")
     label(ax, "Fovea", polar(0.5, 185), (90, 700), ha="right")
     label(ax, "Foveola", FOVEA, (90, 820), ha="right")
     label(ax, "Optic disc", (915, 560), (1090, 330))
