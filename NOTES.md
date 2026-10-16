@@ -1186,8 +1186,20 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
 - [ ] §3.1 `fig:data:example-state` -- Python from raw data; needs the author's decision whether
   a patient's SLO image may be printed.
 - [ ] §2.2.2 `fig:bg:solver-path` -- schematic (TikZ draft), needs author review.
-- [ ] §2.1.3 `fig:bg:oct-acquisition`, §2.1.2 `fig:bg:retinal-anatomy`, §2.1.1
-  `fig:bg:eye-anatomy` -- illustrations, generated with the author. The retinal-anatomy caption
+- [x] 2026-10-16 §2.1.1 `fig:bg:eye-anatomy` (Fig. 2.1) done with two openly licensed Wikimedia
+  Commons images instead of an LLM drawing (author's choice): left Schematic_diagram_of_the_human_eye_en.svg
+  (Rhcastilhos, Jmarchn; CC BY-SA 3.0; background made white), right Macula.svg (photo Danny Hope,
+  diagram Zyxwv99; CC BY 2.0; unchanged). Credits with URLs in the caption; sources in
+  `images/third_party/SOURCES.md`; script `images/scripts/fig_bg_eye_anatomy.py`. Caption corrected:
+  the left panel is a *horizontal* section of a right eye, not a sagittal one. A 6 x 6 mm OCT-window
+  overlay on the fundus was left out (its edges would cross the "macula" and "0.65 mm" labels); the
+  caption says the window is slightly larger than the 5.5 mm macula drawn there.
+- [ ] Author to check Fig. 2.1 (page 18): the small labels of the right panel (distances, inset) are
+  hard to read at 0.48	extwidth; the image also uses its own zone diameters (fovea 1.5 mm, parafovea
+  2.5 mm, macula 5.5 mm), which the text does not quote. The style/ palette does not apply to
+  third-party images.
+- [ ] §2.1.3 `fig:bg:oct-acquisition`, §2.1.2 `fig:bg:retinal-anatomy` -- illustrations, generated
+  with the author. The retinal-anatomy caption
   names layer strata and maps them to the ten channels, which the 2026-09-25 decision forbids
   (boundary names unknown); a real B-scan is not in the repository.
 - [ ] **Illustrations via LLM (author, 2026-10-14; check when the illustrations are made):**
@@ -1198,7 +1210,8 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
   one published figure is an adaptation: "adapted from X" + licence check; (4) Fig. 2.2 must not map
   layers onto the ten channels, and a drawn B-scan is labelled as a schematic, not shown as data;
   (5) check JKU rules on declaring AI-generated figures (ask the supervisor). Supervisor SV-2.3
-  allows licensed third-party images as an alternative.
+  allows licensed third-party images as an alternative. 2026-10-16: Fig. 2.1 took that route (Commons images, see above);
+  the LLM rules now concern Figs. 2.2-2.3 only.
 - [ ] Not yet in the text: GA progression stages from the poster (`poster/figs/eye_stage_1-4.png`),
   e.g. in §1.1 or §2.1.2 -- placement to be decided.
 
@@ -1717,7 +1730,7 @@ Pulled from the code repository (`masterthesis-docker/NOTES.md` + `PROJECT_CONTE
   depth pass on §2.3 (operator-vs-autoregressive contrast) and §2.4 (message passing as a
   learned stencil) once Chapters 4--5 are drafted and it is clear how much background
   they actually lean on.
-- [ ] TODO: produce Figure `fig:bg:eye-anatomy` placed in `02-background.tex` §2.1.1 -- two-panel anatomy reference for ML readers without clinical background: (left) sagittal cross-section of the human eye labelling cornea, lens, vitreous body, retina, fovea, optic-nerve head (ONH) / optic disc, optic nerve, choroid, sclera, with the macular region highlighted on the retina near the posterior pole; (right) en-face fundus view of the posterior pole labelling macula (~6 mm-wide central region), fovea (central pit), foveola (innermost ~0.35 mm of the fovea), parafovea (~0.5--1.5 mm eccentric ring), perifovea (~1.5--3 mm eccentric ring), and ONH / optic disc (~4 mm nasal to the fovea). Overlay the 6 x 6 mm OCT scanning window used by the thesis cohort as a dashed square centred on the fovea. Currently rendered as an `\fbox` placeholder pending a real graphic.
+- [x] (done 2026-10-16 with Wikimedia Commons images, see the Figure plan) TODO: produce Figure `fig:bg:eye-anatomy` placed in `02-background.tex` §2.1.1 -- two-panel anatomy reference for ML readers without clinical background: (left) sagittal cross-section of the human eye labelling cornea, lens, vitreous body, retina, fovea, optic-nerve head (ONH) / optic disc, optic nerve, choroid, sclera, with the macular region highlighted on the retina near the posterior pole; (right) en-face fundus view of the posterior pole labelling macula (~6 mm-wide central region), fovea (central pit), foveola (innermost ~0.35 mm of the fovea), parafovea (~0.5--1.5 mm eccentric ring), perifovea (~1.5--3 mm eccentric ring), and ONH / optic disc (~4 mm nasal to the fovea). Overlay the 6 x 6 mm OCT scanning window used by the thesis cohort as a dashed square centred on the fovea. Currently rendered as an `\fbox` placeholder pending a real graphic.
 - [ ] TODO: produce Figure `fig:bg:retinal-anatomy` placed in `02-background.tex` §2.1.2 (formerly §2.1.1) -- two-panel schematic for readers without a clinical background: (left) labelled cross-section through a healthy macula showing the principal retinal layers from ILM through RNFL, GCL+IPL, INL+OPL, ONL, photoreceptor IS/OS bands (including the ellipsoid zone), RPE, and Bruch's membrane, with the choriocapillaris immediately beneath; (right) a representative OCT B-scan through a GA-affected macula highlighting the dropout of the outer-retinal layers within the lesion and the corresponding choroidal hypertransmission signature beneath. Mirror the channel ordering of the eleven-channel state tensor used in the thesis. Currently rendered as an `\fbox` placeholder pending a real graphic.
 - [ ] TODO: produce Figure `fig:bg:oct-acquisition` placed in `02-background.tex` §2.1.3 -- four-panel schematic of OCT acquisition geometry intended to anchor the geometric vocabulary (A-scan, B-scan, volume, en-face) for ML readers without imaging background: (a) eye + single probe beam + inset depth-vs-reflectivity profile of one A-scan; (b) the same with the beam scanned laterally along one axis to form a B-scan; (c) the beam scanned in both lateral directions to form a 3D volume with the 6 x 6 mm physical footprint annotated (do NOT annotate a fixed voxel count -- native shapes vary per eye: 38-66 B-scans x 961-1719 A-scans, 67 distinct shapes); (d) the volume projected axially onto the fundus plane to yield the 49 x 1024 en-face image used by the model, with a representative GA lesion visible as a region of altered signal. Currently rendered as an `\fbox` placeholder pending a real graphic.
 - [ ] TODO: confirm with supervisor the exact provenance of the eleven state-tensor channels in the MUW cohort (mask: manual grading vs trained network vs combination; layer boundaries: which segmentation algorithm, which boundary list, which post-processing) before drafting `03-data.tex` §3.1. The §2.1.4 text is currently agnostic of those details so it does not need to be revisited once the answer is in hand.

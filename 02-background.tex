@@ -24,48 +24,41 @@ the forecasting of GA and states the problem formally.
 \subsection{Eye Anatomy}
 \label{sec:background:ga-oct:anatomy}
 
-% TODO: produce Figure fig:bg:eye-anatomy --- a two-panel anatomy
-% reference for ML readers without clinical background:
-% (left) sagittal cross-section of the human eye labelling the
-% principal structures from front to back: cornea, lens, vitreous
-% body, retina, fovea, optic nerve head (ONH) / optic disc, optic
-% nerve, choroid, sclera; with an explicit annotation of the macular
-% region as a small disc-shaped area on the retina centred near the
-% posterior pole. (right) en-face fundus view of the posterior pole
-% looking at the inside of the back of the eye, labelling: macula
-% (~6 mm-wide central region), fovea (central pit), foveola (the
-% innermost ~0.35 mm of the fovea), parafovea (~0.5--1.5 mm
-% eccentric ring), perifovea (~1.5--3 mm eccentric ring), and ONH /
-% optic disc (~4 mm nasal to the fovea). The 6 x 6 mm OCT scanning
-% window used by the thesis cohort can be overlaid on the fundus
-% panel as a dashed square centred on the fovea, to make the link
-% between the anatomical reference frame and the modelling grid
-% explicit.
+% Figure fig:bg:eye-anatomy: two openly licensed Wikimedia Commons images,
+% prepared by images/scripts/fig_bg_eye_anatomy.py; authors, URLs and
+% licences in images/third_party/SOURCES.md. (a) is CC BY-SA 3.0, so the
+% adapted panel (white background) is shared under the same licence.
 \begin{figure}[t]
   \centering
-  \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering\itshape Placeholder
-    for Figure~\ref{fig:bg:eye-anatomy}: sagittal cross-section of the
-    eye (left) and en-face view of the fundus (right) labelling the
-    anatomical terms used throughout this thesis. See accompanying
-    \texttt{\% TODO} for the intended content.}}
+  \includegraphics[width=0.48\textwidth]{images/fig_bg_eye_anatomy_a.png}%
+  \hfill
+  \includegraphics[width=0.48\textwidth]{images/fig_bg_eye_anatomy_b.png}
   \caption[Anatomy of the eye and the macular region.]{%
     Anatomy reference for the terms used throughout this thesis.
-    \emph{Left:} sagittal (side-view) cross-section of the eye. Light
-    enters through the cornea and lens at the front, traverses the
-    vitreous body, and falls on the retina at the back; the
-    \emph{macula} is a small disc-shaped specialised region of the
-    retina, and the \emph{fovea} is its
+    \emph{Left:} horizontal cross-section of a right eye, seen from
+    above. Light enters through the cornea and lens at the front,
+    traverses the vitreous body (labelled ``vitreous humour''), and
+    falls on the retina at the back; the \emph{macula} is a small
+    specialised region of the retina, and the \emph{fovea} is its
     centre, where photoreceptor density and visual acuity peak. The
-    optic-nerve head (ONH, also called the optic disc) is the point
-    at which the optic nerve exits the eye.
-    \emph{Right:} en-face view of the fundus, i.e.\ the inside of the
-    back of the eye seen along the optical axis. The fovea sits
-    roughly at the centre of the macula, which is sub-divided into
-    concentric zones of increasing radius: the foveola, fovea,
-    parafovea and perifovea. The dashed
-    square indicates the
-    $6 \times 6$\,mm fovea-centred OCT scanning window used in this
-    thesis (\S\ref{sec:background:ga-oct:muw}).}
+    optic disc (also called the optic-nerve head, ONH) is the point at
+    which the optic nerve exits the eye.
+    \emph{Right:} photograph of the fundus of a right eye, i.e.\ the
+    inside of the back of the eye seen through the pupil, with the
+    concentric zones of the macula drawn over it: fovea, parafovea and
+    perifovea, whose outer edge bounds the macula; the inset at the
+    lower right enlarges the centre of the fovea, including the foveola. The
+    distances are those given in the source image. The optic disc lies
+    to the nasal side of the fovea. The $6 \times 6$\,mm fovea-centred
+    OCT scanning window used in this thesis
+    (\S\ref{sec:background:ga-oct:muw}) is slightly larger than the
+    5.5\,mm macula drawn here.
+    Image credits. Left: Rhcastilhos and Jmarchn, Wikimedia Commons,
+    \url{https://commons.wikimedia.org/wiki/File:Schematic_diagram_of_the_human_eye_en.svg},
+    CC~BY-SA~3.0; background made white. Right: photograph by Danny
+    Hope, diagram by Zyxwv99, Wikimedia Commons,
+    \url{https://commons.wikimedia.org/wiki/File:Macula.svg},
+    CC~BY~2.0; unchanged.}
   \label{fig:bg:eye-anatomy}
 \end{figure}
 
