@@ -1633,6 +1633,39 @@ Solvers?"); contributions back as bullet points. He offers a meeting.
   registration and cleaner segmentations (resolves the §2.4 cohort TODO, update every "larger
   cohort" mention).
 
+### Supervisor review 2 (Dmitrii Lachinov, 2026-10-17)
+
+Second part of the review, `main-thesis_dl_rev2.pdf` (Downloads): the same build of 2026-10-02 as
+review 1, annotated further. Marks 1-28 are the review-1 comments; marks 29-93 (pp. 36-85) are new and
+cover Chapters 4-7 (65 highlights, 47 with a comment). Appendices skipped. Matched against the AI
+editorial review (`reviews/editorial-2026-10-01/`, statuses of 2026-10-02 re-checked against today's
+sources) in one list: **`reviews/worklist-ch4-7-2026-10-17.md`** (39 supervisor items SV-4.1-SV-7.5,
+e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open AI items by section,
+55 of them on sentences he marked). To be worked through chapter by chapter, like Ch. 1-3.
+- [ ] Work through `reviews/worklist-ch4-7-2026-10-17.md`, chapter by chapter.
+- [ ] E-mail, general: every section = intro (purpose + thesis statement) / body / conclusion; no LLM
+  sentence patterns ("What it does is that ...", "not X but Y", "X is not what decides Y"; "they are all
+  over"); compare the MM-PDE paper's style; one table or plot per results subsection, small table
+  excerpts next to each ablation; boxplots/scatterplots. The **guidelines book** he says he sent is not
+  in the repo or Downloads: locate it or ask.
+- [ ] **Layer boundaries (answers review-1 SV-3.4):** 001 ILM, 002 RNFL-GCL, 003 GCL-IPL, 004 IPL-INL,
+  005 INL-OPL, 006 OPL-HFL, 008 IS/OS junction, 009 inner boundary of the OPR, 010 inner boundary of the
+  RPE, 011 outer boundary of the RPE (surface 007 of the Iowa set is not in the data). Write into §3.2 and
+  §6.3 and close the "names of the ten boundaries" TODOs; confirm first that channels 1-10 follow this
+  order.
+- [ ] **FAF annotation confirmed** (SV-6.7, "most likely annotated" -> "it was"): remove the hedge in §6.3
+  and the "inferred from Mai et al." TODO in §3.1; this is the supervisor confirmation that the FACT
+  CHECK item of 2026-09-25 was waiting for.
+- [ ] Decisions to take with the author (or ask the supervisor): SV-4.2 MM-PDE into the main text as a
+  negative result (conflicts with the 2026-09-25 appendix decision); SV-4.4 what "(C, N, K) does not
+  match" refers to; SV-5.2 z-test with an empirical sigma for the noise rule (the 0.016 paired threshold
+  already corresponds to z of about 2); SV-5.12 new step-size test h = 1 ... 1/32 years (post-hoc on
+  existing checkpoints or new training); SV-6.4 "anchor" -> "study evaluation interval?".
+- [ ] Reply mail, new points: introduction/background merge closed ("it's fine"); he uses "framework"
+  himself (SV-4.1), so "methodology" may not be needed; ask about SV-4.4, SV-6.4 and the guidelines book;
+  JKU rule on AI-generated figures still unanswered (he avoids image generators himself, uses
+  matplotlib/seaborn scripts and Claude SVG elements merged in draw.io).
+
 ### Assets that now exist and should be reused
 
 - **The Practical Work report** (`masterthesis-docker/practical/`) was handed in
