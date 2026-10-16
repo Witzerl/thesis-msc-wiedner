@@ -32,6 +32,7 @@ pal = setup()
 PAL = pal.PAL
 RAW = IMAGES / "raw"
 FS = 6.5
+XA = 0.50                        # A-scan column, fraction of the B-scan width
 LEAD = dict(arrowstyle="-", lw=0.4, color=PAL["ink"], shrinkA=1.5, shrinkB=0)
 Z_TOP = 30                       # labels and leaders above every drawn element
 
@@ -113,31 +114,37 @@ def draw_sequence(ax):
     strip = raw[100:658, 0:520]                    # flat left end, ILM ... sclera
     H = 1.0
     W = H * strip.shape[1] / strip.shape[0] * 1.6
-    xa = 0.42                                      # A-scan position, fraction of the width
+    xa = XA                                        # A-scan position, fraction of the width
     aw = 0.09                                      # drawn width of the A-scan column
     gap = 0.46
     n, dx, dy = 6, 0.13, 0.09                      # B-scans in the stack and their offset
+    yc = (n - 1) * dy / 2                          # lift that centres the single drawings on
+    ym = yc + H / 2                                # the stack; arrows at the common mid-height
+    over = 0.04                                    # A-scan outline extends past the B-scan edge
 
     def caption(xc, title, sub):
         text(ax, xc, -0.12, title, va="top")
         text(ax, xc, -0.27, sub, va="top", fontsize=FS - 0.5, color=PAL["ink_2"])
 
     x = 0.0
-    # 1. A-scan: one column of the B-scan
+    # 1. A-scan: one column of the B-scan, cut at the drawn width so it is not stretched
     c = int(xa * strip.shape[1])
-    ax.imshow(strip[:, c - 5:c + 5], extent=(x, x + aw, 0, H), aspect="auto",
+    half = max(1, round(aw / W * strip.shape[1] / 2))
+    ax.imshow(strip[:, c - half:c + half], extent=(x, x + aw, yc, yc + H), aspect="auto",
               interpolation="lanczos", zorder=2)
-    ax.add_patch(Rectangle((x, 0), aw, H, fill=False, ec=PAL["accent"], lw=0.8, zorder=3))
+    ax.add_patch(Rectangle((x, yc - over), aw, H + 2 * over, fill=False, ec=PAL["accent"],
+                           lw=0.8, zorder=3))
     caption(x + aw / 2, "A-scan", "depth profile")
-    arrow(ax, x + aw + 0.08, x + aw + gap - 0.08, H / 2)
+    arrow(ax, x + aw + 0.08, x + aw + gap - 0.08, ym)
     x += aw + gap
     # 2. B-scan: many A-scans side by side
-    ax.imshow(strip, extent=(x, x + W, 0, H), aspect="auto", interpolation="lanczos", zorder=2)
-    ax.add_patch(Rectangle((x, 0), W, H, fill=False, ec=PAL["primary"], lw=0.6, zorder=3))
-    ax.add_patch(Rectangle((x + xa * W - aw / 2, 0), aw, H, fill=False, ec=PAL["accent"],
-                           lw=0.8, zorder=4))
+    ax.imshow(strip, extent=(x, x + W, yc, yc + H), aspect="auto", interpolation="lanczos",
+              zorder=2)
+    ax.add_patch(Rectangle((x, yc), W, H, fill=False, ec=PAL["primary"], lw=0.6, zorder=3))
+    ax.add_patch(Rectangle((x + xa * W - aw / 2, yc - over), aw, H + 2 * over, fill=False,
+                           ec=PAL["accent"], lw=0.8, zorder=4))
     caption(x + W / 2, "B-scan", "A-scans side by side")
-    arrow(ax, x + W + 0.08, x + W + gap - 0.08, H / 2)
+    arrow(ax, x + W + 0.08, x + W + gap - 0.08, ym)
     x += W + gap
     # 3. Volume: a stack of B-scans, offset back and to the right
     for i in reversed(range(n)):
@@ -149,29 +156,32 @@ def draw_sequence(ax):
                                lw=0.6 if i == 0 else 0.35, zorder=10.5 - i))
     caption(x + (W + (n - 1) * dx) / 2, "Volume", "stack of B-scans")
     x += W + (n - 1) * dx
-    arrow(ax, x + 0.08, x + gap - 0.08, H / 2)
+    arrow(ax, x + 0.08, x + gap - 0.08, ym)
     x += gap
     # 4. En-face view: the volume seen from the front of the eye, one line per B-scan
     s = 1.0
-    ax.add_patch(Rectangle((x, 0), s, s, fc="#DCEAF2", ec=PAL["ink_2"], lw=0.5, zorder=2))
+    ax.add_patch(Rectangle((x, yc), s, s, fc="#DCEAF2", ec=PAL["ink_2"], lw=0.5, zorder=2))
     t = np.linspace(0, 2 * np.pi, 200)
     r = 1.0 + 0.18 * np.sin(3 * t + 1) + 0.12 * np.sin(5 * t + 2)
-    ax.add_patch(Polygon(np.c_[x + 0.55 + 0.2 * r * np.cos(t), 0.55 + 0.17 * r * np.sin(t)],
+    ax.add_patch(Polygon(np.c_[x + 0.55 + 0.2 * r * np.cos(t),
+                               yc + 0.55 + 0.17 * r * np.sin(t)],
                          closed=True, fc=PAL["secondary"], alpha=0.45, ec="none", zorder=3))
-    for i, yy in enumerate(np.linspace(0.08, 0.92, n)):
-        ax.plot([x, x + s], [yy, yy], lw=1.0 if i == 0 else 0.4,
+    rows = np.linspace(0.08, 0.92, n)
+    for i, yy in enumerate(rows):
+        ax.plot([x, x + s], [yc + yy, yc + yy], lw=1.0 if i == 0 else 0.4,
                 color=PAL["primary"] if i == 0 else PAL["primary_700"], zorder=4)
-    label(ax, "lesion", (x + 0.62, 0.62), (x + s + 0.12, 0.85))
+    label(ax, "lesion", (x + 0.62, yc + 0.62), (x + s + 0.12, yc + 0.85))
+    label(ax, "B-scans", (x + s - 0.06, yc + rows[1]), (x + s + 0.12, yc + 0.25))
     caption(x + s / 2, "En-face view", "volume seen from the front")
     x += s
-    ax.set_xlim(-0.05, x + 0.55)
+    ax.set_xlim(-0.32, x + 0.55)
     ax.set_ylim(-0.42, H + (n - 1) * dy + 0.05)
     ax.set_aspect("equal")
     ax.axis("off")
 
 
 def main():
-    fig = plt.figure(figsize=(126 / 25.4, 95 / 25.4))
+    fig = plt.figure(figsize=(133 / 25.4, 98 / 25.4))
     ax_a = fig.add_axes([0.09, 0.42, 0.82, 0.58])
     ax_b = fig.add_axes([0.0, 0.0, 1.0, 0.38])
     draw_interferometer(ax_a)
