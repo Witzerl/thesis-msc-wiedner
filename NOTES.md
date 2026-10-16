@@ -1206,6 +1206,12 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
   `images/third_party/` and the two `fig_bg_eye_anatomy_[ab].png` if no longer used. Open choice:
   the prompt suggests `jku_magenta` tints for choroid and vessels, which style/README calls "off by
   default".
+- [ ] 2026-10-16 (author): the matplotlib route for Fig. 2.1 is dropped -- both returned scripts
+  drew the cross-section wrong (layers missing at the back wall, macula as an arc in the vitreous,
+  no fovea pit; vessels crossing the macula in one fundus); renders were only in the scratchpad.
+  New route: image-generating model, one prompt per panel, no text, labels + 6 x 6 mm window +
+  N/T marks added here in TikZ: `prompts/PROMPT_fig_2_1_eye_anatomy_imagegen.md` (with an anatomy
+  checklist). Caption must state "AI-generated"; JKU rules and the tool's terms to be checked.
 - [ ] §2.1.3 `fig:bg:oct-acquisition`, §2.1.2 `fig:bg:retinal-anatomy` -- illustrations, generated
   with the author. The retinal-anatomy caption
   names layer strata and maps them to the ten channels, which the 2026-09-25 decision forbids
