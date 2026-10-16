@@ -1198,6 +1198,14 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
   hard to read at 0.48	extwidth; the image also uses its own zone diameters (fovea 1.5 mm, parafovea
   2.5 mm, macula 5.5 mm), which the text does not quote. The style/ palette does not apply to
   third-party images.
+- [ ] 2026-10-16 (author): Fig. 2.1 is to be redrawn as an own schematic after all (the Commons
+  images stay in the text until then). Prompt for the external LLM, drawing only, no text, with
+  label anchors exported as JSON: `prompts/PROMPT_fig_2_1_eye_anatomy.md`. Afterwards here: audit the
+  anatomy against the prompt's table, add labels / leader lines / N-T marks from the anchors, rewrite
+  the caption ("schematic", layer thickness not to scale, no Commons credits), and remove
+  `images/third_party/` and the two `fig_bg_eye_anatomy_[ab].png` if no longer used. Open choice:
+  the prompt suggests `jku_magenta` tints for choroid and vessels, which style/README calls "off by
+  default".
 - [ ] §2.1.3 `fig:bg:oct-acquisition`, §2.1.2 `fig:bg:retinal-anatomy` -- illustrations, generated
   with the author. The retinal-anatomy caption
   names layer strata and maps them to the ten channels, which the 2026-09-25 decision forbids
