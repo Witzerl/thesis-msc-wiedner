@@ -1194,11 +1194,11 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
   the left panel is a *horizontal* section of a right eye, not a sagittal one. A 6 x 6 mm OCT-window
   overlay on the fundus was left out (its edges would cross the "macula" and "0.65 mm" labels); the
   caption says the window is slightly larger than the 5.5 mm macula drawn there.
-- [ ] Author to check Fig. 2.1 (page 18): the small labels of the right panel (distances, inset) are
+- [x] (superseded 2026-10-16: Commons version replaced) Author to check Fig. 2.1 (page 18): the small labels of the right panel (distances, inset) are
   hard to read at 0.48	extwidth; the image also uses its own zone diameters (fovea 1.5 mm, parafovea
   2.5 mm, macula 5.5 mm), which the text does not quote. The style/ palette does not apply to
   third-party images.
-- [ ] 2026-10-16 (author): Fig. 2.1 is to be redrawn as an own schematic after all (the Commons
+- [x] (done 2026-10-16, see below) 2026-10-16 (author): Fig. 2.1 is to be redrawn as an own schematic after all (the Commons
   images stay in the text until then). Prompt for the external LLM, drawing only, no text, with
   label anchors exported as JSON: `prompts/PROMPT_fig_2_1_eye_anatomy.md`. Afterwards here: audit the
   anatomy against the prompt's table, add labels / leader lines / N-T marks from the anchors, rewrite
@@ -1206,12 +1206,28 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
   `images/third_party/` and the two `fig_bg_eye_anatomy_[ab].png` if no longer used. Open choice:
   the prompt suggests `jku_magenta` tints for choroid and vessels, which style/README calls "off by
   default".
-- [ ] 2026-10-16 (author): the matplotlib route for Fig. 2.1 is dropped -- both returned scripts
+- [x] (done 2026-10-16, see below) 2026-10-16 (author): the matplotlib route for Fig. 2.1 is dropped -- both returned scripts
   drew the cross-section wrong (layers missing at the back wall, macula as an arc in the vitreous,
   no fovea pit; vessels crossing the macula in one fundus); renders were only in the scratchpad.
   New route: image-generating model, one prompt per panel, no text, labels + 6 x 6 mm window +
   N/T marks added here in TikZ: `prompts/PROMPT_fig_2_1_eye_anatomy_imagegen.md` (with an anatomy
   checklist). Caption must state "AI-generated"; JKU rules and the tool's terms to be checked.
+- [x] 2026-10-16 Fig. 2.1 done with two ChatGPT-generated drawings (cross-section: Downloads
+  `eye_cross_section_left_panel.png`; fundus: `Detaillierte Netzhaut mit sichtbarer Papille (5).png`),
+  kept unchanged and read-only in `images/raw/`. `images/scripts/fig_bg_eye_anatomy.py` adds the
+  labels (anchors measured on the raw pixels), the macular zone circles (0.35 / 1.5 / 2.5 / 5.5 mm),
+  the dashed 6 x 6 mm OCT window and the temporal/nasal marks, with the fundus scaled by a 4.5 mm
+  fovea-to-disc distance (disc then ~2.0 x 2.5 mm). Output `images/fig_bg_eye_anatomy.pdf`, printed at
+  135 mm. Caption rewritten (schematic, AI-generated, labels added by the author); the Commons
+  images, their SOURCES.md and the two old panel PNGs were removed.
+- [ ] TODO (Fig. 2.1 inline): confirm with the supervisor how JKU wants AI-generated figures declared,
+  and check the image tool's terms; confirm the cross-section also came from ChatGPT (caption says so).
+- [ ] TODO (Fig. 2.1 inline): cite a standard source for the macular zone diameters and the ~4.5 mm
+  fovea-to-disc distance (candidates: Hogan, Alvarado & Weddell 1971, *Histology of the Human Eye*;
+  Polyak 1941, *The Retina*). Pending external citation.
+- [ ] Author to review Fig. 2.1 on page 5 (label choice: ciliary body, iris, cornea, lens, sclera,
+  choroid, retina, vitreous body, macula, fovea, optic disc, optic nerve; foveola to perifovea,
+  OCT window). The vessels leave the disc slightly nasal of its centre, which is anatomically normal.
 - [ ] §2.1.3 `fig:bg:oct-acquisition`, §2.1.2 `fig:bg:retinal-anatomy` -- illustrations, generated
   with the author. The retinal-anatomy caption
   names layer strata and maps them to the ten channels, which the 2026-09-25 decision forbids
