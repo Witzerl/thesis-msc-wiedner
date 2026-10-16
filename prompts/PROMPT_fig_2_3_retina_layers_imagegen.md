@@ -136,3 +136,49 @@ Panel B
 Afterwards (here): raw files into `images/raw/`, labels and leader lines from measured anchors
 (layer names in panel A; the three signs (i)-(iii) of §2.1.3 in panel B), caption rewritten
 with AI-generation note and citations (Abramoff2010, Sadda2018, Chu2022).
+
+---
+
+## Prompt B, standalone for a new chat (2026-10-16)
+
+Written after five rounds in one chat kept the same error inside the lesion: a band of
+densely packed cells (outer nuclear layer) stays several rows thick, with an extra pale band
+and a separate single row of cells underneath it. Only one version had the lesion right
+(`Schematische Netzhaut mit zentraler Atrophie (2).png`), but it lost the capillary circles
+outside the lesion. Attach two images to the new chat, in this order:
+1. `Schematische Querschnittsdarstellung der Fovea.png` (healthy panel A),
+2. `Schematische Netzhaut mit zentraler Atrophie (2).png` (lesion reference).
+
+Text to paste:
+
+```
+I am making a figure for a master thesis in medical image analysis. It has two panels drawn as flat, clean scientific textbook illustrations (flat colour fills, thin dark grey-blue outlines, no shading, no photorealism, white background). Panel A, the healthy retina, is finished: it is the FIRST attached image. I now need Panel B: the same retina with a lesion of geographic atrophy, a disease in which the pigment epithelium, the photoreceptors and the capillary layer below them die in a patch.
+
+The SECOND attached image is an earlier attempt at Panel B. Its lesion (the middle part) is anatomically correct and should be reproduced exactly, but its healthy parts left and right are wrong (the small capillary circles under the brown layer are missing). Please produce Panel B as follows:
+
+- Canvas, size, proportions, colours, line style and the position and height of every band: exactly as in the FIRST image.
+- Left and right thirds (healthy): identical to the FIRST image, including the thin band of small round capillaries directly under the brown pigment cells.
+- Middle third (lesion): as in the SECOND image.
+
+For clarity, these are the bands from top to bottom:
+
+Healthy part (as in the first image): thin dark top line; light-blue plain band; band with scattered round cells; pale finely textured band; band with round cells; pale finely textured band; THICK band of densely packed round cells; thin dark double line; band of pale upright rods; thin bright white line; band of darker blue upright rods; brown pigment cells; thin dark line (Bruch's membrane, please make it clearly visible); thin band of small round capillaries; thick pink band with large vessels; white fibrous tissue at the bottom.
+
+Centre of the lesion, from top to bottom (and nothing else):
+1. thin dark top line, light-blue plain band, band with scattered round cells, pale band - all intact, but sunk into a shallow trough;
+2. band with round cells (sunk);
+3. pale finely textured band (sunk);
+4. ONE single row of small round cells - this is all that is left of the thick band of densely packed cells;
+5. the thin dark Bruch's membrane line, directly under that single row, continuous with the line under the healthy parts;
+6. no capillary circles at all;
+7. the pink vessel band, clearly brighter and washed out, like a column of light shining down from the lesion;
+8. the white fibrous tissue at the bottom.
+Important: inside the lesion there must NOT be a band of several rows of densely packed cells, and there must NOT be any pale band or gap between the single row of cells and Bruch's membrane. The pale rods, the bright white line, the darker blue rods, the dark double line and the brown pigment cells are completely absent inside the lesion.
+
+At the two lesion edges: the thick band of densely packed cells tapers down smoothly into the single row; the rods, the white line and the double line curve down towards Bruch's membrane and end; the brown pigment cells are heaped up a little thicker just outside the edge and stop at the edge.
+
+Absolutely no text, letters, numbers, labels, arrows, leader lines, scale bars or watermarks anywhere in the image.
+```
+
+If the new chat still fails: use `Schematische Netzhaut mit zentraler Atrophie (2).png` as Panel B
+(lesion correct, capillary circles missing outside; label the plain band as choriocapillaris).
