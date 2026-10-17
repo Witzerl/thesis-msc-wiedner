@@ -107,12 +107,9 @@ def vdim(ax, r0, r1, x, text, col=PAL["ink_2"], left=True):
 
 # ---------------------------------------------------------------- figure
 PANELS = [
-    ("(a) $k$-NN on physical coordinates ($k = 12$)", PHYS, PAL["muted"],
-     f"12 neighbours, all in the same row; the next row is {DY_MM:.3f} mm away"),
-    ("(b) $k$-NN on grid indices ($k = 12$)", INDEX, ARM["knn"],
-     "12 neighbours in two rows and two columns"),
-    ("(c) Dilated stencil", STENCIL, ARM["stencil"],
-     "20 neighbours in three rows and seven columns"),
+    ("(a) $k$-NN on physical coordinates ($k = 12$)", PHYS, PAL["muted"]),
+    ("(b) $k$-NN on grid indices ($k = 12$)", INDEX, ARM["knn"]),
+    ("(c) Dilated stencil", STENCIL, ARM["stencil"]),
 ]
 
 fig, axes = plt.subplots(3, 1, figsize=pal.fig_size(1.0, 0.5),
@@ -121,9 +118,8 @@ fig, axes = plt.subplots(3, 1, figsize=pal.fig_size(1.0, 0.5),
 rows, cols = np.meshgrid(np.arange(-R_WIN, R_WIN + 1), np.arange(-C_WIN, C_WIN + 1),
                          indexing="ij")
 
-for ax, (title, nb, col, sub) in zip(axes, PANELS):
+for ax, (title, nb, col) in zip(axes, PANELS):
     ax.set_title(title, loc="left", fontsize=8, fontweight="semibold", pad=3)
-    ax.set_title(sub, loc="right", fontsize=FS, color=PAL["ink_2"], pad=3)
     ax.axis("off")
     ax.scatter(cols.ravel(), rows.ravel(), s=5, color=PAL["line"], lw=0, zorder=1)
     for r, c in nb:
