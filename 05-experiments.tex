@@ -816,7 +816,7 @@ visits, the scaled update therefore has to produce exactly that distance
 divided by $\Delta t$, whatever the interval, and the operator learns to divide by $\Delta t$ internally. The multiplication is a change
 of parameterisation, not additional knowledge. It is kept because it makes
 the prediction fall back to the current state as $\Delta t$ approaches zero
-(\S\ref{sec:method:dt-residual}), and because it is the form MP-PDE uses
+(under the assumption of~\S\ref{sec:method:dt-residual}), and because it is the form MP-PDE uses
 \citep{Brandstetter2022}. It also means that $f_\theta$ is not a growth
 rate that could be read off; whether the operator can be read as a
 continuous-time model at all is tested

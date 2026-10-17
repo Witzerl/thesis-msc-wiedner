@@ -149,19 +149,41 @@ denotes the patient covariates. $\Delta t$ therefore enters twice. It is an
 input feature of the network, so the operator can adapt its output to the
 length of the interval. It is also the multiplier of the network output.
 
-This form has a useful limit. As $\Delta t$ approaches zero, the predicted
-change vanishes and the prediction collapses to $u_{t+\Delta t} = u_t$.
-For two visits very close in time, the model thus predicts no change. The
-leading $u_t$ term is also a deliberate prior. Consecutive visits are
-almost identical, because GA changes slowly relative to the rest of the
-retinal state. Passing the current state through unchanged relieves the
+% Supervisor review 2, SV-4.3 (2026-10-17): "not entirely true as we don't
+% know df/d delta t; put an assumption on lipschitz constant of f". The limit
+% now states its assumption.
+If $f_\theta$ stays bounded as $\Delta t$ approaches zero, the predicted
+change $\Delta t \cdot f_\theta$ vanishes and the prediction collapses to
+$u_{t+\Delta t} = u_t$. Because $\Delta t$ is also an input of $f_\theta$,
+this is not automatic. It is guaranteed if $f_\theta$ is
+Lipschitz-continuous in $\Delta t$ with a constant $L$, since then
+\begin{align*}
+  \lVert f_\theta(u, \Delta t, \mathbf{z}) - f_\theta(u, 0, \mathbf{z}) \rVert
+  &\leq L \, |\Delta t| , \\
+  \lVert \Delta t \cdot f_\theta(u, \Delta t, \mathbf{z}) \rVert
+  &\leq |\Delta t| \bigl( \lVert f_\theta(u, 0, \mathbf{z}) \rVert
+     + L \, |\Delta t| \bigr) \;\xrightarrow{\;\Delta t \to 0\;}\; 0 .
+\end{align*}
+The operators used here consist of linear layers,
+Lipschitz-continuous activations and normalisation layers with a positive
+stabilising constant, so the assumption holds. The constant $L$ is not
+controlled during training and can be large; on the mask channel the
+operator in fact learns to scale its output with $1/\Delta t$ within the
+observed intervals (\S\ref{sec:experiments:ablations:time}). The statement
+therefore concerns the limit, not how quickly it is approached. The
+leading $u_t$ term is also a deliberate prior: consecutive visits are
+almost identical, because GA progresses little over a typical interval
+between visits. Passing the current state through unchanged relieves the
 network of reproducing the whole state. It only has to model the change
-over the interval. The output of $f_\theta$ is signed and unbounded, so the
-model can in principle also predict a shrinking lesion, although atrophic
-tissue does not regenerate and a shrinking lesion is not clinically
-plausible. No monotonic-growth constraint is imposed, because the reference
+over the interval.
+
+The output of $f_\theta$ is signed and unbounded, so the model can in
+principle also predict a shrinking lesion. Atrophic tissue does not
+regenerate, and a shrinking lesion is not clinically plausible. No
+monotonic-growth constraint is imposed nonetheless, because the reference
 segmentations themselves shrink locally between most pairs of visits
-(\S\ref{sec:discussion:limitations}); the prior rests on slow change alone.
+(\S\ref{sec:discussion:limitations}). The persistence prior therefore rests
+on slow change alone.
 
 The final layer of every operator's output head is initialised to zero,
 weights and bias alike. Before training, $f_\theta$ therefore outputs zero
