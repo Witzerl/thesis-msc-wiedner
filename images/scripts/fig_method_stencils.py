@@ -64,6 +64,12 @@ for name, nb in (("physical k-NN", PHYS), ("index k-NN", INDEX), ("stencil", STE
 FS = 6.5
 
 
+def um(x_mm):
+    """A physical distance in micrometres, as written in Section 4.3.3."""
+    x = x_mm * 1000
+    return f"{x:.1f} \u00b5m" if x < 10 else f"{x:.0f} \u00b5m"
+
+
 def edge(ax, nb, r, c, col):
     """Edge from the centre to (r, c). An edge that would run through another neighbour
     on the same line is bent, by more the more neighbours it passes, so every edge stays
@@ -132,20 +138,20 @@ for ax, (title, nb, col) in zip(axes, PANELS):
     ax.set_aspect("equal")
 
 a = axes[0]                                 # lattice pitch, the same in every panel
-vdim(a, R_WIN - 1, R_WIN, -C_WIN - 0.6, f"{DY_MM:.3f} mm")
-hdim(a, -C_WIN, -C_WIN + 1, -R_WIN - 0.45, f"{DX_MM:.4f} mm")
+vdim(a, R_WIN - 1, R_WIN, -C_WIN - 0.6, um(DY_MM))
+hdim(a, -C_WIN, -C_WIN + 1, -R_WIN - 0.45, um(DX_MM))
 # physical k-NN: six columns either side
-hdim(a, 0, 6, -R_WIN - 0.45, f"{6 * DX_MM:.3f} mm")
-hdim(a, -6, 0, -R_WIN - 0.45, f"{6 * DX_MM:.3f} mm")
+hdim(a, 0, 6, -R_WIN - 0.45, um(6 * DX_MM))
+hdim(a, -6, 0, -R_WIN - 0.45, um(6 * DX_MM))
 
 b = axes[1]                                 # index k-NN: two steps on both axes
-hdim(b, 0, 2, -R_WIN - 0.45, f"{2 * DX_MM:.3f} mm")
-vdim(b, 0, 2, 3.0, f"{2 * DY_MM:.3f} mm", left=False)
+hdim(b, 0, 2, -R_WIN - 0.45, um(2 * DX_MM))
+vdim(b, 0, 2, 3.0, um(2 * DY_MM), left=False)
 
 s = axes[2]                                 # stencil: three taps of seven columns
 for c0 in (0, 7, 14):
-    hdim(s, c0, c0 + 7, -R_WIN - 0.45, f"{7 * DX_MM:.3f} mm")
-hdim(s, -21, 0, -R_WIN - 0.45, f"{21 * DX_MM:.3f} mm")
-vdim(s, 0, 1, 22.2, f"{DY_MM:.3f} mm", left=False)
+    hdim(s, c0, c0 + 7, -R_WIN - 0.45, um(7 * DX_MM))
+hdim(s, -21, 0, -R_WIN - 0.45, um(21 * DX_MM))
+vdim(s, 0, 1, 22.2, um(DY_MM), left=False)
 
 save(fig, "fig_method_stencils")

@@ -565,19 +565,24 @@ reaches.
     The three graph constructions of the graph network on the same
     lattice, drawn in grid indices around one interior node (orange);
     lines connect it to the nodes it exchanges messages with in one round.
-    Rows are B-scans 0.121\,mm apart, columns A-scans 0.0057\,mm apart,
-    so on the retina the vertical spacing is about 21 times the
-    horizontal one. Distances are physical. Edges that would run through
-    another neighbour on the same line are drawn bent.
+    Rows are B-scans 121\,\textmu{}m apart, columns A-scans
+    5.7\,\textmu{}m apart, so on the retina the vertical spacing is about
+    21 times the horizontal one. Distances are physical. Edges that would
+    run through another neighbour on the same line are drawn bent.
     (a)~$k$ nearest neighbours ($k = 12$) on physical coordinates: all
-    twelve lie in the node's own row, at most 0.034\,mm away, so no
+    twelve lie in the node's own row, at most 34\,\textmu{}m away, so no
     message crosses rows.
     (b)~$k$ nearest neighbours ($k = 12$) on grid indices: a diamond of
-    two rows and two columns, reaching 0.242\,mm across rows but only
-    0.011\,mm along a row.
+    two rows and two columns, reaching 242\,\textmu{}m across rows but
+    only 11\,\textmu{}m along a row.
     (c)~The dilated stencil: 20 neighbours at rows $\{-1, 0, +1\}$ and
-    columns $\{0, \pm 7, \pm 14, \pm 21\}$, reaching 0.121\,mm across
-    rows and 0.119\,mm along a row.}
+    columns $\{0, \pm 7, \pm 14, \pm 21\}$, reaching 121\,\textmu{}m across
+    rows and 119\,\textmu{}m along a row.
+    For scale, the GA front advances along a row by a median of
+    12 columns (68\,\textmu{}m) between two visits 180 days apart, and by
+    23 columns (131\,\textmu{}m) at the 90th percentile. One hop of (a) or
+    (b) covers only part of the median advance; one hop of (c) covers
+    about the 90th percentile.}
   \label{fig:method:stencils}
 \end{figure}
 
