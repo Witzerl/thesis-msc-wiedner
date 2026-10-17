@@ -1376,6 +1376,7 @@ worked through one item at a time.
   `% TODO: figure not final (2026-10-02); restore the line above when ready.` marker and replaced
   by a placeholder box; captions and labels unchanged. Scripts and image files are untouched.
 - [ ] TODO (14 inline markers above): restore each figure once it is final.
+  2026-10-17: Fig. 4.2 (`fig:method:stencils`) restored (redrawn); 13 left.
 - [x] #1 title page keywords: MP-PDE, MM-PDE and moving mesh removed, U-Net added
   (2026-10-02). Now: Geographic Atrophy, OCT, neural PDE solvers, graph neural networks, U-Net,
   medical imaging, longitudinal prediction.
@@ -2107,7 +2108,10 @@ Pulled from the code repository (`masterthesis-docker/NOTES.md` + `PROJECT_CONTE
   TODO, and the §4.3.3 table states only "K steps".
 - [ ] TODO: produce Figure `fig:method:pipeline` (§4.1) -- the shared pipeline with the
   operator slot as the one varying box and the moving-mesh branch dashed.
-- [ ] TODO: redraw Figure `fig:method:stencils` (§4.3.3) per author review v6 #12 (2026-10-02):
+- [x] (done 2026-10-17, author's revised brief: three panels -- physical k-NN, index k-NN,
+  dilated stencil -- one orange centre node with its edges, physical distances written on the
+  figure; k-NN sets computed by brute force in the script; figure re-enabled, caption rewritten,
+  text points to panels a/b/c) TODO: redraw Figure `fig:method:stencils` (§4.3.3) per author review v6 #12 (2026-10-02):
   two plain schematic panels in grid indices -- k = 12 diamond and dilated stencil -- no mm axes,
   no two-round markers, no front-advance lines (supersedes the physical-aspect-ratio spec).
 - [ ] TODO (code repo, not editable from here): `THESIS_FRAMEWORK.md` §4.5 still justifies
