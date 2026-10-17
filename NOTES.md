@@ -1643,6 +1643,14 @@ sources) in one list: **`reviews/worklist-ch4-7-2026-10-17.md`** (39 supervisor 
 e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open AI items by section,
 55 of them on sentences he marked). To be worked through chapter by chapter, like Ch. 1-3.
 - [ ] Work through `reviews/worklist-ch4-7-2026-10-17.md`, chapter by chapter.
+  - [x] 2026-10-17 §4.1 done: SV-4.1 (first paragraph: what the framework defines, confounders), AI 4a.2-4a.6,
+    4a.8 (persistence paragraph moved and now backed by the check above). "Canonical" now defined at its first
+    use (the reference configuration on which the framework ablations run and to which the arms are
+    parameter-matched).
+- [ ] TODO (SV-4.2, inline in §4.1): reconsider whether the moving-mesh result goes into the main text as a
+  negative result. Author 2026-10-17: not convinced (argumentation still loose; on the dilated stencil only one
+  fold-2 dual run exists, no bypass control; the 5-fold dual/bypass arms are on the k-NN graph; it would take
+  defence time).
 - [ ] E-mail, general: every section = intro (purpose + thesis statement) / body / conclusion; no LLM
   sentence patterns ("What it does is that ...", "not X but Y", "X is not what decides Y"; "they are all
   over"); compare the MM-PDE paper's style; one table or plot per results subsection, small table
@@ -2008,7 +2016,7 @@ Pulled from the code repository (`masterthesis-docker/NOTES.md` + `PROJECT_CONTE
     layer normalisation the draft had dropped.
   - The draft came in at roughly 60 % of the word budget again; it now fills ~8 pages,
     which is proportionate for the first three of eight sections.
-- [ ] TODO: confirm which persistence-baseline quantities are bit-identical across arms,
+- [x] (checked 2026-10-17: persistence Dice and IoU at 360 d identical to 12 decimals per fold across all 353 non-superseded final runs; §4.1 reworded) TODO: confirm which persistence-baseline quantities are bit-identical across arms,
   and cite the runs (§4.1 inline TODO). `THESIS_FRAMEWORK.md` §0.2 asserts the
   "bit-identical persistence fingerprints across arms" without defining them.
 - [x] (obsolete 2026-09-27: the sizes are no longer quoted anywhere, both inline TODOs removed) TODO: verify the temporal-bundle sizes of the original MP-PDE. The set {20, 25, 50}

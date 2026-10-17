@@ -11,19 +11,20 @@
 % Author review v6 #11 (2026-10-02): the provenance sentence (MP-PDE and
 % MM-PDE suggested by the clinical partner) was removed -- "we can
 % absolutely not write this".
+% Supervisor review 2, SV-4.1 (2026-10-17): first paragraph rewritten (what
+% the framework defines, and that holding it fixed removes confounders).
 This chapter answers the first part of the research question: what kind
-of framework the forecast needs. The framework separates the training and
-evaluation setup from the spatial operators evaluated inside it. The aim
-is to find out which properties a model needs in order to predict GA
-progression. Answering
-that question requires a controlled comparison. If every candidate
-architecture came with its own training pipeline, differences in data
-handling, time representation or optimisation would be confounded with
-the architectural differences under test. A single pipeline is therefore
-fixed, and it provides one swappable slot for the update operator
-$f_\theta$. The operator placed in this slot is the only component that
-changes between experiments. Each setting of the slot is referred to
-below as an \emph{arm} of the comparison.
+of framework the forecast needs. The framework defines everything except
+the update operator: how the state is represented, how the elapsed time
+between visits enters the prediction, and how every model is trained and
+evaluated. Holding these parts fixed removes them as confounding factors
+when operators are compared. If every candidate architecture came with its
+own training pipeline, differences in data handling, time representation
+or optimisation would be confounded with the architectural differences
+under test. A single pipeline therefore provides one swappable slot for
+the update operator $f_\theta$, the only component that changes between
+experiments. Each setting of the slot is referred to below as an
+\emph{arm} of the comparison.
 
 Everything outside the slot is held fixed. The input is the eleven-channel
 state on the $49 \times 1024$ grid of Chapter~\ref{ch:data}. Time is
@@ -31,30 +32,35 @@ handled by a single-step residual update conditioned on the interval
 between visits (\S\ref{sec:method:dt-residual}). The loss, the training
 curriculum, the optimiser, the epoch budget, the cross-validation folds,
 the random seeds, the evaluation and the model selection rule are shared
-by every run. A backbone placed in the slot contains architecture only. It
-receives the current state and its conditioning inputs in a common batch
-format, and it returns the full predicted next state. It may not change the
-optimisation loop or carry training settings of its own. A separate
-pipeline per architecture would reintroduce exactly the confounds the
-design is meant to remove.
+by every run. An operator placed in the slot contains only its
+architecture. It receives the current state and its conditioning inputs in
+a common batch format, and it returns the full predicted next state. It may
+not change the optimisation loop or carry training settings of its own.
+
+% Checked 2026-10-17 (supervisor review 2, AI item 4a.8): in
+% solver_results.csv, the persistence Dice and IoU at 360 d
+% (final_dice_360d_persistence, final_iou_360d_persistence) and the
+% persistence floor agree to 12 decimal places within each fold across all
+% 353 non-superseded "_final_" runs (fold 0-4 Dice: 0.8002, 0.8558, 0.8675,
+% 0.8261, 0.8187).
+The persistence baseline, which predicts no change, is computed in every
+run by the same evaluation code, and its one-year Dice and IoU are
+identical across all arms in every fold. This indicates that every arm was
+evaluated on the same validation eyes with the same evaluation routine.
 
 The operators run through this pipeline are a message-passing graph
 neural network (GNN) on two different neighbourhood graphs
-(\S\ref{sec:method:graph}), one of which is the canonical model of this
-thesis; a U-Net; a Fourier Neural Operator (FNO); and a hybrid Finite
-Element Network (FEN). Several of these are run in more than one variant
-(\S\ref{sec:method:family}). A fixed-step Runge--Kutta wrapper can be placed around any
-of these operators, and a per-pixel model with no spatial context marks the
-lower floor. The arms are parameter-matched to the canonical
-configuration's 67\,147 parameters within a narrow band; the matching and
-its exceptions are described in~\S\ref{sec:method:family:params}.
-
-% TODO: confirm exactly which persistence-baseline quantities are
-% bit-identical across arms, and cite the runs.
-The persistence baseline, which predicts no change, is computed inside
-every run by the same evaluation code. Its values come out identical
-across all arms. This indicates that every arm was trained and evaluated on
-the same data through the same evaluation routine.
+(\S\ref{sec:method:graph}), a U-Net, a Fourier Neural Operator (FNO) and a
+hybrid Finite Element Network (FEN). Several of these are run in more than
+one variant (\S\ref{sec:method:family}). The GNN on one of the two graphs
+is the \emph{canonical} model of this thesis. It is the reference
+configuration: the ablations of the framework in
+Chapter~\ref{ch:experiments} are run on it, and the other arms are matched
+to its 67\,147 parameters within a narrow band; the matching and its
+exceptions are described in~\S\ref{sec:method:family:params}. A
+fixed-step Runge--Kutta wrapper can be placed around any of these
+operators. A per-pixel model with no spatial context serves as the lowest
+reference point of the comparison (\S\ref{sec:method:family:floors}).
 
 \S\ref{sec:method:framework} defines the parts every arm shares.
 \S\ref{sec:method:family} then describes all operators on the same terms:
@@ -63,7 +69,14 @@ summarised before its adaptation to the framework. After that,
 \S\ref{sec:method:covariates} describes the conditioning inputs,
 \S\ref{sec:method:training} the shared training setup, and
 \S\ref{sec:method:implementation} the implementation.
-Figure~\ref{fig:method:pipeline} summarises the pipeline. A moving-mesh
+Figure~\ref{fig:method:pipeline} summarises the pipeline.
+% TODO (supervisor review 2, SV-4.2): he suggests reporting the moving-mesh
+% extension in the main text as a negative result. Author (2026-10-17): not
+% convinced yet (argumentation still loose, no comparison against it on the
+% canonical backbone -- only one fold-2 dual run on the dilated stencil, the
+% 5-fold dual and bypass arms are on the k-NN graph -- and it would take
+% defence time); think about it once more.
+A moving-mesh
 extension of the graph operator, following MM-PDE \citep{Hu2024}, is
 reported separately as an additional experiment in
 Appendix~\ref{app:mm-pde}.
