@@ -1673,6 +1673,89 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
   himself (SV-4.1), so "methodology" may not be needed; ask about SV-4.4, SV-6.4 and the guidelines book;
   JKU rule on AI-generated figures still unanswered (he avoids image generators himself, uses
   matplotlib/seaborn scripts and Claude SVG elements merged in draw.io).
+- [ ] **SV-5.12 step-size ladder, post-hoc (2026-10-17; author to decide whether and how it enters
+  §5.5.1).** No training: the epoch-29 checkpoints were re-evaluated with fixed steps h = 1, 1/2,
+  1/4, 1/8, 1/16, 1/32 year (365 ... 11.4 d) through the unmodified evaluation, `GAIntegrator(step_days
+  = h)`, script `images/scripts/step_ladder.py`, cache and readout `images/data/step_ladder/README.md`
+  (git-ignored). Folds 0, 1, 2 (folds 3, 4 have no local precompute). Each rollout step is one visit
+  interval, split into ceil(interval / h) equal substeps, so the step taken is <= h; no visit skipped.
+  Checks: every trained setting reproduces its logged epoch-29 Dice exactly (all 9 network/fold pairs,
+  incl. canonical f2 Euler 1 / 4 steps 0.596418 / 0.520589, RK4-wrapper f2 0.566656, T-FEN f0 0.548471).
+  **h = 1 and 1/2 year are almost the trained one-step setting**: the median interval is 180 d, and
+  only 2/135, 0/65, 3/100 intervals (f0/f1/f2) get two substeps at 365 d, 23/135, 4/65, 9/100 at
+  182.5 d; a true one-year step would need visit skipping (different set-up, discuss with the
+  supervisor). Runtime: 129 settings in ~51 min on the RTX 5080. Change-region Dice@360d, in brackets
+  the difference to the trained setting; folds have 20 / 12 / 16 eyes at the anchor:
+
+  Canonical stencil network `ANISOGNN_final_dilmean` (trained: one Euler step per interval, Delta t as input; evaluated autonomous = False):
+
+  | h (year) | scheme | median substeps | intervals > 1 substep (f0 / f1 / f2) | fold 0 (20 eyes) | fold 1 (12 eyes) | fold 2 (16 eyes) |
+  |---|---|---:|---|---:|---:|---:|
+  | trained (euler:n1) | euler | 1 | 0/135 / 0/65 / 0/100 | 0.5397 | 0.4534 | 0.5964 |
+  | 1 (365 d) | euler | 1 | 2/135 / 0/65 / 3/100 | 0.5397 (+0.0000) | 0.4534 (+0.0000) | 0.5964 (+0.0000) |
+  | 1/2 (182.5 d) | euler | 1 | 23/135 / 4/65 / 9/100 | 0.5342 (-0.0055) | 0.4412 (-0.0122) | 0.5973 (+0.0009) |
+  | 1/4 (91.25 d) | euler | 2 | 131/135 / 65/65 / 72/100 | 0.5350 (-0.0047) | 0.4740 (+0.0206) | 0.5809 (-0.0155) |
+  | 1/8 (45.6 d) | euler | 4 | 135/135 / 65/65 / 100/100 | 0.5196 (-0.0201) | 0.4948 (+0.0414) | 0.5154 (-0.0811) |
+  | 1/16 (22.8 d) | euler | 8 | 135/135 / 65/65 / 100/100 | 0.5095 (-0.0302) | 0.4995 (+0.0461) | 0.4389 (-0.1575) |
+  | 1/32 (11.4 d) | euler | 16 | 135/135 / 65/65 / 100/100 | 0.5032 (-0.0365) | 0.4961 (+0.0427) | 0.4091 (-0.1873) |
+  | 1 (365 d) | rk4 | 1 | 2/135 / 0/65 / 3/100 | 0.5569 (+0.0172) | 0.4800 (+0.0266) | 0.6062 (+0.0097) |
+  | 1/2 (182.5 d) | rk4 | 1 | 23/135 / 4/65 / 9/100 | 0.5526 (+0.0129) | 0.4702 (+0.0168) | 0.6077 (+0.0113) |
+  | 1/4 (91.25 d) | rk4 | 2 | 131/135 / 65/65 / 72/100 | 0.5513 (+0.0116) | 0.5024 (+0.0490) | 0.5791 (-0.0173) |
+  | 1/8 (45.6 d) | rk4 | 4 | 135/135 / 65/65 / 100/100 | 0.5409 (+0.0012) | 0.5184 (+0.0650) | 0.5060 (-0.0905) |
+  | 1/16 (22.8 d) | rk4 | 8 | 135/135 / 65/65 / 100/100 | 0.5229 (-0.0168) | 0.5099 (+0.0566) | 0.4341 (-0.1623) |
+  | 1/32 (11.4 d) | rk4 | 16 | 135/135 / 65/65 / 100/100 | 0.5122 (-0.0276) | 0.5015 (+0.0481) | 0.4066 (-0.1898) |
+
+  Network trained in the RK4 wrapper `ANISOGNN_final_oderk4n1` (trained: one RK4 step per interval, autonomous):
+
+  | h (year) | scheme | median substeps | intervals > 1 substep (f0 / f1 / f2) | fold 0 (20 eyes) | fold 1 (12 eyes) | fold 2 (16 eyes) |
+  |---|---|---:|---|---:|---:|---:|
+  | trained (rk4:n1) | rk4 | 1 | 0/135 / 0/65 / 0/100 | 0.5275 | 0.4392 | 0.5667 |
+  | 1 (365 d) | rk4 | 1 | 2/135 / 0/65 / 3/100 | 0.5275 (+0.0000) | 0.4392 (+0.0000) | 0.5667 (+0.0000) |
+  | 1/2 (182.5 d) | rk4 | 1 | 23/135 / 4/65 / 9/100 | 0.5356 (+0.0081) | 0.4422 (+0.0030) | 0.5668 (+0.0002) |
+  | 1/4 (91.25 d) | rk4 | 2 | 131/135 / 65/65 / 72/100 | 0.5472 (+0.0197) | 0.4569 (+0.0177) | 0.5670 (+0.0003) |
+  | 1/8 (45.6 d) | rk4 | 4 | 135/135 / 65/65 / 100/100 | 0.5455 (+0.0180) | 0.4565 (+0.0173) | 0.5671 (+0.0004) |
+  | 1/16 (22.8 d) | rk4 | 8 | 135/135 / 65/65 / 100/100 | 0.5450 (+0.0175) | 0.4572 (+0.0180) | 0.5668 (+0.0001) |
+  | 1/32 (11.4 d) | rk4 | 16 | 135/135 / 65/65 / 100/100 | 0.5451 (+0.0176) | 0.4573 (+0.0181) | 0.5667 (+0.0001) |
+  | 1 (365 d) | euler | 1 | 2/135 / 0/65 / 3/100 | 0.4145 (-0.1130) | 0.3963 (-0.0429) | 0.5466 (-0.0201) |
+  | 1/2 (182.5 d) | euler | 1 | 23/135 / 4/65 / 9/100 | 0.4644 (-0.0631) | 0.3929 (-0.0463) | 0.5505 (-0.0161) |
+  | 1/4 (91.25 d) | euler | 2 | 131/135 / 65/65 / 72/100 | 0.5310 (+0.0035) | 0.4543 (+0.0151) | 0.5711 (+0.0045) |
+  | 1/8 (45.6 d) | euler | 4 | 135/135 / 65/65 / 100/100 | 0.5436 (+0.0161) | 0.4669 (+0.0277) | 0.5706 (+0.0039) |
+  | 1/16 (22.8 d) | euler | 8 | 135/135 / 65/65 / 100/100 | 0.5451 (+0.0176) | 0.4627 (+0.0235) | 0.5695 (+0.0028) |
+  | 1/32 (11.4 d) | euler | 16 | 135/135 / 65/65 / 100/100 | 0.5455 (+0.0180) | 0.4594 (+0.0202) | 0.5680 (+0.0014) |
+
+  Energy-conserving T-FEN `FEN_final_w96ftp7rk4d45skew` (trained: RK4 in 45-day steps, autonomous):
+
+  | h (year) | scheme | median substeps | intervals > 1 substep (f0 / f1 / f2) | fold 0 (20 eyes) | fold 1 (12 eyes) | fold 2 (16 eyes) |
+  |---|---|---:|---|---:|---:|---:|
+  | trained (rk4:d45) | rk4 | 4 | 135/135 / 65/65 / 100/100 | 0.5485 | 0.5242 | 0.6066 |
+  | 1 (365 d) | rk4 | 1 | 2/135 / 0/65 / 3/100 | 0.3476 (-0.2009) | 0.4291 (-0.0950) | 0.4755 (-0.1311) |
+  | 1/2 (182.5 d) | rk4 | 1 | 23/135 / 4/65 / 9/100 | 0.3895 (-0.1590) | 0.4557 (-0.0685) | 0.4781 (-0.1285) |
+  | 1/4 (91.25 d) | rk4 | 2 | 131/135 / 65/65 / 72/100 | 0.5470 (-0.0015) | 0.5205 (-0.0036) | 0.5943 (-0.0123) |
+  | 1/8 (45.6 d) | rk4 | 4 | 135/135 / 65/65 / 100/100 | 0.5485 (+0.0000) | 0.5242 (+0.0000) | 0.6066 (+0.0000) |
+  | 1/16 (22.8 d) | rk4 | 8 | 135/135 / 65/65 / 100/100 | 0.5486 (+0.0002) | 0.5254 (+0.0013) | 0.6049 (-0.0017) |
+  | 1/32 (11.4 d) | rk4 | 16 | 135/135 / 65/65 / 100/100 | 0.5486 (+0.0001) | 0.5255 (+0.0014) | 0.6045 (-0.0021) |
+  | 1 (365 d) | euler | 1 | 2/135 / 0/65 / 3/100 | 0.2909 (-0.2576) | 0.3493 (-0.1749) | 0.4417 (-0.1649) |
+  | 1/2 (182.5 d) | euler | 1 | 23/135 / 4/65 / 9/100 | 0.3007 (-0.2477) | 0.3558 (-0.1683) | 0.4484 (-0.1582) |
+  | 1/4 (91.25 d) | euler | 2 | 131/135 / 65/65 / 72/100 | 0.4601 (-0.0884) | 0.4567 (-0.0675) | 0.5253 (-0.0813) |
+  | 1/8 (45.6 d) | euler | 4 | 135/135 / 65/65 / 100/100 | 0.5344 (-0.0141) | 0.5003 (-0.0239) | 0.5845 (-0.0221) |
+  | 1/16 (22.8 d) | euler | 8 | 135/135 / 65/65 / 100/100 | 0.5427 (-0.0058) | 0.5153 (-0.0089) | 0.5997 (-0.0070) |
+  | 1/32 (11.4 d) | euler | 16 | 135/135 / 65/65 / 100/100 | 0.5454 (-0.0030) | 0.5203 (-0.0039) | 0.6024 (-0.0042) |
+
+  Reading (criteria of §5.5.1, run-to-run sd 0.0127):
+  - Canonical network: **fails on all three folds**, as in Table 5.4. No common limit, and the drift
+    has a fold-dependent sign (1/32 year: -0.037 / +0.043 / -0.187); spans over the settings at least
+    as fine as training: Euler 0.037 / 0.058 / 0.188, with RK4 0.054 / 0.077 / 0.201.
+  - RK4-wrapper network: **C1 passes on all folds** (RK4 changes < 0.002 from h = 1/4 year on, and
+    Euler converges to the same limit, within 0.0021 at 1/32 year); **C2 passes on fold 2 only**. On
+    folds 0 and 1 the trained one-RK4-step setting is not yet converged: the limit lies +0.018 above
+    it, span 0.020 / 0.018 > 0.0127. Table 5.4 (fold 2 only) therefore reads more favourably than
+    folds 0-1.
+  - T-FEN: **passes on all three folds** (spans 0.0002 / 0.0014 / 0.0021 at 45.6-11.4 d); coarser steps
+    lose 0.002-0.012 at 1/4 year and 0.07-0.20 at 1/2-1 year. Euler converges to the RK4 value with
+    first-order error (f0 -0.014, -0.006, -0.003 at 1/8 ... 1/32 year). Note: §5.5.1 says Euler is
+    unstable for the T-FEN "at any step"; at the one-year anchor Euler at 11.4 d is within 0.004 of RK4
+    on all three folds (says nothing about long free-running stability, the §5.5.2 criterion).
+  - Training-based variant (one model per h) still open; needs the cluster.
 
 ### Assets that now exist and should be reused
 
