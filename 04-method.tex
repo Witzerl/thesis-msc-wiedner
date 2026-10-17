@@ -107,29 +107,24 @@ Appendix~\ref{app:mm-pde}.
 \section{The Fixed Framework}
 \label{sec:method:framework}
 
-This section defines what every arm shares: the time handling and the
-tensor layout of the state. A further shared choice concerns the input
-itself. Every operator receives exactly one visit and predicts the state at
-the next visit. It sees the current state, the interval to the next visit
-and the patient covariates, but no earlier visits. It has no memory of the
-trajectory so far.
+This section defines what every arm shares: the input, the time handling
+and the tensor layout of the state; the shared loss and curriculum follow
+in~\S\ref{sec:method:training}, the shared evaluation
+in~\S\ref{sec:experiments:protocol}. Every operator receives exactly one
+visit and predicts the state at the next visit. It sees the current state,
+the interval to the next visit and the patient covariates, but no earlier
+visits, and therefore has no memory of the trajectory so far.
 
-Two reasons support this design. First, the clinical sequences are short,
-with five to thirteen visits per eye (\S\ref{sec:data:dataset}). Using
-several past visits as input would leave fewer visits available as
-prediction targets. Second, the framework predicts one step at a
-time. Some neural PDE solvers, such as MP-PDE, predict several future
-steps in one forward pass (temporal bundling,
-\S\ref{sec:background:neural-pde}), but not all of the operators compared here
-support this. Bundling is therefore removed, so that every operator makes
-the same kind of prediction. In addition, as noted above, the sequences
-are so short that splitting them into multi-step windows would not be
-useful anyway.
+This design follows from the length of the clinical sequences: with five
+to thirteen visits per eye (\S\ref{sec:data:dataset}), using several past
+visits as input would leave fewer visits as prediction targets. The
+framework also predicts one step at a time. Some neural PDE solvers, such
+as MP-PDE, predict several future steps in one forward pass (temporal
+bundling, \S\ref{sec:background:neural-pde}), but not all of the operators
+compared here support this. Bundling is therefore removed, so that every
+operator makes the same kind of prediction.
 % Moving-mesh staleness argument moved out of the main text (author review
 % #13, 2026-09-27); see the TODO in Appendix G (91-appendix.tex).
-The shared loss and
-curriculum are defined in~\S\ref{sec:method:training}, and the shared
-evaluation in~\S\ref{sec:experiments:protocol}.
 
 \subsection{\texorpdfstring{$\Delta t$}{Delta t}-Conditioned Residual Formulation}
 \label{sec:method:dt-residual}
@@ -140,8 +135,10 @@ occur at irregular intervals, and patients share no common time origin. The
 absolute time is therefore replaced by the interval between two
 consecutive visits, $\Delta t$, measured in years (\S\ref{sec:data:temporal}).
 
-The transition from the current state $u_t$ to the next state
-$u_{t+\Delta t}$ is written as a residual update scaled by the interval:
+The update of the problem statement,
+Equation~\eqref{eq:bg:problem-update}, writes the transition from the
+current state $u_t$ to the next state $u_{t+\Delta t}$ as a residual update
+scaled by the interval:
 \begin{equation}
   u_{t+\Delta t} \;=\; u_t \;+\; \Delta t \cdot
   f_\theta\!\left(u_t,\, \Delta t,\, \mathbf{z}\right),
@@ -171,38 +168,32 @@ weights and bias alike. Before training, $f_\theta$ therefore outputs zero
 for every input, and Equation~\eqref{eq:method:residual-update} reduces to
 exact persistence. Every arm starts from the same function.
 
-Equation~\eqref{eq:method:residual-update} takes the form of one explicit
-Euler step (\S\ref{sec:background:pde-solvers:time}), with a step size that
-differs from window to window. It is the same for every operator placed in
-the slot. This resemblance to a numerical integrator needs a caution.
-The Euler form does not by itself make $f_\theta$ a time derivative or a
-rate of change. A network trained with this update need not be a consistent
-discretisation of any continuous-time system \citep{Ott2021}. This thesis therefore does not assume such a reading. Instead, it is tested
-directly with a solver-swap diagnostic, reported
-in~\S\ref{sec:experiments:validity}: a trained model is re-evaluated, without
-retraining, under several integration schemes and step counts. A model that
-represents a continuous-time system gives nearly the same predictions under
-all of them.
+Equation~\eqref{eq:method:residual-update} has the form of one explicit
+Euler step (\S\ref{sec:background:pde-solvers:time}) whose step size
+differs from window to window, and this form is the same for every
+operator in the slot. The Euler form does not, however, make $f_\theta$ a
+time derivative: a network trained with this update need not be a
+consistent discretisation of any continuous-time system \citep{Ott2021}.
+Whether such a reading holds is tested
+in~\S\ref{sec:experiments:validity:swap}.
 
 \subsection{Multi-Channel State Propagation}
 \label{sec:method:multichannel}
 
-The framework carries the full eleven-channel state through every
-component. As defined in~\S\ref{sec:data:state}, the state consists of one
-binary mask channel and ten layer-boundary depth channels. This subsection
-covers only how these channels are laid out and moved as tensors.
-
-Each window stores its input and target state with the layout
-$(C, N, K) = (11, 50\,176, 1)$, where $C$ is the number of channels, $N$
-the number of grid nodes and $K$ the number of time steps. At run time, a
-batch of $B$ graphs is flattened into a node-feature matrix of shape
-$(B \cdot N,\; C \cdot K) = (B \cdot 50\,176,\; 11)$. The feature axis is
-ordered channel-major and time-minor. The node axis is ordered row-major
-over the $49 \times 1024$ grid.
-
-Operators that work on images, such as the convolutional arms
-of~\S\ref{sec:method:family}, need the state in the image layout
-$(B, C, 49, 1024)$.
+% Supervisor review 2, SV-4.4 (2026-10-17): "(C, N, K) = (11, 50176, 1)
+% does not match". Rewritten in the notation of the problem statement
+% (C x H x W); K (always 1) dropped, which also removes the clash with K as
+% the last visit index in Section 2.5.2.
+The full eleven-channel state of~\S\ref{sec:data:state} is carried through
+every component of the framework; this subsection describes only how the
+channels are laid out as tensors. The state
+$u_k \in \mathbb{R}^{C \times H \times W}$ of~\S\ref{sec:background:problem}
+is stored per window as a matrix of $N = H \cdot W = 50\,176$ grid nodes by
+$C = 11$ channels, with the nodes ordered row-major over the
+$49 \times 1024$ grid. At run time, a batch of $B$ windows is stacked into
+a node-feature matrix of shape $(B \cdot N,\, C)$. Operators that work on
+the image grid (\S\ref{sec:method:family:dense}) use the layout
+$(B, C, H, W)$ instead.
 
 All eleven channels are both input and output of the operator. The mask
 channel is the clinical target, and the ten layer channels are auxiliary

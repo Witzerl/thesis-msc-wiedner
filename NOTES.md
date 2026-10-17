@@ -524,7 +524,7 @@ be longer, since it supplies two arms and the floors).
   fold 2, one seed per model). Sentence rewritten to name the diagnostic and explain it: a
   trained model is re-evaluated, without retraining, under several integration schemes and step
   counts (2026-09-27). Result not previewed.
-- [ ] TODO (from #16): replace "Chapter 5" in §4.2.1 by a \ref to the validity-diagnostics
+- [x] (done 2026-10-17: §4.2.1 now points to sec:experiments:validity:swap) TODO (from #16): replace "Chapter 5" in §4.2.1 by a \ref to the validity-diagnostics
   section (planned §5.6) once it exists; that section must state the fold-2 / one-seed scope.
 - [x] #17 §4.2.2 view/permute tensor-layout explanation removed (2026-09-27).
 - [x] #18 §4.2.2 "for the graph solver, this is guaranteed by the full-rank decoder" removed
@@ -1519,7 +1519,7 @@ Solvers?"); contributions back as bullet points. He offers a meeting.
   (Eq. `eq:bg:problem-update`), the agreed definition of "operator", the rollout, the evaluation
   target, and the research question in this notation.
 - [ ] **Author review of 2.5.2** (inline `% TODO (author review)`).
-- [ ] Follow-up (Ch. 4): 4.2.1 still defines the same update (Eq. `eq:method:residual-update`);
+- [x] (done 2026-10-17: §4.2.1 now introduces Eq. 4.1 as the update of Eq. bg:problem-update) Follow-up (Ch. 4): 4.2.1 still defines the same update (Eq. `eq:method:residual-update`);
   make it refer back to `eq:bg:problem-update` when Chapter 4 is revised.
 - [x] 2026-10-13 bridges after the restructure (author sign-off per change): Ch. 2 opener, 2.1.1
   roadmap, 2.2 opener without GA, en-face sentence generalised, 2.3 bridges, 2.5 opener, 2.5.1
