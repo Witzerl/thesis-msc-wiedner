@@ -229,60 +229,53 @@ the weights set in~\S\ref{sec:method:training}.
 \section{The Operators}
 \label{sec:method:family}
 
-The framework of~\S\ref{sec:method:framework} provides one slot for the
-update operator $f_\theta$. This section describes every operator that
-occupies it. Each was chosen to isolate one property. A message-passing
-graph neural network, run on two different graphs, tests how far the
-spatial context of one step has to reach. A U-Net tests multiscale local
-detail. A Fourier Neural Operator tests global spectral support without a
-local path, and a hybrid adds a minimal local path to it. Two truncated
-graph networks test how much spatial context is needed at all. A Finite
-Element Network adds an explicit transport term. Finally, a Runge--Kutta
-wrapper changes the time integration of any of these operators. Because
-all of them run in the same training environment, differences between
-them can be attributed to the architecture rather than to the training
-protocol.
-
-\S\ref{sec:method:family:contract} states the interface every operator
-satisfies. \S\ref{sec:method:mppde} describes the message-passing network
-and \S\ref{sec:method:graph} the two graphs it runs on.
-\S\ref{sec:method:family:dense} describes the three dense grid operators,
-\S\ref{sec:method:family:floors} the locality floors, and
-\S\ref{sec:method:family:fen} the Finite Element Network.
-\S\ref{sec:method:family:rk} describes the integration wrapper, and
-\S\ref{sec:method:family:params} the parameter matching.
+This section describes the operators placed in the slot
+of~\S\ref{sec:method:framework}. Each was chosen to isolate one property:
+the reach of the spatial context of one step (the message-passing graph
+neural network on two different graphs,
+\S\ref{sec:method:mppde}--\S\ref{sec:method:graph}), the amount of spatial
+context needed (two truncated versions of it,
+\S\ref{sec:method:family:floors}), multiscale local detail (the U-Net,
+\S\ref{sec:method:family:dense}), global spectral support without and with
+a local path (the Fourier Neural Operator and a hybrid,
+\S\ref{sec:method:family:dense}), an explicit transport term (the Finite
+Element Network, \S\ref{sec:method:family:fen}) and the order of time
+integration (a Runge--Kutta wrapper around any of these operators,
+\S\ref{sec:method:family:rk}). The interface shared by all operators is
+stated first (\S\ref{sec:method:family:contract}), and the parameter
+matching last (\S\ref{sec:method:family:params}).
 
 \subsection{The Operator Contract}
 \label{sec:method:family:contract}
 
-Every operator satisfies the same interface. It is built from
-the same metadata --- one time step, eleven state channels and two
-covariates --- and it consumes the same batch. It returns the full next
-state in the residual form of Equation~\eqref{eq:method:residual-update}:
-the predicted residual is scaled by $\Delta t$ and added to the input
-state. The final layer of every architecture is initialised to zero, so
-every operator starts training at exact persistence. Each module computes the
-residual and the next state from one shared internal computation, so the
-two cannot diverge. The integration wrapper of~\S\ref{sec:method:family:rk}
-integrates exactly this residual.
+Every operator satisfies the same interface: it is built from the same
+metadata (one time step, eleven state channels and two covariates) and
+consumes the same batch. It returns the full next state in the residual
+form of Equation~\eqref{eq:method:residual-update}, and its final layer is
+initialised to zero (\S\ref{sec:method:dt-residual}), so that every
+operator starts training at exact persistence. The residual and the next
+state are computed from one shared internal computation, so the two cannot
+become inconsistent; the integration wrapper
+of~\S\ref{sec:method:family:rk} integrates this same residual.
 
 No operator uses a normalisation that keeps batch statistics. The training
 curriculum of~\S\ref{sec:method:training} rolls the model forward on its
-own predictions without gradients but in training mode. Batch
+own predictions, without gradients but in training mode, so the states it
+produces drift away from the observed ones. Batch
 normalisation \citep{Ioffe2015} would normalise these drifted states with
-the statistics of the current batch, which would erase the very
-perturbation the curriculum is meant to expose the model to. It would also
+the statistics of the current batch and so remove the perturbation the
+curriculum is meant to expose the model to. It would also
 write the drifted statistics into the running estimates that evaluation
 later uses, so that training and evaluation would behave as two different
 operators.
 
-The operators that work on the image grid --- the U-Net and the Fourier
-Neural Operator with its local-kernel hybrid --- receive identical inputs. Each takes
-sixteen input channels: the eleven state channels, $\Delta t$ broadcast as a
-constant plane, the two covariates broadcast as constant planes, and two
-coordinate ramps running from zero to one along each axis.
-The coordinate ramps follow the CoordConv construction of \citet{Liu2018}. Because the inputs are identical, a difference between these
-arms reflects the operator, not the information it receives.
+The operators that work on the image grid (the U-Net, the Fourier Neural
+Operator and its local-kernel hybrid) receive identical inputs, so that a
+difference between them cannot come from the information they receive.
+Each takes sixteen input channels: the eleven state channels, $\Delta t$
+broadcast as a constant plane, the two covariates broadcast as constant
+planes, and two coordinate ramps running from zero to one along each axis,
+following the CoordConv construction of \citet{Liu2018}.
 
 \subsection{Message-Passing Graph Neural Network}
 \label{sec:method:mppde}
