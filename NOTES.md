@@ -1376,7 +1376,9 @@ worked through one item at a time.
   `% TODO: figure not final (2026-10-02); restore the line above when ready.` marker and replaced
   by a placeholder box; captions and labels unchanged. Scripts and image files are untouched.
 - [ ] TODO (14 inline markers above): restore each figure once it is final.
-  2026-10-17: Fig. 4.2 (`fig:method:stencils`) restored (redrawn); 13 left.
+  2026-10-17: Fig. 4.2 (`fig:method:stencils`) restored (redrawn); Fig. A.1
+  (`fig:appendix:cohort`) restored unchanged (author: fine); 12 left. Fig. A.2 (crop) and
+  Fig. 5.3 (reach) need more work and discussion (author).
 - [x] #1 title page keywords: MP-PDE, MM-PDE and moving mesh removed, U-Net added
   (2026-10-02). Now: Geographic Atrophy, OCT, neural PDE solvers, graph neural networks, U-Net,
   medical imaging, longitudinal prediction.
