@@ -284,14 +284,12 @@ The graph operator is the message-passing neural PDE solver (MP-PDE) of
 \citet{Brandstetter2022}, the learned-stencil solver introduced
 in~\S\ref{sec:background:pde-solvers:neural}. It builds on the graph
 neural network model of \citet{Scarselli2009} and the message-passing
-formulation of \citet{Gilmer2017}. It supplies more than one arm
-of the survey: it is run on two different graphs
-(\S\ref{sec:method:graph}), and with fewer message-passing rounds it also
-provides the locality floors of~\S\ref{sec:method:family:floors}. Several
-of its design decisions --- the time handling, the output layer and the
-strict one-step prediction --- also became part of the shared framework.
-The original is summarised first, followed by the architecture used here
-and the differences between the two.
+formulation of \citet{Gilmer2017}. Several of its design decisions also
+became part of the shared framework: the time handling, the output layer
+and the one-step prediction. The original is summarised first, followed by
+the modifications proposed in this work and a summary of them.
+% Supervisor review 2, SV-4.5/SV-4.6 (2026-10-17): forward references to
+% Sections 4.3.3 and 4.3.5 removed; headings renamed as he suggested.
 
 \paragraph{The original MP-PDE.}
 MP-PDE is an autoregressive neural solver for time-dependent PDEs. It
@@ -303,13 +301,13 @@ the $k$ nearest neighbours on irregular meshes.
 The architecture follows the encode--process--decode pattern
 \citep{Battaglia2018, SanchezGonzalez2020}. An encoder, a per-node
 two-layer multilayer perceptron (MLP), lifts the node features into a
-latent space. Its input is
-$f_i^0 = \epsilon([u_i^{k-K:k}, x_i, t_k, \theta_{\text{PDE}}])$: the last
-$K$ states of the node, its position, the current time and the equation
-features.
+latent space. It computes
+$f_i^0 = \epsilon([u_i^{k-K:k}, x_i, t_k, \theta_{\text{PDE}}])$ from the
+last $K$ states of the node, its position, the current time and the
+equation features.
 
 The processor applies several rounds of message passing to the latent
-node states; the original uses six. The message function is
+node states (six in the original paper). The message function is
 $m_{ij}^m = \phi(f_i^m, f_j^m, u_i^{k-K:k} - u_j^{k-K:k}, x_i - x_j,
 \theta_{\text{PDE}})$, and the node update is
 $f_i^{m+1} = \psi(f_i^m, \sum_j m_{ij}^m, \theta_{\text{PDE}})$. Both
@@ -317,14 +315,14 @@ $\phi$ and $\psi$ are two-layer MLPs with skip connections and
 normalisation layers. The relative position $x_i - x_j$ builds
 translational symmetry into the network. The solution difference
 $u_i - u_j$ lets each message act as a learned local difference operator,
-a flexible learned stencil.
+that is, a learned stencil.
 
 The equation feature vector $\theta_{\text{PDE}}$ holds the PDE
 coefficients and the boundary-condition identifiers. It is injected at the
-encoder and at every message-passing layer. This persistent injection is
-what lets a single trained solver generalise across a family of equations;
-removing it hurts most when the equation parameters vary across the
-dataset.
+encoder and at every message-passing layer. Injecting it at every layer
+allows a single trained solver to generalise across a family of equations,
+and removing it degrades performance most when the equation parameters
+vary across the dataset.
 
 The decoder is a shallow one-dimensional convolutional network with
 weights shared across space. It treats the final hidden vector of each
@@ -346,7 +344,7 @@ is wasteful in smooth regions and under-resolved at sharp gradients; it
 motivates the moving-mesh extension of \citet{Hu2024}
 (Appendix~\ref{app:mm-pde}).
 
-\paragraph{The architecture used here.}
+\paragraph{Proposed modifications.}
 The forward pass consists of an encoder, a number of message-passing
 rounds and a decoder. The notation follows the summary above.
 Each node $i$ carries the normalised eleven-channel state $u_i$ and its
@@ -357,10 +355,10 @@ Each node also receives a conditioning vector $\mathbf{c}_i$. In the
 canonical configuration it has three entries: the interval $\Delta t$ in
 years, the z-scored age and the sex of the patient. All three are
 graph-level quantities, broadcast to every node of the graph. The
-conditioning vector fills
-the slot that the equation feature vector $\theta_{\text{PDE}}$ occupies in
-the original. No governing equation or coefficients are known for GA, so
-the interval and the covariates take this place. As in the original, the
+conditioning vector takes the place of the equation feature vector
+$\theta_{\text{PDE}}$ of the original: no governing equation or
+coefficients are known for GA, so the interval and the covariates are used
+instead. As in the original, the
 vector is injected at three points: the encoder input, every message and
 every node update.
 
@@ -391,52 +389,44 @@ $\mathrm{LN}$ denotes layer normalisation. The message function $\phi$ and
 the update function $\psi$ each consist of two linear layers, each followed
 by a ReLU activation. As in the original, the state difference $u_i - u_j$
 lets the message act as a learned local difference operator. Every round
-receives the raw state, the positions and the conditioning vector again, so
-this information is available at every depth. As in the original, which
-uses skip connections in its message-passing layers, each update ends in a
-residual connection followed by a normalisation layer; only the type of
-normalisation differs. The canonical configuration aggregates messages by their
-mean, as written in Equation~\eqref{eq:method:update}. The canonical
-configuration uses two message-passing rounds and a hidden width of 64;
-larger and smaller settings are compared
-in~\S\ref{sec:experiments:ablations:capacity}.
+receives the state $u_i$, the positions and the conditioning vector again,
+so this information is available at every depth. Each update ends in a
+residual connection followed by a normalisation layer; the original also
+uses skip connections in its message-passing layers, and only the type of
+normalisation differs. The canonical configuration aggregates messages by
+their mean, as written in Equation~\eqref{eq:method:update}, and uses two
+message-passing rounds and a hidden width of 64; larger and smaller
+settings are compared in~\S\ref{sec:experiments:ablations:capacity}.
 
 All normalisation layers are per-node layer normalisations \citep{Ba2016}. Each node is normalised over its own feature vector. No running
 statistics are kept, and no nodes or graphs are coupled, so the operator is
 identical in training and in evaluation, as the contract
-of~\S\ref{sec:method:family:contract} requires. Before this change, when
-batch normalisation was used, training and evaluation measurably behaved
-as two different operators. A graph-level variant that normalises a whole
+of~\S\ref{sec:method:family:contract} requires. In earlier runs with batch
+normalisation, training and evaluation measurably behaved as two different
+operators. A graph-level variant that normalises a whole
 batch as one graph was avoided as well, because it would couple the
 samples of a batch.
 
-The decoder maps the final hidden vector $f_i^{M}$ to one output per
-channel. It consists of a linear layer, layer normalisation and a ReLU,
-applied twice, followed by a final linear layer to $C \cdot K = 11$
-outputs. The final layer is bare, without normalisation or activation,
-because the output is a signed and unbounded residual. The node update is
-then
-$u_i + \Delta t \cdot \delta(f_i^{M})$, where $\delta$ denotes the decoder;
-this is Equation~\eqref{eq:method:residual-update} at node level.
-
-In the original, the output head is a one-dimensional convolution. It
-treats the final hidden vector of a node as a temporal signal and convolves
-along it to emit the $K$ bundled future steps \citep{Brandstetter2022}. This
-head exists to produce several time steps at once. Because the framework
-predicts exactly one step ($K = 1$, \S\ref{sec:method:framework}), the
-convolutional head was removed and replaced by the decoder described above.
-The decoder maps the hidden vector of each node directly to the eleven
-channels with a full-rank linear output layer, so every channel receives
-its own independent prediction. Its final layer is initialised to zero,
-which yields the persistence start of~\S\ref{sec:method:dt-residual}.
+Because the framework predicts one step ($K = 1$,
+\S\ref{sec:method:framework}), the one-dimensional convolutional head of
+the original, which exists to emit the $K$ bundled steps, was replaced by
+an MLP decoder. It maps the final hidden vector $f_i^{M}$ to the eleven
+channels: a linear layer, layer normalisation and a ReLU, applied twice,
+followed by a final linear layer whose full-rank output gives every channel
+its own independent prediction. The final layer has no normalisation or
+activation, because the output is a signed and unbounded residual, and it
+is initialised to zero, which yields the persistence start
+of~\S\ref{sec:method:dt-residual}. The predicted next state of node $i$ is
+then $u_i + \Delta t \cdot \delta(f_i^{M})$, where $\delta$ denotes the
+decoder; this is Equation~\eqref{eq:method:residual-update} at node level.
 % Correction-branch exception (no zero-init there) moved to Appendix G.
 
-\paragraph{Differences from the original.}
-Table~\ref{tab:method:mppde-diff} lists the main departures from the original
-MP-PDE \citep{Brandstetter2022}. The original entries refer to the
-published paper; the original was evaluated mainly on one-dimensional
-equations, with additional two-dimensional smoke-inflow experiments, and
-used different settings for the two.
+\paragraph{Summary of the modifications.}
+Table~\ref{tab:method:mppde-diff} summarises the modifications to MP-PDE
+\citep{Brandstetter2022}. The entries for MP-PDE refer to the published
+paper, which evaluates the method mainly on one-dimensional equations,
+with additional two-dimensional smoke-inflow experiments, and uses
+different settings for the two.
 
 \begin{table}[t]
   \centering
@@ -445,9 +435,9 @@ used different settings for the two.
     Differences between the original MP-PDE \citep{Brandstetter2022} and
     the graph solver of this thesis. \emph{1-D} and \emph{2-D} refer to the
     one-dimensional experiments and the two-dimensional smoke-inflow
-    experiments of the original. The original's aggregation is the sum
+    experiments of the original. For MP-PDE, the table gives the sum
     written in its node-update equation; the paper does not describe the
-    aggregation of its reference implementation.}
+    aggregation used in its reference implementation.}
   \label{tab:method:mppde-diff}
   \small
   \begin{tabular}{p{0.18\textwidth} p{0.35\textwidth} p{0.35\textwidth}}
@@ -463,7 +453,7 @@ used different settings for the two.
       origin \\
     Equation identity & Known coefficients and boundary conditions
       ($\theta_{\text{PDE}}$) & None known; $\Delta t$ and covariates in
-      that slot (\S\ref{sec:method:covariates}) \\
+      its place (\S\ref{sec:method:covariates}) \\
     Graph & Cut-off radius (1-D, 2-D) or $k$-nearest neighbours (wave
       equations), on positions & Index-space $k$-nearest neighbours, then
       the dilated stencil (\S\ref{sec:method:graph}) \\
@@ -477,15 +467,8 @@ used different settings for the two.
     \bottomrule
   \end{tabular}
 \end{table}
-
-Each change is motivated where it is introduced. The irregular time
-handling and the removal of bundling follow from the clinical visit
-schedule (\S\ref{sec:method:framework}, \S\ref{sec:method:dt-residual}).
-The conditioning vector replaces the unknown equation identity. The graph
-constructions follow from the anisotropy of the grid
-(\S\ref{sec:method:graph}). The normalisation and the decoder were changed
-so that the operator behaves identically under the training curriculum and
-represents all eleven channels independently (see above).
+% AI review 4a.37 (2026-10-17): the recap paragraph after the table was
+% removed; the table summarises the changes.
 
 \subsection{Graph Construction on an Anisotropic Grid}
 \label{sec:method:graph}
