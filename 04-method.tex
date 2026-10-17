@@ -473,68 +473,84 @@ different settings for the two.
 \subsection{Graph Construction on an Anisotropic Grid}
 \label{sec:method:graph}
 
-The graph on which messages travel turns out to be the most consequential
-design decision of the graph solver. The modelling grid has 49 rows and
-1024 columns, or 50\,176 nodes. Rows are 121.18\,\textmu{}m apart, while columns
-are only 5.68\,\textmu{}m apart (\S\ref{sec:data:spatial}). Along a row, the
-nodes are therefore about 21 times denser than across rows. The node
-positions are stored in physical millimetres.
+% Supervisor review 2 (2026-10-17): SV-4.7 (name the distance; he reads the
+% index-space graph as geodesic), SV-4.8 (prior use of dilated
+% neighbourhoods, Yu2016, Li2019), X4 (micrometres); AI 4b.1-4b.8.
+The graph determines which nodes exchange messages, and therefore how far
+information travels in one round. The modelling grid has 49 rows and 1024
+columns, or 50\,176 nodes. Rows are 121.18\,\textmu{}m apart, while
+columns are only 5.68\,\textmu{}m apart (\S\ref{sec:data:spatial}). Along a
+row, the nodes are therefore about 21 times denser than across rows. The
+node positions are stored in physical millimetres.
 
-A $k$-nearest-neighbour graph built on these physical positions fails
-(Figure~\ref{fig:method:stencils}a). The
-twelve physically nearest neighbours of every node all lie in its own row:
-measured over the grid, 100\,\% of the edges connect nodes in the same row
-and none cross rows. Message passing on such a graph runs along rows only.
-No information can cross from one row to the next at any network depth, and
-the two-dimensional retina falls apart into 49 independent one-dimensional
-strands.
+The usual construction on irregular meshes, a $k$-nearest-neighbour graph,
+connects each node to the $k$ nodes at the smallest Euclidean distance
+between their physical positions (Figure~\ref{fig:method:stencils}a). On
+this grid it does not connect the rows: the twelve physically nearest
+neighbours of every node all lie in its own row, and no edge crosses rows.
+Message passing on such a graph runs along rows only, no information can
+cross from one row to the next at any network depth, and the grid
+decomposes into 49 independent one-dimensional rows. This construction is
+therefore not used in any reported experiment; it is described because it
+is the natural first choice and shows that the anisotropy of the grid has
+to be taken into account.
 
-Building the graph on integer grid indices instead of physical coordinates
-restores two-dimensional connectivity (Figure~\ref{fig:method:stencils}b).
-With $k = 12$, and without
-self-loops, the neighbourhood of an interior node is exactly the
-index-space disc of squared radius four, a diamond of radius two. It
-contains the four direct neighbours, the four diagonal neighbours and the
-four neighbours two steps away along either axis. The resulting graph has
+Measuring the Euclidean distance between integer grid indices (row,
+column) instead restores two-dimensional connectivity
+(Figure~\ref{fig:method:stencils}b). With $k = 12$ and without
+self-loops, the neighbourhood of an interior node is exactly the set of
+nodes at squared index distance at most four. On the integer grid this set
+coincides with the ball of radius two in geodesic (hop) distance on the
+4-connected lattice, a diamond: the four direct neighbours, the four
+diagonal neighbours and the four neighbours two steps away along either
+axis. The resulting graph has
 602\,112 directed edges; about 33\,\% connect nodes in the same row,
 50\,\% nodes one row apart and 17\,\% nodes two rows apart. About 8.5\,\%
 of the nodes (4\,276), on and next to the border of the grid, do not have
 the full interior neighbourhood.
 
-This index-space graph solves the connectivity problem, but its physical
-reach is lopsided. A neighbourhood that is symmetric in grid steps inherits
-the 21:1 anisotropy of the grid. One hop reaches about $\pm 0.25$\,mm
-across rows but only about $\pm 0.011$\,mm along a row. After the two
-message-passing rounds of the canonical configuration, a node has received
-information from at most four columns away, about $\pm 0.023$\,mm along the
-row.
+This index-space graph is the graph of the $k$-nearest-neighbour arm in
+Chapter~\ref{ch:experiments}. It restores two-dimensional connectivity,
+but its physical reach differs strongly between the two axes. A
+neighbourhood that is symmetric in grid steps inherits the 21:1 anisotropy
+of the grid. One hop reaches about $\pm 242$\,\textmu{}m across rows but
+only about $\pm 11$\,\textmu{}m along a row. After the two message-passing
+rounds of the canonical configuration, a node has received information
+from at most four columns away, about $\pm 23$\,\textmu{}m along the row.
 
-This reach can be compared with the scale on which the lesion changes.
-Between two visits 180 days apart, the GA front advances a median of about
-12 columns, or roughly 0.07\,mm. The upper quartile is 17 columns and the
-90th percentile 23 columns. A single hop along a row therefore covers only
-a small fraction of the distance the front typically moves between two
-visits, and even the four columns reached after two rounds are about a
-third of the median advance. The index-space graph thus solves the
-connectivity problem but not the reach problem. This is why a second graph
-construction was needed, one whose reach along a row matches the scale of
-the lesion change.
+For comparison, the GA front advances a median of about 12 columns
+(68\,\textmu{}m) between two visits 180 days apart; the upper quartile is
+17 columns (97\,\textmu{}m) and the 90th percentile 23 columns
+(131\,\textmu{}m). A single hop along a row therefore covers only a small
+fraction of the distance the front typically moves between two visits, and
+the four columns reached after two rounds are about a third of the median
+advance. The index-space graph restores connectivity but not reach, which
+motivates a second graph construction whose reach along a row matches the
+scale of the lesion change.
 
 The dilated stencil is designed to close this gap
 (Figure~\ref{fig:method:stencils}c). Each interior node is connected to the
 nodes at row offsets $\{-1, 0, +1\}$ and column offsets
 $\{0, \pm 7, \pm 14, \pm 21\}$, excluding the node itself: 20 neighbours in
-total. One hop then reaches $\pm 0.121$\,mm across rows and
-$\pm 0.119$\,mm along a row. The physical reach is nearly equal on both
-axes, at about 0.12\,mm per hop. Along a row, one hop now spans 21 columns,
-close to the 90th percentile of the per-visit front advance. The design
-thus sets the reach from the physical scale of the lesion rather than
-treating it as a free hyperparameter. Chapter~\ref{ch:experiments} tests
-this choice against smaller and larger reaches.
-
-The dilated stencil replaces only the edge set. The network, its weights
-and every other component stay unchanged, and the stencil adds no
-parameters.
+total. It follows the idea of dilated convolutions \citep{Yu2016}, which
+apply the same kernel at a larger range by spacing its taps apart, so that
+the receptive field grows while the number of parameters stays the same;
+here the dilation is seven along rows and one across rows. Dilated
+neighbourhoods have also been used in graph networks \citep{Li2019}, where
+the $k$ neighbours are taken from the $k \cdot d$ nearest ones by skipping
+every $d$-th, measured in the feature space of the current layer. Here the
+dilation is instead set in physical distance, because what one hop has to
+cover is the physical advance of the front between two visits; an
+isotropic dilation in grid steps would keep the 21:1 imbalance of the
+index-space graph. One hop reaches $\pm 121$\,\textmu{}m across rows and
+$\pm 119$\,\textmu{}m along a row, nearly equal on both axes at about
+120\,\textmu{}m per hop. Along a row, one hop spans 21 columns, close to the
+90th percentile of the per-visit front advance. The design thus derives the
+reach from the physical scale of the lesion. The dilated stencil changes
+only the edge set; the network architecture and every other component are
+the same as on the index-space graph, and the stencil adds no parameters.
+Chapter~\ref{ch:experiments} tests this choice against smaller and larger
+reaches.
 % Moved-mesh graph (own k-NN off the lattice) moved to Appendix G.
 
 % Figure: images/scripts/fig_method_stencils.py (geometry only: the grid

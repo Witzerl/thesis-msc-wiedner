@@ -1648,6 +1648,23 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
     4a.8 (persistence paragraph moved and now backed by the check above). "Canonical" now defined at its first
     use (the reference configuration on which the framework ablations run and to which the arms are
     parameter-matched).
+  - [x] 2026-10-17 §4.2 (SV-4.3 Lipschitz assumption for the Delta t -> 0 limit, SV-4.4 tensor layout in the
+    2.5.2 notation), §4.3 opener + §4.3.1, §4.3.2 (SV-4.5 forward references, SV-4.6 headings) and §4.3.3
+    (SV-4.7 distances named, index-space k = 12 neighbourhood = geodesic ball of radius 2; SV-4.8 dilated
+    convolutions cited; X4 micrometres) done, with the AI items of these sections.
+- [ ] **Ledger batch to check (Phase 4), from the 2026-10-17 wording pass:** NEW Yu2016 (C125) and Li2019
+  (C126) in §4.3.3, Liu2018 (C116, sentence moved); CHANGED Brandstetter2022 C123 (§4.3.2) and C149 (§5.4.1),
+  Ott2021 C114 (§4.2.1), Ioffe2015 C115 (§4.3.1). Also CHANGED by the author's uncommitted §1.1 edit: Lad2023
+  C017, EMA2024Syfovre/Izelvay C019, Trincao2024 C016 (NEW). PDFs of Yu2016 / Li2019 filed in `pdfs/Methods/`
+  (arXiv versions; page numbers refer to them), text extracted; hub notes still to be written by the workflow.
+  Quotes found by hand: Yu2016 p. 2 "The dilated convolution operator can apply the same filter at different
+  ranges using different dilation factors."; p. 3 (Fig. 1 caption) "The number of parameters associated with
+  each layer is identical." Li2019 p. 4 "the Dilated k-NN returns the k nearest neighbors within the k × d
+  neighborhood region by skipping every d neighbors" and "we use the ℓ2 distance in the feature space of the
+  current layer". Bib metadata: Li2019 checked on Crossref (ICCV 2019, pp. 9266-9275, doi
+  10.1109/ICCV.2019.00936); Yu2016 ICLR 2016 (no DOI).
+- [ ] Fig. 4.2 caption (redrawn by another session, 8e1db2a) still gives distances in mm (0.121, 0.0057,
+  0.034, 0.242, 0.011, 0.119 mm), while §4.3.3 now uses µm (X4); align when the figure is next touched.
 - [ ] TODO (SV-4.2, inline in §4.1): reconsider whether the moving-mesh result goes into the main text as a
   negative result. Author 2026-10-17: not convinced (argumentation still loose; on the dilated stencil only one
   fold-2 dual run exists, no bypass control; the 5-fold dual/bypass arms are on the k-NN graph; it would take
