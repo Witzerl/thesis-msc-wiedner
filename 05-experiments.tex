@@ -130,9 +130,12 @@ which would score exactly as persistence does. The eye-level growth-rate
 measures used for the clinical comparison are defined
 in~\S\ref{sec:experiments:qualitative:mai}.
 
-\subsection{Rollout and Reporting}
+\subsection{Rollout Evaluation}
 \label{sec:experiments:protocol:rollout}
 
+All experiments
+use the patient-level five-fold cross-validation of~\S\ref{sec:data:splits},
+which has no test split; every result is a validation result.
 Two evaluation procedures run after every epoch on the validation eyes of
 the fold. The one-step evaluation predicts every validation window once
 from its observed input. It isolates the accuracy of a single step from the
@@ -151,65 +154,77 @@ rollout by the same code; for the anchor metrics it is the baseline mask
 held constant. Per-step metrics are averaged per eye first and then over
 the eyes, so every eye counts once, whatever its number of visits.
 
-The checkpoint kept as the best one is the epoch with the highest
-change-region Dice at the anchor. The reported numbers, however, are not
-best-epoch values, for two reasons. First, the metric is noisy: with 12 to
-20 validation eyes per fold, it still fluctuates from epoch to epoch once
-training has levelled off, with a standard deviation of about 0.01 to 0.05
-within one run (Figure~\ref{fig:experiments:curves}a), so the highest epoch
-is mostly the luckiest one.
-% Corrected 2026-10-01 (was "0.02 to 0.10", not reproducible): per-fold sd of
-% change-region Dice over epochs 10-29, arms of Table 5.1, is 0.005-0.047
-% (canonical 0.010-0.022); images/scripts/fig_experiments_curves.py.
-Second, the highest epoch is chosen on the same validation
-eyes on which it would be reported. There is no separate test split
-(\S\ref{sec:data:splits}), so a best-epoch value is biased upwards, and the
-more so the noisier the metric. Every reported number is instead a
-late-epoch mean: the mean of the metric over epochs 10 to 29 of one run.
-The window is fixed in advance and the same for every arm, so no choice is
-made on the validation data, and averaging twenty epochs damps the
-epoch-to-epoch noise. The window starts at epoch 10 because by then the
-learning rate has been reduced once, from epoch 5 on
-(\S\ref{sec:method:training}), and the fast early phase of training is
-over; a second reduction takes effect from epoch 20, inside the window.
-Figure~\ref{fig:experiments:curves}a shows the window and the late-epoch
-means for the canonical model.
-% LR schedule from args.json: lr_milestones [5, 20], lr_decay 0.4, MultiStepLR
-% stepped after every 0-based epoch -> 2e-3 for epochs 0-4, 8e-4 for 5-19,
-% 3.2e-4 for 20-29 (was "after epoch 5", off by one in 0-based numbering).
+\subsection{Late-Epoch Mean}
+\label{sec:experiments:protocol:late}
 
-% Figure: images/scripts/fig_experiments_curves.py (metrics.jsonl of
-% ANISOGNN_final_dilmean, _nodice, _plainmse, folds 0-4, seed 42).
+% Rewritten 2026-10-17 with the author (supervisor review 2: E1 section
+% structure, E3 figure; author's objections to "noise" and "bias" left
+% undefined). Every number below: images/scripts/fig_experiments_learning_speed.py
+% (metrics.jsonl of the eleven arms of Table 5.1, seed 42, folds 0-4):
+% sd over epochs 10-29 (mean over folds) 0.007-0.025; best epoch minus late
+% mean +0.025 to +0.050; level reached (fold mean within 0.01 of the late
+% mean) at epoch <= 3 for every arm except the free-form FEN (8) and the
+% U-Net (9); |mean 10-19 - mean 20-29| <= 0.014 (k-NN, k = 20).
+Each run is trained for 30 epochs and evaluated on the validation eyes of
+its fold after every epoch. A comparison of operators needs one value per
+run, and the way this value is formed affects every number in this
+chapter. Every number reported in this chapter is a late-epoch mean: the
+mean of the metric over epochs 10 to 29 of one run.
+
+Single-epoch values are not reported for two reasons: noise and selection
+bias. The validation score of a run is subject to noise. After an operator
+has converged, its score still fluctuates between consecutive epochs
+without a systematic trend, because each fold contains only 12 to 20
+validation eyes (\S\ref{sec:data:splits}), so small weight updates change
+the fold average noticeably. Over epochs 10 to 29, this fluctuation has a
+standard deviation of 0.007 to 0.025 for the arms of
+Table~\ref{tab:experiments:arms}, the same order of magnitude as many of
+the differences between arms. Choosing the epoch with the highest score
+introduces, in addition, a selection bias. The maximum of thirty noisy
+scores systematically exceeds the expected score of the operator, because
+the selection favours epochs whose noise happens to be positive. For the
+arms of Table~\ref{tab:experiments:arms}, this bias amounts to 0.025 to
+0.050, and it is larger for arms whose scores fluctuate more. It could
+only be removed by evaluating the selected epoch on independent eyes,
+which a cross-validation without a test split (\S\ref{sec:data:splits})
+does not provide.
+
+In addition, the operators learn at different speeds
+(Figure~\ref{fig:experiments:learning-speed}), and the mean begins only
+once the slowest of them has reached its level. Most of them reach the
+level they keep for the rest of training within the first few epochs, and
+some, such as the FNO, peak shortly afterwards and settle slightly lower.
+The free-form finite-element network and the U-Net rise more slowly and
+reach their level only at epochs 8 and 9. A mean that started earlier
+would include epochs in which these two operators are still learning,
+which would lower their reported scores below the level they reach after
+training. Over epochs 10 to 29, every arm has settled: the means over
+epochs 10 to 19 and 20 to 29 differ by at most 0.014 for every arm.
+
+The late-epoch mean therefore measures every operator after it has reached
+its level and over the same epochs for every arm. Because no epoch is
+chosen on the validation scores, it carries no selection bias, and
+averaging twenty epochs reduces the noise of a single epoch. It does not
+remove the variation between repeated training runs of the same
+configuration; this variation sets the noise level against which
+differences between arms are read (\S\ref{sec:experiments:protocol:stats}).
+
+% Figure: images/scripts/fig_experiments_learning_speed.py (metrics.jsonl of
+% ANISOGNN_final_dilmean, FNO_final_w5, UNET_final_w5, FEN_final_w96Frk4d45,
+% folds 0-4, seed 42).
 \begin{figure}[t]
   \centering
-  % \includegraphics[width=\textwidth]{images/fig_experiments_curves.pdf}
-  % TODO: figure not final (2026-10-02); restore the line above when ready.
-  \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering\itshape Placeholder
-    for Figure~\ref{fig:experiments:curves}: change-region Dice over training.}}
-  \caption[Change-region Dice over training.]{%
-    Change-region Dice at the one-year anchor over training, seed 42.
-    \emph{(a)}~The canonical dilated-stencil graph network, one line per
-    fold. The shaded region is the late-epoch window (epochs 10 to 29) over
-    which every reported value is averaged; the dark segments are the
-    late-epoch means of the five folds, ended by the fold markers of
-    Figure~\ref{fig:experiments:arms-folds}. Dashed vertical lines mark the
-    two reductions of the learning rate by a factor of 0.4, which take
-    effect from epochs 5 and 20.
-    \emph{(b)}~The training objective on the same network
-    (\S\ref{sec:experiments:ablations:loss}): mean over the five folds
-    (line) and range over the folds (band) for the full objective, for the
-    objective without the soft-Dice term, and for a plain unweighted mean
-    squared error, which stays at 0 at every epoch on every fold. The
-    markers show, for each fold, the first epoch at which the run without
-    the soft-Dice term predicts any change; on one fold this happens only at
-    epoch 12, inside the late-epoch window. Both panels share the vertical
-    axis.}
-  \label{fig:experiments:curves}
+  \includegraphics[width=0.8\textwidth]{images/fig_experiments_learning_speed.pdf}
+  \caption[The operators reach their level at different epochs.]{%
+    Change-region Dice at the one-year anchor over training, mean over the
+    five folds (seed 42), for two operators that learn fast
+    (dilated-stencil GNN, FNO) and two that learn slowly (U-Net, free-form
+    FEN). The marker on each line shows the epoch at which it reaches its
+    level, defined as the first epoch whose fold mean lies within 0.01 of
+    the late-epoch mean. The shaded band marks epochs 10 to 29, over which
+    every reported value is averaged.}
+  \label{fig:experiments:learning-speed}
 \end{figure}
-
-All experiments
-use the patient-level five-fold cross-validation of~\S\ref{sec:data:splits},
-which has no test split; every result is a validation result.
 
 \subsection{Noise Level and Comparisons}
 \label{sec:experiments:protocol:stats}
@@ -878,7 +893,7 @@ operator, decides whether the model learns any change at all.
 The second run keeps the mask weighting and removes only the soft-Dice
 term. The network then does leave the collapse, but late: on the five folds, its
 change-region Dice first rises above 0 at epochs 2, 8, 3, 7 and 12, against
-epoch 0 with the full objective (Figure~\ref{fig:experiments:curves}b).
+epoch 0 with the full objective (Figure~\ref{fig:experiments:curves}).
 It also ends lower, by 0.050 on average, on all five folds and on 56 of
 the 75 eyes. The largest part comes from fold 4, where the collapse lasts
 longest: the difference is $-0.114$ there and $-0.012$ to $-0.044$ on the
@@ -902,6 +917,28 @@ rollout is about twice as large with the term as without it (1.10 against
 % arm 0.0000, n_identical_to_bootstrap at epoch 29 = 20/12/15/15/12. nodice:
 % arm 0.4762 +/- 0.0631 vs 0.5258. These replace the older fold-2 loss
 % ladder, which read the soft-Dice term as not raising the score.
+
+% Figure: formerly panel (b) of the combined training-curve figure in
+% Section 5.1 (split 2026-10-17). New draft script, not yet reviewed:
+% images/scripts/fig_experiments_objective.py. Supervisor SV-5.13 also asks
+% for a small table here.
+\begin{figure}[t]
+  \centering
+  % TODO: figure not final; draft images/scripts/fig_experiments_objective.py
+  % to be reviewed together with SV-5.13.
+  \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering\itshape Placeholder
+    for Figure~\ref{fig:experiments:curves}: the training objective over training.}}
+  \caption[The training objective over training.]{%
+    Change-region Dice at the one-year anchor over training for the
+    dilated-stencil graph network, seed 42: mean over the five folds (line)
+    and range over the folds (band) for the full objective, for the
+    objective without the soft-Dice term, and for a plain unweighted mean
+    squared error, which stays at 0 at every epoch on every fold. The
+    markers show, for each fold, the first epoch at which the run without
+    the soft-Dice term predicts any change; on one fold this happens only at
+    epoch 12, inside the averaging window of epochs 10 to 29.}
+  \label{fig:experiments:curves}
+\end{figure}
 
 The third run adds a monotonic-growth penalty. Atrophic tissue does not
 regenerate, so a penalty on any decrease of the mask where the previous

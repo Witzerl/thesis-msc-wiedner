@@ -1663,6 +1663,17 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
   neighborhood region by skipping every d neighbors" and "we use the ℓ2 distance in the feature space of the
   current layer". Bib metadata: Li2019 checked on Crossref (ICCV 2019, pp. 9266-9275, doi
   10.1109/ICCV.2019.00936); Yu2016 ICLR 2016 (no DOI).
+- [x] 2026-10-17 **§5.1.3 split; new §5.1.4 "Late-Epoch Mean"** (`sec:experiments:protocol:late`), worked out
+  with the author: why no single epoch (noise: sd 0.007-0.025 over epochs 10-29; selection bias of the best
+  epoch +0.025 to +0.050, larger for arms that fluctuate more, not removable without a test split) and why
+  epochs 10-29 (operators learn at different speeds: level reached at epoch <= 3 except free-form FEN 8 and
+  U-Net 9; halves of the window differ <= 0.014). Arguments dropped at the author's request: curriculum (full
+  from epoch 2), learning-rate schedule (drops at 5 and 20), best-checkpoint use, 5-29 robustness check. New
+  Fig. 5.1 `fig:experiments:learning-speed` (`images/scripts/fig_experiments_learning_speed.py`, which also
+  prints every quoted number over all eleven arms). The old combined curves figure is split: its objective
+  panel is now a placeholder in §5.4.2 under the old label `fig:experiments:curves` (draft script
+  `fig_experiments_objective.py` from another session, not reviewed). Old §5.1.4 is now §5.1.5. AI items
+  5a.17, 5a.18, 5a.20-5a.22 done; 5a.15, 5a.16 (wording in the rollout paragraphs) still open.
 - [ ] Fig. 4.2 caption (redrawn by another session, 8e1db2a) still gives distances in mm (0.121, 0.0057,
   0.034, 0.242, 0.011, 0.119 mm), while §4.3.3 now uses µm (X4); align when the figure is next touched.
 - [ ] TODO (SV-4.2, inline in §4.1): reconsider whether the moving-mesh result goes into the main text as a
