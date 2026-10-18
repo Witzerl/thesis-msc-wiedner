@@ -1363,9 +1363,24 @@ does not decide the accuracy.
 \subsection{Numerical Stability of the T-FEN}
 \label{sec:experiments:validity:tfen}
 
+% Definition moved here from Section 4.3.6 (AI review 4b.31/4b.32, 2026-10-18).
+% Source: SOLVER_FINAL_RUNS section 9.13.3 (criterion, fixed 2026-09-11),
+% section 9.19 (diagnosis) and 9.19a (skew-form result, 2026-10-01).
+Stability is judged on the free-running rollout of the evaluation: every
+model predicts the next visit from its own previous prediction, over each
+eye's whole follow-up of up to about six years, without any ground truth
+fed back. A run is called stable if, in this rollout, the root mean
+squared error of the mask channel and of the layer channels, both in
+normalised units, stays at or below 5 on at least 19 of its 20 late epochs
+(\S\ref{sec:experiments:protocol:late}). The normalised values of a correct
+prediction lie within a few units of zero, so an error above 5 means that
+the rollout has left the range of plausible states; in an unstable run it
+keeps growing, up to values of several thousand. The criterion was fixed
+before the energy-conserving form was trained.
+
 The T-FEN was first trained with the Galerkin form of its transport
 operator (\S\ref{sec:method:family:fen}). Four of its five runs are
-unstable in the sense defined there
+unstable in the sense defined above
 (Table~\ref{tab:experiments:tfen-stability}), and so are most of the runs
 repeated with the second seed, whereas the free-form FEN, which lacks only the transport term, is stable on every
 fold. Tracing the rollouts step by step showed where the divergence comes

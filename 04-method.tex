@@ -716,9 +716,9 @@ the graph solver on the index-space $k$-nearest-neighbour graph
 of~\S\ref{sec:method:graph} with fewer message-passing rounds, so neither
 needs a separate module. The one-hop floor uses a single round at width 64,
 so each node sees exactly one ring of neighbours; it has 40\,971 parameters.
-The per-pixel floor uses no message passing at all. Each node's next state
-then depends only on its own state and its conditioning inputs, and the
-model has no spatial context; it has 14\,795 parameters. Together with the
+The per-pixel floor uses no message passing, so each node's next state
+depends only on its own state and its conditioning inputs and the model
+has no spatial context; it has 14\,795 parameters. Together with the
 two-round index-space arm, they form a locality ladder of zero, one and two
 rounds.
 
@@ -726,36 +726,38 @@ rounds.
 \label{sec:method:family:fen}
 
 The Finite Element Network (FEN) of \citet{Lienen2022} builds the
-update from a finite-element discretisation of an unknown PDE. It is the only
-operator whose output is defined as a time derivative by
-construction rather than as a next state. This is a property of the
-architecture. It is not a claim that the trained model behaves as a valid
-continuous-time system, which is tested in Chapter~\ref{ch:experiments}.
+update from a finite-element discretisation of an unknown PDE. Its
+architecture defines the output as a time derivative instead of a next
+state; it is the only operator in the survey that does so. Whether the
+trained model behaves as a valid continuous-time system is a separate
+question, tested in Chapter~\ref{ch:experiments}.
 
 The original uses a Galerkin method with the P1 basis of piecewise-linear
 hat functions, by default on a Delaunay triangulation of the observation
 points. The resulting system involves the mass matrix of inner products
-between basis functions, which is lumped by row-wise summation --- a
+between basis functions, which is lumped by row-wise summation, a
 standard approximation for time-dependent problems that makes its inversion
-trivial. The inner products are factored so that a network, the free-form
-term, predicts one coefficient per cell, vertex and feature from the time,
-the cell centre, the local vertex coordinates and the vertex features. The
+trivial. The inner products are factored so that a network predicts one
+coefficient per cell, vertex and feature from the time, the cell centre,
+the local vertex coordinates and the vertex features; this network is the
+free-form term. The
 transport variant, T-FEN, adds a convection term. It starts from the
 conservative form $-\nabla \cdot (v u)$, applies the product rule and
 assumes a divergence-free velocity, which leaves the advective form
 $-v \cdot \nabla u$. A second network predicts one velocity per cell and
 feature; since the velocity is constant within each cell, it is
 divergence-free there, but not across cells. Both networks are tanh MLPs,
-and the resulting ODE is solved with the adaptive dopri5 solver.
+and the resulting ODE is solved with the adaptive Dormand--Prince solver
+(dopri5).
 
 The FEN used here triangulates the regular grid by splitting every grid
 cell into two right triangles, which gives 98\,208 triangles over the
 50\,176 nodes; each node belongs to one, two, three or six triangles. The
-mass matrix is lumped as in the original. On this equal-area lattice the
+mass matrix is lumped as in the original. On this equal-area lattice, the
 lumped assembly is exactly a mean over the triangles adjacent to a node.
-On a uniform mesh, the FEN is therefore a message-passing network over
-triangle hyperedges with mean aggregation, and the finite-element machinery
-only makes a difference at the boundary. The free-form term is a tanh MLP
+The FEN is therefore a message-passing network with mean aggregation over
+triangles, each linking three nodes, and its finite-element formulation
+differs from such a network only at the boundary. The free-form term is a tanh MLP
 of depth four and width 96, without normalisation and with a
 zero-initialised head. It receives the three vertex states of a triangle, a
 triangle-type indicator for the two triangle orientations, the covariates
@@ -765,10 +767,9 @@ coefficient per vertex and channel.
 The transport term is a second MLP that predicts one velocity per triangle
 and channel, in millimetres per year. The assembled operator is the
 advective form $-v \cdot \nabla u$ with a velocity that is constant within
-each triangle, as in the original. Neither the original nor this
-implementation makes the velocity divergence-free across triangles, so
-reading it as a physical advection speed rests on an assumption the model
-does not enforce globally. The gradient coefficients are assembled in grid
+each triangle, as in the original. As in the original, the velocity is not
+divergence-free across triangles, so reading it as a physical advection
+speed rests on an assumption that the model does not enforce globally. The gradient coefficients are assembled in grid
 units, so the 21:1 axis imbalance never reaches the MLPs; only the velocity
 conversion uses millimetres. The transport term runs on its own coarser mesh,
 made of seven interleaved triangulations, each of which connects every
@@ -780,8 +781,8 @@ The implementation departs from the original in the following points. A
 regular lattice replaces the Delaunay triangulation. A triangle-type
 indicator replaces the local vertex coordinates, which on this lattice take
 only two forms. The covariates are added as inputs. The time is not an
-input, so the learned dynamics are autonomous, a variant the original paper
-explicitly allows. Integration uses a fixed-step scheme instead of the
+input, so the learned time derivative has no explicit dependence on time
+(it is autonomous), a variant the original paper explicitly allows. Integration uses a fixed-step scheme instead of the
 adaptive dopri5 solver. The advective form and the per-cell velocity are the
 same as in the original; the energy-conserving form of the transport
 operator described below is a further departure.
@@ -798,17 +799,18 @@ stable only while the velocity times the step, the Courant number in the
 sense of the stability condition of~\citet{Courant1928}, stays below a limit
 of about 2.4 for this stencil.
 
-\paragraph{Two forms of the transport operator.}
-Two forms of the assembled transport operator were trained. The first is
+The assembled transport operator was trained in two forms. The first is
 the Galerkin form described above, as in the original. At a constant
 velocity and away from the edge of the domain, it conserves a discrete
 energy of the state, the mass-weighted sum of squares $u^\top M u$, as
-pure transport should: content is moved, not created. At the edge of the
-crop, and for a velocity that varies from triangle to triangle, it does
-not. No flux term is assembled at the boundary, so transported content
-accumulates there, and the operator has modes that grow instead of
-travelling. The second form removes this defect. It keeps only the
-energy-conserving part of the Galerkin operator $L$,
+expected of pure transport, which moves content without creating it. At
+the edge of the crop, or where the velocity varies from triangle to
+triangle, it does not conserve this energy. No flux term is assembled at
+the boundary, so transported content accumulates there, and the operator
+has modes that grow instead of travelling. The second form removes this
+defect. It keeps only the part of the Galerkin operator $L$ that is
+skew-adjoint with respect to the mass matrix $M$, which is its
+energy-conserving part,
 \begin{equation}
   L_{\text{skew}} \;=\; \tfrac{1}{2}\left(L - M^{-1} L^\top M\right),
   \label{eq:method:fen-skew}
@@ -818,30 +820,14 @@ the edge, where it acts as a closed wall. In the interior and at a constant
 velocity, the two forms coincide. The energy-conserving form adds no
 parameters and no measurable cost.
 
-The Galerkin form turned out to be unstable, and the T-FEN reported in
-Chapter~\ref{ch:experiments} uses the energy-conserving form; the Galerkin
-runs are reported in~\S\ref{sec:experiments:validity:tfen}. \emph{Unstable}
-has a specific meaning here. During evaluation, every model is run freely:
-it predicts the next visit from its own previous prediction, over each
-eye's whole follow-up of up to about six years, without any ground truth
-fed back. A run is called stable if, in this free-running rollout, the root
-mean squared error of the mask channel and of the layer channels, both in
-normalised units, stays at or below 5 on at least 19 of its 20 late
-epochs. The normalised values of a correct prediction lie within a few
-units of zero, so an error above 5 means that the rollout has left the
-range of plausible states; in an unstable run it keeps growing, up to
-values of several thousand. The criterion was fixed before the
-energy-conserving form was trained.
-% Source: SOLVER_FINAL_RUNS section 9.13.3 (criterion, fixed 2026-09-11),
-% section 9.19 (diagnosis) and 9.19a (skew-form result, 2026-10-01).
+% AI review 4b.31/4b.32 (2026-10-18): the definition of a stable run moved to
+% Section 5.5.2, where the result is reported and "late epochs" is defined.
+Both forms were trained; Chapter~\ref{ch:experiments} reports both
+(\S\ref{sec:experiments:validity:tfen}), and the main comparison uses the
+energy-conserving form.
 
-The T-FEN has 68\,503 parameters, of which 34\,785 belong to the free-form
-term and 33\,718 to the transport head. The free-form-only control removes
-the transport head at the same width and has 34\,785 parameters. This
-control is therefore not parameter-matched to the T-FEN: the two differ by a
-factor of 1.97. A second control widens the free-form network to a width
-of 139, which gives 68\,282 parameters, level with the T-FEN; its comparison
-is reported in~\S\ref{sec:experiments:ingredients:transport}.
+The T-FEN has 68\,503 parameters; its two free-form controls are described
+in~\S\ref{sec:method:family:params}.
 
 \subsection{Fixed-Step Runge--Kutta Integration}
 \label{sec:method:family:rk}
@@ -939,7 +925,9 @@ architecture class from about a quarter to about four times its size
 
 The free-form FEN control at width 96 has 34\,785 parameters, half the
 reference and a factor of 1.97 below the T-FEN it controls, because it is
-the T-FEN with the transport head removed (\S\ref{sec:method:family:fen}).
+the T-FEN with the transport head removed (\S\ref{sec:method:family:fen}):
+of the T-FEN's 68\,503 parameters, 34\,785 belong to the free-form term and
+33\,718 to the transport head.
 A second free-form control at width 139 has 68\,282 parameters and is
 matched to the T-FEN. The Runge--Kutta wrapper adds no parameters to any
 backbone.
