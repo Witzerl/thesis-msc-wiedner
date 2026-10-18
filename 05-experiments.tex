@@ -478,30 +478,10 @@ The fold is a large source of variance. For the $k$-nearest-neighbour graph
 network, the fold values range from about 0.43 to 0.52. The standard
 deviations in the table are between-fold deviations and are much larger
 than the noise level, which is why differences are always taken fold by
-fold. Figure~\ref{fig:experiments:arms-folds} shows the five fold
-values behind each row: the spread between the folds of one arm is larger
-than most differences between adjacent arms, and fold 2 is the highest
-fold for almost every arm.
+fold. How the folds differ, and why, is examined in
+\S\ref{sec:experiments:folds}.
 
-% Figure: images/scripts/fig_experiments_arms_folds.py (thesis_numbers
-% fold_late; reproduces mean, sd and best fold of every plotted row).
-\begin{figure}[t]
-  \centering
-  % \includegraphics[width=0.9\textwidth]{images/fig_experiments_arms_folds.pdf}
-  % TODO: figure not final (2026-10-02); restore the line above when ready.
-  \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering\itshape Placeholder
-    for Figure~\ref{fig:experiments:arms-folds}: fold values of every arm.}}
-  \caption[Fold values of every arm.]{%
-    Fold values of every arm on the headline metric. Each marker is the
-    late-epoch mean (epochs 10 to 29) of the change-region Dice at the
-    one-year anchor on one fold, seed 42; the marker shape identifies the
-    fold and is the same in every row. The vertical bar is the mean over
-    the five folds, which is also given on the right. Open markers denote
-    arms integrated with a fourth-order Runge--Kutta step. The rows follow
-    Table~\ref{tab:experiments:arms}; the per-pixel floor and persistence,
-    both 0 on every fold, lie outside the plotted range and are omitted.}
-  \label{fig:experiments:arms-folds}
-\end{figure} Adjacent rows mostly lie within the noise level of each other, so
+Adjacent rows mostly lie within the noise level of each other, so
 the table is not a leaderboard. What it provides is the evidence for which
 components of an operator move the metric, which
 \S\ref{sec:experiments:ingredients} examines one at a time.
@@ -823,6 +803,146 @@ local context together, is not established
 (\S\ref{sec:experiments:ingredients:global}) and is not counted among
 them. \S\ref{sec:experiments:ablations} reports what
 was measured and did not matter.
+
+
+\section{Differences Between Folds}
+\label{sec:experiments:folds}
+
+% Added 2026-10-18 with the author. Every number in this section:
+% images/scripts/analysis_folds.py (seeds 42 and 7, five main operators,
+% per-eye growth-region Dice late-epoch means from thesis_numbers.eye_late,
+% predicted and true new atrophy from the per-step records, lesion properties
+% from the raw masks cropped to 49 x 1024; every eye id checked against the
+% logged baseline area). Exploratory: six eye properties were tested on two
+% comparisons, so the p values are not corrected for multiple testing
+% (rho -0.32 for the far share: p = 0.006; rho -0.39 for edge contact:
+% p = 0.001; rho 0.79 within fold 4: p = 0.002, 12 eyes).
+The scores of the five folds differ by more than most operators differ from
+each other (\S\ref{sec:experiments:main-results}). This section describes
+these differences and relates them to the validation eyes of each fold. It
+also shows on which eyes the local and the global operators differ, which
+links the fold differences to the reach argument
+of~\S\ref{sec:experiments:ingredients:convergence}. The analysis uses the
+five main operators of Table~\ref{tab:experiments:arms} at both seeds and is
+exploratory. Its per-eye values are the growth-region Dice at the one-year
+anchor, because the change-region Dice is recorded per fold only.
+
+Figure~\ref{fig:experiments:arms-folds} shows the fold values of the five
+operators. Fold~2 is the highest fold of every operator at both seeds, with
+one exception: the FNO at seed~42, whose highest fold is fold~4. The folds
+come from split files supplied with the data, which assign the patients
+without a recorded criterion, so their composition differs by chance. With
+12 to 20 eyes per fold, a few eyes can shift a whole fold. Fold~2 holds the
+largest lesions, with a median baseline area of 7.9\,mm$^2$ against 4.1 to
+6.3\,mm$^2$ on the other folds, and slowly growing ones (median growth rate
+0.21\,mm per year in square-root area, the lowest together with fold~3).
+Both properties go with a higher score: per eye, the growth-region Dice of
+the canonical model rises with the baseline lesion area (Spearman
+$\rho = 0.45$) and falls with the growth rate ($\rho = -0.35$, 75 eyes).
+Every operator meets the same eyes on a fold, so this common shift cancels
+when two operators are compared fold by fold.
+
+% Figure: images/scripts/fig_experiments_arms_folds.py (thesis_numbers
+% fold_late; every plotted fold value checked, five-fold means against
+% Table 5.1).
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.8\textwidth]{images/fig_experiments_arms_folds.pdf}
+  \caption[Fold values of the five main operators.]{%
+    Change-region Dice at the one-year anchor on each of the five folds
+    (late-epoch mean, seed 42) for the five main operators of
+    Table~\ref{tab:experiments:arms}. Lines connect the values of one
+    operator to make the shift between folds visible; the folds themselves
+    have no order.}
+  \label{fig:experiments:arms-folds}
+\end{figure}
+
+Beyond this common shift, some folds favour one kind of operator. At both
+seeds, the dilated-stencil network lies below the mean of the T-FEN, the
+U-Net and the FNO on folds~1 and~4 and above it on folds~0, 2 and~3; the
+$k$-nearest-neighbour network, below it on most folds, falls furthest
+behind on fold~4. On fold~3 the U-Net and the FNO fall behind the
+dilated-stencil network and the T-FEN, at both seeds and on 14 of the
+fold's 15 eyes. Two properties of the eyes separate the local
+from the global operators.
+
+The first is the distance at which new atrophy appears. For every eye, the
+share of its new atrophy at the anchor that lies more than 0.24\,mm from
+the baseline lesion was computed; 0.24\,mm is about the reach of two
+message-passing rounds of the dilated stencil
+(\S\ref{sec:experiments:ingredients:reach}). The larger this share, the
+lower the dilated-stencil network scores relative to the mean of the T-FEN,
+the U-Net and the FNO (Figure~\ref{fig:experiments:far-atrophy}; Spearman
+$\rho = -0.32$ over the 75 eyes). On the third of the eyes with the least distant atrophy
+it leads them by 0.035 on average, and on the third with the most it
+trails them by 0.010. Fold~1 holds the most eyes of the second kind, with a
+median share of 22\,\% against 5 to 16\,\% on the other folds, and its
+three largest deficits of the graph network are eyes of this kind at both
+seeds. Two of them are the two eyes of one patient. The pattern is
+consistent with the reach argument
+of~\S\ref{sec:experiments:ingredients:convergence}: an operator with
+limited reach cannot place atrophy that appears beyond it.
+
+% Figure: images/scripts/fig_experiments_far_atrophy.py
+% (analysis_folds.far_terciles; thirds of the far share 0.00-0.05,
+% 0.05-0.16, 0.18-0.67, 25 eyes each: +0.035 +/- 0.011, +0.018 +/- 0.010,
+% -0.010 +/- 0.012 SE).
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.6\textwidth]{images/fig_experiments_far_atrophy.pdf}
+  \caption[The graph network falls behind where new atrophy appears far from
+    the lesion.]{%
+    Difference in growth-region Dice at the one-year anchor between the
+    dilated-stencil graph network and the mean of the T-FEN, the U-Net and
+    the FNO, per eye and averaged over seeds 42 and 7. The 75 validation
+    eyes are split into thirds by the share of their new atrophy that lies
+    more than 0.24\,mm from the baseline lesion (low: 0 to 5\,\%, medium:
+    5 to 16\,\%, high: 18 to 67\,\%). Points are means over the 25 eyes of
+    a third; bars are standard errors.}
+  \label{fig:experiments:far-atrophy}
+\end{figure}
+
+The second property is contact with the edge of the window. The dense
+operators fall behind the local ones most when the lesion touches the
+window edge, by 0.079 on the 18 such eyes against 0.022 on the other 57
+($\rho = -0.39$). Both dense operators see zeros beyond the edge, the U-Net
+through the padding of its convolutions and the FNO through the zero
+padding added before its Fourier transform, whereas a graph node at the
+edge simply has fewer neighbours; whether this difference causes the
+effect was not tested. The dense operators also gain where new atrophy
+appears far from the lesion ($\rho = 0.29$), the mirror image of the graph
+networks.
+
+The dips on folds~4 and~3 have partial explanations. On fold~4 the graph
+networks predict too little new atrophy. The fold holds the smallest
+lesions, which grow most relative to their size: the new atrophy at the
+anchor is a median 39\,\% of the baseline area, against 18\,\% (fold~3) to
+35\,\% (fold~0) on the other folds. Every operator predicts too little when
+growth is large relative to the lesion; on the third of all eyes where it
+exceeds 40\,\%, each of them predicts less than half of the true new
+atrophy. On fold~4, however, the dilated-stencil network falls shorter than
+the FNO on the same eyes, with a median of 49\,\% of the true amount
+against 83\,\%, and within the fold its deficit follows this extra
+shortfall (Spearman $\rho = 0.79$, 12 eyes). Relative growth does not
+explain the extra shortfall: across all eyes, the gap between the two
+operators' predicted amounts does not depend on it. On fold~3 the new
+atrophy lies closer to the existing lesion than on any other fold. This is
+where the dense operators fall behind most, by 0.055 on the half of all
+eyes with the least distant atrophy against 0.016 on the other half, and
+within the fold they lose most on its two smallest lesions (0.11 and
+0.20\,mm$^2$). Together these properties account for about a quarter of the
+fold-3 gap.
+
+The folds therefore differ mainly through the eyes they contain, and two
+eye properties consistently separate local from global operators: new
+atrophy far from the lesion favours the global ones, and lesions at the
+window edge favour the local ones. These findings are exploratory. Several
+properties were tested, two of the clearest cases are the eyes of one
+patient, and the unexplained parts of the dips on folds~3 and~4 may come
+from the training sets of these folds rather than from their validation
+eyes; only retraining on a different split could separate the two. The
+comparisons of the previous sections are taken fold by fold and are not
+affected by the shift that all operators share.
 
 
 \section{Negative Results}

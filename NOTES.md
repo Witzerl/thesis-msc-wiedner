@@ -1699,6 +1699,25 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
 - [ ] Appendix D (`fig_appendix_rollouts`, still disabled) must show typical and difficult eyes: the Fig. 5.2
   caption now points there for them. Most eyes receive less predicted change than occurs (35 of 48, median
   ratio predicted/true 0.73, folds 0-2, epoch 29).
+- [x] 2026-10-18 **New §5.4 "Differences Between Folds"** (`sec:experiments:folds`, after the ingredient study;
+  Negative Results onwards renumber to §5.5-§5.8), worked out with the author. Fig. 5.5 `fig:experiments:arms-folds`
+  is now one line per operator over the five folds (five main operators, seed 42, `fig_experiments_arms_folds.py`);
+  new Fig. 5.6 `fig:experiments:far-atrophy` (`fig_experiments_far_atrophy.py`). §5.2 keeps a short fold paragraph
+  with a pointer. Content: fold 2 highest because it holds the largest, slowest lesions (per-eye Dice vs area
+  rho 0.45, vs growth rate -0.35); folds come from MUW split files without a recorded criterion; the stencil GNN
+  scores lower relative to the other operators the more new atrophy appears > 0.24 mm from the lesion (rho -0.32;
+  explains fold 1, two of three cases are the eyes of one patient); dense operators lose most at the window edge
+  (rho -0.39; zero padding named as untested reason, checked in unet.py / fno.py: FNO zero-pads 1/8 per axis
+  before the FFT, not periodic); fold 4: all operators under-predict when relative growth is large, the stencil
+  falls shorter than the FNO (49 % vs 83 %), not explained by relative growth; fold 3: growth closest to the
+  lesion and two tiny lesions, about a quarter of the gap explained. Every number from
+  `images/scripts/analysis_folds.py` (per-eye growth-region Dice; eye ids checked against logged areas).
+  Checked on the way and dropped: the T-FEN's lead over the stencil concentrated on folds 1 and 4 at seed 42 does
+  not repeat at seed 7 (training noise); per-fold box plots did not carry the message.
+- [ ] Fold section, open: (i) whether the fold-3/fold-4 dips come from the validation eyes or the training sets
+  needs retraining on a reshuffled patient split (stencil GNN and U-Net, 5 folds each); (ii) ask the supervisor
+  how MUW's split files (`split5_hrf_spec_aligned`, 100 patient ids, 80/20) were assigned; (iii) the stencil
+  GNN's larger lead over the k-NN GNN on folds 2 and 4 (about 0.09 against 0.04, both seeds) is unexplained.
 - [ ] Edge-advance analysis for §6.2 ("good at where, weaker at how fast"), exploratory 2026-10-18, not yet a
   script: per row, outward shift of the left/right lesion edge (columns, fine axis) from baseline to one year.
   Predicted advance correlates with the true one in 47 of 48 eyes (median r 0.53; 0.70 for the Fig. 5.2 eye),
