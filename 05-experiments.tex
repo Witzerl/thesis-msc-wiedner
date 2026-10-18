@@ -12,37 +12,44 @@
 % Appendix G.
 
 
+This chapter answers the second part of the research question: what kind
+of operator the framework of Chapter~\ref{ch:method} needs. The operators
+of~\S\ref{sec:method:family} are run through the same slot under identical
+conditions.
+
 \section{Evaluation Protocol}
 \label{sec:experiments:protocol}
 
-This chapter answers the second part of the research question: what kind
-of operator the framework of Chapter~\ref{ch:method} needs. Many operators
-are run through the same slot under identical conditions. This section
-defines how they are scored and how two scores are compared.
+This section defines how the operators are scored and how two scores are
+compared.
 
-\subsection{Why Not Per-Pixel Error}
+% Supervisor review 2, SV-5.1 (2026-10-18): heading was "Why Not Per-Pixel Error".
+\subsection{Evaluation Challenges}
 \label{sec:experiments:protocol:mse}
 
 GA progresses slowly. Between two consecutive visits, almost all pixels of
-the lesion mask stay unchanged. Persistence, which predicts no change at
-all, is therefore a strong per-pixel baseline. A per-pixel mean squared
+the lesion mask stay unchanged. Persistence, the prediction that nothing
+changes, is therefore a strong per-pixel baseline. A per-pixel mean squared
 error or root mean squared error (RMSE) is dominated by the static pixels,
-and a model can reach a low per-pixel error while predicting no
-progression at all.
+so a model can reach a low per-pixel error without predicting any
+progression.
 
-The same holds for a Dice score over the whole lesion. The static interior
-of the lesion dominates it, so persistence already reaches a full-mask Dice
-of about 0.87. Full-mask Dice is therefore almost blind to progression.
+The same holds for a Dice score over the whole lesion. The Dice score
+measures the overlap of two regions: it is 1 when they coincide and 0 when
+they share no pixel. Over the whole lesion it is dominated by the static
+interior, so persistence already reaches a full-mask Dice of about 0.87,
+and the score barely responds to progression.
 
-Raw errors are also not compared across architectures. The clinical
-metrics are computed on the thresholded mask. The dense operators, such as
-the U-Net and the Fourier Neural Operator, decalibrate their raw mask
-regression under autoregressive rollout much more than the graph network
-does: the late rollout mask RMSE of the U-Net is roughly twice that of the
-graph network, while its thresholded metrics are higher. A raw-error
-comparison across architecture classes would therefore measure calibration,
-not prediction. The soft-Dice loss adds a separate, known stretch to the
-raw mask values (\S\ref{sec:method:training:loss}). RMSE values are
+Raw errors are also not compared across architectures, because the
+clinical metrics are computed on the thresholded mask. Under autoregressive
+rollout, the dense operators, such as the U-Net and the Fourier Neural
+Operator, spread their raw mask predictions much further from the two mask
+values than the graph network does: the late-epoch mask RMSE of the rollout
+is roughly twice as large for the U-Net as for the graph network, while its
+thresholded metrics are higher. A raw-error comparison across architecture
+classes would therefore measure this spread, not the prediction. In
+addition, the soft-Dice term of the loss stretches the raw mask values away
+from the threshold (\S\ref{sec:method:training:loss}). RMSE values are
 computed and logged, but no RMSE value is used as evidence in this chapter.
 
 \subsection{Metrics}
@@ -51,8 +58,8 @@ computed and logged, but no RMSE value is used as evidence in this chapter.
 The headline metric is the change-region Dice at the one-year anchor. All
 predicted and ground-truth masks are binarised at the physical threshold of
 0.5, which is mapped into normalised space in the same way as in the loss. Let $b$
-be the thresholded mask at the baseline visit, the first visit of the
-rollout, $p$ the thresholded prediction at the anchor and $y$ the
+be the thresholded mask at the baseline visit (the first visit of the
+rollout), $p$ the thresholded prediction at the anchor and $y$ the
 thresholded ground truth at the anchor. The predicted and the true change
 regions are
 \begin{equation}
@@ -61,25 +68,27 @@ regions are
   \label{eq:experiments:change-region}
 \end{equation}
 and the change-region Dice is $2\,|\hat{C} \cap C| \,/\, (|\hat{C}| + |C|)$.
-A Dice score measures the overlap of two regions: it is 1 when they
-coincide and 0 when they share no pixel. Applied to the change regions, it
-asks whether the model predicts change where change actually happened, and
-it ignores the large part of the lesion that stays the same.
+Applied to the change regions, the Dice score measures how well the
+predicted change overlaps the change that occurred; the large part of the
+lesion that stays the same does not enter it.
 
-Three consequences follow. First, persistence predicts no change, so its
-score is 0 by construction, and every positive value is lift over "no
-progression". Second, the metric is symmetric. A predicted shrinkage counts
-as predicted change and is scored against the truth, which is consistent
-with the absence of a monotonic-growth constraint
-(\S\ref{sec:method:dt-residual}). Third, it is not the growth-region Dice
-of \citet{Mai2024}, which this chapter also uses. The growth-region Dice
+Two consequences follow. First, persistence predicts no change, so its
+score is 0 by construction, and every positive value is an improvement over
+predicting no progression. Second, the metric is symmetric. A predicted
+shrinkage counts as predicted change and is scored against the truth, which
+is consistent with the absence of a monotonic-growth constraint
+(\S\ref{sec:method:dt-residual}).
+
+The change-region Dice differs from the growth-region Dice
+of~\citet{Mai2024}, which this chapter also uses. The growth-region Dice
 scores only new atrophy, the pixels that are lesion at the anchor but not
 at baseline. The change-region Dice scores every changed pixel, growth and
 shrinkage alike. Both score 0 for persistence and are easy to confuse:
 Table~\ref{tab:experiments:arms} and all differences between arms use the
 change-region Dice, while the eye counts of
-\S\ref{sec:experiments:protocol:stats} use the growth-region Dice. The
-change-region Dice is also the model-selection metric.
+\S\ref{sec:experiments:protocol:stats} use the growth-region Dice.
+% "The change-region Dice is also the model-selection metric." removed
+% 2026-10-18: no reported number uses the selected checkpoint (5.1.4).
 
 % TODO (author review v4 #19, 2026-09-30): crop-variant paragraph commented
 % out; neither variant enters any reported number. Decide later whether to
@@ -109,16 +118,17 @@ counterpart. It is used for the eye counts of
 \S\ref{sec:experiments:protocol:stats}. It is also computed at every
 rollout step and grouped by the time since baseline into $(0, 1]$,
 $(1, 2]$, $(2, 3]$ and more than three years. These horizon bins show how
-the prediction degrades as the forecast reaches further than the one-year
-anchor, and they are the bins in which \citet{Mai2024} report the same
-metric.
+the prediction degrades beyond the one-year anchor. \citet{Mai2024} report
+the same metric in the same bins.
 
-For the split reported in~\S\ref{sec:experiments:main-results}, an eye
-counts as border-touching when its true lesion at the anchor touches the
-edge of the imaged field: the outermost ring of the crop or, for padded
-visits, the edge of the zero padding, because there the true edge of the
-field lies inside the crop (\S\ref{sec:data:spatial}). Of the 75 eyes, 21
-touch it.
+Because growth across the edge of the imaged field is censored
+(\S\ref{sec:data:spatial}), the eyes are also split by whether their lesion
+touches that edge; the split is reported
+in~\S\ref{sec:experiments:main-results}. An eye counts as border-touching
+when its true lesion at the anchor touches the edge of the imaged field.
+This edge is the outermost ring of the crop or, for padded visits, the edge
+of the zero padding, since for those visits the true edge of the field lies
+inside the crop. Of the 75 eyes, 21 touch it.
 % Author decision (e), 2026-10-01; definition from the commented-out
 % crop-variant paragraph above (pad-aware boundary). The pad-masked variant
 % stays unreported.
@@ -139,17 +149,17 @@ which has no test split; every result is a validation result.
 Two evaluation procedures run after every epoch on the validation eyes of
 the fold. The one-step evaluation predicts every validation window once
 from its observed input. It isolates the accuracy of a single step from the
-drift of a rollout. The rollout evaluation is the procedure every reported
-number comes from. For each validation eye, it starts at the baseline
+drift of a rollout. Every reported number comes from the rollout
+evaluation. For each validation eye, it starts at the baseline
 visit and predicts the next visit. The prediction is then fed back as the
 input of the next window, and the rollout continues over the eye's real
 visit schedule, with the actual $\Delta t$ of each window.
 
 The one-year anchor is taken at the first step whose cumulative time
 reaches it (\S\ref{sec:data:temporal}). For a few eyes this step lies
-beyond one year, where the true change region is larger; this is accepted,
-as \citet{Mai2024} also score every follow-up visit by its time since
-baseline rather than at a fixed horizon. Persistence is computed inside every
+beyond one year, where the true change region is larger. This is accepted
+because \citet{Mai2024} also score every follow-up visit by its time since
+baseline and not at a fixed horizon. Persistence is computed inside every
 rollout by the same code; for the anchor metrics it is the baseline mask
 held constant. Per-step metrics are averaged per eye first and then over
 the eyes, so every eye counts once, whatever its number of visits.
