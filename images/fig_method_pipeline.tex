@@ -1,0 +1,46 @@
+% Figure 4.1 (fig:method:pipeline): the fixed framework with its one swappable slot.
+% Drawn in TikZ (loaded by jkureport.sty); colours from style/thesis-colors.sty.
+% Message: every operator sits in the same slot; the residual update, the
+% conditioning on Delta t and the rollout around it are shared. Operator names
+% and all explanations are in the caption (figure rule, NOTES 2026-10-18).
+\begin{tikzpicture}[
+    font=\small,
+    >=latex,
+    fixed/.style={draw=gaPrimary, fill=gaPrimaryTint, rounded corners=2pt,
+                  minimum height=9mm, inner sep=4pt, align=center},
+    slot/.style={draw=gaAccent, fill=gaAccentTint, very thick, rounded corners=2pt,
+                 minimum height=12mm, minimum width=24mm, align=center},
+    op/.style={draw=gaPrimary, fill=white, circle, minimum size=7mm, inner sep=0pt},
+    flow/.style={->, draw=gaInk, line width=0.6pt},
+    cond/.style={->, draw=gaInkMuted, line width=0.6pt},
+    loop/.style={->, draw=gaInkMuted, line width=0.6pt, dashed},
+  ]
+  % main row
+  \node[fixed] (u)   at (0, 0)    {state\\$u_k$};
+  \node[slot]  (f)   at (3.1, 0)  {operator\\$f_\theta$};
+  \node[op, minimum size=10.5mm] (dt) at (5.75, 0) {$\times\Delta t$};
+  \node[op]    (add) at (7.55, 0) {$+$};
+  \node[fixed] (out) at (9.7, 0)  {next state\\$\hat u_{k+1}$};
+
+  % conditioning inputs of the operator
+  \node[text=gaInkMuted, align=center] (cin) at (3.1, -1.4) {$\Delta t$, $\mathbf{z}$};
+
+  \draw[flow] (u) -- (f);
+  \draw[flow] (f) -- (dt);
+  \draw[flow] (dt) -- (add);
+  \draw[flow] (add) -- (out);
+  \draw[cond] (cin) -- (f);
+
+  % residual connection: the current state is added unchanged
+  \draw[flow] (u.north) -- ++(0, 0.75) -| (add.north);
+
+  % objective: the prediction is compared with the observed next state
+  \node[fixed] (loss) at (9.7, 1.65) {loss};
+  \node[text=gaInkMuted] (obs) at (9.7, 2.85) {observed $u_{k+1}$};
+  \draw[flow] (out) -- (loss);
+  \draw[cond] (obs) -- (loss);
+
+  % rollout: the prediction becomes the next input
+  \draw[loop] (out.south) -- ++(0, -1.85) -| node[pos=0.27, below, text=gaInkMuted]
+      {rollout} ([xshift=-4mm]u.south);
+\end{tikzpicture}

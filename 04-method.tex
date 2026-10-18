@@ -83,25 +83,25 @@ extension of the graph operator, following MM-PDE \citep{Hu2024}, is
 reported separately as an additional experiment in
 Appendix~\ref{app:mm-pde}.
 
-% TODO: produce Figure fig:method:pipeline. Raw visits -> precomputation
-% (crop/pad, normalisation, windows with Delta t and covariates, graph
-% edges) -> the shared training loop. In the loop, the current state and
-% its conditioning (Delta t, covariates) enter the operator slot ->
-% residual update u + Delta t * f -> next state, fed back for multi-step
-% rollout during training and evaluation -> evaluation. The operator slot
-% is drawn as the one box that changes, listing the architecture classes.
-% No moving-mesh path (reported in Appendix G only).
+% Figure: images/fig_method_pipeline.tex (TikZ, drafted 2026-10-18). Only the
+% update loop is drawn; precomputation (Chapter 3) and the moving-mesh path
+% (Appendix G) are left out on purpose.
 \begin{figure}[t]
   \centering
-  \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering\itshape Placeholder
-    for Figure~\ref{fig:method:pipeline}: the shared pipeline with the
-    operator slot as the only varying component. See accompanying
-    \texttt{\% TODO} for the intended content.}}
+  \input{images/fig_method_pipeline.tex}
   \caption[The fixed framework and its swappable operator slot.]{%
-    The fixed framework and its swappable operator slot. Precomputation,
-    conditioning, the residual update, the training curriculum and the
-    evaluation are shared by every experiment. Only the operator
-    $f_\theta$ in the highlighted box changes between arms.}
+    The fixed framework and its swappable operator slot. The operator
+    $f_\theta$ (orange) receives the current state $u_k$ together with the
+    interval $\Delta t$ to the next visit and the patient covariates
+    $\mathbf{z}$. Its output is multiplied by $\Delta t$ and added to the
+    unchanged current state, which gives the predicted next state
+    (Equation~\ref{eq:method:residual-update}). During training, the
+    prediction is compared with the observed next state in the shared loss
+    (\S\ref{sec:method:training:loss}). In the rollout, the prediction is
+    fed back as the input of the next step. Everything except
+    the operator is the same in every experiment; the slot is filled in
+    turn by the graph network, the U-Net, the Fourier Neural Operator and
+    the finite-element network (\S\ref{sec:method:family}).}
   \label{fig:method:pipeline}
 \end{figure}
 

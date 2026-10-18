@@ -1182,7 +1182,7 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
   - Rollouts ran on the CPU: the GPU path ran out of host memory while another process held
     most of the RAM.
 - [x] §4.3.3 `fig:method:stencils` -- done 2026-10-01 (`fig_method_stencils.py`).
-- [ ] §4.1 `fig:method:pipeline` -- schematic (TikZ draft), needs author review.
+- [x] (done 2026-10-18: TikZ `images/fig_method_pipeline.tex`, update loop only; author accepted) §4.1 `fig:method:pipeline` -- schematic (TikZ draft), needs author review.
 - [ ] §3.1 `fig:data:example-state` -- Python from raw data; needs the author's decision whether
   a patient's SLO image may be printed.
 - [ ] §2.2.2 `fig:bg:solver-path` -- schematic (TikZ draft), needs author review.
@@ -2303,7 +2303,7 @@ Pulled from the code repository (`masterthesis-docker/NOTES.md` + `PROJECT_CONTE
 - [x] (obsolete 2026-09-27: the sizes are no longer quoted anywhere, both inline TODOs removed) TODO: verify the temporal-bundle sizes of the original MP-PDE. The set {20, 25, 50}
   (from code-side notes) could not be found in the paper text; §2.4 carries an inline
   TODO, and the §4.3.3 table states only "K steps".
-- [ ] TODO: produce Figure `fig:method:pipeline` (§4.1) -- the shared pipeline with the
+- [x] (done 2026-10-18, see the Figure plan) TODO: produce Figure `fig:method:pipeline` (§4.1) -- the shared pipeline with the
   operator slot as the one varying box and the moving-mesh branch dashed.
 - [x] (done 2026-10-17, author's revised brief: three panels -- physical k-NN, index k-NN,
   dilated stencil -- one orange centre node with its edges, physical distances written on the
