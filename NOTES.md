@@ -1826,6 +1826,35 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
     unstable for the T-FEN "at any step"; at the one-year anchor Euler at 11.4 d is within 0.004 of RK4
     on all three folds (says nothing about long free-running stability, the §5.5.2 criterion).
   - Training-based variant (one model per h) still open; needs the cluster.
+- [ ] **Pad positions excluded from the loss, one local run (2026-10-18; author to decide whether it
+  enters §5.4.2 or goes to the cluster).** Canonical stencil network, fold 2, seed 42, 30 epochs, with
+  `--exclude_pad_nodes True` (positions whose target equals the zero-fill vector in all channels are
+  dropped from every loss term); command line copied from the reference run `ANISOGNN_final_dilmean_f2`
+  (cluster, A6000, 2026-09-02). Args diff: only `exclude_pad_nodes`, experiment name, device, input path,
+  save_dir, plus flags added to the code later, all at their defaults (`weight_decay 0.01` = AdamW's old
+  implicit default). Local run on the RTX 5080, code repo HEAD dd8d269 (the `code_sha` stamp in args.json
+  comes from a stale `.code_sha` file). Launcher, comparison script (`compare.py`, per-eye instrument
+  copied from `thesis_numbers.py` eye_late) and run dir: `images/data/pad_exclusion/` (git-ignored).
+  Same validation set: persistence Dice@360d identical (0.86748). Late window epochs 10-29:
+
+  | | pad positions in the loss (reference) | pad positions excluded | difference |
+  |---|---:|---:|---:|
+  | change-region Dice@360d, late mean (sd over epochs) | 0.6060 (0.0101) | 0.5922 (0.0103) | -0.0138 |
+  | same, pad-masked (`_anat`) | 0.6098 | 0.5958 | -0.0139 |
+  | border-touching / interior eyes | 0.6463 / 0.5818 | 0.6145 / 0.5788 | -0.032 / -0.003 |
+  | growth-region Dice at the anchor (16 eyes) | 0.6260 | 0.6117 | -0.0143 (higher on 4/16 eyes, t -1.8) |
+  | epoch-paired difference | | | lower on 18/20 late epochs |
+  | s/epoch (min / median) | 101 / 117 | 89 / 154 | |
+
+  Reading: no gain. The exclusion is slightly *lower*, mainly on the border-touching eyes, but -0.014 is
+  inside the single-fold floor of 0.036 (run-to-run sd 0.0127), so it is not an effect either way. As
+  expected, layer RMSE over valid positions falls (0.696 -> 0.628) while RMSE over all positions rises
+  (0.729 -> 0.814), because the fill values are no longer trained. Caveats: one fold, one seed, different
+  GPU from the reference (GPU nondeterminism dominates seed choice in this project); separating hardware
+  from the switch would need a local control run of the unchanged configuration (not run). The old
+  k-NN-era ladder read +0.029 (`MPPDE_L5_nopad_f2`, also inside the floor); this run does not repeat it.
+  Suggestion: keep "off in every reported run" and the mention in §3.3/§4.5.1 as is; a 5-fold cluster run
+  only if the objective table (SV-5.13) needs a pad row.
 
 ### Assets that now exist and should be reused
 
