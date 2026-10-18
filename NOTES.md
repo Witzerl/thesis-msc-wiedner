@@ -1866,6 +1866,59 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
   `thesis_numbers.py pair ANISOGNN_final_dilmean_nopad ANISOGNN_final_dilmean`, plus the
   border/interior split, then decide whether to enable the prepared §5.4.2 paragraph (steps listed
   in the comment there). ~1 h per fold on an A6000.
+- [ ] **U-Net run-to-run spread, local repeats on fold 2 (2026-10-18; for SV-5.2, the z-test with an
+  empirical sigma; author to decide which sigma_U enters §5.1.5 / App. E).** Parameter-matched U-Net
+  (`UNET_final_w5`, 83,081 params), fold 2, retrained three times on the RTX 5080 (seed 42, seed 42, seed 7),
+  30 epochs each. Command line copied from the reference run's `solver-7841338.out`; args diff only
+  experiment, device, input path, save_dir, num_epochs (smoke test) and flags added to the code later, all at
+  their defaults (`weight_decay 0.01` = AdamW's old implicit default; `gnn_aggr mean_max` kept as in the
+  reference, inert for the U-Net). Persistence Dice@360d identical (0.86748). Launcher, analysis scripts
+  (`analyse.py`, `seedspread.py`) and runs: `images/data/unet_repeats/` (git-ignored). Late mean of
+  `change_region_dice_360d`, epochs 10-29:
+
+  | run | late mean | sd over late epochs | s/epoch min / median | wall-clock |
+  |---|---:|---:|---:|---:|
+  | cluster A6000, seed 42 (`UNET_final_w5_f2`) | 0.5918 | 0.0106 | 21.0 / 32.7 | |
+  | cluster A6000, seed 7 (`UNET_final_w5s7_f2`) | 0.5787 | 0.0213 | 46.2 / 81.4 | |
+  | local RTX 5080, seed 42, run 1 | 0.5827 | 0.0126 | 10.7 / 12.2 | 7.0 min |
+  | local RTX 5080, seed 42, run 2 | 0.5827 | 0.0126 | 10.7 / 12.4 | 7.0 min |
+  | local RTX 5080, seed 7 | 0.5875 | 0.0110 | 10.0 / 12.4 | 7.0 min |
+
+  - **The two local seed-42 runs are bit-identical** (Dice and train RMSE at every epoch): the U-Net trains
+    deterministically on this GPU (unlike the graph networks, whose same-seed repeats differ). The same-seed
+    repeat therefore adds no information; locally there are two independent runs, not three.
+  - Single-run sd on fold 2 (convention of the 0.0127: sd of one run; pair = |d|/sqrt 2): local seed pair
+    0.0034; cluster seed pair 0.0092; local three runs (formally) 0.0028, 90 % CI 0.0016-0.0124 (df 2, but
+    not valid, see above); all five runs 0.0050, 90 % CI 0.0033-0.0120; the four independent runs 0.0057,
+    90 % CI 0.0035-0.0166 (df 3). Pairwise: cluster s42 - s7 +0.0131; cluster - local s42 +0.0091; local s42
+    - s7 -0.0049; cluster s7 - local s7 -0.0088. **On fold 2 the U-Net varies less than the graph networks
+    (about 0.4-0.45 x 0.0127), and hardware adds at most about 0.009.**
+  - **But the "one pair" premise is wrong, and fold 2 is a quiet fold.** The cluster has a seed-42/seed-7
+    pair of the U-Net on every fold (late means): f0 +0.0041, f1 -0.0301, f2 +0.0131, f3 -0.0480, f4 -0.0155.
+    Pooled single-run sd sqrt(mean(d^2)/2) = **0.0191** (df 5, 90 % CI 0.0128-0.0399), 1.50 x 0.0127; with
+    the local fold-2 seed pair added 0.0175 (df 6, CI 0.0121-0.0335). Same estimator on the graph networks'
+    own seed pairs: dilated stencil 0.0111, k-NN (mean) 0.0069, so the U-Net spreads 1.7 x the stencil and
+    2.8 x the k-NN network. The "1.9 x" in App. E (`app:full-results:criteria`) was not reproduced from these
+    runs; check its source. The spread is carried by folds 1 and 3; the fold-2 repeats cannot tell whether
+    those two pairs are unlucky. A fold-1 repeat is possible locally (precompute exists, ~7 min per run);
+    fold 3 is not (no local precompute).
+  - z-tests with a U-Net on one side, sigma_Delta = sqrt(0.0127^2 + sigma_U^2) / sqrt 5 (* = |z| > 1.96;
+    other side assumed 0.0127, also for the FNOs), seed 42 / seed 7:
+
+    | comparison | mean s42 / s7 | sigma_U 0.0127 (sD 0.0080) | 0.0191, cluster 5 folds (sD 0.0103) | 0.0241 = 1.9 x (sD 0.0122) | 0.0050, fold 2 only (sD 0.0061) |
+    |---|---|---|---|---|---|
+    | dilated stencil - U-Net | +0.0212 / +0.0081 | +2.64* / +1.01 | +2.07* / +0.79 | +1.74 / +0.66 | +3.47* / +1.33 |
+    | T-FEN - U-Net | +0.0383 / +0.0246 | +4.77* / +3.06* | +3.73* / +2.40* | +3.14* / +2.02* | +6.27* / +4.02* |
+    | U-Net - k-NN | +0.0423 / +0.0548 | +5.27* / +6.82* | +4.12* / +5.34* | +3.47* / +4.49* | +6.92* / +8.97* |
+    | FNO - U-Net | -0.0215 / -0.0136 | -2.68* / -1.69 | -2.10* / -1.33 | -1.76 / -1.12 | -3.52* / -2.23* |
+    | FNO+3x3 - U-Net | -0.0061 / -0.0193 | -0.76 / -2.40* | -0.59 / -1.88 | -0.50 / -1.58 | -1.00 / -3.16* |
+
+    Robust under every sigma_U: T-FEN above the U-Net and U-Net above the k-NN network at both seeds; the
+    stencil - U-Net difference never counts at seed 7. Borderline (depend on sigma_U): stencil - U-Net and
+    FNO - U-Net at seed 42 (count at 0.0191, not at 1.9 x); FNO+3x3 - U-Net at seed 7. The fold-2 value
+    (0.0050) would make the FNO arms count at seed 7 as well; it should not be used, since the U-Net's spread
+    differs between folds. Recommendation: use the five-fold cluster estimate 0.0191 (sigma_Delta about 0.010,
+    threshold about 0.020, i.e. the 0.020 already in the text).
 
 ### Assets that now exist and should be reused
 
