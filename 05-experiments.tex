@@ -184,8 +184,14 @@ introduces, in addition, a selection bias. The maximum of thirty noisy
 scores systematically exceeds the expected score of the operator, because
 the selection favours epochs whose noise happens to be positive. For the
 arms of Table~\ref{tab:experiments:arms}, this bias amounts to 0.025 to
-0.050, and it is larger for arms whose scores fluctuate more. It could
-only be removed by evaluating the selected epoch on independent eyes,
+0.050, and it differs between arms: it is larger both for arms whose
+scores fluctuate more and for arms whose score peaks early and then settles
+slightly lower, such as the FNO.
+% Changed 2026-10-18: "it is larger for arms whose scores fluctuate more" was
+% only weakly supported (eleven arms of Table 5.1: Pearson r = 0.42 between
+% the sd over epochs 10-29 and best minus late mean; FNO sd 0.008, bias
+% +0.045).
+It could only be removed by evaluating the selected epoch on independent eyes,
 which a cross-validation without a test split (\S\ref{sec:data:splits})
 does not provide.
 
@@ -893,7 +899,7 @@ operator, decides whether the model learns any change at all.
 The second run keeps the mask weighting and removes only the soft-Dice
 term. The network then does leave the collapse, but late: on the five folds, its
 change-region Dice first rises above 0 at epochs 2, 8, 3, 7 and 12, against
-epoch 0 with the full objective (Figure~\ref{fig:experiments:curves}).
+epoch 0 with the full objective (Figure~\ref{fig:experiments:objective}).
 It also ends lower, by 0.050 on average, on all five folds and on 56 of
 the 75 eyes. The largest part comes from fold 4, where the collapse lasts
 longest: the difference is $-0.114$ there and $-0.012$ to $-0.044$ on the
@@ -918,26 +924,24 @@ rollout is about twice as large with the term as without it (1.10 against
 % arm 0.4762 +/- 0.0631 vs 0.5258. These replace the older fold-2 loss
 % ladder, which read the soft-Dice term as not raising the score.
 
-% Figure: formerly panel (b) of the combined training-curve figure in
-% Section 5.1 (split 2026-10-17). New draft script, not yet reviewed:
-% images/scripts/fig_experiments_objective.py. Supervisor SV-5.13 also asks
-% for a small table here.
+% Figure: images/scripts/fig_experiments_objective.py (metrics.jsonl of
+% ANISOGNN_final_dilmean, _nodice, _plainmse, folds 0-4, seed 42; checks the
+% late-epoch means and escape epochs quoted above). Reviewed with the author
+% 2026-10-18. Supervisor SV-5.13 also asks for a small table here (open).
 \begin{figure}[t]
   \centering
-  % TODO: figure not final; draft images/scripts/fig_experiments_objective.py
-  % to be reviewed together with SV-5.13.
-  \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering\itshape Placeholder
-    for Figure~\ref{fig:experiments:curves}: the training objective over training.}}
+  \includegraphics[width=0.8\textwidth]{images/fig_experiments_objective.pdf}
   \caption[The training objective over training.]{%
     Change-region Dice at the one-year anchor over training for the
-    dilated-stencil graph network, seed 42: mean over the five folds (line)
-    and range over the folds (band) for the full objective, for the
-    objective without the soft-Dice term, and for a plain unweighted mean
-    squared error, which stays at 0 at every epoch on every fold. The
-    markers show, for each fold, the first epoch at which the run without
-    the soft-Dice term predicts any change; on one fold this happens only at
-    epoch 12, inside the averaging window of epochs 10 to 29.}
-  \label{fig:experiments:curves}
+    dilated-stencil graph network (seed 42), mean over the five folds, for
+    three objectives: the full objective (late-epoch mean 0.526), the
+    objective without the soft-Dice term (0.476) and a plain unweighted mean
+    squared error, which stays at 0 at every epoch on every fold. Without the
+    soft-Dice term the five folds start to predict change at different
+    epochs (2, 3, 7, 8 and 12). Each dot marks one of these epochs, which is
+    why the dashed line rises in steps. The shaded band marks epochs 10 to
+    29, over which every reported value is averaged.}
+  \label{fig:experiments:objective}
 \end{figure}
 
 The third run adds a monotonic-growth penalty. Atrophic tissue does not

@@ -1676,6 +1676,19 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
   panel is now a placeholder in §5.4.2 under the old label `fig:experiments:curves` (draft script
   `fig_experiments_objective.py` from another session, not reviewed). Old §5.1.4 is now §5.1.5. AI items
   5a.17, 5a.18, 5a.20-5a.22 done; 5a.15, 5a.16 (wording in the rollout paragraphs) still open.
+- [x] 2026-10-18 **Objective figure in §5.4.2** (Fig. 5.6, label renamed `fig:experiments:curves` ->
+  `fig:experiments:objective`), reviewed with the author: one panel, one line per objective (mean over the
+  five folds of the dilated-stencil GNN, seed 42), legend names only, everything else in the caption.
+  `images/scripts/fig_experiments_objective.py` now also checks the other §5.4.2 numbers (late sd
+  0.015/0.043 and 0.013/0.017 on folds 0-3, raw mask RMSE 1.10/0.51, 74/75 eyes identical): all match.
+  Old combined `fig_experiments_curves.py` / `.pdf` removed. Dropped after review: a best-epoch-vs-late-mean
+  plot (a maximum always lies above a mean) and an eleven-arm scatter of epoch-to-epoch sd vs best-epoch
+  gain (Pearson r = 0.42; the FNO has sd 0.008 but gain +0.045 because it peaks early). Consequently the
+  §5.1.4 sentence "larger for arms whose scores fluctuate more" now reads "larger both for arms whose
+  scores fluctuate more and for arms whose score peaks early ..., such as the FNO".
+- [ ] SV-5.13: small table next to the §5.4.2 objective test (full / without soft-Dice / plain MSE).
+- [ ] Figure rule (author, 2026-10-18): one message per figure, one line per condition, text only as axis
+  labels and short legend names, everything else in the caption. Apply to the remaining disabled figures.
 - [ ] Fig. 4.2 caption (redrawn by another session, 8e1db2a) still gives distances in mm (0.121, 0.0057,
   0.034, 0.242, 0.011, 0.119 mm), while §4.3.3 now uses µm (X4); align when the figure is next touched.
 - [ ] TODO (SV-4.2, inline in §4.1): reconsider whether the moving-mesh result goes into the main text as a
