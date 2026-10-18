@@ -249,13 +249,19 @@ values. Cropping and padding run before the normalisation
 statistics are computed (\S\ref{sec:data:normalization}), so the padded
 zeros enter the per-channel mean and standard deviation. After
 normalisation, the zero fill of the layer channels sits between $-2.35$
-and $-2.94$ standard deviations, which is an extreme value. The training
-loss can optionally exclude the pad positions, but no reported run does so
-(\S\ref{sec:method:training}). The models are therefore trained to
+and $-2.94$ standard deviations, which is an extreme value. The loss
+treats these positions like any other, so the models are trained to
 reproduce this value at full weight.
-% TODO (author, 2026-10-14): rethink the pad positions in the loss. No reported
-% run excludes them, so either drop the mention of the option here (and in
-% 4.5.1) or run the exclusion on the canonical stencil (5 folds) and report it.
+% Commented out 2026-10-18 (author): the pad-exclusion option is only mentioned
+% once it has been run at 5 folds. If the ablation in 5.4.2 is enabled, replace
+% the sentence above by:
+% The training loss can optionally exclude the pad positions
+% (\S\ref{sec:method:training}); no model of the comparison does so, and
+% \S\ref{sec:experiments:ablations:loss} tests the option. The models are
+% therefore trained to reproduce this value at full weight.
+% TODO (author, 2026-10-14): rethink the pad positions in the loss. Decided
+% 2026-10-18: mention dropped for now; the 5-fold run on the canonical stencil
+% waits for cluster access (NOTES.md). A local fold-2 run read -0.014 (no gain).
 % Checked 2026-10-14 against solver_results.csv (code repo): cfg_exclude_pad_nodes
 % is False for every final-era run of every reported arm; only the two fold-2
 % loss-ladder runs MPPDE_L5_nopad_f2 and MPPDE_L7_combo_f2 used it.

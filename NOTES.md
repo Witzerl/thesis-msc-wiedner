@@ -1853,8 +1853,19 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
   GPU from the reference (GPU nondeterminism dominates seed choice in this project); separating hardware
   from the switch would need a local control run of the unchanged configuration (not run). The old
   k-NN-era ladder read +0.029 (`MPPDE_L5_nopad_f2`, also inside the floor); this run does not repeat it.
-  Suggestion: keep "off in every reported run" and the mention in §3.3/§4.5.1 as is; a 5-fold cluster run
-  only if the objective table (SV-5.13) needs a pad row.
+  Author decision (2026-10-18): no gain, so the option is not mentioned in the thesis until it has been
+  run properly. Commented out: the §3.3 sentence, the §4.5.1 sentence and the "Pad-position masking"
+  row of Table `tab:method:hparams` (each with its replacement text in a comment). A fourth objective
+  test is prepared, commented out, at the end of §5.4.2: the paragraph with `[TODO]` slots and the
+  steps to enable it (no numbers; the local pilot appears only in a comment, marked not for the text).
+- [ ] TODO (cluster, as soon as A6000 access is back): run the pad-exclusion ablation on the canonical
+  stencil, 5 folds, seed 42:
+  `EXCLUDE_PAD_NODES=True EXP_TAG=dilmean_nopad ARM=sb sbatch --array=0-4 --gres=gpu:nva6000:1 ~/jobs/train_solver.slurm`
+  (BACKBONE=anisognn and GNN_AGGR=mean are the slurm defaults; before submitting, check that the args
+  diff against `ANISOGNN_final_dilmean` is only `exclude_pad_nodes` and the experiment name). Read out with
+  `thesis_numbers.py pair ANISOGNN_final_dilmean_nopad ANISOGNN_final_dilmean`, plus the
+  border/interior split, then decide whether to enable the prepared §5.4.2 paragraph (steps listed
+  in the comment there). ~1 h per fold on an A6000.
 
 ### Assets that now exist and should be reused
 

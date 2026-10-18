@@ -979,6 +979,37 @@ contradict.
 % every backbone. The per-graph fix of 2026-08-15 leaves the single-eye case
 % unchanged.
 
+% ---------------------------------------------------------------------------
+% PREPARED, NOT ENABLED (2026-10-18, author): pad-position exclusion as a fourth
+% objective test. Enable only after ANISOGNN_final_dilmean_nopad has run at
+% 5 folds on the cluster (A6000, seed 42; command in NOTES.md). On enabling:
+% (1) the opening paragraph of this subsection says "Four runs" and adds
+% "and one in which the padded positions are left out of the loss";
+% (2) restore the commented sentences in 3.3 and 4.5.1 and the table row
+% "Pad-position masking & Off" in tab:method:hparams;
+% (3) fill every [TODO] below with thesis_numbers.py pair
+% ANISOGNN_final_dilmean_nopad ANISOGNN_final_dilmean (fold-paired and per
+% eye), the border/interior split from change_region_dice_360d_border /
+% _interior, and the layer RMSE on valid positions (ts_layer_rmse_valid);
+% (4) if the SV-5.13 table exists, add a row.
+% Local fold-2 pilot (RTX 5080, 2026-10-18, NOT for the text): -0.014, inside
+% the single-fold floor; mostly on border-touching eyes.
+%
+% The fourth run asks whether the padded positions should enter the loss at
+% all. After normalisation, the fill value of the layer channels lies far
+% outside the range of real depths (\S\ref{sec:data:spatial}), and every
+% other run regresses it at full weight. With every position whose target
+% equals the fill value removed from all terms of the loss, the change-region
+% Dice is [TODO: mean difference] on average, higher on [TODO] of the five
+% folds and on [TODO] of the 75 eyes. [TODO: one sentence on the lesions that
+% touch the border of the imaged field against the others, since the fill
+% lies next to that border.] [TODO: conclusion -- either "no measurable
+% effect, so the simpler objective is kept" or the effect and whether it
+% changes the canonical recipe.] The layer error on the positions with real
+% data [TODO: falls/rises] from [TODO] to [TODO], because the fill values are
+% no longer fitted.
+% ---------------------------------------------------------------------------
+
 % Removed 2026-10-01 (author review v4 #35/#36): the fold-2 loss ladder,
 % the sharpness sweep (escape epochs 0/2/5/9/26, raw RMSE 0.880/0.336/0.362),
 % the fold-2 monotonic-penalty comparison (-0.0032, old loss setting), the

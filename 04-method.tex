@@ -348,15 +348,28 @@ threshold. This cannot change a thresholded prediction, but it changes
 the raw error of the mask channel. It is one reason why the evaluation does
 not compare operators on raw errors (Chapter~\ref{ch:experiments}).
 
-Two further options exist in the implementation and are off in every
-reported run. First, the loss can exclude grid positions whose target
-equals the fill value of the crop padding (\S\ref{sec:data:spatial}), from
-both terms. Since this option is off, the padded positions are regressed at
-full weight. Second, a monotonic-growth penalty can be added, which
+One further option exists in the implementation and is off in every
+reported run: a monotonic-growth penalty can be added, which
 penalises a decrease of the mask where the previous state is atrophic. Its
 weight is zero for every operator of the comparison;
 \S\ref{sec:method:dt-residual} explains why no monotonic constraint is
 imposed, and~\S\ref{sec:experiments:ablations:loss} tests the penalty.
+% Commented out 2026-10-18 (author): the pad-exclusion option is mentioned only
+% once its 5-fold run exists. If the ablation in 5.4.2 is enabled, replace the
+% paragraph above by:
+% Two further options exist in the implementation and are off in every
+% reported run. First, the loss can exclude grid positions whose target
+% equals the fill value of the crop padding (\S\ref{sec:data:spatial}), from
+% both terms. Since this option is off, the padded positions are regressed at
+% full weight; \S\ref{sec:experiments:ablations:loss} tests the option.
+% Second, a monotonic-growth penalty can be added, which penalises a decrease
+% of the mask where the previous state is atrophic. Its weight is zero for
+% every operator of the comparison; \S\ref{sec:method:dt-residual} explains
+% why no monotonic constraint is imposed,
+% and~\S\ref{sec:experiments:ablations:loss} tests the penalty.
+% Code: --exclude_pad_nodes (GraphPDE/train.py, _WeightedChannelMSE); "pad"
+% means every position whose target equals the zero-fill vector in all 11
+% channels, which also covers within-scan positions with all-zero layers.
 
 \subsection{Time-Budgeted Pushforward Curriculum}
 \label{sec:method:training:curriculum}
@@ -455,7 +468,7 @@ reported numbers and why.
     Gradient clipping & Norm 1.0, per module \\
     Loss weights & Mask MSE 5, layer MSE 1 each, soft-Dice 5 (sharpness
       2), monotonic penalty 0 \\
-    Pad-position masking & Off \\
+    % Pad-position masking & Off \\  % restore with the 5.4.2 pad ablation (2026-10-18)
     Pushforward budget & Base 180 days, maximum 360 days ($U = 2$) \\
     Seeds & 42 (replication: 7) \\
     \bottomrule
