@@ -1715,6 +1715,22 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
   now point to `sec:method:training:curriculum` (03-data.tex x2, 4.3.1); App. F row points to 4.2 and 5.1.
   Also done: all Chapter 4 AI items except 4c.13 (waits for the local pad-exclusion run) and SV-4.2 (author's
   TODO). Table 4.3 is now Table 4.1 (it comes before the parameter table).
+- [x] 2026-10-18 **SV-5.2 z-test applied** (author sign-off): §5.1.5 states the rule as a z-test
+  (z = mean fold-paired difference / sigma_Delta, sigma_Delta = sqrt(sigma_A^2 + sigma_B^2)/sqrt(n),
+  sigma_GNN = 0.0127 from seven replicate pairs, sigma_UNet = 0.0191 from its seed pairs on all five folds;
+  |z| > 1.96); "established" still also needs the per-eye check, leave-one-fold-out and the second seed. App.
+  E.3 criteria rewritten with the formula and three caveats (sigma itself estimated; ~50 tests; fellow eyes);
+  the unreproducible "1.9x" for the U-Net replaced by the measured 1.5x. App. E tables: z in every fold-paired
+  cell, written by `images/scripts/appendix_ztests.py` (rerun it if a table value changes; it skips cells that
+  already carry z). Readings changed: T-FEN - stencil "just beyond retraining noise at both seeds (z = 2.1), not
+  established" (§5.2 twice + App. E); stencil - U-Net "beyond noise at seed 42 (z = 2.1), not at seed 7 (0.8)";
+  FNO+3x3 - U-Net at seed 7 now "within retraining noise" (z = -1.9). All other readings unchanged.
+- [ ] **TODO (author, 2026-10-18): re-read the z-test parts when going through the thesis again** -- §5.1.5
+  second paragraph (inline TODO there), App. E.3 criteria, the z values in the three App. E tables, and the two
+  §5.2 sentences on T-FEN vs stencil and stencil vs U-Net.
+- [ ] For §5.4.3 (capacity) when it is reviewed: with the z-test, the FNO+3x3 at width 2 and at width 9 are both
+  significantly *below* width 5 (z = -2.4 / -2.2), and the U-Net at width 2 is not (z = -1.4 with sigma_UNet).
+  The conclusion "no width step raises a class" holds; check that "the smaller versions lost little" still fits.
 - [ ] Fig. 4.2 caption (redrawn by another session, 8e1db2a) still gives distances in mm (0.121, 0.0057,
   0.034, 0.242, 0.011, 0.119 mm), while §4.3.3 now uses µm (X4); align when the figure is next touched.
 - [ ] TODO (SV-4.2, inline in §4.1): reconsider whether the moving-mesh result goes into the main text as a

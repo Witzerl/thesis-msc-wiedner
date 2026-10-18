@@ -255,13 +255,31 @@ spread between them is larger than most differences between arms
 compared fold by fold, on the same five folds, and the five differences
 are averaged.
 
-Differences of about 0.02 or less are within the noise level and are not
-interpreted on their own. A difference is treated as real only when its
-average over the five folds clearly exceeds what retraining alone
-produces, when it holds on most folds and most of the 75 validation eyes,
-and when it does not depend on a single fold. Results are stated in these
-terms, for example ``higher by 0.064 on average, on all five folds and on
-70 of the 75 eyes''. The eye counts use the growth-region Dice at the
+% Supervisor review 2, SV-5.2 (2026-10-18): the comparison rule stated as a
+% z-test with an empirically estimated measurement error. sigma_GNN from seven
+% replicate pairs; sigma_UNet from the U-Net's two seeds on all five folds
+% (NOTES, "U-Net run-to-run spread", 2026-10-18).
+% TODO (author, 2026-10-18): re-read this z-test paragraph, the matching
+% criteria in Appendix E.3 and the z values in the Appendix E tables when going
+% through the thesis again.
+A difference between two arms is tested against the variation caused by
+retraining. Repeated runs of the same configuration on the same fold give a
+standard deviation of $\sigma \approx 0.0127$ for the late-epoch
+change-region Dice of one graph network
+(Appendix~\ref{app:full-results:criteria}). If two arms did not differ, the
+mean of their five fold-wise differences would vary with a standard
+deviation of $\sigma_\Delta = \sqrt{2}\,\sigma / \sqrt{5} \approx 0.008$.
+The ratio $z = \bar{\Delta} / \sigma_\Delta$ is compared with a standard
+normal distribution: a difference with $|z| > 1.96$, that is, a mean
+difference above about 0.016, is unlikely to come from retraining alone
+(two-sided $p < 0.05$). The runs of the U-Net vary more: its two seeds on
+the five folds give $\sigma \approx 0.019$, so comparisons with a U-Net are
+read against a mean difference of about 0.020. A difference is called
+established only when, in addition, it holds on most folds and most of the
+75 validation eyes, does not depend on a single fold, and holds at the
+second seed. Results are stated in these terms, for example ``higher by
+0.064 on average ($z = 7.9$), on all five folds and on 70 of the 75
+eyes''. The eye counts use the growth-region Dice at the
 anchor, because the change-region Dice was logged only as a mean over the
 eyes of each fold. In tables, ``mean $\pm$ sd'' is the mean and the
 standard deviation over the five fold values, each the late-epoch mean of
@@ -392,12 +410,15 @@ lists every arm on the headline metric.
 The three highest arms come from three unrelated architecture classes: a
 finite-element network, a graph network and a U-Net. The T-FEN is higher
 than the dilated-stencil graph network by 0.017 on average, on four of the
-five folds and on 46 of the 75 eyes: a small lead at the noise level. The
+five folds. This lies just beyond the variation of retraining ($z = 2.1$ at
+both seeds), but the lead is small, and at the first seed the T-FEN is
+higher on only 46 of the 75 eyes, so it is not counted as established. The
 dilated-stencil network is higher than the U-Net by 0.021 on average, but
-on only three of the five folds; the scores of the U-Net vary more between
-runs than those of the graph networks
-(Appendix~\ref{app:full-results:criteria}), so this is at the noise
-level, and the two cannot be told apart. The T-FEN is higher than
+on only three of the five folds. Because the scores of the U-Net vary more
+between runs than those of the graph networks
+(Appendix~\ref{app:full-results:criteria}), this lies just beyond the
+variation of retraining at the first seed ($z = 2.1$) and within it at the
+second ($z = 0.8$), and the two cannot be told apart. The T-FEN is higher than
 the U-Net by 0.038 on average, on all five folds and on 51 of the 75 eyes,
 and this lead is real.
 
@@ -428,7 +449,8 @@ compared in~\S\ref{sec:experiments:validity:tfen}.
 
 Although the T-FEN scores highest at the anchor, the dilated-stencil graph
 network is the canonical model of this thesis, for three reasons. First,
-the lead of the T-FEN is small, 0.017 and at the noise level, and it does
+the lead of the T-FEN is small, 0.017, just beyond the variation of
+retraining but not established, and it does
 not persist over longer horizons: in the growth-region Dice by year since
 baseline the two are level for three years, and beyond three years the
 graph network lies higher (0.655 against 0.611, a descriptive value that
