@@ -382,14 +382,14 @@ Table~\ref{tab:data:intervals} gives the distribution of the intervals
 between consecutive visits. Three properties of this schedule shape the
 rest of the pipeline. First, every interval is a multiple of 90 days, and
 the most common interval, 180 days, is the base of the time budget used
-in training (\S\ref{sec:method:training}). Second, the short 90-day intervals are
+in training (\S\ref{sec:method:training:curriculum}). Second, the short 90-day intervals are
 concentrated in a small subgroup: all 67 of them belong to 10 eyes from
 7 patients. A training scheme restricted to the 90-day intervals would therefore learn from this densely imaged subgroup
 alone.
 
 Third, the schedule limits how far an eye can be rolled forward during
 training, because the training curriculum chains visits within a fixed
-time budget (\S\ref{sec:method:training}). With a budget of 90 days, none
+time budget (\S\ref{sec:method:training:curriculum}). With a budget of 90 days, none
 of the 75 eyes can chain two visits, so no step is unrolled. With 360
 days, 74 of the 75 eyes reach at least one unrolled step. With 540 days,
 68 eyes reach at least two, and with 720 days, 73 eyes do.

@@ -1689,6 +1689,14 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
 - [ ] SV-5.13: small table next to the §5.4.2 objective test (full / without soft-Dice / plain MSE).
 - [ ] Figure rule (author, 2026-10-18): one message per figure, one line per condition, text only as axis
   labels and short legend names, everything else in the caption. Apply to the remaining disabled figures.
+- [x] 2026-10-18 **Chapter 4 reordered** (author, option (a) of AI S7/T9 and supervisor E1): conditioning and
+  training are now subsections 4.2.3-4.2.6 of the framework section; 4.3 Operators unchanged; Implementation is
+  4.4. Pure move checked line by line (only headings changed), then: §4.1 roadmap and §4.2 opener rewritten for
+  the new order; per-operator covariate details dropped from 4.2.3 (each operator subsection states them); the
+  curriculum no longer repeats the batch-statistics rule (4.3.1 states it); references meaning the curriculum
+  now point to `sec:method:training:curriculum` (03-data.tex x2, 4.3.1); App. F row points to 4.2 and 5.1.
+  Also done: all Chapter 4 AI items except 4c.13 (waits for the local pad-exclusion run) and SV-4.2 (author's
+  TODO). Table 4.3 is now Table 4.1 (it comes before the parameter table).
 - [ ] Fig. 4.2 caption (redrawn by another session, 8e1db2a) still gives distances in mm (0.121, 0.0057,
   0.034, 0.242, 0.011, 0.119 mm), while §4.3.3 now uses µm (X4); align when the figure is next touched.
 - [ ] TODO (SV-4.2, inline in §4.1): reconsider whether the moving-mesh result goes into the main text as a

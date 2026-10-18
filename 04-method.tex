@@ -62,13 +62,15 @@ fixed-step Runge--Kutta wrapper can be placed around any of these
 operators. A per-pixel model with no spatial context serves as the lowest
 reference point of the comparison (\S\ref{sec:method:family:floors}).
 
-\S\ref{sec:method:framework} defines the parts every arm shares.
-\S\ref{sec:method:family} then describes all operators on the same terms:
-each was taken from the literature, and for each the original is
-summarised before its adaptation to the framework. After that,
-\S\ref{sec:method:covariates} describes the conditioning inputs,
-\S\ref{sec:method:training} the shared training setup, and
-\S\ref{sec:method:implementation} the implementation.
+% Chapter reordered 2026-10-18 (supervisor review 2, E1; AI review S7/T9):
+% conditioning and training now belong to the framework section.
+\S\ref{sec:method:framework} defines the framework, that is, everything
+every arm shares: the time handling, the layout of the state, the
+conditioning inputs, the objective, the training curriculum and the
+optimisation. \S\ref{sec:method:family} then describes all operators on
+the same terms: each was taken from the literature, and for each the
+original is summarised before its adaptation to the framework.
+\S\ref{sec:method:implementation} closes with the implementation.
 Figure~\ref{fig:method:pipeline} summarises the pipeline.
 % TODO (supervisor review 2, SV-4.2): he suggests reporting the moving-mesh
 % extension in the main text as a negative result. Author (2026-10-17): not
@@ -108,8 +110,14 @@ Appendix~\ref{app:mm-pde}.
 \label{sec:method:framework}
 
 This section defines what every arm shares: the input, the time handling
-and the tensor layout of the state; the shared loss and curriculum follow
-in~\S\ref{sec:method:training}, the shared evaluation
+(\S\ref{sec:method:dt-residual}), the tensor layout of the state
+(\S\ref{sec:method:multichannel}), the conditioning inputs
+(\S\ref{sec:method:covariates}), the objective
+(\S\ref{sec:method:training:loss}), the training curriculum
+(\S\ref{sec:method:training:curriculum}) and the optimisation
+(\S\ref{sec:method:training:optim}). These parts are the same for every
+operator of the survey, and Table~\ref{tab:method:hparams} lists the
+training settings; the shared evaluation follows
 in~\S\ref{sec:experiments:protocol}. Every operator receives exactly one
 visit and predicts the state at the next visit. It sees the current state,
 the interval to the next visit and the patient covariates, but no earlier
@@ -170,7 +178,8 @@ stabilising constant, so the assumption holds. The constant $L$ is not
 controlled during training and can be large; on the mask channel the
 operator in fact learns to scale its output with $1/\Delta t$ within the
 observed intervals (\S\ref{sec:experiments:ablations:time}). The statement
-therefore concerns the limit, not how quickly it is approached. The
+therefore concerns only the limit and says nothing about how quickly it is
+approached. The
 leading $u_t$ term is also a deliberate prior: consecutive visits are
 almost identical, because GA progresses little over a typical interval
 between visits. Passing the current state through unchanged relieves the
@@ -226,6 +235,234 @@ the weights set in~\S\ref{sec:method:training}.
 % #19, 2026-09-27); see the TODO in Appendix G (91-appendix.tex).
 
 
+\subsection{Conditioning: Patient Covariates}
+\label{sec:method:covariates}
+
+Every window carries two patient-level covariates, the age of the patient
+at the start visit and the sex. Their extraction and encoding are described
+in~\S\ref{sec:data:covariates}. Both covariates are global quantities: a
+visit has one value of each, and that value is shared by all $50\,176$
+grid positions. Along the trajectory of one eye, the sex is constant and
+the age advances only with the elapsed time. Because the covariates carry
+no spatial information, they act on the prediction of an operator only as
+a whole and cannot point to a location on the grid or shape the lesion
+boundary locally.
+
+The covariates are included because age and sex are plausible modulators
+of how fast GA progresses. They are enabled in the canonical configuration
+of every operator. Each operator receives them together with $\Delta t$;
+how they enter its forward pass is described with the operator
+in~\S\ref{sec:method:family}.
+% Reorder 2026-10-18: the per-operator details (graph conditioning vector,
+% constant input planes of the grid operators, FEN free-form inputs, fixed
+% across RK stages) were removed here; each is stated in the operator's own
+% subsection (4.3.1, 4.3.2, 4.3.6, 4.3.7), so this subsection no longer
+% points forward to them one by one.
+% Sentence on the unsettled value of the covariates removed (author review v4
+% #12, 2026-09-30); the open question is a TODO in Section 6.3.
+% Pointer to the covariate ablation removed 2026-09-28: that subsection of
+% Chapter 5 is commented out (author).
+
+% Layer-encoder paragraph moved to Future Work (author review v4 #13,
+% 2026-09-30); see the TODO in Section 6.4. Kept here, commented out, as the
+% source text.
+\iffalse
+The framework also provides an optional layer encoder. It compresses the
+ten layer-boundary channels of the current state into one global embedding
+vector per visit, which is appended to the conditioning vector of the graph
+network next to $\Delta t$ and the covariates. It was intended as a learned
+stand-in for the equation features: a summary of the retinal structure the
+operator is evolving, so that the network does not have to extract the
+layer geometry through message passing. The encoder consists of four
+$3 \times 3$ convolutions with group normalisation and ReLU activations,
+with strides that reduce the rows by a factor of four and the columns by a
+factor of eight, followed by adaptive average pooling and a linear layer.
+It is recomputed at every forward pass, so during a rollout it encodes
+predicted rather than observed layers. The encoder is switched off in the
+canonical configuration and in every operator of the main comparison, and
+it is not examined further in this thesis.
+\fi
+% It was run only as an ablation of its width (32-256) on the k-NN graph
+% network; that subsection of Chapter 5 is commented out (author, 2026-09-28).
+
+% Subsection "Surrogate Equation Encoder" commented out 2026-09-27 (author:
+% the encoder is off in every reported arm and was only tested in the T5
+% ablation, a null). It is reduced to one paragraph in this section.
+
+
+\subsection{Objective}
+\label{sec:method:training:loss}
+\label{sec:method:training}
+
+The loss is computed on the normalised state (\S\ref{sec:data:normalization})
+and has two terms, a channel-weighted mean squared error (MSE) and a
+soft-Dice term on the mask channel:
+\begin{equation}
+  \mathcal{L} \;=\; \frac{1}{\bar{w}} \sum_{c=0}^{10} w_c\,
+  \mathcal{L}_{\text{MSE}}^{(c)} \;+\; \lambda_{\text{Dice}}\,
+  \mathcal{L}_{\text{Dice}},
+  \label{eq:method:loss}
+\end{equation}
+where $\mathcal{L}_{\text{MSE}}^{(c)}$ is the mean squared error of
+channel~$c$, $w_c$ its weight and $\bar{w}$ the mean of the weights.
+The mask channel ($c = 0$), which is the clinical target, has the weight
+$w_0 = 5$, and each of the ten layer channels has the weight $w_c = 1$.
+Dividing by the mean weight keeps the scale of the term comparable to an
+unweighted MSE. The layer channels are auxiliary targets, but the operator
+must still predict them, because they are part of the next state that is
+fed back during a rollout. The same loss is used in training and in
+validation.
+
+The second term is a soft-Dice loss on the mask channel
+\citep{Milletari2016}, with the weight $\lambda_{\text{Dice}} = 5$. It
+counters an imbalance in the data: between two consecutive visits, almost
+all mask pixels are unchanged, so a plain MSE is dominated by static pixels
+and gives little gradient at the moving lesion boundary. A model trained
+on it can learn to copy its input. The soft-Dice term restores gradient in
+the band around the binarisation threshold, which is where the boundary
+lies. Unlike the original soft-Dice loss, which scores a segmentation
+probability map, the term is applied here to a regression output. The prediction $p$ of the mask channel is first
+turned into a soft mask,
+\begin{equation}
+  p_{\text{soft}} \;=\; \sigma\!\left(s\,(p - \tau)\right),
+  \label{eq:method:soft-mask}
+\end{equation}
+where $\sigma$ is the logistic sigmoid, $s = 2$ the sharpness and $\tau$
+the physical threshold of 0.5 mapped into normalised space. The evaluation
+uses the same mapping (\S\ref{sec:data:normalization}), so the loss and the
+metric agree on where the threshold lies. With the hard-thresholded target
+mask $t$, the term is
+$\mathcal{L}_{\text{Dice}} = 1 - 2 \sum p_{\text{soft}} t \,/\,
+(\sum p_{\text{soft}} + \sum t)$.
+
+The soft-Dice term is computed per eye and then averaged over the batch.
+A Dice score is a ratio of sums. If the sums were pooled over the whole
+batch, the gradient for one eye would depend on which other eyes it was
+batched with. Scoring per eye also matches the evaluation, which scores
+each eye separately before averaging.
+
+The soft-Dice term has one accepted side effect. Because the sigmoid of
+Equation~\eqref{eq:method:soft-mask} does not saturate at the physical mask
+values, the term stretches the raw mask predictions away from the
+threshold. This cannot change a thresholded prediction, but it changes
+the raw error of the mask channel. It is one reason why the evaluation does
+not compare operators on raw errors (Chapter~\ref{ch:experiments}).
+
+Two further options exist in the implementation and are off in every
+reported run. First, the loss can exclude grid positions whose target
+equals the fill value of the crop padding (\S\ref{sec:data:spatial}), from
+both terms. Since this option is off, the padded positions are regressed at
+full weight. Second, a monotonic-growth penalty can be added, which
+penalises a decrease of the mask where the previous state is atrophic. Its
+weight is zero for every operator of the comparison;
+\S\ref{sec:method:dt-residual} explains why no monotonic constraint is
+imposed, and~\S\ref{sec:experiments:ablations:loss} tests the penalty.
+
+\subsection{Time-Budgeted Pushforward Curriculum}
+\label{sec:method:training:curriculum}
+
+The operators are trained with the pushforward trick of
+\citet{Brandstetter2022} (\S\ref{sec:background:neural-pde}): the model is
+rolled forward on its own predictions without gradients, and only the
+final step is supervised. The original counts the depth of this rollout in
+steps. With irregular visit intervals (\S\ref{sec:data:temporal}), a step
+count is not a comparable quantity: two steps can mean 180 days for one eye
+and 720 days for another. The framework therefore counts the depth in
+elapsed days.
+
+Training proceeds in passes; in each pass, every training eye contributes
+one randomly chosen start window. Each training pass draws a time budget
+$B$ uniformly from $\{0, 1, \dots, \min(e, U)\} \times 180$ days, where $e$
+is the current epoch and $U$ the largest number of 180-day units in a
+budget. The base of 180 days is the modal visit interval of the cohort
+(\S\ref{sec:data:temporal}). Every reported run uses $U = 2$, so the
+largest budget is 360 days, which matches the one-year evaluation anchor.
+Because the upper limit is $\min(e, U)$, the largest budget grows by 180
+days per epoch over the first $U$ epochs; after that, budgets of 0, 180 and
+360 days are drawn with equal probability. A budget of zero gives a plain one-step pass on observed
+inputs.
+
+For a given budget, only start windows that can realise it are sampled.
+The chain of consecutive visits from such a window must reach at least $B$
+days in total, and its first interval must not exceed $B$. If an eye has no
+such window, sampling for that eye falls back to all of its windows.
+% Checked 2026-10-01 in utils/utils.py (_rebuild_valid_t0s): the restriction
+% applies only for B > 0; at B = 0 any window is drawn.
+The number of unrolled steps for each eye then follows an undershoot rule:
+it is the largest $n$ for which the $n$ rolled intervals and the final,
+supervised interval together stay within $B$. The chain never overshoots
+the budget, so eyes on different visit schedules are trained to the same
+elapsed horizon. The undershoot rule is also the reason for the 180-day
+base: a budget of 90 days, the shortest interval, can never chain two
+visits (\S\ref{sec:data:temporal}), so the curriculum would not unroll.
+
+Within a batch, the eyes are grouped by their number of unrolled steps.
+Each group is rolled forward $n$ steps without gradients: at every step,
+the next window of the eye is fetched and its input state is replaced by
+the model's own prediction. All channels are rolled, including the
+predicted mask. An eye whose sequence ends is dropped from the chain. The
+group then receives one forward pass with gradients, and the loss is taken
+against the observed next state. The group losses are combined, each
+weighted by the share of the batch its group holds.
+% Reorder 2026-10-18: "Because the rollout runs in training mode, no operator
+% may use batch statistics (4.3.1)" removed; the operator contract in 4.3.1
+% states this rule and refers back to this curriculum.
+
+\subsection{Optimisation}
+\label{sec:method:training:optim}
+
+All operators are trained with AdamW \citep{Loshchilov2019}, a
+learning rate of $2 \times 10^{-3}$ and a weight decay of
+$1 \times 10^{-2}$ on all trainable parameters. The learning rate is
+multiplied by 0.4 at the start of epoch 5 and again at the start of epoch
+20, counting from 0, so the first five epochs run at the initial rate.
+
+Training runs for 30 epochs of 20 passes each, with a batch size of four
+eyes. Because the number of training eyes differs between the folds
+(\S\ref{sec:data:splits}), an epoch has between 280 and 320 optimiser
+steps, depending on the fold.
+
+Gradients are clipped to a norm of 1.0 separately for each trainable
+module, so that a large gradient in one module cannot shrink the updates of
+another. For the
+single-network operators of the main comparison, this amounts to one clip
+over the whole model. The separation matters for the moving-mesh extension
+of Appendix~\ref{app:mm-pde}.
+
+Unless stated otherwise, every reported run uses seed 42; replication runs
+with seed 7 are reported in Chapter~\ref{ch:experiments} and
+Appendix~\ref{app:ablations}. The model is validated on the held-out
+fold after every epoch (\S\ref{sec:data:splits});
+\S\ref{sec:experiments:protocol:late} sets out which epochs enter the
+reported numbers and why.
+
+\begin{table}[t]
+  \centering
+  \caption[Shared training settings.]{%
+    Training settings, identical for every operator of the survey.}
+  \label{tab:method:hparams}
+  \small
+  \begin{tabular}{p{0.32\textwidth} p{0.58\textwidth}}
+    \toprule
+    Setting & Value \\
+    \midrule
+    Optimiser & AdamW \\
+    Learning rate & $2 \times 10^{-3}$, multiplied by 0.4 at the start of
+      epochs 5 and 20 (counted from 0) \\
+    Weight decay & $1 \times 10^{-2}$ \\
+    Epochs $\times$ passes per epoch & $30 \times 20$ \\
+    Batch size & 4 eyes \\
+    Gradient clipping & Norm 1.0, per module \\
+    Loss weights & Mask MSE 5, layer MSE 1 each, soft-Dice 5 (sharpness
+      2), monotonic penalty 0 \\
+    Pad-position masking & Off \\
+    Pushforward budget & Base 180 days, maximum 360 days ($U = 2$) \\
+    Seeds & 42 (replication: 7) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+
 \section{The Operators}
 \label{sec:method:family}
 
@@ -259,7 +496,7 @@ become inconsistent; the integration wrapper
 of~\S\ref{sec:method:family:rk} integrates this same residual.
 
 No operator uses a normalisation that keeps batch statistics. The training
-curriculum of~\S\ref{sec:method:training} rolls the model forward on its
+curriculum of~\S\ref{sec:method:training:curriculum} rolls the model forward on its
 own predictions, without gradients but in training mode, so the states it
 produces drift away from the observed ones. Batch
 normalisation \citep{Ioffe2015} would normalise these drifted states with
@@ -958,245 +1195,7 @@ matched to the T-FEN.
     % U-Net, width 32 & 3\,354\,347 & 49.95 & capacity (control) \\ % removed 2026-09-28
     One-hop floor & 40\,971 & 0.61 & one ring of spatial context \\
     Per-pixel floor & 14\,795 & 0.22 & no spatial context (control) \\
-    Any backbone with RK4 wrapper & unchanged & --- & integration order \\
-    \bottomrule
-  \end{tabular}
-\end{table}
-
-
-\section{Conditioning: Patient Covariates}
-\label{sec:method:covariates}
-
-Every window carries two patient-level covariates, the age of the patient
-at the start visit and the sex. Their extraction and encoding are described
-in~\S\ref{sec:data:covariates}. Both covariates are global quantities: a
-visit has one value of each, and that value is shared by all $50\,176$
-grid positions. Along the trajectory of one eye, the sex is constant and
-the age advances only with the elapsed time. Because the covariates carry
-no spatial information, they act on the prediction of an operator only as
-a whole and cannot point to a location on the grid or shape the lesion
-boundary locally.
-
-The covariates are included because age and sex are plausible modulators
-of how fast GA progresses. How they enter the forward pass depends on the
-operator. In the graph network, they are two of the three entries of the
-conditioning vector, broadcast to every node and injected at the encoder
-input, into every message and into every node update
-(\S\ref{sec:method:mppde}). The per-pixel and one-hop floors are truncated
-graph networks and receive them in the same way
-(\S\ref{sec:method:family:floors}). In the dense grid operators (the U-Net,
-the FNO and the local-kernel hybrid), each covariate is an extra input
-channel holding a constant plane (\S\ref{sec:method:family:contract}). In
-the FEN, they are additional inputs to the free-form term
-(\S\ref{sec:method:family:fen}). Inside the Runge--Kutta wrapper, they are
-held fixed across the stages of one integration step
-(\S\ref{sec:method:family:rk}). The covariates are enabled in the canonical
-configuration of every operator.
-% Sentence on the unsettled value of the covariates removed (author review v4
-% #12, 2026-09-30); the open question is a TODO in Section 6.3.
-% Pointer to the covariate ablation removed 2026-09-28: that subsection of
-% Chapter 5 is commented out (author).
-
-% Layer-encoder paragraph moved to Future Work (author review v4 #13,
-% 2026-09-30); see the TODO in Section 6.4. Kept here, commented out, as the
-% source text.
-\iffalse
-The framework also provides an optional layer encoder. It compresses the
-ten layer-boundary channels of the current state into one global embedding
-vector per visit, which is appended to the conditioning vector of the graph
-network next to $\Delta t$ and the covariates. It was intended as a learned
-stand-in for the equation features: a summary of the retinal structure the
-operator is evolving, so that the network does not have to extract the
-layer geometry through message passing. The encoder consists of four
-$3 \times 3$ convolutions with group normalisation and ReLU activations,
-with strides that reduce the rows by a factor of four and the columns by a
-factor of eight, followed by adaptive average pooling and a linear layer.
-It is recomputed at every forward pass, so during a rollout it encodes
-predicted rather than observed layers. The encoder is switched off in the
-canonical configuration and in every operator of the main comparison, and
-it is not examined further in this thesis.
-\fi
-% It was run only as an ablation of its width (32-256) on the k-NN graph
-% network; that subsection of Chapter 5 is commented out (author, 2026-09-28).
-
-% Subsection "Surrogate Equation Encoder" commented out 2026-09-27 (author:
-% the encoder is off in every reported arm and was only tested in the T5
-% ablation, a null). It is reduced to one paragraph in this section.
-
-
-\section{Training}
-\label{sec:method:training}
-
-The objective, the curriculum and the optimisation settings are the same
-for every operator of the survey (\S\ref{sec:method:family:contract}), and
-Table~\ref{tab:method:hparams} lists them.
-
-\subsection{Objective}
-\label{sec:method:training:loss}
-
-The loss is computed on the normalised state (\S\ref{sec:data:normalization})
-and has two terms, a channel-weighted mean squared error (MSE) and a
-soft-Dice term on the mask channel:
-\begin{equation}
-  \mathcal{L} \;=\; \frac{1}{\bar{w}} \sum_{c=0}^{10} w_c\,
-  \mathcal{L}_{\text{MSE}}^{(c)} \;+\; \lambda_{\text{Dice}}\,
-  \mathcal{L}_{\text{Dice}},
-  \label{eq:method:loss}
-\end{equation}
-where $\mathcal{L}_{\text{MSE}}^{(c)}$ is the mean squared error of
-channel~$c$, $w_c$ its weight and $\bar{w}$ the mean of the weights.
-The mask channel ($c = 0$), which is the clinical target, has the weight
-$w_0 = 5$, and each of the ten layer channels has the weight $w_c = 1$.
-Dividing by the mean weight keeps the scale of the term comparable to an
-unweighted MSE. The layer channels are auxiliary targets, but the operator
-must still predict them, because they are part of the next state that is
-fed back during a rollout. The same loss is used in training and in
-validation.
-
-The second term is a soft-Dice loss on the mask channel
-\citep{Milletari2016}, with the weight $\lambda_{\text{Dice}} = 5$. It
-counters an imbalance in the data: between two consecutive visits, almost
-all mask pixels are unchanged, so a plain MSE is dominated by static pixels
-and gives little gradient at the moving lesion boundary. A model trained
-on it can learn to copy its input. The soft-Dice term restores gradient in
-the band around the binarisation threshold, which is where the boundary
-lies. Unlike the original soft-Dice loss, which scores a segmentation
-probability map, the term is applied here to a regression output. The prediction $p$ of the mask channel is first
-turned into a soft mask,
-\begin{equation}
-  p_{\text{soft}} \;=\; \sigma\!\left(s\,(p - \tau)\right),
-  \label{eq:method:soft-mask}
-\end{equation}
-where $\sigma$ is the logistic sigmoid, $s = 2$ the sharpness and $\tau$
-the physical threshold of 0.5 mapped into normalised space. The evaluation
-uses the same mapping (\S\ref{sec:data:normalization}), so the loss and the
-metric agree on where the threshold lies. With the hard-thresholded target
-mask $t$, the term is
-$\mathcal{L}_{\text{Dice}} = 1 - 2 \sum p_{\text{soft}} t \,/\,
-(\sum p_{\text{soft}} + \sum t)$.
-
-The soft-Dice term is computed per eye and then averaged over the batch.
-A Dice score is a ratio of sums. If the sums were pooled over the whole
-batch, the gradient for one eye would depend on which other eyes it was
-batched with. Scoring per eye also matches the evaluation, which scores
-each eye separately before averaging.
-
-The soft-Dice term has one accepted side effect. Because the sigmoid of
-Equation~\eqref{eq:method:soft-mask} does not saturate at the physical mask
-values, the term stretches the raw mask predictions away from the
-threshold. This cannot change a thresholded prediction, but it changes
-the raw error of the mask channel. It is one reason why the evaluation does
-not compare operators on raw errors (Chapter~\ref{ch:experiments}).
-
-Two further options exist in the implementation and are off in every
-reported run. First, the loss can exclude grid positions whose target
-equals the fill value of the crop padding (\S\ref{sec:data:spatial}), from
-both terms. Since this option is off, the padded positions are regressed at
-full weight. Second, a monotonic-growth penalty can be added, which
-penalises a decrease of the mask where the previous state is atrophic. Its
-weight is zero for every operator of the comparison;
-\S\ref{sec:method:dt-residual} explains why no monotonic constraint is
-imposed, and~\S\ref{sec:experiments:ablations:loss} tests the penalty.
-
-\subsection{Time-Budgeted Pushforward Curriculum}
-\label{sec:method:training:curriculum}
-
-The operators are trained with the pushforward trick of
-\citet{Brandstetter2022} (\S\ref{sec:background:neural-pde}): the model is
-rolled forward on its own predictions without gradients, and only the
-final step is supervised. The original counts the depth of this rollout in
-steps. With irregular visit intervals (\S\ref{sec:data:temporal}), a step
-count is not a comparable quantity: two steps can mean 180 days for one eye
-and 720 days for another. The framework therefore counts the depth in
-elapsed days.
-
-Training proceeds in passes; in each pass, every training eye contributes
-one randomly chosen start window. Each training pass draws a time budget
-$B$ uniformly from $\{0, 1, \dots, \min(e, U)\} \times 180$ days, where $e$
-is the current epoch and $U$ the largest number of 180-day units in a
-budget. The base of 180 days is the modal visit interval of the cohort
-(\S\ref{sec:data:temporal}). Every reported run uses $U = 2$, so the
-largest budget is 360 days, which matches the one-year evaluation anchor.
-Because the upper limit is $\min(e, U)$, the largest budget grows by 180
-days per epoch over the first $U$ epochs; after that, budgets of 0, 180 and
-360 days are drawn with equal probability. A budget of zero gives a plain one-step pass on observed
-inputs.
-
-For a given budget, only start windows that can realise it are sampled.
-The chain of consecutive visits from such a window must reach at least $B$
-days in total, and its first interval must not exceed $B$. If an eye has no
-such window, sampling for that eye falls back to all of its windows.
-% Checked 2026-10-01 in utils/utils.py (_rebuild_valid_t0s): the restriction
-% applies only for B > 0; at B = 0 any window is drawn.
-The number of unrolled steps for each eye then follows an undershoot rule:
-it is the largest $n$ for which the $n$ rolled intervals and the final,
-supervised interval together stay within $B$. The chain never overshoots
-the budget, so eyes on different visit schedules are trained to the same
-elapsed horizon. The undershoot rule is also the reason for the 180-day
-base: a budget of 90 days, the shortest interval, can never chain two
-visits (\S\ref{sec:data:temporal}), so the curriculum would not unroll.
-
-Within a batch, the eyes are grouped by their number of unrolled steps.
-Each group is rolled forward $n$ steps without gradients: at every step,
-the next window of the eye is fetched and its input state is replaced by
-the model's own prediction. All channels are rolled, including the
-predicted mask. An eye whose sequence ends is dropped from the chain. The
-group then receives one forward pass with gradients, and the loss is taken
-against the observed next state. The group losses are combined, each
-weighted by the share of the batch its group holds. Because the rollout
-runs in training mode, no operator may use batch statistics
-(\S\ref{sec:method:family:contract}).
-
-\subsection{Optimisation}
-\label{sec:method:training:optim}
-
-All operators are trained with AdamW \citep{Loshchilov2019}, a
-learning rate of $2 \times 10^{-3}$ and a weight decay of
-$1 \times 10^{-2}$ on all trainable parameters. The learning rate is
-multiplied by 0.4 at the start of epoch 5 and again at the start of epoch
-20, counting from 0, so the first five epochs run at the initial rate.
-
-Training runs for 30 epochs of 20 passes each, with a batch size of four
-eyes. Because the number of training eyes differs between the folds
-(\S\ref{sec:data:splits}), an epoch has between 280 and 320 optimiser
-steps, depending on the fold.
-
-Gradients are clipped to a norm of 1.0 separately for each trainable
-module, so that a large gradient in one module cannot shrink the updates of
-another. For the
-single-network operators of the main comparison, this amounts to one clip
-over the whole model. The separation matters for the moving-mesh extension
-of Appendix~\ref{app:mm-pde}.
-
-Unless stated otherwise, every reported run uses seed 42; replication runs
-with seed 7 are reported in Chapter~\ref{ch:experiments} and
-Appendix~\ref{app:ablations}. The model is validated on the held-out
-fold after every epoch (\S\ref{sec:data:splits});
-\S\ref{sec:experiments:protocol:late} sets out which epochs enter the
-reported numbers and why.
-
-\begin{table}[t]
-  \centering
-  \caption[Shared training settings.]{%
-    Training settings, identical for every operator of the survey.}
-  \label{tab:method:hparams}
-  \small
-  \begin{tabular}{p{0.32\textwidth} p{0.58\textwidth}}
-    \toprule
-    Setting & Value \\
-    \midrule
-    Optimiser & AdamW \\
-    Learning rate & $2 \times 10^{-3}$, multiplied by 0.4 at the start of
-      epochs 5 and 20 (counted from 0) \\
-    Weight decay & $1 \times 10^{-2}$ \\
-    Epochs $\times$ passes per epoch & $30 \times 20$ \\
-    Batch size & 4 eyes \\
-    Gradient clipping & Norm 1.0, per module \\
-    Loss weights & Mask MSE 5, layer MSE 1 each, soft-Dice 5 (sharpness
-      2), monotonic penalty 0 \\
-    Pad-position masking & Off \\
-    Pushforward budget & Base 180 days, maximum 360 days ($U = 2$) \\
-    Seeds & 42 (replication: 7) \\
+    Any operator with RK4 wrapper & unchanged & --- & integration order \\
     \bottomrule
   \end{tabular}
 \end{table}
