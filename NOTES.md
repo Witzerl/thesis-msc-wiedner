@@ -1687,6 +1687,24 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
   §5.1.4 sentence "larger for arms whose scores fluctuate more" now reads "larger both for arms whose
   scores fluctuate more and for arms whose score peaks early ..., such as the FNO".
 - [ ] SV-5.13: small table next to the §5.4.2 objective test (full / without soft-Dice / plain MSE).
+- [x] 2026-10-18 **Rollout figure in §5.2** (Fig. 5.2, `fig:experiments:rollout`, now a vector PDF), reworked
+  with the author: one row of four panels (baseline / truth / prediction / agreement), canonical model only,
+  epoch-29 weights, cropped to the lesion, edges smoothed for display as in the poster (drawn areas within 3 %
+  of the native ones; Dice on the unsmoothed masks). Eye rule: among the validation eyes of folds 0-2 whose
+  lesion does not touch the window edge, the highest change-region Dice: fold 0, eye 10 (PEAT0013_OD), 0.761,
+  best of 48 (median 0.544); the caption calls it an eye on which the model does well. Rejected on the way:
+  the old fold-2 median eye (best fold, edge contact, large no-data area, 10 % shrinkage) and a folds 0-2
+  median eye (fold 2 eye 6, 0.552: correct places but 40 % of the true change). §5.2 sentence changed to
+  match. Old PNG removed.
+- [ ] Appendix D (`fig_appendix_rollouts`, still disabled) must show typical and difficult eyes: the Fig. 5.2
+  caption now points there for them. Most eyes receive less predicted change than occurs (35 of 48, median
+  ratio predicted/true 0.73, folds 0-2, epoch 29).
+- [ ] Edge-advance analysis for §6.2 ("good at where, weaker at how fast"), exploratory 2026-10-18, not yet a
+  script: per row, outward shift of the left/right lesion edge (columns, fine axis) from baseline to one year.
+  Predicted advance correlates with the true one in 47 of 48 eyes (median r 0.53; 0.70 for the Fig. 5.2 eye),
+  but varies about half as much between places (median sd 25 vs 51 columns) and is smaller (23 vs 39). Caveats:
+  horizontal axis only; outermost edge per row, so lobe merging inflates the largest values. Write as a script
+  in images/scripts/ before quoting.
 - [ ] Figure rule (author, 2026-10-18): one message per figure, one line per condition, text only as axis
   labels and short legend names, everything else in the caption. Apply to the remaining disabled figures.
 - [x] 2026-10-18 **Chapter 4 reordered** (author, option (a) of AI S7/T9 and supervisor E1): conditioning and

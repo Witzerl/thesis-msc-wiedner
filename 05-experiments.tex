@@ -357,37 +357,35 @@ lists every arm on the headline metric.
 % (thesis_numbers.py): all match.
 
 % Figure: images/scripts/fig_experiments_rollout.py, from rollouts regenerated
-% by images/scripts/rollouts_regen.py (epoch-29 weights, fold 2, unmodified
-% train.test_rollout_losses; every arm reproduces its logged epoch-29
-% change-region Dice). The per-pixel floor row of the original plan was
-% replaced by the k-NN graph network: the floor is identical to the baseline
-% at every step. Eye: fold-2 validation index 8 (median rule, lower of the two
-% middle eyes; the other one has a lesion of about 0.36 mm^2).
+% by images/scripts/rollouts_regen.py (epoch-29 weights, unmodified
+% train.test_rollout_losses; each fold reproduces its logged epoch-29
+% change-region Dice). Eye (rule fixed 2026-10-18 with the author): among the
+% validation eyes of folds 0-2 whose lesion does not touch the window edge,
+% the one with the highest change-region Dice at the anchor: fold 0, eye 10
+% (PEAT0013_OD), 0.761, the highest of all 48 eyes (median 0.544). Smoothed
+% display areas within 3 % of the native ones (true change 1.380 vs 1.408 mm^2,
+% predicted 1.505 vs 1.479 mm^2). Most eyes receive less predicted change than
+% true change (35 of 48; median ratio 0.73).
 \begin{figure}[t]
   \centering
-  % \includegraphics[width=\textwidth]{images/fig_experiments_rollout.png}
-  % TODO: figure not final (2026-10-02); restore the line above when ready.
-  \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering\itshape Placeholder
-    for Figure~\ref{fig:experiments:rollout}: rollouts of five operators for one validation eye.}}
-  \caption[Rollouts of five operators for one validation eye.]{%
-    Rollouts of five operators for one validation eye of fold~2, computed
-    with the weights after the last training epoch. Rows: ground truth, the
-    dilated-stencil graph network, the U-Net (width 5), the T-FEN, the FNO
-    and the index-space $k$-NN graph network ($k = 12$). Columns: the
-    baseline visit and the first five of the eye's eight follow-up visits,
-    headed by the time since baseline in days; the one-year anchor is set
-    in bold. Each panel shows the $49 \times 1024$ grid at its physical
-    aspect ratio, with the baseline lesion outlined; hatched positions have
-    no data at that visit. Ground-truth panels fill the true lesion. Model
-    panels show in light grey the predicted lesion that coincides with the
-    baseline lesion and code the change against the baseline: predicted and
-    true in blue, predicted only in orange, true only (missed) in purple; in
-    the baseline column they show the input mask. The eye was selected by a
-    fixed rule: the one whose per-eye growth-region Dice of the canonical
-    model at the anchor is closest to the median of the 16 validation eyes
-    of the fold (of the two middle eyes, the lower). The figure illustrates
-    a single eye and is not evidence for any comparison between
-    operators.}
+  \includegraphics[width=\textwidth]{images/fig_experiments_rollout.pdf}
+  \caption[An eye on which the model does well.]{%
+    An eye on which the model does well: change at the one-year visit (360
+    days), cropped to the lesion (each panel $4.4 \times 4.8$~mm, physical
+    aspect ratio). (a)~The baseline lesion, which the model receives as
+    input. (b)~The ground truth: the baseline lesion that remains (light
+    grey) and the true change against it (dark). (c)~The prediction of the
+    dilated-stencil graph network, computed with the weights after the last
+    training epoch, in the same encoding. (d)~The agreement of (b) and (c):
+    change that is predicted and true (blue), predicted only (orange) and
+    missed (purple). The eye is the one with the highest change-region Dice
+    (0.76) among the validation eyes of folds 0 to 2 whose lesion does not
+    touch the edge of the window; the median over these folds is 0.54, and
+    most eyes receive less predicted change than occurs. For display, the
+    lesion edges are smoothed; this changes the drawn areas by less than
+    3\,\% and removes isolated single pixels, while the Dice is computed on
+    the unsmoothed masks. Pixel-exact rollouts of further eyes, including
+    typical and difficult ones, are shown in Appendix~\ref{app:rollouts}.}
   \label{fig:experiments:rollout}
 \end{figure}
 
@@ -491,11 +489,10 @@ For every arm except the two FNO arms without a local path, the best fold
 is fold 2, so the column mostly reflects the spread between folds rather
 than a separate result.
 
-Figure~\ref{fig:experiments:rollout} shows the rollouts of five operators
-for one validation eye. It illustrates what the change-region Dice scores:
-most of every prediction is the unchanged baseline lesion, and the
-operators differ in the narrow band of change along its border. Further
-eyes, including failure cases, are shown in Appendix~\ref{app:rollouts}.
+Figure~\ref{fig:experiments:rollout} shows an eye on which the canonical
+model does well. Most of the lesion stays as it is, and the metric scores
+only the band of change along its border. Further eyes, including failure
+cases, are shown in Appendix~\ref{app:rollouts}.
 
 The Runge--Kutta arms are nulls against their single-step
 counterparts and are taken up in~\S\ref{sec:experiments:ablations}. The

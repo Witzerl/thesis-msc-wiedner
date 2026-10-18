@@ -1,158 +1,207 @@
-"""Figure fig_experiments_rollout (Chapter 5, section 5.2): one validation eye of fold 2, its
-ground truth and the rollouts of five operators (epoch-29 weights), visit by visit.
+"""Figure fig_experiments_rollout (Chapter 5, section 5.2): what the change-region Dice scores.
 
-Data: images/data/rollouts/<EXP>_f2.npz, written and self-checked by rollouts_regen.py
-(each cache reproduces the run's logged epoch-29 change-region Dice@360d).
+One validation eye at the one-year anchor, four panels in one row, cropped to the lesion
+(bounding box of baseline, truth and prediction + CROP_MM), at the physical aspect ratio:
+  (a) the baseline lesion (the model's input mask);
+  (b) truth at the anchor: the baseline lesion kept (light) and the true change (dark);
+  (c) prediction of the canonical dilated-stencil GNN (epoch-29 weights), same encoding;
+  (d) agreement: predicted and true / predicted only / missed change.
+One message: an eye on which the model does well, shown so that truth and prediction can be
+compared directly; most of the lesion stays as it is and the metric scores the band of change
+along its border. It is a deliberately good example and the caption says so (with the median for
+comparison); typical and difficult eyes are in Appendix D (fig_appendix_rollouts.py). Positions
+without data are drawn as background; all explanation is in the caption. "Change" is the
+symmetric difference against the baseline mask (the definition behind change-region Dice), so it
+includes the rare pixels where the true lesion shrinks.
 
-Eye-selection rule (fixed before looking at the panels): among the fold-2 validation eyes
-with at least 4 follow-up visits, the eye whose canonical-model per-eye growth-region Dice at
-the one-year anchor (late-epoch mean, thesis_numbers.eye_late('ANISOGNN_final_dilmean', [2]))
-is closest to the median over those eligible eyes. At most baseline + 5 follow-ups are drawn.
+Eye-selection rule (2026-10-18): among the validation eyes of folds 0-2 (the folds with cached
+rollouts) whose lesion does not touch the window edge at baseline or at the anchor (truth or
+prediction), the eye with the highest change-region Dice of the epoch-29 rollout at the anchor.
+This gives fold 0, eye 10 (Dice 0.761, the highest of all 48 eyes; median 0.544). An earlier
+median rule (fold 2, eye 6, Dice 0.552) was rejected by the author because it does not show
+growth being captured.
 
-Run from images/scripts/:  python fig_experiments_rollout.py [--eye N]
-(--eye only for previews of other eyes; the thesis figure uses the rule.)
+Display smoothing (after the poster, masterthesis-docker/poster/poster_figures.ipynb cell 10):
+each binary mask is upsampled bilinearly from 49 x 1024 to a display grid at the physical aspect
+ratio, blurred (MASK_SIGMA display pixels, stronger than the poster because one native row spans
+~12 display pixels here) and thresholded at 0.5; every coloured region is then blurred slightly
+(SIGMA display pixels) and drawn as a filled contour at 0.5. For display only: the printed pixel
+counts and the Dice of the eye are computed on the native, unsmoothed masks; the script prints
+how much the smoothing changes the drawn areas. Pixel-exact panels are in Appendix D.
+
+Data: images/data/rollouts/ANISOGNN_final_dilmean_f{0,1,2}.npz, written and self-checked by
+rollouts_regen.py (last.pt = epoch 29; each cache reproduces the logged epoch-29 change-region
+Dice@360d).
+
+Include at width=\textwidth.
+Run from images/scripts/:  python fig_experiments_rollout.py
 """
 from __future__ import annotations
 
-import argparse
-import statistics
-
 import matplotlib as mpl
 import numpy as np
+from matplotlib.patches import Patch
 
-from _common import setup, save, PREVIEW, thesis_numbers
+from _common import setup, save
 import rollouts_panels as RP
 from rollouts_panels import load_cache
 
-ARMS = [  # (row label, experiment) -- order of the figure
-    ("Dilated stencil", "ANISOGNN_final_dilmean"),
-    ("U-Net", "UNET_final_w5"),
-    ("T-FEN", "FEN_final_w96ftp7rk4d45skew"),
-    ("FNO", "FNO_final_w5"),
-    ("k-NN graph", "MPPDE_final_aggrmean"),
-]
-FOLD = 2
-MAX_FOLLOW = 5
-MIN_FOLLOW = 4
+EXP = "ANISOGNN_final_dilmean"
+FOLDS = (0, 1, 2)
+PX_MM2 = 0.12118 * 0.00568
+DISP_W = 600          # display grid width (columns); height follows the physical aspect ratio
+SIGMA = 1.5           # region blur in display pixels (poster: 1.5 for the TP/FP/FN slivers)
+MASK_SIGMA = 5.0      # blur of each upsampled mask before thresholding (display px; one native
+                      # row is ~12 display px tall), removes the row staircase
+FRAC = 1.0
+CROP_MM = 0.35        # margin around the lesion bounding box
+RP_DX, RP_DY = 0.00568, 0.12118
 
 
-def select_eye(caches):
-    tn = thesis_numbers()
-    late = tn.eye_late("ANISOGNN_final_dilmean", [FOLD])
-    canon = {e["eye_idx"]: e for e in caches["ANISOGNN_final_dilmean"]}
-    elig = {i: late[(FOLD, i)] for i, e in canon.items()
-            if len(e["dt"]) >= MIN_FOLLOW and (FOLD, i) in late}
-    med = float(np.median(list(elig.values())))
-    # With an even number of eligible eyes the two middle eyes are exactly equidistant from
-    # the median; the tie is broken by the lower median (statistics.median_low).
-    low = statistics.median_low(list(elig.values()))
-    ranked = sorted(elig, key=lambda i: (abs(elig[i] - med), elig[i] != low))
-    print(f"eligible eyes: {len(elig)} of {len(canon)}; median late growth Dice {med:.6f} "
-          f"(lower median {low:.6f})")
-    for i in ranked[:4]:
-        print(f"  eye {i:2d} {canon[i]['eye_id']:<12s} late Dice {elig[i]:.6f} "
-              f"|d| {abs(elig[i] - med):.6f} follow-ups {len(canon[i]['dt'])}")
-    pick = next(i for i in elig if elig[i] == low)
-    return pick, elig, med
+def upsample(mask, h, w):
+    """Binary (49, 1024) mask -> binary (h, w) display mask: bilinear upsampling, a Gaussian
+    blur of MASK_SIGMA display pixels, threshold 0.5."""
+    import torch
+    import torch.nn.functional as F
+    t = torch.tensor(mask[None, None], dtype=torch.float32)
+    up = F.interpolate(t, size=(h, w), mode="bilinear", align_corners=False)[0, 0].numpy()
+    return blur(up, MASK_SIGMA) > 0.5
+
+
+def blur(a, sigma=SIGMA):
+    """Separable Gaussian blur (torch, as smooth01 in the poster notebook)."""
+    import torch
+    import torch.nn.functional as F
+    r = int(max(1, round(3 * sigma)))
+    xs = torch.arange(-r, r + 1, dtype=torch.float32)
+    k = torch.exp(-(xs ** 2) / (2 * sigma ** 2)); k = k / k.sum()
+    t = torch.tensor(a.astype(np.float32))[None, None]
+    return F.conv2d(t, (k[:, None] * k[None, :])[None, None], padding=r)[0, 0].numpy()
+
+
+def draw_smooth(ax, regions, outline, pal):
+    """regions: list of (bool mask on the display grid, colour), drawn in order as smoothed
+    filled contours; outline: display-grid baseline mask drawn as a smoothed contour line."""
+    h, w = outline.shape
+    xc = (np.arange(w) + 0.5) / w * RP.EXTENT[1]
+    yc = (np.arange(h) + 0.5) / h * RP.EXTENT[2]
+    for m, col in regions:
+        b = blur(m)
+        if b.max() >= 0.5:
+            ax.contourf(xc, yc, b, levels=[0.5, 1.01], colors=[col])
+    ax.contour(xc, yc, blur(outline), levels=[0.5], colors=[pal.MASK["baseline"]],
+               linewidths=0.6)
+    ax.set_xlim(RP.EXTENT[0], RP.EXTENT[1])
+    ax.set_ylim(RP.EXTENT[2], RP.EXTENT[3])
+    ax.set_aspect("equal")
+    ax.set_xticks([]); ax.set_yticks([])
+    ax.grid(False)
+    for sp in ax.spines.values():
+        sp.set_visible(True); sp.set_color(pal.PAL["line"]); sp.set_linewidth(0.5)
+
+
+def touches_edge(*ms):
+    return any(m[0].any() or m[-1].any() or m[:, 0].any() or m[:, -1].any() for m in ms)
+
+
+def eye_table():
+    """One row per validation eye of folds 0-2 (the folds with cached rollouts): change-region
+    Dice of the epoch-29 rollout at the one-year anchor, baseline area, edge contact."""
+    rows = []
+    for fold in FOLDS:
+        eyes, meta = load_cache(f"{EXP}_f{fold}")
+        assert meta["epoch"] == 29
+        assert abs(meta["chg_cache"] - meta["chg_logged"]) < 1e-3, "unverified rollout"
+        for e in eyes:
+            a = RP.anchor_step(e["cum_days"])
+            b, g, p = e["base"], e["gt"][a], e["pred"][a]
+            tc, pc = g != b, p != b
+            tp, fp, fn = (tc & pc).sum(), (pc & ~tc).sum(), (tc & ~pc).sum()
+            rows.append(dict(fold=fold, e=e, a=a, dice=2 * tp / (2 * tp + fp + fn),
+                             area=b.sum() * PX_MM2, edge=touches_edge(b, g, p)))
+    return rows
+
+
+def select_eye():
+    """Rule: among eyes whose lesion (baseline, truth or prediction at the anchor) does not
+    touch the window edge, the one with the highest change-region Dice. A deliberately good
+    example; the caption says so and gives the median for comparison."""
+    rows = eye_table()
+    el = [r for r in rows if not r["edge"]]
+    d_all = [r["dice"] for r in rows]
+    print(f"{len(rows)} eyes (folds {FOLDS}): median Dice {np.median(d_all):.3f}, "
+          f"upper quartile from {np.percentile(d_all, 75):.3f}; {len(el)} without edge contact")
+    pick = max(el, key=lambda r: r["dice"])
+    rank = sorted(d_all, reverse=True).index(pick["dice"]) + 1
+    print(f"  pick: fold {pick['fold']} eye {pick['e']['eye_idx']} ({pick['e']['eye_id']}), "
+          f"Dice {pick['dice']:.3f}, rank {rank} of {len(rows)}")
+    return pick
 
 
 def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--eye", type=int, default=None, help="preview another eye (not the rule)")
-    args = ap.parse_args()
-
     pal = setup()
     import matplotlib.pyplot as plt
-    mpl.rcParams["hatch.color"] = pal.PAL["muted"]
-    mpl.rcParams["hatch.linewidth"] = 0.4
-    # exact physical size (no tight bbox): the PNG is then exactly the text width, so the
-    # 7-8 pt labels print at their nominal size when included at width = text width
     mpl.rcParams["savefig.bbox"] = "standard"
 
-    caches, metas = {}, {}
-    for _, exp in ARMS:
-        eyes, meta = load_cache(f"{exp}_f{FOLD}")
-        caches[exp], metas[exp] = eyes, meta
-        print(f"{exp:<32s} cache: logged e29 {meta['chg_logged']:.6f}  regenerated "
-              f"{meta['chg_cache']:.6f}  ({meta['run_dir'][-15:]})")
-        assert abs(meta["chg_cache"] - meta["chg_logged"]) < 1e-3, "unverified rollout"
+    r = select_eye()
+    e, a = r["e"], r["a"]
+    base, gt, pred = e["base"], e["gt"][a], e["pred"][a]
+    day = int(round(e["cum_days"][a]))
 
-    eye_idx, elig, med = select_eye(caches)
-    if args.eye is not None:
-        eye_idx = args.eye
-    E = {exp: next(e for e in caches[exp] if e["eye_idx"] == eye_idx) for _, exp in ARMS}
-    ref = E["ANISOGNN_final_dilmean"]
-    n_follow = len(ref["dt"])
-    n_show = min(MAX_FOLLOW, n_follow)
-    cum = np.rint(ref["cum_days"]).astype(int)
-    a_idx = RP.anchor_step(ref["cum_days"])
-    for _, exp in ARMS:   # every arm rolled out the same eye on the same schedule
-        assert np.array_equal(E[exp]["gt"], ref["gt"]) and np.array_equal(E[exp]["base"], ref["base"])
-        assert np.allclose(E[exp]["dt"], ref["dt"])
-    base_pad, eye_id = RP.baseline_pad(FOLD, eye_idx)
-    assert eye_id == ref["eye_id"], (eye_id, ref["eye_id"])
-    pads = [base_pad] + [~ref["valid"][s] for s in range(n_show)]
-    any_pad = any(p.any() for p in pads)
-    print(f"eye {eye_idx} ({ref['eye_id']}): {n_follow} follow-ups, showing {n_show}; "
-          f"cumulative days {cum.tolist()}; anchor step {a_idx} ({cum[a_idx]} d); "
-          f"zero padding present: {any_pad}")
-    print(f"  baseline lesion {ref['base'].sum()} px; true lesion per step "
-          f"{[int(g.sum()) for g in ref['gt'][:n_show]]}")
-    for lab, exp in ARMS:
-        e = E[exp]
-        print(f"  {lab:<16s} growth-region Dice per step (this rollout): "
-              + " ".join(f"{v:.3f}" for v in e["dice_growth"][:n_show]))
+    tc, pc = gt != base, pred != base
+    tp, fp, fn = (tc & pc).sum(), (pc & ~tc).sum(), (tc & ~pc).sum()
+    dice = 2 * tp / (2 * tp + fp + fn)
+    print(f"eye {e['eye_idx']} ({e['eye_id']}), anchor step {a} = {day} d")
+    print(f"  baseline lesion {base.sum()} px, true change {tc.sum()} px "
+          f"({tc.sum() / base.sum():.1%} of the baseline lesion), predicted change {pc.sum()} px")
+    print(f"  predicted and true {tp}, predicted only {fp}, missed {fn}; "
+          f"change-region Dice of this eye {dice:.3f}")
 
-    # ---------------- layout (inches) ----------------
-    W = pal.fig_size(1.0)[0]
-    lm, rm, top, gap, gt_gap = 0.80, 0.04, 0.20, 0.035, 0.09
-    ncol = n_show + 1
-    pw = (W - lm - rm - (ncol - 1) * gap) / ncol
-    ph = pw * (RP.EXTENT[2] / RP.EXTENT[1])
-    nrow = 1 + len(ARMS)
-    leg_h = 0.42
-    H = top + nrow * ph + (nrow - 2) * gap + gt_gap + leg_h
+    # display grid at the physical aspect ratio; categories formed on the upsampled masks
+    H_d = int(round(DISP_W * RP.EXTENT[2] / RP.EXTENT[1]))
+    B, G, P = (upsample(m, H_d, DISP_W) for m in (base, gt, pred))
+    tcd, pcd = G != B, P != B
+    a_px = (RP.EXTENT[1] / DISP_W) * (RP.EXTENT[2] / H_d)
+    print(f"  display areas (mm^2): true change {tcd.sum() * a_px:.3f} (native "
+          f"{tc.sum() * PX_MM2:.3f}), predicted change {pcd.sum() * a_px:.3f} "
+          f"(native {pc.sum() * PX_MM2:.3f})")
+    grey, chg = pal.PAL["line"], pal.MASK["gt"]
+    panels = [
+        ([(B, grey)], "(a) Baseline"),
+        ([(B & G, grey), (tcd, chg)], "(b) Truth"),
+        ([(B & P, grey), (pcd, chg)], "(c) Prediction"),
+        ([(B & P, grey), (tcd & pcd, pal.MASK["tp"]), (tcd & ~pcd, pal.MASK["fn"]),
+          (pcd & ~tcd, pal.MASK["fp"])], "(d) Agreement"),
+    ]
+    # crop all panels to the lesion: bounding box of baseline, truth and prediction + margin
+    ys, xs = np.nonzero(base | gt | pred)
+    x0, x1 = xs.min() * RP_DX - CROP_MM, (xs.max() + 1) * RP_DX + CROP_MM
+    y0, y1 = ys.min() * RP_DY - CROP_MM, (ys.max() + 1) * RP_DY + CROP_MM
+    x0, y0 = max(x0, 0.0), max(y0, 0.0)
+    x1, y1 = min(x1, RP.EXTENT[1]), min(y1, RP.EXTENT[2])
+    print(f"  crop {x1 - x0:.2f} x {y1 - y0:.2f} mm")
+
+    W = pal.fig_size(FRAC)[0]
+    lm, rm, gap, top, leg_h = 0.02, 0.02, 0.10, 0.22, 0.40
+    pw = (W - lm - rm - 3 * gap) / 4
+    ph = pw * (y1 - y0) / (x1 - x0)
+    H = top + ph + leg_h
     fig = plt.figure(figsize=(W, H))
-
-    def add_ax(r, c):
-        y_top = top + r * (ph + gap) + (gt_gap - gap if r >= 1 else 0)
-        return fig.add_axes([(lm + c * (pw + gap)) / W, 1 - (y_top + ph) / H, pw / W, ph / H])
-
-    rows = [("Ground truth", None)] + ARMS
-    for r, (lab, exp) in enumerate(rows):
-        for c in range(ncol):
-            ax = add_ax(r, c)
-            s = c - 1
-            if exp is None:
-                codes = RP.gt_codes(ref["base"] if c == 0 else ref["gt"][s])
-            else:
-                if c == 0:   # the input every model receives: the baseline mask itself
-                    codes = np.where(ref["base"], RP.UNCH, RP.BG).astype(np.uint8)
-                else:
-                    codes = RP.model_codes(E[exp]["pred"][s], ref["gt"][s], ref["base"])
-            RP.draw_panel(ax, codes, ref["base"], pal, pad=pads[c])
-            if r == 0:
-                head = "Baseline" if c == 0 else f"{cum[s]} d"
-                ax.set_title(head, fontsize=7, loc="center", pad=3, color=pal.PAL["ink"],
-                             fontweight="bold" if (c > 0 and s == a_idx) else "normal")
-            if c == 0:
-                ax.text(-0.08, 0.5, lab, transform=ax.transAxes, ha="right", va="center",
-                        fontsize=7.5, color=pal.PAL["ink"])
-
-    RP.scale_bar_fig(fig, pal, x_right_in=lm - 0.10, y_in=top * 0.45, panel_w_in=pw, W=W, H=H)
-    leg = fig.legend(handles=RP.legend_handles(pal, with_pad=any_pad), loc="lower center",
-                     ncol=4, frameon=False, fontsize=7, handlelength=1.3, handleheight=0.9,
-                     columnspacing=1.0, handletextpad=0.5,
-                     bbox_to_anchor=(0.5, 0.0))
-    name = "fig_experiments_rollout" if args.eye is None else f"_alt_rollout_eye{args.eye}"
-    if args.eye is None:
-        save(fig, name, raster=True)
-    else:
-        PREVIEW.mkdir(exist_ok=True)
-        fig.savefig(PREVIEW / f"{name}.png", dpi=200)
-        print("wrote preview", PREVIEW / f"{name}.png")
-    print(f"{'selected' if args.eye is None else 'preview'} eye {eye_idx} ({ref['eye_id']}), late-epoch growth Dice {elig[eye_idx]:.5f}, "
-          f"median {med:.5f}; figure {W:.2f} x {H:.2f} in")
+    for k, (regions, title) in enumerate(panels):
+        ax = fig.add_axes([(lm + k * (pw + gap)) / W, leg_h / H, pw / W, ph / H])
+        draw_smooth(ax, regions, B, pal)
+        ax.set_xlim(x0, x1)
+        ax.set_ylim(y1, y0)
+        ax.set_title(title, fontsize=7.5, pad=3, loc="left", color=pal.PAL["ink"])
+    handles = [Patch(fc=grey, ec="none", label="Baseline lesion"),
+               Patch(fc=chg, ec="none", label="Change"),
+               Patch(fc=pal.MASK["tp"], ec="none", label="Predicted and true"),
+               Patch(fc=pal.MASK["fp"], ec="none", label="Predicted only"),
+               Patch(fc=pal.MASK["fn"], ec="none", label="Missed")]
+    fig.legend(handles=handles, loc="lower center", ncol=5, frameon=False, fontsize=7,
+               handlelength=1.2, handleheight=0.9, columnspacing=1.0, handletextpad=0.5,
+               bbox_to_anchor=(0.5, 0.0))
+    save(fig, "fig_experiments_rollout")
 
 
 if __name__ == "__main__":
