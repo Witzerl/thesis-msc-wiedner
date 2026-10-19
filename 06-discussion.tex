@@ -81,14 +81,14 @@ than any ranking of architectures.
 % Author decision (b), 2026-10-01: global + local demoted to an observation.
 Whether global and local context are separate properties remains open.
 The FNO, which sees the whole grid in every layer but has no local path,
-lies below the U-Net at the one-year visit, at both seeds. A
+lies below the U-Net at the one-year visit at both seeds. A
 $3 \times 3$ local path of 800 parameters brought it level at one seed but
 not at the second (\S\ref{sec:experiments:ingredients:global}), so whether
 local detail is what the FNO lacks is not established.
 Beyond one year the plain FNO catches up with the U-Net and lies above it
 after three years. These horizon values are descriptive and were not
 tested, but they suggest that global support matters more for long
-forecasts than at the one-year visit.
+forecasts than for the one-year visit.
 
 \paragraph{Capacity.}
 Capacity was not a lever in any of the four classes tested
@@ -296,7 +296,7 @@ is one reason why no monotonic-growth constraint was imposed.
 % in 21 %, > 10 % in 5 % of pairs; lost / gained area over all pairs 22 %.
 
 The evaluation has limits of its own. The one-year visit is the first
-visit of the rollout at or after about one year, and its time
+rollout step at or beyond 360 days and
 has no upper bound, so a few eyes are scored later, where more change has
 accumulated. The change-region Dice was logged only as a cohort mean per
 run, so the eye counts use the growth-region Dice instead

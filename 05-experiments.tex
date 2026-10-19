@@ -71,8 +71,8 @@ The headline metric is the change-region Dice at the one-year visit. All
 predicted and ground-truth masks are binarised at the physical threshold of
 0.5, which is mapped into normalised space in the same way as in the loss. Let $b$
 be the thresholded mask at the baseline visit (the first visit of the
-rollout), and $p$ and $y$ the thresholded prediction and ground truth at
-the one-year visit. The predicted and the true change
+rollout), $p$ the thresholded prediction at the one-year visit and $y$ the
+thresholded ground truth at the one-year visit. The predicted and the true change
 regions are
 \begin{equation}
   \hat{C} = \{\, i : p_i \neq b_i \,\}, \qquad
@@ -167,8 +167,8 @@ visit and predicts the next visit. The prediction is then fed back as the
 input of the next window, and the rollout continues over the eye's real
 visit schedule, with the actual $\Delta t$ of each window.
 
-The one-year visit is the first visit of the rollout whose time since
-baseline reaches about one year (\S\ref{sec:data:temporal}). For a few eyes this step lies
+The one-year visit is taken at the first step whose cumulative time
+reaches it (\S\ref{sec:data:temporal}). For a few eyes this step lies
 beyond one year, where the true change region is larger. This is accepted
 because \citet{Mai2024} also score every follow-up visit by its time since
 baseline and not at a fixed horizon. Persistence is computed inside every
@@ -733,9 +733,9 @@ the only difference.
 The T-FEN is higher by 0.062 on average, on all five folds and on 68 of the
 75 eyes. With the earlier Galerkin form of the transport operator, the
 difference was of the same order, 0.053, again on all five folds. That form
-becomes unstable in long free-running rollouts, but only well after one
-year (\S\ref{sec:experiments:validity:tfen}), so its score at the
-one-year visit is valid, and the effect does not depend on the form of the
+becomes unstable in long free-running rollouts, but only well after the
+one-year visit (\S\ref{sec:experiments:validity:tfen}), so its score at
+the one-year visit is valid, and the effect does not depend on the form of the
 transport operator.
 % Seed-7 values (tab:appendix:seeds): thesis_numbers.py pair, 2026-10-01,
 % against FEN_final_w96Frk4d45s7. The previously quoted seed-7 Galerkin value
@@ -1643,8 +1643,8 @@ of the T-FEN comes from its transport term
     retraining, with a fixed step of $h = 1$ to $1/32$ year (365 to 11.4
     days) and with explicit Euler or classical RK4; folds 0 to 2, seed 42.
     The table gives the change of the change-region Dice at the one-year
-    visit, evaluated at the finest step, against the setting the model was
-    trained with, the span over all settings at least as fine as the training
+    visit at the finest step against the setting the model was trained
+    with, the span over all settings at least as fine as the training
     setting in both step and order, and the two criteria: convergence at
     the finest steps (C1) and agreement of those settings within the
     run-to-run noise of 0.0127 (C2). Every setting is listed in
