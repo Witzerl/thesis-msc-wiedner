@@ -223,45 +223,52 @@ The comparison is not like-for-like
 as input is weaker on growth speed than one that must find the lesion
 itself.
 
-Several explanations are possible. A local model
-applied autoregressively over several years can drift, and the growth
-rate is taken at the last visit, often three or more years after
-baseline. Large, fast-growing lesions are the ones most often cut by the
-crop, which lowers their measured growth. The operators see one visit and
-have no memory of how fast the eye has grown so far. And, as argued in
-\S\ref{sec:discussion:interpretation}, nothing in the conditioning tells
-the operator how fast this particular eye progresses. Three further
-explanations were not tested. First, the operators are not trained on the
-growth rate. It is computed afterwards from their predicted maps, whereas
-some models of~\S\ref{sec:experiments:qualitative} regress the rate
-directly. Second, the operators predict less change than occurs in most
-eyes, 35 of 48 on folds 0 to 2 at a median of 0.73 of the true change
-(Figure~\ref{fig:experiments:rollout}), and about half the true rate for
-the fastest eyes (\S\ref{sec:experiments:qualitative}). A deterministic
-model trained with a pixel-wise loss may favour such cautious
-predictions. Third, the inputs carry no image intensity. The models
-of~\S\ref{sec:experiments:qualitative} with stronger growth-speed values
-use reflectivity maps or the raw OCT volume, and for fundus
-autofluorescence images the tissue around the lesion carries the most
-information on growth speed (\S\ref{sec:background:related-work}). Masks
-and layer depths may hold less of that information.
+Several explanations are possible; none of them was tested:
+\begin{itemize}
+  \item A local model applied autoregressively over several years can
+    drift, and the growth rate is taken at the last visit, often three or
+    more years after baseline.
+  \item Large, fast-growing lesions are the ones most often cut by the
+    crop, which lowers their measured growth.
+  \item The operators see one visit and have no memory of how fast the eye
+    has grown so far.
+  \item The conditioning carries no information on how fast this
+    particular eye progresses (\S\ref{sec:discussion:equation-features}).
+  \item The operators are not trained on the growth rate. It is computed
+    afterwards from their predicted maps, whereas some models
+    of~\S\ref{sec:experiments:qualitative} regress the rate directly.
+  \item The operators predict less change than occurs in most eyes, 35 of
+    48 on folds 0 to 2 at a median of 0.73 of the true change
+    (Figure~\ref{fig:experiments:rollout}), and about half the true rate
+    for the fastest eyes (\S\ref{sec:experiments:qualitative}). A
+    deterministic model trained with a pixel-wise loss may favour such
+    cautious predictions.
+  \item The inputs carry no image intensity. The models
+    of~\S\ref{sec:experiments:qualitative} with stronger growth-speed
+    values use reflectivity maps or the raw OCT volume, and for fundus
+    autofluorescence images the tissue around the lesion carries the most
+    information on growth speed (\S\ref{sec:background:related-work}).
+    Masks and layer depths may hold less of that information.
+\end{itemize}
 % 2026-10-19 (author): hypotheses for the growth-speed gap, from the 5.7
 % comparison. Cautious predictions: 35/48 eyes and median ratio 0.73 from the
 % Figure 5.2 analysis (folds 0-2, epoch 29); fastest 15 eyes ratio 0.50 (5.7).
 % Image signal: Gigon2021 reflectivity maps, Mai2024 raw OCT, Cluceru2024 rim
 % (cited in 2.4).
 
-The distinction matters clinically. Complement inhibitors slow GA growth
-but do not stop it (\S\ref{sec:introduction:motivation}), so the eyes
-that grow fastest are the ones for which treatment is most worth its
-burden. That decision depends on growth speed, which is the weaker of the
-two capabilities. A forecast of where the lesion will expand is useful in
+The distinction is clinically relevant. Complement inhibitors slow GA
+growth but do not stop it (\S\ref{sec:introduction:motivation}), so the
+benefit of treatment relative to its burden is largest in the eyes that
+grow fastest. The decision to treat therefore depends on growth speed, the
+weaker of the two capabilities. A forecast of where the lesion will expand is useful in
 a different way, for example to judge whether growth is heading towards
 the fovea, but that use was not evaluated here.
 
 A second clinical question is how far ahead the forecast remains useful.
-All comparisons in this thesis are made at the one-year anchor. Beyond
-one year, the growth-region Dice of the canonical model does not fall; it
+All comparisons in this thesis are made at the one-year anchor, the
+first visit about one year after baseline. Beyond one year, the
+growth-region Dice of the canonical model, which scores only new atrophy,
+does not fall; it
 lies at about 0.60 to 0.66 in the second, third and later years
 (\S\ref{sec:experiments:ingredients:transport}). These values are
 descriptive and pooled over rollout steps. Whether any of these levels is
@@ -274,14 +281,13 @@ When two trained graders outline the same fundus autofluorescence images,
 their outlines of the region that became atrophic within one year agree
 with a Dice of only about 0.71 to 0.73 \citep{Salvi2025}. The outlines
 that serve as ground truth therefore carry considerable uncertainty of
-their own, and a Dice of 1 is not reachable in practice. A forecast with a
-growth-region Dice of about 0.5 in the first year, as here
-(Table~\ref{tab:experiments:mai-bins}), is accordingly less far from what
-is attainable than it would appear on a scale from 0 to 1. The grader
-value is an orientation point, not a target or an upper limit for the
-models of this thesis: it was measured on a different imaging modality and
-a different cohort, and the graders outlined existing images rather than
-predicting a future one.
+their own, and a Dice of 1 is not reachable in practice. On this scale,
+the first-year growth-region Dice of about 0.5 obtained here
+(Table~\ref{tab:experiments:mai-bins}) lies closer to the attainable level
+than its distance from 1 suggests. The grader value is a reference point,
+neither a target nor an upper limit for the models of this thesis. It was
+measured on a different imaging modality and a different cohort, and the
+graders outlined existing images rather than predicting a future one.
 % Literature check 2026-10-01: no clinical Dice threshold for spatial GA
 % forecasts found. Salvi et al. 2025 (PMC11699103), Results / Table 6:
 % inter-grader DSC for the 1-year region of growth 0.71 +/- 0.12 (training),
@@ -291,7 +297,8 @@ predicting a future one.
 Finally, because every model starts from segmented masks and layer
 depths, a clinical use would place it behind a segmentation model. Errors of that
 segmentation would pass into the forecast, and this thesis does not model
-them. Failures would matter most where the method is known to be weak:
+them. Forecast failures are most likely where the method is known to be
+weak:
 lesions that touch the border of the crop, where growth is censored
 (\S\ref{sec:experiments:folds}); fast progressors, whose growth is
 under-predicted (\S\ref{sec:experiments:qualitative}); and eyes with
@@ -320,24 +327,24 @@ Table~\ref{tab:experiments:arms} (\S\ref{sec:experiments:main-results}).
 Every area in mm$^2$ rests on a pixel spacing that is treated as constant
 across the cohort. It was checked only against the cohort's own
 transform files, to about 2\,\%, and not against the original DICOM
-spacing fields. The GA reference was most likely annotated on fundus
-autofluorescence and registered onto the OCT grid, as described
-by~\citet{Mai2024} for this cohort; the provenance of the layer
-segmentation and the anatomical names of the ten boundaries are not
-recorded. The reference masks also shrink between visits. The total
+spacing fields. The GA reference was annotated on fundus
+autofluorescence and registered onto the OCT grid (\S\ref{sec:data:dataset}).
+
+The reference masks also shrink between visits. The total
 lesion area decreases in 5\,\% of the 478 pairs of consecutive visits, by a
 median of 2.6\,\%, but almost every pair (96\,\%) loses some atrophic
 pixels along the border, a median of 2.2\,\% of the lesion. This pattern is
 more consistent with annotation and registration noise at the boundary
-than with regression, although the masks alone cannot separate the two. It
-is one reason why no monotonic-growth constraint was imposed.
+than with regression of the atrophy, although the masks alone cannot
+separate the two. The observed shrinkage is one reason why no
+monotonic-growth constraint was imposed.
 % Computed 2026-10-01 from data/MUW_GA/scans/*/*/mask_oct.png (native grid;
 % the 49 x 1024 crop gives 5.4 % / 96 % / 2.1 %): 478 pairs, 75 eyes; net
 % decrease in 24 pairs (15 eyes), max -14 %; local loss > 5 % of the lesion
 % in 21 %, > 10 % in 5 % of pairs; lost / gained area over all pairs 22 %.
 
 The evaluation has limits of its own. The one-year anchor is the first
-rollout step at or beyond 360 days and
+visit at or after about one year, and its time
 has no upper bound, so a few eyes are scored later, where more change has
 accumulated. The change-region Dice was logged only as a cohort mean per
 run, so the eye counts use the growth-region Dice instead
@@ -354,9 +361,11 @@ cannot localise anything. The pipeline starts from segmented masks, so
 it neither benefits from nor accounts for the information in the raw OCT
 volume.
 
-Physics-informed neural networks
+Two directions lie outside the survey. Physics-informed neural networks
 were deliberately not run, because the governing equation is unknown and
-the residual would have to be taken on a binary mask. All operators work on the uniform $49 \times 1024$ grid. Adapting the mesh
+the equation residual would have to be taken on a binary mask. The second
+is mesh adaptation: all operators work on the uniform $49 \times 1024$
+grid. Adapting the mesh
 to the lesion, so that grid points concentrate where the front moves, might
 help, but it excludes the operators that need a regular grid, such as the
 U-Net and the FNO. A moving-mesh extension of the graph network was tested
@@ -395,9 +404,9 @@ speed that the binary state predicts less well
 \paragraph{Trajectory memory.}
 Giving the operator several past visits, or a recurrent state carried
 along the rollout, would let it use the eye's own growth history. This
-addresses the growth-speed gap of \S\ref{sec:discussion:clinical}
+would address the growth-speed gap of \S\ref{sec:discussion:clinical}
 directly. It is also the setting in which sequence models such as
-recurrent networks and transformers apply.
+recurrent networks and transformers become applicable.
 
 \paragraph{An eye-level descriptor.}
 A learned descriptor could take the place of the missing equation
@@ -410,10 +419,11 @@ condition locally.
 
 \paragraph{A valid transport model.}
 The transport term is established, but the velocity field of the T-FEN
-is not interpreted in this thesis. A velocity parameterisation that is
-bounded by construction, starting from the energy-conserving form, would
-give a model that stays numerically valid over multi-year horizons and
-whose velocity field could be read as a direction and speed of growth.
+is not interpreted in this thesis. A next step is a velocity
+parameterisation that is bounded by construction and builds on the
+energy-conserving form. A model with such a parameterisation would stay
+numerically valid over multi-year horizons, and its velocity field could
+be read as a direction and speed of growth.
 
 \paragraph{From raw OCT, in 3-D.}
 One way to address the gap to \citet{Mai2024} is to learn from the raw

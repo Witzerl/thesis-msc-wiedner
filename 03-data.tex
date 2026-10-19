@@ -73,9 +73,9 @@ the OCT, which yields the en-face annotation on the OCT grid.
 Figure~\ref{fig:data:example-state} shows one visit as the SLO fundus
 image with the OCT field of view, the GA mask on the modelling grid and a
 layer-boundary depth map.
-% TODO: the FAF origin of the mask is inferred from Mai et al. (2024)
-% and the IoU check; confirm with the MUW data provider together with
-% the device model and the layer-segmentation provenance.
+% FAF origin of the mask confirmed by the supervisor (review 2, 2026-10-17,
+% SV-6.7: "it was"). Layer segmentation: Iowa Reference Algorithms (3.2).
+% TODO: confirm the device model (Spectralis) with the MUW data provider.
 
 The native en-face grids do not all have the same size. The 553 visits have 67
 distinct grid shapes, with 38 to 66 rows and 961 to 1719 columns. The
@@ -158,10 +158,25 @@ maps, ordered from the most superficial boundary to the deepest. They
 supply structural context and serve as auxiliary prediction targets.
 The layer boundaries were segmented with the Iowa Reference Algorithms
 (Retinal Image Analysis Lab, Iowa Institute for Biomedical Imaging, Iowa
-City, IA) \citep{Li2006,Garvin2009,Abramoff2010}.
-% TODO (supervisor review 1, SV-3.4): the Iowa software segments eleven
-% surfaces, the data hold ten boundary maps; ask the supervisor which ten
-% (and their names).
+City, IA) \citep{Li2006,Garvin2009,Abramoff2010}. Of the eleven surfaces
+the software segments, the data hold ten. From the most superficial to the
+deepest, they are the inner limiting membrane (ILM), the boundaries
+between the retinal nerve fibre and ganglion cell layers, between the
+ganglion cell and inner plexiform layers, between the inner plexiform and
+inner nuclear layers, between the inner nuclear and outer plexiform layers
+and between the outer plexiform and Henle's fibre layers, the junction of
+the photoreceptor inner and outer segments, the inner boundary of the
+outer photoreceptor layer, and the inner and outer boundaries of the
+retinal pigment epithelium (RPE).
+% Source: supervisor e-mail, review 2 (2026-10-17, E5): 001 ILM, 002 RNFL-GCL,
+% 003 GCL-IPL, 004 IPL-INL, 005 INL-OPL, 006 OPL-HFL, 008 IS/OS junction,
+% 009 inner boundary of the OPR, 010 inner boundary of the RPE, 011 outer
+% boundary of the RPE; surface 007 is not in the data. Checked 2026-10-19
+% against the data: in all 553 visits the mean depth of channels 1-10
+% increases strictly (143.7, 155.9, 162.9, 169.9, 177.1, 183.1, 203.9, 204.8,
+% 207.9, 213.6 axial px); the largest gap (20.8 px) lies between channels 6
+% and 7, consistent with the outer nuclear layer between OPL-HFL and IS/OS.
+% Answers SV-3.4 (review 1).
 
 The tensor is assembled per visit from the two required files. The
 stored mask, which has the values 0 and 255, is thresholded above 127.

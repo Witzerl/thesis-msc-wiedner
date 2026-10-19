@@ -204,7 +204,7 @@ wrong / to change". The author asked for no shortening yet; cuts wait for a late
   (§2.1.4 opening), "what the thesis receives" stated after the projection sentence, and the
   last paragraph of §2.1.3 opens with the two pieces of information used. "graph-neural-network
   architectures" -> "models".
-- [ ] ⚠️ FACT CHECK (2026-09-25, Mai et al. 2024, PMC11000109): in the Mai study of the MUW
+- [x] (2026-10-19: confirmed by the supervisor, review 2 SV-6.7) ⚠️ FACT CHECK (2026-09-25, Mai et al. 2024, PMC11000109): in the Mai study of the MUW
   cohort the GA reference was annotated **on FAF** by certified Vienna Reading Center readers
   ("well-demarcated areas with a significantly decreased or extinguished degree of
   autofluorescence"), then registered automatically to the near-infrared image aligned with
@@ -1829,6 +1829,12 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
   (57-142 / 11 / 119 µm); why more reach stops helping (author TODO) now in 6.1.2; regulariser placed as an earlier
   attempt (S20). The capacity and equation-feature paragraphs are unchanged (SV-6.3) apart from "growth-speed gap".
   AI 6-7.1-6-7.12, 6-7.20, 6-7.22-6-7.24 done; 6-7.19/6-7.21 dropped. Numbers from Table 5.1, §5.3, §5.5 (unchanged).
+- [x] 2026-10-19 **§6.2-§6.4** (SV-6.7, E5, author sign-off): §6.2 explanations of the growth-speed gap as one list
+  ("none of them was tested"; my earlier wording implied the first four were tested), clinical paragraph reworded,
+  "one-year anchor" defined in place, grader scale reworded, "Forecast failures"; §6.3 FAF annotation stated as fact
+  (§3.1 TODO closed, device-model TODO kept), layer-provenance/name clause removed (names now in §3.2), shrinkage as its
+  own paragraph, anchor time "about one year" (consistent with §3.6/§5.1.2), PINN/mesh paragraph with a bridge; §6.4
+  trajectory memory and transport model reworded. AI 6-7.26-6-7.43 done. Run-in headings of §6.4 kept (author 2026-10-02).
 - [ ] **Reply mail (2026-10-20): ask the supervisor about SV-5.12** -- is the post-hoc step-size ladder (trained
   networks re-evaluated with fixed steps h = 1 ... 1/32 year, no retraining; three networks, folds 0-2) what he
   meant, or did he want networks trained at different step sizes?
@@ -1853,12 +1859,12 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
   over"); compare the MM-PDE paper's style; one table or plot per results subsection, small table
   excerpts next to each ablation; boxplots/scatterplots. The **guidelines book** he says he sent is not
   in the repo or Downloads: locate it or ask.
-- [ ] **Layer boundaries (answers review-1 SV-3.4):** 001 ILM, 002 RNFL-GCL, 003 GCL-IPL, 004 IPL-INL,
+- [x] (2026-10-19: in §3.2 with the ten names; mean depth strictly increasing over channels 1-10 in all 553 visits) **Layer boundaries (answers review-1 SV-3.4):** 001 ILM, 002 RNFL-GCL, 003 GCL-IPL, 004 IPL-INL,
   005 INL-OPL, 006 OPL-HFL, 008 IS/OS junction, 009 inner boundary of the OPR, 010 inner boundary of the
   RPE, 011 outer boundary of the RPE (surface 007 of the Iowa set is not in the data). Write into §3.2 and
   §6.3 and close the "names of the ten boundaries" TODOs; confirm first that channels 1-10 follow this
   order.
-- [ ] **FAF annotation confirmed** (SV-6.7, "most likely annotated" -> "it was"): remove the hedge in §6.3
+- [x] (2026-10-19: §6.3 hedge removed, §3.1 TODO closed) **FAF annotation confirmed** (SV-6.7, "most likely annotated" -> "it was"): remove the hedge in §6.3
   and the "inferred from Mai et al." TODO in §3.1; this is the supervisor confirmation that the FACT
   CHECK item of 2026-09-25 was waiting for.
 - [ ] Decisions to take with the author (or ask the supervisor): SV-4.2 MM-PDE into the main text as a
