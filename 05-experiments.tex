@@ -67,8 +67,13 @@ computed and logged, but no RMSE value is used as evidence in this chapter.
 \subsection{Metrics}
 \label{sec:experiments:protocol:metrics}
 
-The headline metric is the change-region Dice at the one-year anchor. All
-predicted and ground-truth masks are binarised at the physical threshold of
+The headline metric is the change-region Dice at the one-year anchor: the
+first visit of the rollout whose time since baseline reaches about one year
+(\S\ref{sec:data:temporal}, \S\ref{sec:experiments:protocol:rollout}).
+% 2026-10-19 (SV-6.4, author): "anchor" kept; defined at its first use in
+% Chapter 5 instead of renamed. In the version the supervisor read (2026-10-02)
+% the term was used in 3.3 and 6.1 without a definition.
+All predicted and ground-truth masks are binarised at the physical threshold of
 0.5, which is mapped into normalised space in the same way as in the loss. Let $b$
 be the thresholded mask at the baseline visit (the first visit of the
 rollout), $p$ the thresholded prediction at the anchor and $y$ the
