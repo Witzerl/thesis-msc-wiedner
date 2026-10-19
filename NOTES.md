@@ -1417,6 +1417,10 @@ worked through one item at a time.
   2026-10-17: Fig. 4.2 (`fig:method:stencils`) restored (redrawn); Fig. A.1
   (`fig:appendix:cohort`) restored unchanged (author: fine); 12 left. Fig. A.2 (crop) and
   Fig. 5.3 (reach) need more work and discussion (author).
+  2026-10-19: Fig. G.1 (`fig:appendix:moved-mesh`) restored unchanged (author: fine; caption
+  checked against the PNG of 2026-10-01). Still disabled (8): reach, horizon, capacity, swap,
+  T-FEN stability, growth rate (author: later; only the in-plot text needs moving to the
+  caption), App. A crop, App. D rollouts.
 - [x] #1 title page keywords: MP-PDE, MM-PDE and moving mesh removed, U-Net added
   (2026-10-02). Now: Geographic Atrophy, OCT, neural PDE solvers, graph neural networks, U-Net,
   medical imaging, longitudinal prediction.
