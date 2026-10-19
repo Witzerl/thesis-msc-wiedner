@@ -904,7 +904,7 @@ Being worked through one item at a time.
      |t| ≳ 2.7 — fixed after the fact, say so; both robust to leaving out a fold) and the
      fellow-eye caveat (75 eyes from 51 patients, t optimistic) go to the appendix.
   Keep "mean ± sd" over the five folds in tables (author: understandable).
-- [ ] TODO (from #17): §5.7 must state the cost convention (min epoch time over folds, why
+- [x] (2026-10-19: stated in §5.8, first paragraph) TODO (from #17): §5.7 must state the cost convention (min epoch time over folds, why
   not the mean, 280–320 steps per epoch) — Table 5.1's caption points to §5.7.
 - [ ] TODO (from #13): §6.4 — a learned summary of the retinal structure as a θ_PDE stand-in;
   first version (layer encoder) tried only at four widths on one backbone, null (inline TODO).
@@ -1806,6 +1806,13 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
   2026-10-19). Horizon table narrowed (footnotesize, "Stencil GNN"). §6.2: comparison updated; three untested
   explanations added (not trained on the rate; cautious predictions, 35/48 eyes at 0.73, fastest at 0.50; no image
   intensity in the inputs); the failure-case TODO replaced by pointers to §5.4 and §5.7. AI S12/T12, 5d.22-5d.34 done.
+- [x] 2026-10-19 **§5.8 Computational Cost, Chapter 5 opener, new §5.9 Summary** (author sign-off): §5.8 opens with
+  its purpose and the cost convention (scope: inference time and memory not measured), the FENs are no longer called
+  single-step, the ratio paragraph explains why the wrapper ratio depends on the operator, the conclusion says the
+  T-FEN's lead over the stencil is not established; Chapter 5 opener with a section map that names the framework tests
+  of §5.5 (AI T5); new §5.9 "Summary" (`sec:experiments:summary`) so the chapter ends on its answer (AI T6).
+  AI 5d.36-5d.45 done. Chapter 5 worklist done except §5.4 (fold section, written 2026-10-18, not in either review)
+  and the open author items (z-test re-read, ladder placement, SV-4.2).
 - [ ] Qualitative material without a section (2026-10-19): per-eye rollouts are Fig. 5.2 and Appendix D (figure
   disabled); sparse schedules and short vs long Delta t were never analysed (old §5.7 plan). Decide whether Appendix D
   needs a short text on typical and difficult eyes when its figure is restored.

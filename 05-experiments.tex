@@ -15,7 +15,19 @@
 This chapter answers the second part of the research question: what kind
 of operator the framework of Chapter~\ref{ch:method} needs. The operators
 of~\S\ref{sec:method:family} are run through the same slot under identical
-conditions.
+conditions. Section~\ref{sec:experiments:protocol} defines the evaluation,
+\S\ref{sec:experiments:main-results} compares all operators, and
+\S\ref{sec:experiments:ingredients} isolates the properties that separate
+them. Section~\ref{sec:experiments:folds} examines how the folds differ.
+Section~\ref{sec:experiments:ablations} tests settings of the framework itself,
+namely the time handling, the objective and the size of the operators, and
+so also adds evidence on the first part of the question.
+Section~\ref{sec:experiments:validity} checks which statements about the
+operators are licensed, \S\ref{sec:experiments:qualitative} compares the
+results with prior work, and \S\ref{sec:experiments:cost} reports the cost.
+Section~\ref{sec:experiments:summary} summarises the chapter.
+% 2026-10-19 (AI T5, E1, author): section map added; the framework tests of
+% 5.5 named.
 
 \section{Evaluation Protocol}
 \label{sec:experiments:protocol}
@@ -2052,48 +2064,76 @@ in~\S\ref{sec:discussion:clinical}.
 \section{Computational Cost}
 \label{sec:experiments:cost}
 
-The cost of an arm is reported as its minimum epoch time over the five
-folds. The mean is not used. The epoch times of a run carry a nearly
-constant additive overhead of 17 to 64~s, which would penalise cheap
-operators far more than expensive ones. The spread between folds has two
-measured causes. The first is this overhead. The second is that the work
-per epoch differs between folds: an epoch is twenty passes over the
-fold's training eyes in batches of four, which gives 280, 320, 300, 300
-and 320 optimiser steps for folds 0 to 4. Normalised by the number of
-steps, the minimum epoch times of the five folds agree to about 3\,\%. All
-runs used
-one NVIDIA RTX A6000 GPU and 30 epochs. The cost figures support
-order-of-magnitude statements only.
+This section compares the training cost of the arms. Cost is reported as
+the minimum epoch time over the five folds, not as the mean. The epoch
+times of a run carry a nearly constant additive overhead of 17 to 64~s,
+which would penalise cheap operators far more than expensive ones. The
+epoch times also differ between folds because the work per epoch differs:
+an epoch is twenty passes over the fold's training eyes in batches of four,
+which gives 280, 320, 300, 300 and 320 optimiser steps for folds 0 to 4.
+Normalised by the number of steps, the minimum epoch times of the five
+folds agree to about 3\,\%. All runs used one NVIDIA RTX A6000 GPU and 30
+epochs. Inference time per rollout step and memory footprint were not
+measured. The figures support order-of-magnitude statements only.
 
-Within this precision, the U-Net is the cheapest spatial operator at 21~s per
-epoch, about $0.23\times$ the 91~s of the canonical dilated-stencil graph
-network. The FNO takes 23~s and the FNO with a $3 \times 3$ local path
-29~s. The graph networks on the index-space graph take 76~s ($k = 12$)
-and 108~s ($k = 20$), and the one-hop floor 37~s. The Finite Element
-Networks are the most expensive single-step family: 180~s for the
-free-form network and 367~s for the T-FEN
+Within this precision, the U-Net is the cheapest spatial operator, at 21~s
+per epoch, about $0.23\times$ the 91~s of the canonical dilated-stencil
+graph network. The FNO takes 23~s and the FNO with a $3 \times 3$ local path
+29~s. The graph networks on the index-space graph take 76~s ($k = 12$) and
+108~s ($k = 20$), and the one-hop floor 37~s. The most expensive arms are
+those that integrate their operator over several sub-steps: the free-form
+FEN at 180~s and the T-FEN at 367~s, both with RK4 in 45-day steps, and the
+dilated-stencil network inside the Runge--Kutta wrapper at 439~s
 (Table~\ref{tab:experiments:arms}).
 
-Three ratios do not depend on the fine details of the timing. The
-Runge--Kutta wrapper evaluates the operator four times per step. Over the
-dilated-stencil network, where the forward pass of the operator dominates
-the epoch, it raises the epoch time from 91 to 439~s, about $4.8\times$.
-Over the FNO, whose forward pass is cheap, it raises it only from 23 to
-45~s, about $2\times$, because the fixed part of the epoch weighs more.
-The T-FEN costs about $4\times$ the dilated-stencil network. The
-dual-branch moving-mesh extension costs about $10\times$ its
+How much such an integration adds depends on how much of an epoch the
+operator itself takes. The Runge--Kutta wrapper evaluates the operator four
+times per step. Over the dilated-stencil network, whose forward pass
+dominates the epoch, the wrapper raises the epoch time from 91 to 439~s,
+about $4.8\times$. Over the FNO, whose forward pass is cheap, the epoch time
+rises only from 23 to 45~s, about $2\times$, because the fixed part of the
+epoch weighs more. The T-FEN costs about $4\times$ the dilated-stencil
+network, and the dual-branch moving-mesh extension about $10\times$ its
 single-branch counterpart (Appendix~\ref{app:mm-pde}).
 
-Set against the results of this chapter, most of the extra cost bought
-nothing measurable. The Runge--Kutta wrappers are nulls against their
+Set against the results of this chapter, most of the extra cost brings no
+measurable gain. The Runge--Kutta wrappers are nulls against their
 single-step counterparts (\S\ref{sec:experiments:ablations:time}), wider
 operators did not improve on their original sizes
-(\S\ref{sec:experiments:ablations:capacity}), and the dual branch is a
-null (Appendix~\ref{app:mm-pde}). The T-FEN is the one expensive arm with
-an established effect, its transport term, but at the anchor it ties the
-dilated-stencil network, which reaches the same level at about a quarter
-of the cost. Inference time per rollout step and memory footprint were
-not measured.
+(\S\ref{sec:experiments:ablations:capacity}), and the dual branch is a null
+(Appendix~\ref{app:mm-pde}). The T-FEN is the only expensive arm with an
+established effect, its transport term. Its lead over the dilated-stencil
+network at the anchor is not established
+(\S\ref{sec:experiments:main-results}), however, and that network reaches
+about the same level at about a quarter of the cost.
+% 2026-10-19 (AI 5d.36-5d.45): purpose first; "single-step" for the FENs
+% removed (RK4 in 45-day sub-steps); the ratios no longer called
+% independent of the timing; the scope statement moved to the definition.
+
+\section{Summary}
+\label{sec:experiments:summary}
+
+This chapter answered the second part of the research question. Inside
+the fixed framework, operators of three different classes reach similar
+scores at the one-year anchor, and every point of change-region Dice comes
+from spatial context (\S\ref{sec:experiments:main-results}). What
+separates the operators is how far they reach in one step: placing the
+neighbours of the graph network at lesion scale and adding an explicit
+transport term each raise the score by 0.06 to 0.07 against their own
+controls, and the two arms built in these ways are the two highest
+(\S\ref{sec:experiments:ingredients}). Of the framework's own settings,
+the objective matters: it must emphasise the mask. The time handling, the
+integration scheme and the size of the operators do not change the result
+(\S\ref{sec:experiments:ablations}). The energy-conserving T-FEN can be
+read as a continuous-time model, the canonical network cannot, and this
+property does not decide the accuracy
+(\S\ref{sec:experiments:validity}). Against prior work, the canonical
+model forecasts where the lesion grows within the range of other models,
+but agrees less well on how fast (\S\ref{sec:experiments:qualitative}).
+Chapter~\ref{ch:discussion} interprets these results.
+% 2026-10-19 (AI T6, author): chapter summary added so that the chapter
+% ends on its answer rather than on the cost.
+
 
 
 %%
