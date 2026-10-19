@@ -1328,8 +1328,10 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
 - [ ] 2026-10-19 (author): **§2.1.2 `fig:bg:ga-faf`** -- what GA looks like on a real eye, from the
   MUW FAF images (`data/MUW_GA/scans/<eye>/<day>/faf_global.png`). Placeholder + spec in
   02-background.tex after the FAF paragraph; referenced there and in the §2.1.3 opener. (a) baseline,
-  (b) same eye ~3 years later, grey, common window, dashed OCT field of view, scale bar, no mask
-  overlay. Before drawing: check that `faf_global.png` shares the frame of `slo_global.png` /
+  (b) same eye ~3 years later, grey, each image stretched on its own (1st-99th percentile; a
+  common window would mislead, since FAF brightness differs per acquisition: median grey 82 vs 110
+  in the scratch candidate), caption says brightness is not comparable between panels, dashed OCT
+  field of view, scale bar, no mask overlay. Before drawing: check that `faf_global.png` shares the frame of `slo_global.png` /
   `mask_global.png`; fix an eye rule in the script (lesion inside the window, median growth,
   follow-up >= 3 y; scratch candidate GX511402_OS days 0 / 1080), author confirms the eye; then fill
   the caption's interval and describe only what that eye shows. Script

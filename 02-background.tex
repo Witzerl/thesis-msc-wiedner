@@ -215,8 +215,12 @@ and FAF has become the gold standard for detecting and measuring GA area
 % Source: masterthesis-docker/data/MUW_GA/scans/<eye>/<day>/faf_global.png
 % (1536 x 1536, greyscale), read-only.
 % (a) FAF of one eye at baseline, (b) FAF of the same eye at a later visit
-% about three years on, shown unchanged in grey (no colour map, no
-% contrast stretch beyond a common window for both panels), same crop.
+% about three years on, in grey (no colour map), same crop. Each image is
+% scaled on its own: its 1st-99th percentile of grey values is stretched
+% to the full grey range. A common window would mislead: FAF brightness is
+% in arbitrary units per acquisition, and the stored PNGs differ (scratch
+% check GX511402_OS: median grey 82 at day 0 vs 110 at day 1080,
+% 99th percentile 160 vs 226).
 % Dashed rectangle = OCT field of view from slo.transform.json
 % (transform_oct_fov); check first that faf_global.png is in the frame of
 % slo_global.png / mask_global.png. Scale bar derived from that window.
@@ -241,7 +245,8 @@ and FAF has become the gold standard for detecting and measuring GA area
     [interval] later. The lesion is the dark area: where the RPE has
     been lost, there is no autofluorescence. Over the interval the lesion
     has grown. The dashed rectangle marks the OCT field of view, about
-    $6 \times 6$\,mm.}
+    $6 \times 6$\,mm. Each image was contrast-stretched on its own, so
+    brightness cannot be compared between the two panels.}
   % TODO: once the eye is fixed, describe what the two panels show
   % (e.g. growth at the margin, merging of satellite patches) only as far
   % as it is visible in that eye.
