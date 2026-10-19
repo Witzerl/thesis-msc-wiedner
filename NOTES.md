@@ -1654,7 +1654,7 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
     2.5.2 notation), §4.3 opener + §4.3.1, §4.3.2 (SV-4.5 forward references, SV-4.6 headings) and §4.3.3
     (SV-4.7 distances named, index-space k = 12 neighbourhood = geodesic ball of radius 2; SV-4.8 dilated
     convolutions cited; X4 micrometres) done, with the AI items of these sections.
-- [ ] **Ledger batch to check (Phase 4), from the 2026-10-17 wording pass:** NEW Yu2016 (C125) and Li2019
+- [ ] (2026-10-19: add Courant1928 C137, §4.3.6, "in the sense of the stability condition of", previous verdict PARTLY) **Ledger batch to check (Phase 4), from the 2026-10-17 wording pass:** NEW Yu2016 (C125) and Li2019
   (C126) in §4.3.3, Liu2018 (C116, sentence moved); CHANGED Brandstetter2022 C123 (§4.3.2) and C149 (§5.4.1),
   Ott2021 C114 (§4.2.1), Ioffe2015 C115 (§4.3.1). Also CHANGED by the author's uncommitted §1.1 edit: Lad2023
   C017, EMA2024Syfovre/Izelvay C019, Trincao2024 C016 (NEW). PDFs of Yu2016 / Li2019 filed in `pdfs/Methods/`
@@ -1835,6 +1835,14 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
   (§3.1 TODO closed, device-model TODO kept), layer-provenance/name clause removed (names now in §3.2), shrinkage as its
   own paragraph, anchor time "about one year" (consistent with §3.6/§5.1.2), PINN/mesh paragraph with a bridge; §6.4
   trajectory memory and transport model reworded. AI 6-7.26-6-7.43 done. Run-in headings of §6.4 kept (author 2026-10-02).
+- [x] 2026-10-19 **Chapter 7 rewritten in place** (SV-7.1-SV-7.5, author sign-off): "requires", "equally", "implements these
+  requirements"; no participle opener, no "is not what decides", no "What separates ... are", no slogan sentence, no closing
+  "what matters is ... rather than"; bullets name their subject and use "scores"; the Runge-Kutta null stated once; the
+  reach/transport interpretation directly after the list; the limits moved into the last paragraph; the growth-speed
+  comparison now against 0.52-0.61 (§5.7). Numbers unchanged. AI 6-7.44-6-7.56 done. Ledger: Mai2024 C180 (new) and
+  Courant1928 C175 (§6.1.2, reworded) checked by hand, quote PASS / scan as before; the §6.3 Mai citation was removed
+  with the FAF hedge. **Chapters 4-7 worklist: every supervisor item done or decided, except SV-4.2 (author TODO) and
+  SV-5.12 (question to the supervisor).**
 - [ ] **Reply mail (2026-10-20): ask the supervisor about SV-5.12** -- is the post-hoc step-size ladder (trained
   networks re-evaluated with fixed steps h = 1 ... 1/32 year, no retraining; three networks, folds 0-2) what he
   meant, or did he want networks trained at different step sizes?
