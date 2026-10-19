@@ -854,7 +854,7 @@ Being worked through one item at a time.
     pooled values are.
 - [x] (done 2026-10-01: all three arms above Mai in every bin by 0.2-0.3; stated as not head-to-head) TODO (from #20): §5.5.1 — compare growth-region Dice per horizon bin with Mai Table 2
   (inline TODO); optional appendix table of r/AUC for all arms.
-- [ ] TODO (from #20): §6.2 — "good at where, weaker at how fast" (inline TODO).
+- [x] (2026-10-19: §6.2 states it, now with the §5.7 comparison and three untested explanations) TODO (from #20): §6.2 — "good at where, weaker at how fast" (inline TODO).
 - [x] (checked 2026-10-01: Ch. 5-7 all defined; border-touching definition added to §5.1.2) TODO (from #20, author 2026-10-01): **every metric mentioned anywhere must have a plain
   description** of what it measures — check Chapters 5–6 for metrics used without one.
 - [x] #22 §5.1.3 "Runs are compared only when … same version of the pipeline" removed
@@ -1794,6 +1794,21 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
   Euler solid / RK4 dotted, log step axis) before restoring it.
 - [ ] **TODO (author, 2026-10-19): review the placement of the step-size ladder explicitly** -- now in §5.6.1
   (Table 5.4 summary + Appendix E full table), with one pointer sentence in §5.5.1 (inline TODOs in both).
+- [x] 2026-10-19 **§5.7 "Comparison with Prior Work"** (author sign-off; heading was "Qualitative Analysis and
+  Clinical Comparison" with one subsection, no paper name in the heading): intro, the Mai et al. differences in one
+  paragraph (32 months = about 2.7 years, SV-5.17; growth rate from the respective follow-up vs from the last visit),
+  growth-region Dice by horizon now also against Gigon2021 Table 2 (same bins, RORA, en-face thickness + reflectivity
+  input: 0.46 / 0.57 / 0.59 / 0.65 / 0.72) and Salvi2025 (test Dice 0.70; two input visits, lesions 2.54-17.78 mm2,
+  median 9.03, growth from the 6-month lesion), growth speed also against Gigon2021 (r 0.52) and Yoshida2025 (r2
+  0.33-0.35, r about 0.57-0.59; trained on the rate, 1219 eyes, FAF slope in mm2/yr), conclusion: in range on where,
+  below every comparable model on how fast (0.40 vs 0.52-0.61). Every claim checked against the local text; 19 new
+  or re-checked ledger entries by hand, all quotes PASS in verify_quotes.py (literature/_scratch/final, manual pass
+  2026-10-19). Horizon table narrowed (footnotesize, "Stencil GNN"). §6.2: comparison updated; three untested
+  explanations added (not trained on the rate; cautious predictions, 35/48 eyes at 0.73, fastest at 0.50; no image
+  intensity in the inputs); the failure-case TODO replaced by pointers to §5.4 and §5.7. AI S12/T12, 5d.22-5d.34 done.
+- [ ] Qualitative material without a section (2026-10-19): per-eye rollouts are Fig. 5.2 and Appendix D (figure
+  disabled); sparse schedules and short vs long Delta t were never analysed (old §5.7 plan). Decide whether Appendix D
+  needs a short text on typical and difficult eyes when its figure is restored.
 - [ ] **Reply mail (2026-10-20): ask the supervisor about SV-5.12** -- is the post-hoc step-size ladder (trained
   networks re-evaluated with fixed steps h = 1 ... 1/32 year, no retraining; three networks, folds 0-2) what he
   meant, or did he want networks trained at different step sizes?
@@ -2616,7 +2631,7 @@ GNN, FNO and FEN have never been run at another size.
 - [x] (table drafted 2026-09-27; rollout figure tracked separately) TODO: 5.3 Main results table + rollout figure.
 - [x] (drafted 2026-09-28, rewritten 2026-10-01) TODO: 5.4 Ablations sweep.
 - [x] (moved to Appendix G.3 2026-09-27) TODO: 5.5 Moving mesh quality.
-- [ ] TODO: 5.6 Qualitative analysis (success + failure modes).
+- [x] (2026-10-19, author: section dropped; §5.7 is now "Comparison with Prior Work"; see the 2026-10-19 entry) TODO: 5.6 Qualitative analysis (success + failure modes).
 - [x] (written as §5.6 in ce6bf3e) TODO: 5.7 Computational cost.
 
 ### Chapter 6 - Discussion (`06-discussion.tex`)

@@ -1829,21 +1829,101 @@ without changing the Dice (\S\ref{sec:experiments:validity:swap}).
 % of 2.8) was removed 2026-10-01: its step-size reading is superseded by the
 % diagnosis in section 9.19.
 
-\section{Qualitative Analysis and Clinical Comparison}
+\section{Comparison with Prior Work}
 \label{sec:experiments:qualitative}
-
-% TODO: per-eye rollouts, success cases and failure modes (atypical
-% progression, sparse schedules, short vs long Delta t, border-censored
-% lesions).
-
-\subsection{Comparison with Mai et al. (2024)}
 \label{sec:experiments:qualitative:mai}
+% 2026-10-19 (author): heading was "Qualitative Analysis and Clinical
+% Comparison" with one subsection "Comparison with Mai et al. (2024)"; both
+% labels kept here. The qualitative material lives in Figure 5.2, Section 5.4
+% and Appendix D; the former TODO (per-eye rollouts, success and failure
+% cases) is tracked in NOTES.md. AI S12/T12, 5d.22-5d.34; SV-5.17.
 
-\citet{Mai2024} predict GA growth on a larger MUW cohort from a single
-baseline OCT volume, with a Neural ODE integrated by RK4. Besides Dice
-scores, their evaluation uses two eye-level measures of growth speed,
-which the Dice scores do not capture. Both are computed here following the
-definitions of \citet{Mai2024}, as far as these are specified.
+No study reports results for the exact task and data of this thesis, but
+several report comparable measures. The closest is the study
+of~\citet{Mai2024}, who predict GA growth from a single baseline OCT
+volume, with a Neural ODE integrated by RK4, on the MUW cohort from which
+the data of this thesis are drawn. Three further studies report values on
+related tasks (\S\ref{sec:background:related-work:spatial}). This section
+compares the canonical model with them on the two kinds of measure they
+use: the growth-region Dice by time since baseline, which scores where the
+lesion grows, and eye-level measures of growth speed, which the Dice does
+not capture.
+
+The values give an orientation, not a head-to-head result. The study
+of~\citet{Mai2024} differs from this thesis in several respects. It
+evaluates 184 eyes of 100 patients with a mean follow-up of 32 months,
+about 2.7 years; this thesis uses 75 eyes of 51 patients with a mean
+follow-up of 3.3 years. Their model starts from the raw OCT volume, the
+models here from segmented masks and layer depths. Their paper reports no
+cropping, whereas the areas here are measured inside the
+$49 \times 1024$ crop, which censors growth at its border
+(\S\ref{sec:data:spatial}). The two studies also evaluate different sets of
+follow-up visits. The measures below follow their definitions as far as
+these are specified. One difference remains: their paper computes the
+growth rate from the baseline and the respective follow-up area, whereas
+here one rate per eye is computed from the baseline and the last visit. The
+other studies differ further, as stated with each comparison.
+
+\citet{Mai2024} report the growth-region Dice by time since baseline: the
+Dice of the newly atrophic region, follow-up lesion minus baseline lesion,
+averaged over the follow-up visits in each bin. The same quantity is
+computed here for the dilated-stencil network, the U-Net and the T-FEN,
+averaged over the follow-up visits of the rollouts and the late epochs
+(Table~\ref{tab:experiments:mai-bins}). All three lie above the values
+of~\citet{Mai2024} in every bin, by 0.18 to 0.29. \citet{Gigon2021}
+predicted the progression of RORA from OCT en-face maps of layer
+thicknesses and reflectivity, an input close to the one used here, and
+report the same quantity in the same bins. Their values, 0.46 in the first
+year rising to 0.72 after four years, lie close to those of the canonical
+network, 0.50 rising to 0.66. \citet{Salvi2025} report a Dice of 0.70 on
+their test set for the one-year region of growth, predicted from fundus
+autofluorescence images. Their setting differs in two ways that favour a
+higher value of this metric. Their best model receives two visits, at
+baseline and after six months, and the lesions of their trial cohort are
+larger, 2.54 to 17.78\,mm$^2$ at inclusion with a median of 9.03\,mm$^2$,
+against a median of 6.7\,mm$^2$ here (\S\ref{sec:data:dataset}); the Dice of
+a growth region rises with its size (\S\ref{sec:experiments:folds}). Their
+region of growth is also measured from the six-month lesion over the
+following year rather than from the baseline.
+% Sources (checked 2026-10-19 against pdfs/GA/*.txt): Gigon2021 p. 7 Table 2
+% (Testing Scenario A, GT-manual, RORA growth 0.46 / 0.57 / 0.59 / 0.65 / 0.72
+% for 0-1 / 1-2 / 2-3 / 3-4 / >4 y), p. 1-2 (13-channel input of en-face
+% thickness and reflectivity maps). Salvi2025 p. 1 (abstract: baseline and
+% 6-month FAF, 1-year ROG = 1.5-year minus 6-month lesion, test Dice 0.70),
+% p. 2 (inclusion 2.54-17.78 mm2), p. 3 (median baseline area 9.03 mm2).
+
+\begin{table}[t]
+  \centering
+  \caption[Growth-region Dice by horizon against prior work.]{%
+    Growth-region Dice (newly atrophic region, follow-up minus baseline) by
+    time since baseline, against Table~2 of \citet{Mai2024} and Table~2
+    of~\citet{Gigon2021}, whose lesion is RORA and whose last two bins are
+    3 to 4 and more than 4 years. Values of this thesis: mean over the
+    follow-up visits in each bin and over the late epochs, pooled over the
+    five folds, seed 42. Number of visits per bin in brackets. The values
+    are a reference, not a head-to-head comparison (see text).}
+  \label{tab:experiments:mai-bins}
+  \footnotesize
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{l c c c c c}
+    \toprule
+    Years & \citet{Mai2024} & \citet{Gigon2021} & Stencil GNN
+      & U-Net & T-FEN \\
+    \midrule
+    0--1      & 0.25 (296) & 0.46 & 0.503 (149) & 0.458 & 0.519 \\
+    1--2      & 0.38 (260) & 0.57 & 0.600 (149) & 0.563 & 0.602 \\
+    2--3      & 0.38 (148) & 0.59 & 0.634 (109) & 0.581 & 0.633 \\
+    $>3$      & 0.37 (79)  & 0.65 / 0.72 & 0.655 (71)  & 0.555 & 0.611 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+% Values: thesis_numbers.py horizon ANISOGNN_final_dilmean UNET_final_w5
+% FEN_final_w96ftp7rk4d45skew, 2026-10-01 (steps per bin 2980 / 2980 / 2180 /
+% 1420 = 20 late epochs x 149 / 149 / 109 / 71 visits; reproduces SOLVER_FINAL_RUNS
+% 9.20). Mai et al.: PMC11000109, Table 2 (n = OCT volumes). Same metric
+% definition (follow-up AND NOT baseline); Mai do not state how empty growth
+% regions are handled, here they are left out. Gigon et al.: Table 2, p. 7
+% (GT-manual, testing scenario A).
 
 The growth rate of an eye is the change of the square root of its lesion
 area per year, $(\sqrt{A_{\text{last}}} - \sqrt{A_{\text{base}}}) / T$,
@@ -1851,15 +1931,15 @@ where $T$ is the time from the baseline visit to the eye's last visit.
 Taking the square root of the area removes the dependence of the growth
 rate on the baseline lesion size \citep{Feuer2013}. The rate is computed
 once from the ground truth and once from the model's rollout, over the
-eye's whole follow-up as in \citet{Mai2024}, not at the one-year anchor.
+eye's whole follow-up as in~\citet{Mai2024}, not at the one-year anchor.
 Two measures compare the two rates over the cohort. The Pearson
 correlation $r$ measures how closely the predicted rates follow a linear
 relation with the true rates across eyes: $r = 1$ is a perfect linear
 relation and $r = 0$ no linear relation. It does not require the two to
 agree in scale. The fast-progressor area under the receiver operating
-characteristic curve (AUC) asks whether the predicted rate separates the
-fastest-growing eyes, the top 10, 15 or 20\,\% of true growth rates, from
-the rest: 0.5 is chance and 1 is perfect separation.
+characteristic curve (AUC) measures how well the predicted rate separates
+the fastest-growing eyes, the top 10, 15 or 20\,\% of true growth rates,
+from the rest; 0.5 is chance and 1 is perfect separation.
 
 Both measures are computed for the canonical model. Each eye's predicted
 rate is averaged over the late epochs, the 75 validation eyes of the five
@@ -1899,15 +1979,20 @@ Table~\ref{tab:experiments:mai} lists the result.
 % the top round(q x 75) true rates): r [0.20, 0.57], AUC [0.53, 0.91],
 % [0.53, 0.85], [0.53, 0.84]; images/scripts/fig_experiments_growth_rate.py.
 
-The canonical model captures growth-speed information
-(Figure~\ref{fig:experiments:growth-rate}): its correlation is
-clearly above zero, whereas the baseline lesion size alone is not
-correlated with the growth rate in this cohort ($r = -0.10$). It is,
-however, weaker than the model of \citet{Mai2024} on both measures. The
-AUCs rest on 8 to 15 positive eyes, and their intervals reach down to
+The correlation of the canonical model is 0.40, and its 95\,\% bootstrap
+interval, 0.20 to 0.57, excludes zero
+(Figure~\ref{fig:experiments:growth-rate}). The baseline lesion size alone
+is not correlated with the growth rate in this cohort ($r = -0.10$). The
+model therefore predicts part of the differences in growth speed between
+eyes, but less of them than the model of~\citet{Mai2024}, on both measures.
+The AUCs rest on 8 to 15 positive eyes, and their intervals reach down to
 values close to chance. The fastest eyes are under-predicted: of the 15
-eyes with the highest true rates, 14 receive a lower predicted rate, about
-half the true rate in the median.
+eyes with the highest true rates, 14 receive a lower predicted rate, with a
+median ratio of predicted to true rate of 0.50. The other operators of the
+survey give similar values ($r$ between 0.30 and 0.47, fast-progressor
+AUCs between 0.66 and 0.78; Table~\ref{tab:appendix:growth-speed}), so the
+weaker agreement on growth speed is shared by every operator in the
+framework.
 % 14/15 under-predicted, median predicted/true 0.50 (27 of the other 60 eyes
 % under-predicted); images/scripts/fig_experiments_growth_rate.py.
 
@@ -1929,64 +2014,39 @@ half the true rate in the median.
     fast-progressor AUC. Dashed: identity. The Pearson correlation is given
     with its 95\,\% bootstrap interval (2000 resamples over eyes).}
   \label{fig:experiments:growth-rate}
-\end{figure} The other arms of the survey do not differ from the
-canonical model on these measures ($r$ between 0.30 and 0.47, fast-progressor
-AUCs between 0.66 and 0.78; Table~\ref{tab:appendix:growth-speed}), so the
-gap belongs to the approach, not to one operator.
+\end{figure}
 
-The comparison is an anchor, not a head-to-head result. \citet{Mai2024}
-evaluate 184 eyes of 100 patients with a mean follow-up of 32 months; this
-thesis uses 75 eyes of 51 patients, with a mean follow-up of 3.3 years.
-\citet{Mai2024} start from the raw OCT volume, whereas this thesis starts
-from segmented masks and layer depths. Their paper reports no cropping of
-the areas, whereas the areas here are measured inside the
-$49 \times 1024$ crop, which censors growth at its border
-(\S\ref{sec:data:spatial}). The two studies also evaluate different
-sets of follow-up visits. The paper defines the growth rate as the
-difference between the square roots of the baseline and the respective
-follow-up area.
+Two further studies report how well predicted and true growth rates agree.
+\citet{Gigon2021} report a correlation of 0.52 over the whole follow-up.
+The four OCT-based models of~\citet{Yoshida2025} reach a squared
+correlation of 0.33 to 0.35 on 442 holdout eyes, an $r$ of about 0.57 to
+0.59. Their models were trained on 1219 eyes to predict the growth rate
+itself, defined as the annual slope of the lesion area in square
+millimetres, fitted over all visits and measured on fundus
+autofluorescence images with a larger field of view than the OCT scan.
+The canonical model, with $r = 0.40$, lies below all three models on growth
+speed.
+% Sources (checked 2026-10-19): Gigon2021 p. 5 ("The correlation coefficient
+% between manual and predicted progression rates calculated over the whole
+% follow-up period was 0.52."); Yoshida2025 p. 5 (holdout r2 0.33, 0.33,
+% 0.35, 0.35), p. 1 and 3 (1219 development and 442 holdout eyes; growth rate
+% = annualised slope of a linear model fitted to all FAF measurements, mm2
+% per year; FAF about 8.7 x 8.7 mm against OCT 6 x 6 mm). r = sqrt(r2).
 
-\citet{Mai2024} also report the growth-region Dice by time since baseline:
-the Dice of the newly atrophic region, follow-up lesion minus baseline
-lesion, averaged over the follow-up visits in each bin. The same quantity
-is computed here for the follow-up visits of the rollouts, averaged over
-the late epochs (Table~\ref{tab:experiments:mai-bins}). All three operators
-lie above the values of \citet{Mai2024} in every bin, by 0.18 to 0.29. This
-gap is not evidence that one approach predicts better. The models of this
-thesis receive the segmented baseline lesion as input, so its outline is
-given exactly, whereas \citet{Mai2024} must first find the lesion in the
-raw OCT volume. The comparison therefore mainly shows how
-much of the spatial forecast the segmented mask already carries; on growth
-speed, where the mask helps less, the model of \citet{Mai2024} is ahead.
-
-\begin{table}[t]
-  \centering
-  \caption[Growth-region Dice by horizon against Mai et al. (2024).]{%
-    Growth-region Dice (newly atrophic region, follow-up minus baseline) by
-    time since baseline, against Table~2 of \citet{Mai2024}. Values of this
-    thesis: mean over the follow-up visits in each bin and over the late
-    epochs, pooled over the five folds, seed 42. Number of visits per bin in
-    brackets. The values are a reference, not a head-to-head comparison
-    (see text).}
-  \label{tab:experiments:mai-bins}
-  \small
-  \begin{tabular}{l c c c c}
-    \toprule
-    Years since baseline & \citet{Mai2024} & Dilated stencil & U-Net & T-FEN \\
-    \midrule
-    0--1      & 0.25 (296) & 0.503 (149) & 0.458 & 0.519 \\
-    1--2      & 0.38 (260) & 0.600 (149) & 0.563 & 0.602 \\
-    2--3      & 0.38 (148) & 0.634 (109) & 0.581 & 0.633 \\
-    $>3$      & 0.37 (79)  & 0.655 (71)  & 0.555 & 0.611 \\
-    \bottomrule
-  \end{tabular}
-\end{table}
-% Values: thesis_numbers.py horizon ANISOGNN_final_dilmean UNET_final_w5
-% FEN_final_w96ftp7rk4d45skew, 2026-10-01 (steps per bin 2980 / 2980 / 2180 /
-% 1420 = 20 late epochs x 149 / 149 / 109 / 71 visits; reproduces SOLVER_FINAL_RUNS
-% 9.20). Mai et al.: PMC11000109, Table 2 (n = OCT volumes). Same metric
-% definition (follow-up AND NOT baseline); Mai do not state how empty growth
-% regions are handled, here they are left out.
+The two kinds of measure point in different directions. On where the
+lesion grows, the canonical model lies within the range of prior work:
+above~\citet{Mai2024} on the same cohort, close to~\citet{Gigon2021}, whose
+input is similar, and below the FAF model of~\citet{Salvi2025}, whose
+setting differs in ways that favour this metric. The higher values
+against~\citet{Mai2024} are not evidence that one approach predicts better.
+The models of this thesis receive the segmented baseline lesion as input,
+so its outline is given exactly, whereas the model of~\citet{Mai2024} first
+has to find the lesion in the raw OCT volume. Together with the
+differences listed above, this means that the comparison mainly shows how
+much of the spatial forecast the segmented mask already carries. On how
+fast the lesion grows, the canonical model lies below every comparable
+model, with $r = 0.40$ against 0.52 to 0.61. Possible reasons are discussed
+in~\S\ref{sec:discussion:clinical}.
 
 
 \section{Computational Cost}

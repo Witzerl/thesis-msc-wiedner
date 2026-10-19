@@ -170,11 +170,12 @@ measures whether a model predicts change where change actually happens. On
 this measure the operators are well above persistence. The speed of
 growth of an individual eye over its whole follow-up is captured less
 well. The correlation between predicted and true growth rates is 0.40 for
-the canonical model, against 0.61 reported by \citet{Mai2024} on the full
-cohort from which the data here are drawn, and the fast-progressor AUCs are 0.70 to 0.74 against 0.77 to
-0.81 (\S\ref{sec:experiments:qualitative:mai}). The other arms do not
-differ from the canonical model on these measures, so the gap belongs to
-the approach rather than to one operator.
+the canonical model, against 0.52 to 0.61 for the comparable models
+of~\S\ref{sec:experiments:qualitative}, and its fast-progressor AUCs are
+0.70 to 0.74 against 0.77 to 0.81 reported by \citet{Mai2024} on the full
+cohort from which the data here are drawn. The other operators of the
+survey give similar values, so the weaker agreement on growth speed is
+shared by every operator in the framework.
 
 The comparison is not like-for-like
 (\S\ref{sec:experiments:qualitative:mai}). It is still notable that a model given the segmented lesion
@@ -188,7 +189,26 @@ baseline. Large, fast-growing lesions are the ones most often cut by the
 crop, which lowers their measured growth. The operators see one visit and
 have no memory of how fast the eye has grown so far. And, as argued in
 \S\ref{sec:discussion:interpretation}, nothing in the conditioning tells
-the operator how fast this particular eye progresses.
+the operator how fast this particular eye progresses. Three further
+explanations were not tested. First, the operators are not trained on the
+growth rate. It is computed afterwards from their predicted maps, whereas
+some models of~\S\ref{sec:experiments:qualitative} regress the rate
+directly. Second, the operators predict less change than occurs in most
+eyes, 35 of 48 on folds 0 to 2 at a median of 0.73 of the true change
+(Figure~\ref{fig:experiments:rollout}), and about half the true rate for
+the fastest eyes (\S\ref{sec:experiments:qualitative}). A deterministic
+model trained with a pixel-wise loss may favour such cautious
+predictions. Third, the inputs carry no image intensity. The models
+of~\S\ref{sec:experiments:qualitative} with stronger growth-speed values
+use reflectivity maps or the raw OCT volume, and for fundus
+autofluorescence images the tissue around the lesion carries the most
+information on growth speed (\S\ref{sec:background:related-work}). Masks
+and layer depths may hold less of that information.
+% 2026-10-19 (author): hypotheses for the growth-speed gap, from the 5.7
+% comparison. Cautious predictions: 35/48 eyes and median ratio 0.73 from the
+% Figure 5.2 analysis (folds 0-2, epoch 29); fastest 15 eyes ratio 0.50 (5.7).
+% Image signal: Gigon2021 reflectivity maps, Mai2024 raw OCT, Cluceru2024 rim
+% (cited in 2.4).
 
 The distinction matters clinically. Complement inhibitors slow GA growth
 but do not stop it (\S\ref{sec:introduction:motivation}), so the eyes
@@ -231,11 +251,13 @@ Finally, because every model starts from segmented masks and layer
 depths, a clinical use would place it behind a segmentation model. Errors of that
 segmentation would pass into the forecast, and this thesis does not model
 them. Failures would matter most where the method is known to be weak:
-lesions that touch the border of the crop, where growth is censored; fast
-progressors; and eyes with sparse visit schedules, where each step must
-bridge a long interval.
-% TODO: link to the failure cases of Section 5.5 once that section is
-% written.
+lesions that touch the border of the crop, where growth is censored
+(\S\ref{sec:experiments:folds}); fast progressors, whose growth is
+under-predicted (\S\ref{sec:experiments:qualitative}); and eyes with
+sparse visit schedules, where each step must bridge a long interval.
+% 2026-10-19: the former TODO (link to a qualitative section) resolved by
+% pointers; the qualitative section was dropped (author), Appendix D holds
+% further eyes.
 
 
 \section{Limitations}
