@@ -1322,8 +1322,21 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
   (5) check JKU rules on declaring AI-generated figures (ask the supervisor). Supervisor SV-2.3
   allows licensed third-party images as an alternative. 2026-10-16: Fig. 2.1 took that route (Commons images, see above);
   the LLM rules now concern Figs. 2.2-2.3 only.
-- [ ] Not yet in the text: GA progression stages from the poster (`poster/figs/eye_stage_1-4.png`),
+- [x] (2026-10-19: superseded by the real FAF figure below; author: no schematic needed for now)
+  Not yet in the text: GA progression stages from the poster (`poster/figs/eye_stage_1-4.png`),
   e.g. in §1.1 or §2.1.2 -- placement to be decided.
+- [ ] 2026-10-19 (author): **§2.1.2 `fig:bg:ga-faf`** -- what GA looks like on a real eye, from the
+  MUW FAF images (`data/MUW_GA/scans/<eye>/<day>/faf_global.png`). Placeholder + spec in
+  02-background.tex after the FAF paragraph; referenced there and in the §2.1.3 opener. (a) baseline,
+  (b) same eye ~3 years later, grey, common window, dashed OCT field of view, scale bar, no mask
+  overlay. Before drawing: check that `faf_global.png` shares the frame of `slo_global.png` /
+  `mask_global.png`; fix an eye rule in the script (lesion inside the window, median growth,
+  follow-up >= 3 y; scratch candidate GX511402_OS days 0 / 1080), author confirms the eye; then fill
+  the caption's interval and describe only what that eye shows. Script
+  `images/scripts/fig_bg_ga_faf.py`. Earlier there was no figure showing GA on a real eye (only the
+  schematic Fig. 2.3(b) and the still unbuilt `fig:data:example-state`).
+- [ ] Reply mail: confirm that de-identified MUW FAF/SLO fundus images may be printed in the thesis
+  (needed for `fig:bg:ga-faf` and `fig:data:example-state`).
 
 - [x] Chapter 5 data figures (author approved all eight, 2026-10-01), all in the text with a
   referencing sentence, every plotted value checked against the text: `fig:experiments:curves`

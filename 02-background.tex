@@ -204,9 +204,49 @@ image of this kind together with each volume, aligned with the OCT scans
 \citep{Mai2024}. Fundus autofluorescence (FAF) imaging records the
 natural fluorescence of lipofuscin, a breakdown product of photoreceptor
 outer segments that accumulates in the RPE. Where the RPE is lost, the
-signal is lost, so GA appears as a dark area with high-contrast borders,
+signal is lost, so GA appears as a dark area with high-contrast borders
+(Figure~\ref{fig:bg:ga-faf}),
 and FAF has become the gold standard for detecting and measuring GA area
 \citep{Boopathiraj2024}.
+
+% TODO: produce Figure fig:bg:ga-faf (planned 2026-10-19, author: from the
+% MUW images, FAF; no schematic needed for now). Script
+% images/scripts/fig_bg_ga_faf.py -> images/fig_bg_ga_faf.pdf, style/ rules.
+% Source: masterthesis-docker/data/MUW_GA/scans/<eye>/<day>/faf_global.png
+% (1536 x 1536, greyscale), read-only.
+% (a) FAF of one eye at baseline, (b) FAF of the same eye at a later visit
+% about three years on, shown unchanged in grey (no colour map, no
+% contrast stretch beyond a common window for both panels), same crop.
+% Dashed rectangle = OCT field of view from slo.transform.json
+% (transform_oct_fov); check first that faf_global.png is in the frame of
+% slo_global.png / mask_global.png. Scale bar derived from that window.
+% No mask overlay (one message: what GA looks like and that it grows);
+% the annotation is shown in Fig. fig:data:example-state.
+% Eye rule (fix in the script, author confirms): lesion inside the OCT
+% window without touching its edge, square-root growth rate near the
+% cohort median (0.234 mm/yr), follow-up >= 3 years. Candidate seen in a
+% scratch preview: GX511402_OS, days 0 and 1080 (lesion near the left
+% edge -- check the rule).
+% Fill [interval] and [growth] in the caption from the script output.
+\begin{figure}[tp]
+  \centering
+  \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering\itshape Placeholder
+    for Figure~\ref{fig:bg:ga-faf}: fundus autofluorescence of one eye
+    of the MUW cohort at baseline and at a later visit. See accompanying
+    \texttt{\% TODO} for the intended content.}}
+  % \includegraphics[width=\textwidth]{images/fig_bg_ga_faf.pdf}
+  \caption[Geographic atrophy on fundus autofluorescence.]{%
+    Geographic atrophy on fundus autofluorescence (FAF), one eye of the
+    MUW cohort. \emph{(a)}~Baseline visit. \emph{(b)}~The same eye
+    [interval] later. The lesion is the dark area: where the RPE has
+    been lost, there is no autofluorescence. Over the interval the lesion
+    has grown. The dashed rectangle marks the OCT field of view, about
+    $6 \times 6$\,mm.}
+  % TODO: once the eye is fixed, describe what the two panels show
+  % (e.g. growth at the margin, merging of satellite patches) only as far
+  % as it is visible in that eye.
+  \label{fig:bg:ga-faf}
+\end{figure}
 
 OCT is preferred over fundus autofluorescence (FAF), the other common
 imaging modality for GA, for three reasons given by \citet{Vallino2024}: it
@@ -300,7 +340,8 @@ choriocapillaris, a dense capillary bed immediately below it
 \citep{Boopathiraj2024,Boyer2017}. These three layers are
 anatomically interdependent: the RPE supports the photoreceptors, and
 the choriocapillaris supplies both. Atrophy of one layer therefore leads
-to the degeneration of the others, and the resulting lesion appears on imaging as a sharply delineated patch in which the entire
+to the degeneration of the others, and the resulting lesion appears on imaging as a sharply delineated patch
+(Figure~\ref{fig:bg:ga-faf}) in which the entire
 outer-retinal complex is missing rather than as the loss of a single
 isolated layer.
 
