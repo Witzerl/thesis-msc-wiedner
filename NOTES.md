@@ -1744,6 +1744,16 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
   already carry z). Readings changed: T-FEN - stencil "just beyond retraining noise at both seeds (z = 2.1), not
   established" (§5.2 twice + App. E); stencil - U-Net "beyond noise at seed 42 (z = 2.1), not at seed 7 (0.8)";
   FNO+3x3 - U-Net at seed 7 now "within retraining noise" (z = -1.9). All other readings unchanged.
+- [x] 2026-10-19 **§5.2 restructured** (SV-5.3, author sign-off): heading "The Arm Table" -> "Main
+  Results" (label kept); order intro -> reading the table (per-pixel floor, between-fold sd, best fold,
+  adjacent rows) -> the three highest arms (T-FEN form folded in) -> interior eyes -> canonical choice ->
+  example eye -> summary. The summary no longer claims "not their class but the ingredients" (AI S11/T10,
+  5a.34, 5a.35); it states that the two highest arms extend the reach of a local operator and hands the
+  test to §5.3. Per-pixel sentence now "its thresholded prediction at the anchor is identical to the
+  baseline mask" (author: no "collapse counter flags", no colon). AI 5a.29-5a.40 done or obsolete.
+  Numbers unchanged.
+- [ ] TODO (inline at the §5.3 opener, AI 5b.1): the opener repeats "within about 0.04" from the new §5.2
+  summary and gives no map of the subsections; rewrite when §5.3 is reviewed.
 - [ ] **TODO (author, 2026-10-18): re-read the z-test parts when going through the thesis again** -- §5.1.5
   second paragraph (inline TODO there), App. E.3 criteria, the z values in the three App. E tables, and the two
   §5.2 sentences on T-FEN vs stencil and stencil vs U-Net.

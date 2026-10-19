@@ -298,13 +298,18 @@ values at the second seed.
 % app:full-results:criteria. Counts are "first arm higher" everywhere.
 
 
-\section{The Arm Table}
+\section{Main Results}
 \label{sec:experiments:main-results}
+% Supervisor review 2, SV-5.3 (2026-10-19): heading was "The Arm Table";
+% section reordered as intro -> reading the table -> the three highest arms ->
+% robustness -> canonical choice -> example eye -> conclusion (E1).
 
-Every architecture in the survey is a peer arm; none is a baseline to be
-beaten. Only two entries fix the scale: persistence, which scores 0 by
-construction, and the per-pixel floor. Table~\ref{tab:experiments:arms}
-lists every arm on the headline metric.
+This section compares all arms on the headline metric, the change-region
+Dice at the one-year anchor (Table~\ref{tab:experiments:arms}, seed 42).
+Two entries set the scale: persistence, which scores 0 by construction, and
+the per-pixel floor, which has no spatial context. The three highest arms
+come from three different architecture classes and lie within about 0.04
+of each other.
 
 \begin{table}[t]
   \centering
@@ -407,8 +412,25 @@ lists every arm on the headline metric.
   \label{fig:experiments:rollout}
 \end{figure}
 
-The three highest arms come from three unrelated architecture classes: a
-finite-element network, a graph network and a U-Net. The T-FEN is higher
+The per-pixel floor reads exactly 0.0000 on all five folds, the same as
+persistence. On every validation eye, its thresholded prediction at the
+anchor is identical to the baseline mask
+(\S\ref{sec:experiments:protocol:metrics}). Every point of change-region
+Dice in the table therefore comes from spatial context. The standard
+deviations in the table are between-fold deviations and are much larger
+than the noise level of~\S\ref{sec:experiments:protocol:stats}. For the
+$k$-nearest-neighbour graph network, the fold values range from about 0.43
+to 0.52, and for every arm except the two FNO arms without a local path
+the best fold is fold 2. Arms are therefore compared fold by fold; how the
+folds differ is examined in~\S\ref{sec:experiments:folds}. Adjacent rows
+mostly lie within the noise level of each other, so the order of the table
+alone does not rank them.
+
+The three highest arms are a finite-element network, a graph network and a
+U-Net. The T-FEN reported here uses the energy-conserving form of its
+transport operator (\S\ref{sec:method:family:fen}). Its first version, with
+the Galerkin form, is not stable beyond the training horizon; the two forms
+are compared in~\S\ref{sec:experiments:validity:tfen}. The T-FEN is higher
 than the dilated-stencil graph network by 0.017 on average, on four of the
 five folds. This lies just beyond the variation of retraining ($z = 2.1$ at
 both seeds), but the lead is small, and at the first seed the T-FEN is
@@ -422,30 +444,14 @@ second ($z = 0.8$), and the two cannot be told apart. The T-FEN is higher than
 the U-Net by 0.038 on average, on all five folds and on 51 of the 75 eyes,
 and this lead is real.
 
-The three highest arms thus lie within about 0.04 of each other. The
-T-FEN is highest and lies above the U-Net; the dilated-stencil network and
-the U-Net cannot be told apart. The two highest arms are the two that
-carry a remedy for the reach deficit taken up
-in~\S\ref{sec:experiments:ingredients:convergence}: the transport term and
-the dilated stencil. What separates the arms is therefore not their class
-but the ingredients they carry.
-% Author decision (a), 2026-10-01: headline scoped instead of "the
-% strongest arms of different classes are indistinguishable".
-
-The fixed crop censors growth across the window edge
-(\S\ref{sec:data:spatial}). Of the 75 eyes, 21 have a lesion that touches
-the crop border at the one-year anchor and 54 do not. On the 54 interior
-eyes the arms keep the order of Table~\ref{tab:experiments:arms}; the
-values for both groups are given in
+Growth across the edge of the imaged field is censored
+(\S\ref{sec:data:spatial}). On the 54 eyes whose lesion does not touch that
+edge (\S\ref{sec:experiments:protocol:metrics}), the arms keep the order of
+Table~\ref{tab:experiments:arms}; the values for both groups are given in
 Table~\ref{tab:appendix:border-interior}.
 % Author decision (e), 2026-10-01. Source: solver_results.csv,
 % late_change_region_dice_360d_{border,interior}_mean, seed 42; eye counts
 % final_n_{border,interior}_eyes_360d (21 / 54).
-
-The T-FEN reported here uses the energy-conserving form of its transport
-operator (\S\ref{sec:method:family:fen}). Its first version, with the
-Galerkin form, is not stable beyond the training horizon; the two forms are
-compared in~\S\ref{sec:experiments:validity:tfen}.
 
 Although the T-FEN scores highest at the anchor, the dilated-stencil graph
 network is the canonical model of this thesis, for three reasons. First,
@@ -468,42 +474,35 @@ half years (\S\ref{sec:experiments:validity:tfen}).
 % and Section 5.3.4 (seed 42, pooled per step); cost Table 5.1; residual from
 % about day 1 260 in 9 of 20 eyes on fold 0, Section 5.5.2.
 
-The per-pixel floor reads exactly 0.0000 on all five folds, identical to
-persistence; its collapse counter flags every validation eye as unchanged
-from baseline. A model without spatial context predicts no change at all.
-This licenses reading every point of change-region Dice in the table as
-coming from spatial context.
-
-The fold is a large source of variance. For the $k$-nearest-neighbour graph
-network, the fold values range from about 0.43 to 0.52. The standard
-deviations in the table are between-fold deviations and are much larger
-than the noise level, which is why differences are always taken fold by
-fold. How the folds differ, and why, is examined in
-\S\ref{sec:experiments:folds}.
-
-Adjacent rows mostly lie within the noise level of each other, so
-the table is not a leaderboard. What it provides is the evidence for which
-components of an operator move the metric, which
-\S\ref{sec:experiments:ingredients} examines one at a time.
-
-The best-fold column shows how far a single fold can lie above the mean.
-For every arm except the two FNO arms without a local path, the best fold
-is fold 2, so the column mostly reflects the spread between folds rather
-than a separate result.
-
 Figure~\ref{fig:experiments:rollout} shows an eye on which the canonical
 model does well. Most of the lesion stays as it is, and the metric scores
 only the band of change along its border. Further eyes, including failure
 cases, are shown in Appendix~\ref{app:rollouts}.
 
-The Runge--Kutta arms are nulls against their single-step
-counterparts and are taken up in~\S\ref{sec:experiments:ablations}. The
-cost column is discussed in~\S\ref{sec:experiments:cost}.
+In summary, operators of different classes reach similar scores: the three
+highest arms come from three classes and lie within about 0.04 of each
+other, and of the comparisons between them only the lead of the T-FEN over
+the U-Net is established. The two highest arms share one property. Both
+extend the reach of a local operator on this grid
+(\S\ref{sec:method:graph}): the T-FEN through its transport term, the
+dilated-stencil network through neighbours placed at lesion scale.
+Section~\ref{sec:experiments:ingredients} tests such properties one at a
+time. The Runge--Kutta arms are compared with their single-step
+counterparts in~\S\ref{sec:experiments:ablations:time}, and the cost
+column is discussed in~\S\ref{sec:experiments:cost}.
+% Author decision (a), 2026-10-01: headline scoped instead of "the
+% strongest arms of different classes are indistinguishable".
+% 2026-10-19 (SV-5.3, AI S11/T10, 5a.34, 5a.35): the conclusion moved to the
+% end of the section and no longer claims "not their class but the
+% ingredients"; that reading is left to Section 5.3.
 
 
 \section{The Ingredient Study}
 \label{sec:experiments:ingredients}
 
+% TODO (2026-10-19, AI 5b.1 / SV-5.4): this opener repeats "within about 0.04"
+% from the new 5.2 summary and gives no map of the subsections; rewrite when
+% Section 5.3 is reviewed (worklist ch4-7, Section "The Ingredient Study").
 The strongest arms of different classes lie within about 0.04 of each
 other, so comparing whole architectures says little about what makes an
 operator work. This section therefore compares operators that differ in one
