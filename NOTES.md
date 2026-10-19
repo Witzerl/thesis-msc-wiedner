@@ -355,8 +355,23 @@ Being worked through one item at a time.
 - [ ] TODO (Appendix G): cite **Bachlechner2021** (ReZero, UAI 2021) -- `% TODO: cite` marker in G.2.2.
 - [ ] TODO (Appendix G): produce Figure `fig:appendix:moved-mesh` (moved mesh over the GA mask,
   2-3 eyes, physical aspect ratio, uniform grid alongside).
-- [ ] Author to review Appendix G (G.1 was not touched; it still contains "Crucially" and
-  "entirely", and describes the original paper's matrix monitor).
+- [x] (superseded 2026-10-19 by the rewrite below) Author to review Appendix G (G.1 was not
+  touched; it still contains "Crucially" and "entirely", and describes the original paper's
+  matrix monitor).
+- [x] 2026-10-19 **Appendix G rewritten in the style of the revised main chapters** (author: so that
+  it can move into the main text with little rework, cf. SV-4.2). Chapter opener with a map of the
+  sections; every section opens with its purpose and closes with what follows; G.1 uses the thesis
+  notation (update operator, interpolation, monitor constant written alpha_M so it does not clash with
+  the gate alpha); "encoder" named as the DeepONet branch network; "the gate opens / stays shut"
+  defined at first use; G.3 results split into mesh validity and mesh quality; G.4 reordered
+  (pre-registered reading -> the bypass control removes it -> the narrower statement -> contrast with
+  Hu et al.) with the fold-2 probe scope stated. No LLM patterns ("not X but Y", "Crucially",
+  "entirely"). All tables, figures, labels and numbers unchanged (checked number by number against
+  the previous version); builds clean. Remaining AI-review items of Appendix G (G.1-G.9 partly
+  addressed) are covered by the rewrite.
+  Ledger: Hu2024 C181, C182, C184, C185 checked by hand (quotes pass verify_quotes on their pages),
+  C192, C193 re-checked (same claim); HuangRussell2011 C183, C191 stay PENDING (book not on disk).
+- [ ] Author to review the rewritten Appendix G (inline `% TODO (author review)` at its start).
 - [x] (superseded by the entry above) TODO: Appendix G still needs the rest of its content (inline `% TODO` at its end): DMM
   for GA, dual branch + α gate, the null result with its scope, mesh-quality study, ~10×
   cost. Chapters 4 and 5 still contain the MM-PDE sections to be moved ("The Moving-Mesh
