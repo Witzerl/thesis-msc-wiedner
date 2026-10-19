@@ -1816,11 +1816,6 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
 - [ ] Qualitative material without a section (2026-10-19): per-eye rollouts are Fig. 5.2 and Appendix D (figure
   disabled); sparse schedules and short vs long Delta t were never analysed (old §5.7 plan). Decide whether Appendix D
   needs a short text on typical and difficult eyes when its figure is restored.
-- [x] 2026-10-19 **"anchor" removed thesis-wide** (SV-6.4, author: the supervisor dislikes the word): "the one-year
-  anchor" / "at the anchor" -> "the one-year visit" / "at the one-year visit" in 56 places (03, 04, 05, 06, App. E),
-  defined in §3.6 and §5.1.3 as the first rollout step whose cumulative time reaches about 347 days; comments left as
-  they were. Script: session scratchpad `replace_anchor.py` (skips comments). Also repaired a §6.1 sentence whose first
-  word an earlier edit of the same day had put into a comment line.
 - [ ] **Reply mail (2026-10-20): ask the supervisor about SV-5.12** -- is the post-hoc step-size ladder (trained
   networks re-evaluated with fixed steps h = 1 ... 1/32 year, no retraining; three networks, folds 0-2) what he
   meant, or did he want networks trained at different step sizes?

@@ -81,14 +81,14 @@ than any ranking of architectures.
 % Author decision (b), 2026-10-01: global + local demoted to an observation.
 Whether global and local context are separate properties remains open.
 The FNO, which sees the whole grid in every layer but has no local path,
-lies below the U-Net at the one-year visit at both seeds. A
+lies below the U-Net at the one-year anchor at both seeds. A
 $3 \times 3$ local path of 800 parameters brought it level at one seed but
 not at the second (\S\ref{sec:experiments:ingredients:global}), so whether
 local detail is what the FNO lacks is not established.
 Beyond one year the plain FNO catches up with the U-Net and lies above it
 after three years. These horizon values are descriptive and were not
 tested, but they suggest that global support matters more for long
-forecasts than for the one-year visit.
+forecasts than for the one-year anchor.
 
 \paragraph{Capacity.}
 Capacity was not a lever in any of the four classes tested
@@ -140,13 +140,13 @@ three tested folds and can therefore be read as a continuous-time model
 (\S\ref{sec:experiments:validity:swap}). The network trained inside the
 Runge--Kutta wrapper also defines a vector field, but its training step of
 one RK4 step per interval resolves it on only one of the three folds.
-Neither is more accurate than the canonical network at the one-year visit, and the
+Neither is more accurate than the canonical network at the anchor, and the
 wrapper costs about $4.8\times$ the training time. If predictions between
 visits are needed clinically, these two are the principled choice; the
 wrapper network would need a finer training step.
-Their predictions between visits remain unverified, however, because no
-ground truth exists between two observations.
-% 2026-10-19: updated to the step-size ladder of 5.6.1 (three folds).
+% 2026-10-19: updated to the step-size ladder of 5.6.1 (three folds). Their
+predictions between visits remain unverified, however, because no ground
+truth exists between two observations.
 
 \paragraph{Where modelling effort pays.}
 Taken together, the positive results and the nulls indicate where effort
@@ -219,7 +219,7 @@ a different way, for example to judge whether growth is heading towards
 the fovea, but that use was not evaluated here.
 
 A second clinical question is how far ahead the forecast remains useful.
-All comparisons in this thesis are made at the one-year visit. Beyond
+All comparisons in this thesis are made at the one-year anchor. Beyond
 one year, the growth-region Dice of the canonical model does not fall; it
 lies at about 0.60 to 0.66 in the second, third and later years
 (\S\ref{sec:experiments:ingredients:transport}). These values are
@@ -295,7 +295,7 @@ is one reason why no monotonic-growth constraint was imposed.
 % decrease in 24 pairs (15 eyes), max -14 %; local loss > 5 % of the lesion
 % in 21 %, > 10 % in 5 % of pairs; lost / gained area over all pairs 22 %.
 
-The evaluation has limits of its own. The one-year visit is the first
+The evaluation has limits of its own. The one-year anchor is the first
 rollout step at or beyond 360 days and
 has no upper bound, so a few eyes are scored later, where more change has
 accumulated. The change-region Dice was logged only as a cohort mean per
