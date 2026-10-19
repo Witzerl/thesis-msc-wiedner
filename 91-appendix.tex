@@ -100,7 +100,7 @@ area the window removes (\S\ref{sec:data:spatial}).
 Figure~\ref{fig:appendix:rollouts} shows rollouts of the canonical
 dilated-stencil graph network for three further eyes, chosen by fixed
 rules from the 48 validation eyes of folds 0, 1 and 2: the eye with the
-highest growth-region Dice at the one-year anchor, the eye whose lesion has
+highest growth-region Dice at the one-year visit, the eye whose lesion has
 the most pixels on the border of the crop, and the eye with the fastest
 true growth. In the fastest-growing eye, the true lesion expands far beyond
 its baseline outline while the predicted change stays a narrow band along
@@ -127,13 +127,13 @@ that outline, so most of the true change is missed.
     follow-up visits. The eyes were selected by fixed rules from the 48
     validation eyes of folds 0, 1 and 2, excluding the eye of
     Figure~\ref{fig:experiments:rollout}: \emph{(a)}~the highest per-eye
-    growth-region Dice at the one-year anchor (late-epoch mean, 0.775);
+    growth-region Dice at the one-year visit (late-epoch mean, 0.775);
     \emph{(b)}~the eye with the most true-lesion pixels on the border of the
-    imaged field at the anchor; \emph{(c)}~the eye with the fastest true
+    imaged field at the one-year visit; \emph{(c)}~the eye with the fastest true
     growth over its whole
     follow-up (0.59\,mm per year on the square-root area scale, measured
     within the crop). Column headers give the time since baseline in days;
-    the one-year anchor is set in bold. The encoding is that of
+    the one-year visit is set in bold. The encoding is that of
     Figure~\ref{fig:experiments:rollout}. The figure illustrates single
     eyes and is not evidence for any comparison.}
   \label{fig:appendix:rollouts}
@@ -152,7 +152,7 @@ that outline, so most of the true change is missed.
 \begin{table}[h]
   \centering
   \caption[Change-region Dice on border-touching and interior eyes.]{%
-    Change-region Dice at the one-year anchor, seed 42, split by whether the
+    Change-region Dice at the one-year visit, seed 42, split by whether the
     eye's lesion touches the border of the fixed crop
     (\S\ref{sec:data:spatial}). Of the 75 validation eyes, 21 touch the
     border and 54 do not; per fold the border group holds 1 to 6 eyes.
@@ -307,7 +307,7 @@ are those of~\S\ref{app:full-results:criteria}.
     $z$ statistic of \S\ref{app:full-results:criteria} ($|z| > 1.96$
     corresponds to $p < 0.05$). Per eye:
     mean $\pm$ SE of the differences of the growth-region Dice at the
-    anchor, with the number of eyes on which the first arm is higher and
+    one-year visit, with the number of eyes on which the first arm is higher and
     the paired $t$ statistic.}
   \label{tab:appendix:seeds}
   \footnotesize
@@ -479,7 +479,7 @@ at half a year.
   \caption[The step-size ladder.]{%
     The step-size ladder of the solver-swap test, folds 0 to 2, seed 42.
     Each cell is the change of the change-region Dice at the one-year
-    anchor against the setting the model was trained with, when the same
+    visit against the setting the model was trained with, when the same
     weights are evaluated with a fixed step $h$ (in years, with days below)
     and with explicit Euler or classical RK4. The trained setting itself
     reproduces the change-region Dice recorded at the end of training on
@@ -1063,7 +1063,7 @@ lists the arms.
 \begin{table}[t]
   \centering
   \caption[Single branch, dual branch and bypass control.]{%
-    Change-region Dice at the one-year anchor, mean $\pm$ sd over the five
+    Change-region Dice at the one-year visit, mean $\pm$ sd over the five
     folds, seed 42. All arms use the earlier $k$-nearest-neighbour graph
     network with mean and maximum aggregation, not the configurations of
     Table~\ref{tab:experiments:arms}. Cost is the minimum epoch time over

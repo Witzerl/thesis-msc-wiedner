@@ -275,7 +275,7 @@ the imaged field inside the window: the border of the window or, for a
 padded visit, the edge of the scan itself. Growth across that edge is
 not observed (it is censored), and no flag in the data marks it. The models
 are therefore trained on censored targets, and the change-region metrics at
-the one-year anchor (\S\ref{sec:experiments:protocol}) under-measure
+the one-year visit (\S\ref{sec:experiments:protocol}) under-measure
 progression for roughly one visit in five. The censoring also limits
 comparability with literature results computed over the whole field of
 view.
@@ -401,9 +401,9 @@ days, 74 of the 75 eyes reach at least one unrolled step. With 540 days,
 68 eyes reach at least two, and with 720 days, 73 eyes do.
 
 Beyond training, the schedule also affects the evaluation. The
-change-region metrics of Chapter~\ref{ch:experiments} are taken at a
-one-year anchor, the first rollout step whose cumulative time reaches
-about 347 days. This anchor has no upper bound. For 68 of the 75 eyes, it
+change-region metrics of Chapter~\ref{ch:experiments} are taken at the
+one-year visit, the first rollout step whose cumulative time reaches
+about 347 days. This visit has no upper bound in time. For 68 of the 75 eyes, it
 falls at exactly 360 days. The remaining 7 eyes (9.3\,\%) are scored at 450 to
 720 days, where the true change region is 1.3 to 1.7 times larger.
 This is accepted deliberately. \citet{Mai2024} likewise score every follow-up

@@ -67,12 +67,12 @@ computed and logged, but no RMSE value is used as evidence in this chapter.
 \subsection{Metrics}
 \label{sec:experiments:protocol:metrics}
 
-The headline metric is the change-region Dice at the one-year anchor. All
+The headline metric is the change-region Dice at the one-year visit. All
 predicted and ground-truth masks are binarised at the physical threshold of
 0.5, which is mapped into normalised space in the same way as in the loss. Let $b$
 be the thresholded mask at the baseline visit (the first visit of the
-rollout), $p$ the thresholded prediction at the anchor and $y$ the
-thresholded ground truth at the anchor. The predicted and the true change
+rollout), $p$ the thresholded prediction at the one-year visit and $y$ the
+thresholded ground truth at the one-year visit. The predicted and the true change
 regions are
 \begin{equation}
   \hat{C} = \{\, i : p_i \neq b_i \,\}, \qquad
@@ -93,7 +93,7 @@ is consistent with the absence of a monotonic-growth constraint
 
 The change-region Dice differs from the growth-region Dice
 of~\citet{Mai2024}, which this chapter also uses. The growth-region Dice
-scores only new atrophy, the pixels that are lesion at the anchor but not
+scores only new atrophy, the pixels that are lesion at the one-year visit but not
 at baseline. The change-region Dice scores every changed pixel, growth and
 shrinkage alike. Both score 0 for persistence and are easy to confuse:
 Table~\ref{tab:experiments:arms} and all differences between arms use the
@@ -114,7 +114,7 @@ change-region Dice, while the eye counts of
 \iffalse
 Two variants handle the crop (\S\ref{sec:data:spatial}). The first splits
 the per-eye change-region Dice by whether the ground-truth lesion at the
-anchor touches the boundary of the imaged field. This boundary is
+one-year visit touches the boundary of the imaged field. This boundary is
 pad-aware: it is the outermost ring of the crop or any position next to the
 zero-pad band, because for visits whose native grid is smaller than the
 crop, the true edge of the field lies inside the crop. The interior group
@@ -130,14 +130,14 @@ counterpart. It is used for the eye counts of
 \S\ref{sec:experiments:protocol:stats}. It is also computed at every
 rollout step and grouped by the time since baseline into $(0, 1]$,
 $(1, 2]$, $(2, 3]$ and more than three years. These horizon bins show how
-the prediction degrades beyond the one-year anchor. \citet{Mai2024} report
+the prediction degrades beyond the one-year visit. \citet{Mai2024} report
 the same metric in the same bins.
 
 Because growth across the edge of the imaged field is censored
 (\S\ref{sec:data:spatial}), the eyes are also split by whether their lesion
 touches that edge; the split is reported
 in~\S\ref{sec:experiments:main-results}. An eye counts as border-touching
-when its true lesion at the anchor touches the edge of the imaged field.
+when its true lesion at the one-year visit touches the edge of the imaged field.
 This edge is the outermost ring of the crop or, for padded visits, the edge
 of the zero padding, since for those visits the true edge of the field lies
 inside the crop. Of the 75 eyes, 21 touch it.
@@ -146,7 +146,7 @@ inside the crop. Of the 75 eyes, 21 touch it.
 % stays unreported.
 
 Finally, a collapse counter records how many eyes have a thresholded
-prediction at the anchor that is identical, pixel for pixel, to their
+prediction at the one-year visit that is identical, pixel for pixel, to their
 baseline mask. It detects a model that has learned to copy its input,
 which would score exactly as persistence does. The eye-level growth-rate
 measures used for the clinical comparison are defined
@@ -167,12 +167,12 @@ visit and predicts the next visit. The prediction is then fed back as the
 input of the next window, and the rollout continues over the eye's real
 visit schedule, with the actual $\Delta t$ of each window.
 
-The one-year anchor is taken at the first step whose cumulative time
+The one-year visit is taken at the first step whose cumulative time
 reaches it (\S\ref{sec:data:temporal}). For a few eyes this step lies
 beyond one year, where the true change region is larger. This is accepted
 because \citet{Mai2024} also score every follow-up visit by its time since
 baseline and not at a fixed horizon. Persistence is computed inside every
-rollout by the same code; for the anchor metrics it is the baseline mask
+rollout by the same code; for the metrics at the one-year visit it is the baseline mask
 held constant. Per-step metrics are averaged per eye first and then over
 the eyes, so every eye counts once, whatever its number of visits.
 
@@ -244,7 +244,7 @@ differences between arms are read (\S\ref{sec:experiments:protocol:stats}).
   \centering
   \includegraphics[width=0.8\textwidth]{images/fig_experiments_learning_speed.pdf}
   \caption[The operators reach their level at different epochs.]{%
-    Change-region Dice at the one-year anchor over training, mean over the
+    Change-region Dice at the one-year visit over training, mean over the
     five folds (seed 42), for two operators that learn fast
     (dilated-stencil GNN, FNO) and two that learn slowly (U-Net, free-form
     FEN). The marker on each line shows the epoch at which it reaches its
@@ -292,7 +292,7 @@ established only when, in addition, it holds on most folds and most of the
 second seed. Results are stated in these terms, for example ``higher by
 0.064 on average ($z = 7.9$), on all five folds and on 70 of the 75
 eyes''. The eye counts use the growth-region Dice at the
-anchor, because the change-region Dice was logged only as a mean over the
+one-year visit, because the change-region Dice was logged only as a mean over the
 eyes of each fold. In tables, ``mean $\pm$ sd'' is the mean and the
 standard deviation over the five fold values, each the late-epoch mean of
 one run.
@@ -317,7 +317,7 @@ values at the second seed.
 % robustness -> canonical choice -> example eye -> conclusion (E1).
 
 This section compares all arms on the headline metric, the change-region
-Dice at the one-year anchor (Table~\ref{tab:experiments:arms}, seed 42).
+Dice at the one-year visit (Table~\ref{tab:experiments:arms}, seed 42).
 Two entries set the scale: persistence, which scores 0 by construction, and
 the per-pixel floor, which has no spatial context. The three highest arms
 come from three different architecture classes and lie within about 0.04
@@ -326,7 +326,7 @@ of each other.
 \begin{table}[t]
   \centering
   \caption[All arms on the headline metric.]{%
-    All arms on the change-region Dice at the one-year anchor, seed 42.
+    All arms on the change-region Dice at the one-year visit, seed 42.
     Each fold value is the late-epoch mean (epochs 10 to 29) of one run;
     the table gives the mean $\pm$ sd over the five folds and the highest of
     the five fold values (best fold), with the index of that fold in
@@ -426,7 +426,7 @@ of each other.
 
 The per-pixel floor reads exactly 0.0000 on all five folds, the same as
 persistence. On every validation eye, its thresholded prediction at the
-anchor is identical to the baseline mask
+one-year visit is identical to the baseline mask
 (\S\ref{sec:experiments:protocol:metrics}). Every point of change-region
 Dice in the table therefore comes from spatial context. The standard
 deviations in the table are between-fold deviations and are much larger
@@ -465,7 +465,7 @@ Table~\ref{tab:appendix:border-interior}.
 % late_change_region_dice_360d_{border,interior}_mean, seed 42; eye counts
 % final_n_{border,interior}_eyes_360d (21 / 54).
 
-Although the T-FEN scores highest at the anchor, the dilated-stencil graph
+Although the T-FEN scores highest at the one-year visit, the dilated-stencil graph
 network is the canonical model of this thesis, for three reasons. First,
 the lead of the T-FEN is small, 0.017, just beyond the variation of
 retraining but not established, and it does
@@ -594,7 +594,7 @@ geometries and the index-space graph on one axis of physical reach.
     The reach ladder. Each geometry is compared with the default dilated
     stencil (rows $\pm 1$, columns $\{0, \pm 7, \pm 14, \pm 21\}$). The
     difference is the mean over five folds of the per-fold difference of
-    the change-region Dice at the one-year anchor, seed 42; the counts give
+    the change-region Dice at the one-year visit, seed 42; the counts give
     the folds and the eyes on which the geometry is higher than the default.
     Standard errors are given in Appendix~\ref{app:full-results:seeds}.}
   \label{tab:experiments:reach}
@@ -622,7 +622,7 @@ geometries and the index-space graph on one axis of physical reach.
   \caption[The reach ladder.]{%
     The reach ladder of the dilated-stencil graph network. Each point is
     the fold-paired difference of the change-region Dice at the one-year
-    anchor against the default stencil (rows $\pm 1$, columns
+    visit against the default stencil (rows $\pm 1$, columns
     $\{0, \pm 7, \pm 14, \pm 21\}$, 20 neighbours), over five folds at
     seed 42, with the between-fold standard error; the shaded band marks
     the noise level ($\pm 0.016$, Appendix~\ref{app:full-results:criteria}).
@@ -685,7 +685,7 @@ while the eyes lean consistently one way, so the effect is not
 established.
 
 Against the other operators, the plain FNO lies below the U-Net at the
-one-year anchor: lower by 0.022 on average, higher on only one of the five
+one-year visit: lower by 0.022 on average, higher on only one of the five
 folds and on 30 of the 75 eyes. It is higher than the $k$-NN graph network
 by 0.021 on average, but fold 4 carries all of it (without it, $-0.001$),
 so this is not established. With the local path, the FNO cannot be told
@@ -704,10 +704,10 @@ These values are descriptive and were not tested.
 % use a different aggregation and must not be mixed with these.
 
 Global context alone therefore does not reach the U-Net at the one-year
-anchor. With a local path of 800 parameters, the FNO can no longer be told
+visit. With a local path of 800 parameters, the FNO can no longer be told
 apart from the U-Net, but the effect of the local path itself is not
 established. The values beyond one year suggest that global context may
-matter more at longer horizons than at the anchor.
+matter more at longer horizons than at the one-year visit.
 % Author decision (b), 2026-10-01: global + local is reported as an
 % observation, not as an established property (5.3.5, 6.1, Ch. 7,
 % abstracts). Values: thesis_numbers.py pair, 2026-10-01; recomputed
@@ -734,8 +734,8 @@ The T-FEN is higher by 0.062 on average, on all five folds and on 68 of the
 75 eyes. With the earlier Galerkin form of the transport operator, the
 difference was of the same order, 0.053, again on all five folds. That form
 becomes unstable in long free-running rollouts, but only well after the
-one-year anchor (\S\ref{sec:experiments:validity:tfen}), so its score at
-the anchor is valid, and the effect does not depend on the form of the
+one-year visit (\S\ref{sec:experiments:validity:tfen}), so its score at
+the one-year visit is valid, and the effect does not depend on the form of the
 transport operator.
 % Seed-7 values (tab:appendix:seeds): thesis_numbers.py pair, 2026-10-01,
 % against FEN_final_w96Frk4d45s7. The previously quoted seed-7 Galerkin value
@@ -749,7 +749,7 @@ gain could come from the extra parameters. A second control widens the
 free-form network to a width of 139, giving 68\,282 parameters, level with
 the T-FEN (\S\ref{sec:method:family:params}). This matched control does
 not train on fold 4: its training error rises from the first epoch, and it
-reads 0.047 at the anchor. A second attempt gave the same result, while
+reads 0.047 at the one-year visit. A second attempt gave the same result, while
 the width-96 control trains normally on this fold (0.501). With the second
 seed, the matched control trains on all five folds, so the failure is
 specific to this run (Appendix~\ref{app:full-results:seeds}). It is a
@@ -896,7 +896,7 @@ links the fold differences to the reach argument
 of~\S\ref{sec:experiments:ingredients:convergence}. The analysis uses the
 five main operators of Table~\ref{tab:experiments:arms} at both seeds and is
 exploratory. Its per-eye values are the growth-region Dice at the one-year
-anchor, because the change-region Dice is recorded per fold only.
+visit, because the change-region Dice is recorded per fold only.
 
 Figure~\ref{fig:experiments:arms-folds} shows the fold values of the five
 operators. Fold~2 is the highest fold of every operator at both seeds, with
@@ -920,7 +920,7 @@ when two operators are compared fold by fold.
   \centering
   \includegraphics[width=0.8\textwidth]{images/fig_experiments_arms_folds.pdf}
   \caption[Fold values of the five main operators.]{%
-    Change-region Dice at the one-year anchor on each of the five folds
+    Change-region Dice at the one-year visit on each of the five folds
     (late-epoch mean, seed 42) for the five main operators of
     Table~\ref{tab:experiments:arms}. Lines connect the values of one
     operator to make the shift between folds visible; the folds themselves
@@ -938,7 +938,7 @@ fold's 15 eyes. Two properties of the eyes separate the local
 from the global operators.
 
 The first is the distance at which new atrophy appears. For every eye, the
-share of its new atrophy at the anchor that lies more than 0.24\,mm from
+share of its new atrophy at the one-year visit that lies more than 0.24\,mm from
 the baseline lesion was computed; 0.24\,mm is about the reach of two
 message-passing rounds of the dilated stencil
 (\S\ref{sec:experiments:ingredients:reach}). The larger this share, the
@@ -963,7 +963,7 @@ limited reach cannot place atrophy that appears beyond it.
   \includegraphics[width=0.6\textwidth]{images/fig_experiments_far_atrophy.pdf}
   \caption[The graph network falls behind where new atrophy appears far from
     the lesion.]{%
-    Difference in growth-region Dice at the one-year anchor between the
+    Difference in growth-region Dice at the one-year visit between the
     dilated-stencil graph network and the mean of the T-FEN, the U-Net and
     the FNO, per eye and averaged over seeds 42 and 7. The 75 validation
     eyes are split into thirds by the share of their new atrophy that lies
@@ -987,7 +987,7 @@ networks.
 The dips on folds~4 and~3 have partial explanations. On fold~4 the graph
 networks predict too little new atrophy. The fold holds the smallest
 lesions, which grow most relative to their size: the new atrophy at the
-anchor is a median 39\,\% of the baseline area, against 18\,\% (fold~3) to
+one-year visit is a median 39\,\% of the baseline area, against 18\,\% (fold~3) to
 35\,\% (fold~0) on the other folds. Every operator predicts too little when
 growth is large relative to the lesion; on the third of all eyes where it
 exceeds 40\,\%, each of them predicts less than half of the true new
@@ -1121,7 +1121,7 @@ penalty.
   \centering
   \caption[The objective tests.]{%
     The objective tests on the dilated-stencil graph network.
-    Change-region Dice at the one-year anchor, five folds, seed 42; the
+    Change-region Dice at the one-year visit, five folds, seed 42; the
     mean $\pm$ sd is over the five fold values. The difference is against
     the full objective, as the mean over the five folds of the per-fold
     difference; the columns Folds and Eyes count the folds and the eyes on
@@ -1196,7 +1196,7 @@ free-running rollout is about twice as large with the term as without it
   \centering
   \includegraphics[width=0.8\textwidth]{images/fig_experiments_objective.pdf}
   \caption[The training objective over training.]{%
-    Change-region Dice at the one-year anchor over training for the
+    Change-region Dice at the one-year visit over training for the
     dilated-stencil graph network (seed 42), mean over the five folds, for
     three objectives: the full objective (late-epoch mean 0.526), the
     objective without the soft-Dice term (0.476) and a plain unweighted mean
@@ -1304,7 +1304,7 @@ remaining rows of Table~\ref{tab:experiments:capacity}.
 \begin{table}[t]
   \centering
   \caption[The capacity study.]{%
-    The capacity study. Change-region Dice at the one-year anchor, five
+    The capacity study. Change-region Dice at the one-year visit, five
     folds, seed 42; the mean is over the five fold values. The ratio is the
     parameter count divided by that of the arm at its original size. The difference
     is against that original size, as the mean over the five folds of the
@@ -1369,7 +1369,7 @@ remaining rows of Table~\ref{tab:experiments:capacity}.
   \caption[The capacity study.]{%
     The capacity study of Table~\ref{tab:experiments:capacity}. Each point
     is the fold-paired difference of the change-region Dice at the one-year
-    anchor between an operator scaled in size and the same operator at its
+    visit between an operator scaled in size and the same operator at its
     original size, over five folds at seed 42, with the between-fold
     standard error, plotted against the ratio of their parameter counts on
     a logarithmic axis. Lines and filled markers change the width; open
@@ -1643,7 +1643,7 @@ of the T-FEN comes from its transport term
     retraining, with a fixed step of $h = 1$ to $1/32$ year (365 to 11.4
     days) and with explicit Euler or classical RK4; folds 0 to 2, seed 42.
     The table gives the change of the change-region Dice at the one-year
-    anchor at the finest step against the setting the model was trained
+    visit at the finest step against the setting the model was trained
     with, the span over all settings at least as fine as the training
     setting in both step and order, and the two criteria: convergence at
     the finest steps (C1) and agreement of those settings within the
@@ -1692,7 +1692,7 @@ of the T-FEN comes from its transport term
     retraining, with explicit Euler (solid) or classical RK4 (dotted) at a
     fixed step of 365 to 11.4 days, on a logarithmic axis with finer steps
     to the right. The vertical axis gives the change of the change-region
-    Dice at the one-year anchor against the trained setting; one line per
+    Dice at the one-year visit against the trained setting; one line per
     fold (folds 0 to 2, seed 42). The shaded band marks $\pm 0.0127$, the
     run-to-run standard deviation.
     \emph{(a)}~The canonical dilated-stencil network, trained with one
@@ -1729,12 +1729,12 @@ repeated with the second seed, whereas the free-form FEN, which lacks only the t
 fold. Tracing the rollouts step by step showed where the divergence comes
 from. It starts at the edge of the crop, in a layer channel, driven by the
 transport term, and only after about 1.6 to 2 years: later than the
-one-year anchor and later than the 360 days that training unrolls. A
+one-year visit and later than the 360 days that training unrolls. A
 smaller step left the divergence in place, and the velocities at the onset
 were within the stability limit of RK4. The divergence therefore comes from
 the defect of the Galerkin operator at the domain edge
 (\S\ref{sec:method:family:fen}), not from the step size. Because the divergence starts after the
-anchor and away from the lesion, it did not affect the change-region Dice
+one-year visit and away from the lesion, it did not affect the change-region Dice
 of the Galerkin T-FEN at one year.
 % Details (SOLVER_FINAL_RUNS 9.19, three runs traced): onset within 7 columns
 % of the left/right crop edge in 79-93 % of eyes, often next to the padded
@@ -1943,7 +1943,7 @@ where $T$ is the time from the baseline visit to the eye's last visit.
 Taking the square root of the area removes the dependence of the growth
 rate on the baseline lesion size \citep{Feuer2013}. The rate is computed
 once from the ground truth and once from the model's rollout, over the
-eye's whole follow-up as in~\citet{Mai2024}, not at the one-year anchor.
+eye's whole follow-up as in~\citet{Mai2024}, not at the one-year visit.
 Two measures compare the two rates over the cohort. The Pearson
 correlation $r$ measures how closely the predicted rates follow a linear
 relation with the true rates across eyes: $r = 1$ is a perfect linear
@@ -2103,7 +2103,7 @@ operators did not improve on their original sizes
 (\S\ref{sec:experiments:ablations:capacity}), and the dual branch is a null
 (Appendix~\ref{app:mm-pde}). The T-FEN is the only expensive arm with an
 established effect, its transport term. Its lead over the dilated-stencil
-network at the anchor is not established
+network at the one-year visit is not established
 (\S\ref{sec:experiments:main-results}), however, and that network reaches
 about the same level at about a quarter of the cost.
 % 2026-10-19 (AI 5d.36-5d.45): purpose first; "single-step" for the FENs
@@ -2115,7 +2115,7 @@ about the same level at about a quarter of the cost.
 
 This chapter answered the second part of the research question. Inside
 the fixed framework, operators of three different classes reach similar
-scores at the one-year anchor, and every point of change-region Dice comes
+scores at the one-year visit, and every point of change-region Dice comes
 from spatial context (\S\ref{sec:experiments:main-results}). What
 separates the operators is how far they reach in one step: placing the
 neighbours of the graph network at lesion scale and adding an explicit
