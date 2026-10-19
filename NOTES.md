@@ -1752,8 +1752,19 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
   test to §5.3. Per-pixel sentence now "its thresholded prediction at the anchor is identical to the
   baseline mask" (author: no "collapse counter flags", no colon). AI 5a.29-5a.40 done or obsolete.
   Numbers unchanged.
-- [ ] TODO (inline at the §5.3 opener, AI 5b.1): the opener repeats "within about 0.04" from the new §5.2
+- [x] (done 2026-10-19, see below) TODO (inline at the §5.3 opener, AI 5b.1): the opener repeats "within about 0.04" from the new §5.2
   summary and gives no map of the subsections; rewrite when §5.3 is reviewed.
+- [x] 2026-10-19 **§5.3 first round** (SV-5.4, SV-5.6, author sign-off): heading "The Ingredient Study" ->
+  "Ablation Studies" (supervisor's wording, label kept); "ingredient" dropped in favour of "property" in
+  §2.3, the §5.3 opener and §6.1 (heading "The operator: its properties."); §5.3.5 still uses it (next
+  round). New opener with a map of the subsections. §5.3.1 and §5.3.2 as goal -> results -> conclusion;
+  §5.3.1 ends on the reach limit of the k-NN graph (author: the depth question belongs to §5.3.2), §5.3.2
+  ends with the four-round pointer to §5.5.3; distances in µm (11 / 119 µm). "Negative Results" keeps its
+  heading (supervisor did not flag it). AI 5b.1, 5b.2, 5b.4-5b.12 done.
+- [ ] TODO (inline in §6.1, author 2026-10-19): discuss why more message-passing rounds or more reach stop
+  helping (second round on the k-NN graph +0.011, not established; four rounds on the stencil -0.009; reaches
+  ±35/±42 and rows ±2 lower than ±21), with the untested candidate explanations (mean aggregation diluting
+  near neighbours; extra reach bringing in unrelated tissue).
 - [ ] **TODO (author, 2026-10-18): re-read the z-test parts when going through the thesis again** -- §5.1.5
   second paragraph (inline TODO there), App. E.3 criteria, the z values in the three App. E tables, and the two
   §5.2 sentences on T-FEN vs stencil and stencil vs U-Net.

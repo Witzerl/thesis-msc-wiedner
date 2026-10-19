@@ -497,74 +497,84 @@ column is discussed in~\S\ref{sec:experiments:cost}.
 % ingredients"; that reading is left to Section 5.3.
 
 
-\section{The Ingredient Study}
+\section{Ablation Studies}
 \label{sec:experiments:ingredients}
+% Supervisor review 2, SV-5.4 (2026-10-19): heading was "The Ingredient
+% Study"; the term "ingredient" is dropped thesis-wide in favour of
+% "property" (2.3, 5.3, 6.1). Labels kept. Subsections follow goal ->
+% results -> conclusion (SV-5.5).
 
-% TODO (2026-10-19, AI 5b.1 / SV-5.4): this opener repeats "within about 0.04"
-% from the new 5.2 summary and gives no map of the subsections; rewrite when
-% Section 5.3 is reviewed (worklist ch4-7, Section "The Ingredient Study").
-The strongest arms of different classes lie within about 0.04 of each
-other, so comparing whole architectures says little about what makes an
-operator work. This section therefore compares operators that differ in one
-property only, with the rest of the framework held fixed. Each comparison
-measures one ingredient. All comparisons are taken fold by fold over the
-same five folds (\S\ref{sec:experiments:protocol:stats}).
+The operators of Table~\ref{tab:experiments:arms} differ in more than one
+respect at once, so their scores alone do not show which property of an
+operator matters. This section therefore compares operators that differ in
+one property only, with the rest of the framework held fixed. Four
+properties are tested, the ones named in~\S\ref{sec:background:neural-pde}:
+whether the operator has spatial context at all
+(\S\ref{sec:experiments:ingredients:context}), how far that context
+reaches physically (\S\ref{sec:experiments:ingredients:reach}), whether
+global context needs a local path
+(\S\ref{sec:experiments:ingredients:global}), and whether an explicit
+transport term helps (\S\ref{sec:experiments:ingredients:transport}).
+Section~\ref{sec:experiments:ingredients:convergence} brings the results
+together. All comparisons are taken fold by fold
+(\S\ref{sec:experiments:protocol:stats}); one control trains on only four
+folds (\S\ref{sec:experiments:ingredients:transport}).
 
 \subsection{Spatial Context}
 \label{sec:experiments:ingredients:context}
 
-The locality ladder uses the graph network on the index-space
+The first question is whether an operator needs to see its neighbours at
+all. It is tested on the graph network on the index-space
 $k$-nearest-neighbour graph with zero, one and two message-passing rounds
-(\S\ref{sec:method:family:floors}). With zero rounds, the per-pixel floor
-reads 0.0000 on every fold, identical to persistence. With one round, the
-one-hop floor reads $0.4515 \pm 0.0243$. With two rounds, the $k$-NN arm
-reads $0.4623 \pm 0.0361$. The second round adds 0.011 on average, within
-the noise level: the one-hop floor is higher on one of the five folds and
-on 33 of the 75 eyes. The second round thus adds at most about 0.01.
+(\S\ref{sec:method:family:floors}). With zero rounds, each pixel sees only
+itself.
 
-A single ring of neighbours therefore buys almost everything the graph
-network on this graph achieves, and the second ring adds little or nothing. Every
-point of change-region Dice comes from spatial context. One possible reason
-why the second ring adds so little is where its extra reach lies: on the
-index-space graph it extends mostly across rows, and only about 0.01\,mm
-along them (\S\ref{sec:method:graph}). This motivates the
-next comparison, which changes where the neighbours lie.
+Without message passing, the network predicts no change on any eye and
+scores 0.0000, the same as persistence. One round raises the score to
+$0.4515 \pm 0.0243$, and a second round to $0.4623 \pm 0.0361$. The second
+round adds 0.011 on average. This is within the noise level: the one-hop
+floor is higher on one of the five folds and on 33 of the 75 eyes.
+
+Spatial context is therefore necessary, and on this graph a single ring of
+neighbours provides almost all of it. Along a row, one hop of the
+index-space graph reaches only about 11\,\textmu{}m
+(\S\ref{sec:method:graph}). The dilated stencil, tested next, was built to
+remove this limit.
+% 2026-10-19 (SV-5.5, AI 5b.2, 5b.4; author): goal / results / conclusion;
+% the "more rounds" question is answered in 5.3.2, not here.
 
 \subsection{Physical Reach at Lesion Scale}
 \label{sec:experiments:ingredients:reach}
 
-This comparison keeps the graph network, the loss and the data, and changes
-only the edge set, from the index-space $k$-nearest-neighbour graph to the
-dilated stencil (\S\ref{sec:method:graph}, Figure~\ref{fig:method:stencils}).
-Both networks use mean
-aggregation and have the same 67\,147 parameters. The dilated stencil is
-higher by 0.064 on average, on all five folds and on 70 of the 75 eyes.
-This gain was obtained by changing only the edge set, at the same parameter
-count, and it is the reason the dilated stencil is the canonical
-configuration.
+The second question is whether the physical reach of the neighbourhood
+matters. The graph network is kept with its loss, its data and its
+67\,147 parameters, and only its edge set is changed. The index-space
+$k$-nearest-neighbour graph, whose hop reaches about 11\,\textmu{}m along a
+row, is replaced by the dilated stencil, whose hop reaches about
+119\,\textmu{}m (\S\ref{sec:method:graph},
+Figure~\ref{fig:method:stencils}). The dilated stencil is higher by 0.064
+on average, on all five folds and on 70 of the 75 eyes. This result is the
+reason the dilated stencil is the canonical configuration.
 
-Table~\ref{tab:experiments:reach} compares other stencil geometries with the
-default. Both a shorter and a longer reach along the rows are lower: by
-0.019 for a reach of $\pm 12$ columns and by 0.026 for $\pm 42$ columns,
-each higher than the default on at most one fold. The default of $\pm 21$
-columns, about 0.12\,mm, is therefore the best of the tested reaches on
-this axis. It lies close to the 90th percentile of the
-per-visit front advance, 23 columns (\S\ref{sec:method:graph}). The
+Table~\ref{tab:experiments:reach} varies the stencil around this default.
+A reach of $\pm 12$ columns is lower by 0.019 and a reach of $\pm 42$
+columns by 0.026, each higher than the default on at most one fold. The
 $\pm 42$ geometry keeps the 20 neighbours of the default by doubling the
-column spacing from 7 to 14, so its neighbours are sparser. The geometry
-reaching $\pm 35$ columns keeps the default spacing of 7 columns instead,
-with 32 neighbours; it is also lower, by 0.010, within the noise level. A
-longer reach therefore does not help even when the spacing is kept, so the
-penalty at $\pm 42$ columns is not a matter of sparser neighbours alone.
-Widening the stencil across rows, to $\pm 2$ rows, costs the most of all
-geometries, 0.039.
-Figure~\ref{fig:experiments:reach} places these geometries and the
-index-space graph on one axis of physical reach.
+column spacing from 7 to 14, so reach and spacing change together. To
+separate the two, the $\pm 35$ geometry keeps the default spacing and adds
+neighbours (32 in total). It is also lower, by 0.010, within the noise
+level, so a longer reach does not help even at the default spacing.
+Widening the stencil across rows, to $\pm 2$ rows, lowers the score most of
+all geometries, by 0.039. Figure~\ref{fig:experiments:reach} places these
+geometries and the index-space graph on one axis of physical reach.
 % Corrected 2026-10-01: the text and table said "same number of neighbours"
 % for the +/-35 geometry. Per baselines/anisognn.py, ANISOGNN_final_meant5 is
 % pitch 7, taps 5 (columns 0, +/-7..+/-35; 32 neighbours) and
 % ANISOGNN_final_meanp14 is pitch 14, taps 3 (columns 0, +/-14, +/-28,
 % +/-42; 20 neighbours); rows +/-2 (meanr2) has 34 neighbours.
+% 2026-10-19 (SV-5.6, AI 5b.5-5b.7, X4): subject named, the reason for the
+% +/-35 geometry stated, distances in micrometres (hop of +/-2 columns =
+% 11.4 um, +/-21 columns = 119 um at 5.68 um per column).
 
 \begin{table}[t]
   \centering
@@ -618,24 +628,34 @@ index-space graph on one axis of physical reach.
   \label{fig:experiments:reach}
 \end{figure}
 
-A higher degree at the same reach buys nothing. The index-space
-$k$-nearest-neighbour graph with $k = 20$ reaches as far as with $k = 12$
-but has more neighbours. Against the same network with $k = 12$, it is
+The number of neighbours was also varied at a fixed reach. With $k = 20$
+neighbours, the index-space graph reaches as far as with $k = 12$. It is
 lower by 0.010 on average, higher on only one of the five folds and on 20
 of the 75 eyes. The fold average is within the noise level while the eyes
 lean consistently one way, so the difference is not established; neither
-view points to a gain from the extra neighbours. What matters is where the
-neighbours are placed, not how many there are.
+view shows a gain from the extra neighbours.
 
-This also explains an earlier result. Before the dilated stencil, the
-parameter-matched U-Net was higher than the $k$-NN graph network, by
-0.042 on average, on four of the five folds and on 53 of the 75 eyes.
-Fold 3 goes the other way ($-0.042$), so the effect varies between folds.
-With the
-dilated stencil, the graph network is indistinguishable from the U-Net
-(\S\ref{sec:experiments:main-results}). The deficit of the graph network
-was therefore located in its graph --- in where its neighbours lie
-physically --- and not in its operator class.
+The placement of the neighbours also accounts for the gap between the
+graph network and the U-Net. On the index-space graph, the
+parameter-matched U-Net is higher by 0.042 on average, on four of the five
+folds and on 53 of the 75 eyes; fold 3 goes the other way ($-0.042$). On
+the dilated stencil, the two cannot be told apart
+(\S\ref{sec:experiments:main-results}).
+
+Reach along the rows therefore decides how well the graph network does.
+The best tested reach, $\pm 21$ columns (about 119\,\textmu{}m), lies close
+to the 90th percentile of the per-visit front advance, 23 columns
+(\S\ref{sec:method:graph}). Shorter and longer reaches score lower, and
+more neighbours at the same reach add nothing. More reach through more
+message-passing rounds does not help either: four rounds instead of two,
+which double the reach of the stencil, lower the canonical network by
+0.009 on average (\S\ref{sec:experiments:ablations:capacity}). The gap to
+the U-Net closed when only the placement of the neighbours changed, so it
+lay in the graph.
+% 2026-10-19 (SV-5.6, AI 5b.8-5b.12): "This also explains an earlier
+% result" -> the placement of the neighbours; no "What matters is ... not"
+% and no em-dash antithesis; four-round pointer added (author: the depth
+% question belongs here, not in 5.3.1).
 
 \subsection{Global and Local Context Together}
 \label{sec:experiments:ingredients:global}

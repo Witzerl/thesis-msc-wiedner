@@ -48,7 +48,7 @@ What the framework needs, in short, is a loss that puts weight on the
 lesion mask, an interval length that reaches the operator, and everything
 else held fixed.
 
-\paragraph{The operator: ingredients, not classes.}
+\paragraph{The operator: its properties.}
 The three highest arms come from three unrelated classes --- a
 finite-element network, a graph network and a U-Net --- and lie within
 about 0.04 of each other (\S\ref{sec:experiments:main-results}). The
@@ -79,7 +79,7 @@ rather than a proof of mechanism, but it is a more specific statement
 than any ranking of architectures.
 
 % Author decision (b), 2026-10-01: global + local demoted to an observation.
-Whether global and local context are separate ingredients remains open.
+Whether global and local context are separate properties remains open.
 The FNO, which sees the whole grid in every layer but has no local path,
 lies below the U-Net at the one-year anchor at both seeds. A
 $3 \times 3$ local path of 800 parameters brought it level at one seed but
@@ -97,7 +97,14 @@ above the noise level, and the smaller versions lost little. With 75 eyes, this 
 \S\ref{sec:introduction:why-pde} leads one to expect: the assumptions built
 into an operator weigh more than its size. The capacity study shows that
 size did not help; that the built-in assumptions are the reason is an
-interpretation, supported by the ingredient study.
+interpretation, supported by the ablation studies.
+% TODO (2026-10-19, author): discuss why more message-passing rounds or more
+% reach stop helping: the second round on the k-NN graph adds about 0.01, not
+% established (5.3.1); four rounds on the dilated stencil are lower by 0.009
+% (5.5.3); reaches of +/-35 and +/-42 columns and rows +/-2 are lower than
+% +/-21 (5.3.2). Untested candidate explanations: with mean aggregation, far
+% neighbours beyond the front advance dilute the near ones; the extra reach
+% brings in tissue unrelated to the next visit's change.
 
 \paragraph{A missing counterpart to the equation features.}
 In MP-PDE, a vector of equation features $\theta_{\text{PDE}}$ --- the
