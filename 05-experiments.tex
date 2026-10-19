@@ -660,112 +660,145 @@ lay in the graph.
 \subsection{Global and Local Context Together}
 \label{sec:experiments:ingredients:global}
 
-The Fourier Neural Operator has global spectral support but no local path
-(\S\ref{sec:method:family:dense}). The local-kernel hybrid adds a
-$3 \times 3$ local path to the same operator, at a cost of 800 parameters.
+The third question is whether an operator with global context also needs
+a local path. The Fourier Neural Operator sees the whole grid in every
+layer through its Fourier modes but has no local path
+(\S\ref{sec:method:family:dense}). This comparison pairs the plain FNO
+with the same FNO plus a $3 \times 3$ local path, which adds 800
+parameters.
 
-The FNO is higher than the $k$-NN graph network by 0.021 on average, on
-three of the five folds and on 41 of the 75 eyes. Fold 4 carries all of
-it: without fold 4 the average is $-0.001$, so this difference is not
-established. Against the U-Net, the FNO is lower by 0.022 on average and
-higher on only one of the five folds and on 30 of the 75 eyes: at the
-one-year anchor the FNO lies below the U-Net. Beyond one year the order
-changes. In
-the growth-region Dice by horizon, the FNO reads 0.546, 0.583 and 0.594 for
-one to two, two to three and more than three years, and the U-Net 0.563,
-0.581 and 0.555: the FNO trails the U-Net in the second year, ties it in
-the third and lies above it beyond three years
-(Figure~\ref{fig:experiments:horizon}a). Global spectral support
-may therefore matter more at long horizons than at the one-year anchor;
-the horizon values are descriptive and were not tested for significance.
+The local path raises the FNO by 0.015 on average, on four of the five
+folds and on 48 of the 75 eyes. The fold average is within the noise level
+while the eyes lean consistently one way, so the effect is not
+established.
+
+Against the other operators, the plain FNO lies below the U-Net at the
+one-year anchor: lower by 0.022 on average, higher on only one of the five
+folds and on 30 of the 75 eyes. It is higher than the $k$-NN graph network
+by 0.021 on average, but fold 4 carries all of it (without it, $-0.001$),
+so this is not established. With the local path, the FNO cannot be told
+apart from the U-Net ($-0.006$ on average). It is higher than the $k$-NN
+graph network by 0.036 on average, on four of the five folds and on 49 of
+the 75 eyes, and this does not depend on any single fold.
+
+Beyond one year, the order between the FNO and the U-Net changes
+(Figure~\ref{fig:experiments:horizon}a). In the growth-region Dice, the
+FNO reads 0.546 against 0.563 for the U-Net in the second year, 0.583
+against 0.581 in the third and 0.594 against 0.555 beyond three years.
+These values are descriptive and were not tested.
 % Source: SOLVER_FINAL_RUNS section 9.20 (thesis_numbers.py, 2026-10-01);
 % pooled over every late-epoch rollout step in each bin, seed 42. FNO + 3x3:
 % 0.553 / 0.571 / 0.553. Section 9.8a's per-eye-bin means for the same arms
 % use a different aggregation and must not be mixed with these.
 
-The hybrid is higher than the $k$-NN graph network by 0.036 on average,
-on four of the five folds and on 49 of the 75 eyes, and the difference
-does not depend on any single fold. The effect of the local path itself is
-the hybrid against the FNO: higher by 0.015 on average, on four of the
-five folds and on 48 of the 75 eyes. The fold average is within the noise
-level while the eyes lean consistently one way, so the effect is not
-established. The hybrid and the U-Net cannot be told apart ($-0.006$ on
-average).
-
-Global spectral support alone therefore does not reach the U-Net at the
-one-year anchor. Whether a minimal local path closes this gap is not
-established.
+Global context alone therefore does not reach the U-Net at the one-year
+anchor. With a local path of 800 parameters, the FNO can no longer be told
+apart from the U-Net, but the effect of the local path itself is not
+established. The values beyond one year suggest that global context may
+matter more at longer horizons than at the anchor.
 % Author decision (b), 2026-10-01: global + local is reported as an
-% observation, not as an established ingredient (5.3.5, 6.1, Ch. 7,
+% observation, not as an established property (5.3.5, 6.1, Ch. 7,
 % abstracts). Values: thesis_numbers.py pair, 2026-10-01; recomputed
 % 2026-10-02. The seed-7 paragraph moved to tab:appendix:seeds (reporting
 % scheme; author: do not single out the local-path result in 5.1.4).
+% 2026-10-19 (SV-5.7, SV-5.8, AI 5b.13, 5b.15): goal / within-FNO ablation /
+% comparison with the other operators / horizon / conclusion; horizon values
+% paired per year.
 
 \subsection{An Explicit Transport Term}
 \label{sec:experiments:ingredients:transport}
 
-This comparison pairs the T-FEN with the same finite-element network
-without its transport head, at the same width
-(\S\ref{sec:method:family:fen}). The ablation is additive: both
-heads are zero-initialised, so both arms start as the same function. The
-T-FEN is higher by 0.062 on average, on all five folds and on 68 of the 75
-eyes. With the earlier Galerkin form of the transport operator the
-difference was of the same order, 0.053, again on all five folds, so the
-effect does not depend on the form of the transport operator.
+The fourth question is whether an explicit transport term helps. The
+finite-element network computes the change of the state with a free-form
+term, a small network evaluated on each triangle. The T-FEN adds a
+transport term, which moves the state along a velocity predicted by a
+second network (\S\ref{sec:method:family:fen}). The comparison pairs the
+T-FEN with the same network without the transport term, at the same width
+of 96. Both arms start at persistence, because their output heads are
+zero-initialised (\S\ref{sec:method:dt-residual}), so the transport term is
+the only difference.
+
+The T-FEN is higher by 0.062 on average, on all five folds and on 68 of the
+75 eyes. With the earlier Galerkin form of the transport operator, the
+difference was of the same order, 0.053, again on all five folds. That form
+becomes unstable in long free-running rollouts, but only well after the
+one-year anchor (\S\ref{sec:experiments:validity:tfen}), so its score at
+the anchor is valid, and the effect does not depend on the form of the
+transport operator.
 % Seed-7 values (tab:appendix:seeds): thesis_numbers.py pair, 2026-10-01,
 % against FEN_final_w96Frk4d45s7. The previously quoted seed-7 Galerkin value
 % (+0.0495) used the seed-42 free-form control and is superseded.
+% Galerkin onset of instability: about day 585-720, beyond the 360-day
+% training horizon (5.6.2 and its source comment).
 
-This control, however, is not parameter-matched: the T-FEN has
-68\,503 parameters and the free-form control 34\,785, a factor of 1.97.
-Part of the gain could therefore come from the extra parameters. A second
-control closes this gap. It widens the free-form network to a width of
-139, which gives 68\,282 parameters, level with the T-FEN
-(\S\ref{sec:method:family:params}). This control does not train on fold 4:
-its training error rises from the first epoch instead of falling, and it
-reads 0.047 at the anchor, in two separate attempts, while the width-96
-control trains normally on the same fold (0.501). Repeated with the second
+The control without the transport term is not parameter-matched, however.
+It has 34\,785 parameters against 68\,503 for the T-FEN, so part of the
+gain could come from the extra parameters. A second control widens the
+free-form network to a width of 139, giving 68\,282 parameters, level with
+the T-FEN (\S\ref{sec:method:family:params}). This matched control does
+not train on fold 4: its training error rises from the first epoch, and it
+reads 0.047 at the anchor. A second attempt gave the same result, while
+the width-96 control trains normally on this fold (0.501). With the second
 seed, the matched control trains on all five folds, so the failure is
-specific to this run (Appendix~\ref{app:full-results:seeds}). On folds 0
-to 3, the T-FEN is higher than the matched control by 0.072 on average, on
-all four folds and on 59 of the 63 eyes. The extra width moves the
-free-form network by little ($-0.008$ on these four folds, within the
-noise level). The transport effect is therefore not a matter of parameter
-count.
+specific to this run (Appendix~\ref{app:full-results:seeds}). It is a
+failure of the optimisation rather than overfitting, since the error rises
+on the training data itself. Its cause was not diagnosed; the larger
+T-FEN networks of~\S\ref{sec:experiments:ablations:capacity} fail in a
+similar way, which suggests that the shared training settings suit the
+larger finite-element networks less well.
+
+On folds 0 to 3, the T-FEN is higher than the matched control by 0.072 on
+average, on all four folds and on 59 of the 63 eyes. The extra width
+changes the free-form network little ($-0.008$ on these folds, within the
+noise level), so spending the parameters on a wider free-form term does not
+help, as for every class in the capacity study
+(\S\ref{sec:experiments:ablations:capacity}). The matched control
+therefore rules out that the same number of parameters in the free-form
+term explains the gain, but not every other use of them. That the
+transport term does not depend on its own size is shown by the T-FEN at
+width 48: with 20\,455 parameters, fewer than the width-96 control, it
+scores the same as at width 96
+(\S\ref{sec:experiments:ablations:capacity}).
 % Seed-7 values: thesis_numbers.py pair, 2026-10-01 (w139 s7 folds 0.4652,
 % 0.4468, 0.5351, 0.4521, 0.4418). Seed-42 values verified 2026-10-01 against
 % solver_results.csv (superseded fold-4 attempt skipped) and SOLVER_FINAL_RUNS
 % section 9.18. Including the failed seed-42 fold the difference would read
-% +0.159, which only reflects the failure.
+% +0.159, which only reflects the failure. Fold-4 failure (SOLVER_FINAL_RUNS
+% 9.18): training RMSE rises from 1.221 in both attempts (0.0469 / 0.0467);
+% cause not diagnosed. Width 48 in the energy-conserving form: 0.5434 against
+% 0.5428 at width 96 (Table tab:experiments:capacity).
 
-Where the transport term acts can be seen in the first year. In the
-growth-region Dice between baseline and one year, the free-form FEN reads
-0.388, close to the one-hop floor (0.395) and the $k$-NN graph network
-(0.397), the operators whose reach falls short of the per-visit front
-advance (\S\ref{sec:method:graph}). The transport term lifts the T-FEN to
-0.519, level with the dilated stencil (0.503), whose single hop was
+The first-year values show where the transport term acts. In the
+growth-region Dice up to one year, the free-form FEN reads 0.388, close to
+the one-hop floor (0.395) and the $k$-NN graph network (0.397). All three
+operators reach less far in one step than the lesion front advances between
+two visits (\S\ref{sec:method:graph}). With the transport term, the T-FEN
+reads 0.519, level with the dilated stencil (0.503), whose single hop was
 designed to match that advance (Figure~\ref{fig:experiments:horizon}b).
-The two constructions close the same near-term gap.
+Over the later years the two stay close: 0.602 against 0.600 in the second
+year and 0.633 against 0.634 in the third. Only beyond three years does the
+stencil lie higher (0.655 against 0.611,
+Figure~\ref{fig:experiments:horizon}a). The velocity field learned by the
+T-FEN is not interpreted here; its stability is examined
+in~\S\ref{sec:experiments:validity:tfen}.
 % Source: SOLVER_FINAL_RUNS section 9.20 (thesis_numbers.py, 2026-10-01),
 % growth-region Dice in the (0, 1] y bin, pooled over every late-epoch
 % rollout step, seed 42; T-FEN in the energy-conserving form.
 % Corrected 2026-10-01: the k-NN value was 0.393, which is the retired
 % mean+max arm MPPDE_final_dts; the reported mean-aggregation arm
 % MPPDE_final_aggrmean reads 0.397 (re-computed from the mai/ records).
-
-The T-FEN and the dilated stencil tie at the anchor, and their profiles
-over the horizon are close as well. In the growth-region Dice by horizon,
-the T-FEN reads 0.519, 0.602 and 0.633 in the first three years and the
-dilated stencil 0.503, 0.600 and 0.634; only beyond three years does the
-stencil lie higher (0.655 against 0.611; Figure~\ref{fig:experiments:horizon}a).
-The velocity field learned by the T-FEN is not interpreted here; its
-stability is examined in~\S\ref{sec:experiments:validity:tfen}.
 % Horizon values: late-epoch growth-region Dice per horizon bin, seed 42,
 % SOLVER_FINAL_RUNS section 9.19a (2026-10-01); verified against the per-step
 % records in section 9.20.
-% 2026-10-01: the clause "whether its velocities stay within the stability
-% limit of RK4 has not been read back" was removed -- the read-back exists
-% (fold 0, section 5.5.2).
+
+The transport term therefore improves the finite-element network, also
+against a control of the same size, and it brings the first-year values to
+those of the dilated stencil.
+% 2026-10-19 (SV-5.9, AI 5b.19-5b.27; author): opening expanded; no
+% paragraph-opening "This control"; Galerkin instability scoped; fold-4
+% failure interpreted (optimisation, not overfitting; cause open); the matched
+% control's limit stated (a wider free-form term is one use of the
+% parameters, not every use) and the width-48 T-FEN added.
 
 % Figure: images/scripts/fig_experiments_horizon.py (thesis_numbers horizon
 % aggregation; Mai et al. 2024, Table 2).
@@ -794,34 +827,41 @@ stability is examined in~\S\ref{sec:experiments:validity:tfen}.
   \label{fig:experiments:horizon}
 \end{figure}
 
-\subsection{Two Routes to One Deficit}
+\subsection{Summary of the Ablation Studies}
 \label{sec:experiments:ingredients:convergence}
+% Supervisor review 2, SV-5.10 (2026-10-19): heading was "Two Routes to One
+% Deficit"; the closing "the architecture class is not what separates ...;
+% the ingredients they carry are" replaced by the two measured magnitudes.
 
-The GA front moves about 10 to 25 columns per visit, with a median of 12
+Two of the tested properties improve an operator against its own control,
+and both concern how far an operator reaches in one step. The GA front
+advances about 10 to 25 columns between two visits, with a median of 12
 and a 90th percentile of 23 columns (\S\ref{sec:method:graph}). One hop on
-the index-space graph reaches only $\pm 2$ columns, about 0.011\,mm along a
-row. An operator of that kind cannot see as far as the lesion front moves
-between two visits.
+the index-space graph reaches only $\pm 2$ columns, about 11\,\textmu{}m
+along a row, so a single step of such an operator covers only a small part
+of that advance.
 
-Two unrelated constructions correct this deficit. The first is physical
-reach: the dilated stencil, whose single hop spans 21 columns. The second
-is an explicit transport term: the T-FEN, established against a
-parameter-matched control (\S\ref{sec:experiments:ingredients:transport}).
-Each is
-established against its own control, and the two end up within about
-0.017 of each other, at the noise level; they are the two highest arms of
-Table~\ref{tab:experiments:arms}
-(\S\ref{sec:experiments:main-results}). The central
-architectural result of the survey is this coincidence --- two independent
-routes to the same deficit --- rather than the score of any single arm. It
-is suggestive rather than a proof of mechanism.
+Two different constructions remove this limit. The dilated stencil places
+the neighbours of the graph network at lesion scale, so that one hop spans
+21 columns (\S\ref{sec:experiments:ingredients:reach}). The transport term
+of the T-FEN moves the state along a learned velocity
+(\S\ref{sec:experiments:ingredients:transport}). Each is established
+against its own control, and the two arms lie within about 0.017 of each
+other as the two highest arms of Table~\ref{tab:experiments:arms}
+(\S\ref{sec:experiments:main-results}). That two unrelated constructions
+aimed at the same limit reach about the same score is the central
+architectural result of the survey. It is consistent with the reach
+explanation but does not prove the mechanism.
 
-The architecture class therefore is not what separates the strongest
-operators; the ingredients they carry are. A third candidate, global and
-local context together, is not established
-(\S\ref{sec:experiments:ingredients:global}) and is not counted among
-them. \S\ref{sec:experiments:ablations} reports what
-was measured and did not matter.
+Spatial context is necessary (\S\ref{sec:experiments:ingredients:context}),
+and a local path for the FNO is not established
+(\S\ref{sec:experiments:ingredients:global}). Within one architecture
+class, changing one of these properties moves the score by 0.06 to 0.07;
+between the three highest classes, the scores differ by at most 0.04. The
+settings of the framework itself are tested
+in~\S\ref{sec:experiments:ablations}.
+% 0.06 to 0.07: reach +0.064 (5.3.2), transport +0.062 / +0.072 against the
+% matched control (5.3.4); three highest arms within 0.038 (Table 5.1).
 
 
 \section{Differences Between Folds}

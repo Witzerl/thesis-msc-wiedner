@@ -1761,6 +1761,15 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
   §5.3.1 ends on the reach limit of the k-NN graph (author: the depth question belongs to §5.3.2), §5.3.2
   ends with the four-round pointer to §5.5.3; distances in µm (11 / 119 µm). "Negative Results" keeps its
   heading (supervisor did not flag it). AI 5b.1, 5b.2, 5b.4-5b.12 done.
+- [x] 2026-10-19 **§5.3 second round** (SV-5.7-SV-5.10, author sign-off): §5.3.3 goal -> FNO vs FNO+3x3 ->
+  comparison with the other operators -> horizon (paired per year) -> conclusion; §5.3.4 opening expanded
+  (free-form term, transport term, zero-init), Galerkin result scoped (unstable only well after the anchor),
+  fold-4 failure of the matched control interpreted as an optimisation failure (training error rises; cause
+  not diagnosed; larger FENs in §5.5.3 fail similarly), the matched control's limit stated (author: a wider
+  free-form term is not a useful use of the parameters; it rules out that use, not every use) and the
+  width-48 T-FEN (20 455 params, fewer than the width-96 control, same score) added; §5.3.5 heading
+  "Summary of the Ablation Studies", closing now the two magnitudes (one property within a class 0.06-0.07,
+  the three highest classes within 0.04). AI 5b.13-5b.34 done. Numbers unchanged.
 - [ ] TODO (inline in §6.1, author 2026-10-19): discuss why more message-passing rounds or more reach stop
   helping (second round on the k-NN graph +0.011, not established; four rounds on the stencil -0.009; reaches
   ±35/±42 and rows ±2 lower than ±21), with the untested candidate explanations (mean aggregation diluting
