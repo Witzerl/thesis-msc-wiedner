@@ -1340,7 +1340,15 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
 - [x] (2026-10-19: superseded by the real FAF figure below; author: no schematic needed for now)
   Not yet in the text: GA progression stages from the poster (`poster/figs/eye_stage_1-4.png`),
   e.g. in §1.1 or §2.1.2 -- placement to be decided.
-- [ ] 2026-10-19 (author): **§2.1.2 `fig:bg:ga-faf`** -- what GA looks like on a real eye, from the
+- [x] 2026-10-19 **Fig. `fig:bg:ga-faf` done** (`images/fig_bg_ga_faf.png`, script
+  `images/scripts/fig_bg_ga_faf.py`): PEAT0021_OD, days 0 and 1080, rank 1 of 26 eyes passing the
+  rule, chosen by the author over rank 3 (PEA00039_OD, textbook large lesion) and rank 2
+  (PEA01821_OD, rejected: dark artefact over the later image). Frame checked (T_mask IoU 1.000; mask
+  on the FAF lesion edge within 2 px, 26 visits). Window = 49 x 1024 modelling window, dashed blue
+  on a white halo, labelled "≈ 6 × 6 mm" (no scale bar, author). Simple caption; referenced in §2.1.2 (FAF), §2.1.3
+  opener, §2.5.1 (growth at the margin), §3.1 (FAF annotation) and §3.3 (window). The spec entry
+  below is kept as history.
+- [x] 2026-10-19 (author): **§2.1.2 `fig:bg:ga-faf`** -- what GA looks like on a real eye, from the
   MUW FAF images (`data/MUW_GA/scans/<eye>/<day>/faf_global.png`). Placeholder + spec in
   02-background.tex after the FAF paragraph; referenced there and in the §2.1.3 opener. (a) baseline,
   (b) same eye ~3 years later, grey, each image stretched on its own (1st-99th percentile; a

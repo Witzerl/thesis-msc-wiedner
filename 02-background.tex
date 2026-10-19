@@ -209,47 +209,26 @@ signal is lost, so GA appears as a dark area with high-contrast borders
 and FAF has become the gold standard for detecting and measuring GA area
 \citep{Boopathiraj2024}.
 
-% TODO: produce Figure fig:bg:ga-faf (planned 2026-10-19, author: from the
-% MUW images, FAF; no schematic needed for now). Script
-% images/scripts/fig_bg_ga_faf.py -> images/fig_bg_ga_faf.pdf, style/ rules.
-% Source: masterthesis-docker/data/MUW_GA/scans/<eye>/<day>/faf_global.png
-% (1536 x 1536, greyscale), read-only.
-% (a) FAF of one eye at baseline, (b) FAF of the same eye at a later visit
-% about three years on, in grey (no colour map), same crop. Each image is
-% scaled on its own: its 1st-99th percentile of grey values is stretched
-% to the full grey range. A common window would mislead: FAF brightness is
-% in arbitrary units per acquisition, and the stored PNGs differ (scratch
-% check GX511402_OS: median grey 82 at day 0 vs 110 at day 1080,
-% 99th percentile 160 vs 226).
-% Dashed rectangle = OCT field of view from slo.transform.json
-% (transform_oct_fov); check first that faf_global.png is in the frame of
-% slo_global.png / mask_global.png. Scale bar derived from that window.
-% No mask overlay (one message: what GA looks like and that it grows);
-% the annotation is shown in Fig. fig:data:example-state.
-% Eye rule (fix in the script, author confirms): lesion inside the OCT
-% window without touching its edge, square-root growth rate near the
-% cohort median (0.234 mm/yr), follow-up >= 3 years. Candidate seen in a
-% scratch preview: GX511402_OS, days 0 and 1080 (lesion near the left
-% edge -- check the rule).
-% Fill [interval] and [growth] in the caption from the script output.
+% Figure fig:bg:ga-faf: images/scripts/fig_bg_ga_faf.py (read-only source
+% data/MUW_GA/scans/PEAT0021_OD/{0,1080}/faf_global.png). Eye picked by a
+% rule fixed before viewing (follow-up >= 3 y; lesion inside the modelling
+% window at both visits; growth rate closest to the cohort median): rank 1
+% of 26, 0.247 mm/yr, baseline 1.06 mm^2 in the window, days 0 -> 1080;
+% confirmed by the author 2026-10-19. Lesion patches (mask_global): 4 at
+% day 0, 3 at day 1080, the two largest merged. Each image stretched on its
+% own (1st-99th percentile); FAF brightness differs per acquisition.
+% Window drawn through T_mask (IoU 1.000 against mask_oct; the mask lies on
+% the FAF lesion edge within 2 px in 26 checked visits).
 \begin{figure}[tp]
   \centering
-  \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering\itshape Placeholder
-    for Figure~\ref{fig:bg:ga-faf}: fundus autofluorescence of one eye
-    of the MUW cohort at baseline and at a later visit. See accompanying
-    \texttt{\% TODO} for the intended content.}}
-  % \includegraphics[width=\textwidth]{images/fig_bg_ga_faf.pdf}
+  \includegraphics[width=\textwidth]{images/fig_bg_ga_faf.png}
   \caption[Geographic atrophy on fundus autofluorescence.]{%
-    Geographic atrophy on fundus autofluorescence (FAF), one eye of the
-    MUW cohort. \emph{(a)}~Baseline visit. \emph{(b)}~The same eye
-    [interval] later. The lesion is the dark area: where the RPE has
-    been lost, there is no autofluorescence. Over the interval the lesion
-    has grown. The dashed rectangle marks the OCT field of view, about
-    $6 \times 6$\,mm. Each image was contrast-stretched on its own, so
-    brightness cannot be compared between the two panels.}
-  % TODO: once the eye is fixed, describe what the two panels show
-  % (e.g. growth at the margin, merging of satellite patches) only as far
-  % as it is visible in that eye.
+    Geographic atrophy on fundus autofluorescence in one eye of the
+    cohort. \emph{(a)}~First visit. \emph{(b)}~The same eye three years
+    later. The lesion is the dark area, where the RPE has been lost. It
+    has grown, and its two largest patches have merged. The dashed square
+    marks the region the models receive (\S\ref{sec:data:spatial}).
+    Brightness is not comparable between the two panels.}
   \label{fig:bg:ga-faf}
 \end{figure}
 
@@ -976,7 +955,7 @@ four respects, and the thesis adopts it for these reasons.
     solver advances.
   \item \textbf{Change driven by the neighbourhood.} As described above,
     GA grows at the margin of the lesion, while its atrophic interior and
-    the surrounding retina change little. Whether a pixel becomes atrophic
+    the surrounding retina change little (Figure~\ref{fig:bg:ga-faf}). Whether a pixel becomes atrophic
     depends on what surrounds it, which is the situation a stencil is
     designed for.
   \item \textbf{Slow change.} Consecutive visits differ in a small part
