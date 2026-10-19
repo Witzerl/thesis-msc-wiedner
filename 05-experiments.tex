@@ -1486,32 +1486,36 @@ settings of the message function did not, at this precision.
 \section{Validity Diagnostics}
 \label{sec:experiments:validity}
 
-The two diagnostics of this section are not accuracy numbers. They decide
-which statements about the operators are licensed. The first tests whether
-a trained operator can be read as a continuous-time system; the second
-shows why the first version of the T-FEN was not a stable free-running
-model, and how the energy-conserving form fixes it.
+This section examines two properties of the trained operators that the
+accuracy numbers do not show: whether an operator can be read as a
+continuous-time model, and whether the T-FEN stays stable when it predicts
+far beyond the training horizon. Two tests were designed for this purpose.
+The solver-swap test re-evaluates trained models with smaller integration
+steps (\S\ref{sec:experiments:validity:swap}), and a stability criterion
+checks the free-running rollout (\S\ref{sec:experiments:validity:tfen}).
+Their results decide which statements about the operators are licensed.
+% 2026-10-19 (SV-5.15, AI 5d.1): opener states what is examined and which
+% tests were designed for it.
 
 \subsection{The Solver-Swap Test}
 \label{sec:experiments:validity:swap}
 
 The update of the framework, $u_t + \Delta t \cdot f_\theta$, has the form
-of one explicit Euler step (\S\ref{sec:method:dt-residual}), and the
-Runge--Kutta wrapper and the Finite Element Network go further and
-integrate $f_\theta$ over several sub-steps
-(\S\ref{sec:method:family:rk}, \S\ref{sec:method:family:fen}). This
-invites reading $f_\theta$ as the right-hand side of an ordinary
+of one explicit Euler step (\S\ref{sec:method:dt-residual}). The
+Runge--Kutta wrapper and the Finite Element Network integrate $f_\theta$
+over several sub-steps instead (\S\ref{sec:method:family:rk},
+\S\ref{sec:method:family:fen}). As discussed in~\S\ref{sec:method:family:rk},
+both suggest reading $f_\theta$ as the right-hand side of an ordinary
 differential equation $\mathrm{d}u/\mathrm{d}t = g(u)$, in the sense of a
-Neural ODE \citep{Chen2018}: a vector field that states how the state
-changes at every moment. Under that reading, a model would define the state
+Neural ODE \citep{Chen2018}: a vector field that gives the change of the
+state at every moment. Under that reading, a model would define the state
 at any time, its predictions for different intervals would be consistent
 with one another, and $f_\theta$ could be interpreted as a rate of growth.
 A network trained with one fixed discretisation need not have this
 property. It can fit the observed data while its output depends on the
 discretisation it was trained with \citep{Ott2021, Krishnapriyan2023}. The
 solver-swap test determines which of the trained models have the property,
-and therefore for which models statements about continuous-time behaviour
-are admissible.
+and therefore for which models continuous-time statements may be made.
 
 The test rests on a basic property of numerical integration. If a model
 defines an ordinary differential equation
@@ -1529,136 +1533,161 @@ Two criteria make this operational:
     run-to-run noise, the standard deviation of 0.0127 between repeated runs of one
     configuration (Appendix~\ref{app:full-results:criteria}).
 \end{itemize}
-A model is read as a continuous-time model only if it satisfies both.
+A model is read as a continuous-time model only if it satisfies both. C1
+is read at the two finest steps: from 22.8 to 11.4 days the prediction
+changes by less than the run-to-run noise with both schemes, and the two
+schemes agree to within it at 11.4 days.
 
 The test requires no retraining. A trained checkpoint is rebuilt from its
-own configuration and evaluated with the unmodified evaluation code, with
-only the integration scheme or the step changed. The integration wrapper
-has no parameters (\S\ref{sec:method:family:rk}), so every setting uses the
-same weights. As a control, the setting a model was trained with reproduces
-exactly the change-region Dice recorded at the end of its training. Three
-models were tested: the canonical dilated-stencil network, trained with one
-Euler step and with $\Delta t$ as an input of the operator; the same
-network trained inside the autonomous Runge--Kutta wrapper, with one RK4
-step and without a $\Delta t$ input; and the T-FEN in its energy-conserving
-form, trained with RK4 in steps of 45 days and without a $\Delta t$ input.
-The two graph networks were tested on fold 2 and the T-FEN on fold 0, each
-with one seed. The T-FEN was integrated with RK4 only, because an explicit
-Euler step is unstable for its transport operator at any step
-(\S\ref{sec:method:family:fen}).
+own configuration and evaluated with the unmodified evaluation code; only
+the integration scheme and the step change. The integration wrapper has no
+parameters (\S\ref{sec:method:family:rk}), so every setting uses the same
+weights. As a control, each model was evaluated with the setting it was
+trained with, which reproduces its recorded change-region Dice exactly. The
+step is fixed in time: $h = 1, 1/2, 1/4, 1/8, 1/16$ and $1/32$ year, that
+is 365 to 11.4 days. Each visit interval is split into the smallest number
+of equal sub-steps that are no longer than $h$, so no visit is skipped.
+Both explicit Euler and classical RK4 are evaluated at every step. Because
+the median interval between visits is 180 days, steps of one and of half a
+year leave almost every interval in one piece. Three models were tested,
+each on folds 0 to 2 with one seed:
+\begin{itemize}
+  \item the canonical dilated-stencil network, trained with one Euler step
+    per interval and with $\Delta t$ as an input of the operator;
+  \item the same network trained inside the autonomous Runge--Kutta
+    wrapper, with one RK4 step per interval and without a $\Delta t$ input;
+  \item the T-FEN in its energy-conserving form, trained with RK4 in steps
+    of 45 days and without a $\Delta t$ input.
+\end{itemize}
 
-Table~\ref{tab:experiments:swap} lists the results, and
-Figure~\ref{fig:experiments:swap} shows them against the step size. The
-canonical network fails both criteria. Refining its Euler step from one to two to four
-sub-steps changes the Dice first by $-0.016$ and then by a further
-$-0.060$: the change grows instead of shrinking (C1). Across the five
-settings the Dice spans 0.086, almost seven times the run-to-run noise
-(C2). The reason is structural. The operator receives $\Delta t$ as an
-input, so a smaller step also changes the input on which the operator is
-conditioned. There is no single vector field $g(u)$ to converge to: the
-canonical network is a one-step map conditioned on the length of the step,
-a single jump in the sense of \S\ref{sec:method:family:rk}.
+Table~\ref{tab:experiments:swap} summarises the results per model and
+fold, Table~\ref{tab:appendix:step-ladder} lists every setting, and
+Figure~\ref{fig:experiments:swap} shows the change against the step. The
+canonical network fails C2 on all three folds. Over the settings at least
+as fine as its training setting, its Dice spans 0.054, 0.077 and 0.201 on
+folds 0, 1 and 2, four to sixteen times the run-to-run noise. At the
+finest step, Euler changes the Dice by $-0.037$, $+0.043$ and $-0.187$
+against the trained setting. On folds 0 and 1 the two schemes approach a
+common value at the finest steps (C1), but that value lies far from the
+prediction of the trained setting; on fold 2 the prediction still changes
+by about 0.03 per halving of the step (C1 fails). The operator receives
+$\Delta t$ as an input, so a smaller step also changes the input on which
+it is conditioned, and steps of 45 days or less are shorter than any
+interval between two visits. The canonical network is a one-step map
+conditioned on the length of the step, a jump in the sense
+of~\S\ref{sec:method:family:rk}.
 
-The network trained inside the Runge--Kutta wrapper passes both criteria.
-Its Euler refinements change the Dice by $+0.018$ and then by $+0.004$
-(C1), and every setting except the single Euler step, the crudest one,
-lies within 0.0044 of the others; the three RK4 settings agree to within
-0.0005 (C2). The T-FEN passes as well. Refining its step from 45 days,
-the training step, to 30, 22.5 and 15 days changes the Dice by at most
-0.0003 (C1, C2). Only the coarser step of 90 days departs, and by no more
-than 0.0015.
+The network trained inside the Runge--Kutta wrapper converges on all three
+folds (C1). From a step of a quarter year on, its RK4 predictions change by
+less than 0.002, and its Euler predictions approach the same value, to
+within 0.002 at the finest step. It therefore defines a single vector field.
+C2 holds on fold 2 only. On folds 0 and 1, the converged value lies about
+0.018 above the value of the trained setting, one RK4 step per interval. On
+these folds, that step is too coarse to resolve the vector field to within
+the run-to-run noise.
 
-It follows that the canonical network, and with it every headline
-result, may not be described as a continuous-time model: no statement about an ordinary
-differential equation, a learned rate of growth or learned dynamics is
-made for it. For the network trained inside the Runge--Kutta wrapper and
-for the energy-conserving T-FEN, a continuous-time reading is admissible,
-within the scope of one fold and one seed. The network trained inside the
-Runge--Kutta wrapper is not more accurate than the canonical network
-(\S\ref{sec:experiments:ablations:time}). The T-FEN lies slightly above it,
-at the noise level (\S\ref{sec:experiments:main-results}), and owes this to
-its transport term (\S\ref{sec:experiments:ingredients:transport}), not to
-the continuous-time property. The continuous-time property can therefore be obtained on this task, but it
-does not decide the accuracy.
-% Sources: SOLVER_FINAL_RUNS section 9.17 (graph networks, fold 2,
-% 2026-09-17) and section 9.19b (skew T-FEN, fold 0, 2026-10-01). The
-% criteria C1/C2 make explicit the reading used there (solver-independence
-% against the 0.0127 replicate sd); they were not fixed as numbers before
-% section 9.17 was run.
-% TODO: optional -- repeat the T-FEN swap on fold 2 so all three models share
-% a fold, and on the seed-7 skew T-FEN once it is in.
+The T-FEN passes both criteria on all three folds. Between its training
+step of 45 days and the finest step of 11.4 days, its RK4 predictions
+change by at most 0.002. Coarser steps lose accuracy: 0.001 to 0.012 at a
+quarter year, and 0.07 to 0.20 at half a year and one year. Explicit Euler
+amplifies every mode of the transport operator
+(\S\ref{sec:method:family:fen}). At small steps, however, this growth stays
+small over one year, and the Euler predictions approach the RK4 value with
+an error that roughly halves with each halving of the step, as expected of
+a first-order scheme.
+
+The canonical network, and with it every headline result, may therefore
+not be described as a continuous-time model: no statement about an ordinary
+differential equation, a learned rate of growth or learned dynamics is made
+for it. The energy-conserving T-FEN can be read as a continuous-time model,
+within the scope of three folds and one seed. The network trained inside
+the Runge--Kutta wrapper defines a vector field as well, but its training
+step resolves it on only one of the three folds. Neither property decides
+the accuracy. The Runge--Kutta network is not more accurate than the
+canonical network (\S\ref{sec:experiments:ablations:time}), and the score
+of the T-FEN comes from its transport term
+(\S\ref{sec:experiments:ingredients:transport}).
+% Sources: images/scripts/table_step_ladder.py (cache of
+% images/scripts/step_ladder.py, 2026-10-17; NOTES.md, SV-5.12 entry). The
+% earlier test (SOLVER_FINAL_RUNS 9.17, graph networks on fold 2, intervals
+% split into 1, 2 or 4 steps; 9.19b, T-FEN on fold 0 at 90 to 15 days) is
+% replaced by this ladder (supervisor review 2, SV-5.12 / SV-5.16,
+% 2026-10-19). It agreed on the folds it covered; the ladder adds that the
+% RK4-trained network fails C2 on folds 0 and 1. The operational reading of
+% C1 (two finest steps) was fixed after the ladder had run.
+% Per-halving changes at the two finest steps (Euler / RK4): canonical f0
+% -0.010, -0.006 / -0.018, -0.011; f1 +0.005, -0.003 / -0.009, -0.008; f2
+% -0.077, -0.030 / -0.072, -0.028; Euler - RK4 at 11.4 d -0.009 / -0.005 /
+% +0.003. Smallest visit interval in the cohort: 90 days.
+% TODO (2026-10-19, SV-5.12): ask the supervisor whether this post-hoc
+% ladder is what he meant, or training at different step sizes (NOTES.md).
+% TODO (author): review this subsection and the placement of the ladder
+% explicitly (NOTES.md).
 
 \begin{table}[t]
   \centering
   \caption[The solver-swap test.]{%
     The solver-swap test. Each trained model is re-evaluated, without
-    retraining, with the integration scheme and step changed; the values
-    are the change-region Dice at the one-year anchor and its difference to
-    the setting the model was trained with. A model that defines an
-    ordinary differential equation converges as the step is refined (C1)
-    and gives the same result, within the run-to-run noise of 0.0127, for
-    all settings at least as fine as its training setting in both step and
-    order (C2). The graph
-    networks were tested on fold 2, the T-FEN on fold 0.}
+    retraining, with a fixed step of $h = 1$ to $1/32$ year (365 to 11.4
+    days) and with explicit Euler or classical RK4; folds 0 to 2, seed 42.
+    The table gives the change of the change-region Dice at the one-year
+    anchor at the finest step against the setting the model was trained
+    with, the span over all settings at least as fine as the training
+    setting in both step and order, and the two criteria: convergence at
+    the finest steps (C1) and agreement of those settings within the
+    run-to-run noise of 0.0127 (C2). Every setting is listed in
+    Table~\ref{tab:appendix:step-ladder}.}
   \label{tab:experiments:swap}
   \small
-  \begin{tabular}{l r r}
+  \begin{tabular}{l c c c c c}
     \toprule
-    Scheme / steps & Dice & $\Delta$ vs.\ trained \\
+    & \multicolumn{2}{c}{Change at 11.4 days} & & & \\
+    Fold & Euler & RK4 & Span & C1 & C2 \\
     \midrule
-    \multicolumn{3}{l}{\emph{Canonical dilated-stencil network (trained:
-      Euler, 1 step): fails C1 and C2}} \\
-    Euler, 1 step (trained) & 0.5964 & $+0.0000$ \\
-    Euler, 2 steps & 0.5802 & $-0.0162$ \\
-    Euler, 4 steps & 0.5206 & $-0.0758$ \\
-    RK4, 1 step & 0.6062 & $+0.0097$ \\
-    RK4, 2 steps & 0.5798 & $-0.0166$ \\
+    \multicolumn{6}{l}{\emph{Canonical dilated-stencil network (trained:
+      Euler, one step per interval)}} \\
+    0 & $-0.037$ & $-0.028$ & 0.054 & passes & fails \\
+    1 & $+0.043$ & $+0.048$ & 0.077 & passes & fails \\
+    2 & $-0.187$ & $-0.190$ & 0.201 & fails & fails \\
     \midrule
-    \multicolumn{3}{l}{\emph{Network trained in the RK4 wrapper (trained:
-      RK4, 1 step): passes}} \\
-    Euler, 1 step & 0.5466 & $-0.0201$ \\
-    Euler, 2 steps & 0.5645 & $-0.0022$ \\
-    Euler, 4 steps & 0.5689 & $+0.0022$ \\
-    RK4, 1 step (trained) & 0.5667 & $+0.0000$ \\
-    RK4, 2 steps & 0.5671 & $+0.0005$ \\
-    RK4, 4 steps & 0.5669 & $+0.0002$ \\
+    \multicolumn{6}{l}{\emph{Network trained in the RK4 wrapper (trained:
+      RK4, one step per interval)}} \\
+    0 & $+0.018$ & $+0.018$ & 0.020 & passes & fails \\
+    1 & $+0.020$ & $+0.018$ & 0.018 & passes & fails \\
+    2 & $+0.001$ & $+0.000$ & 0.000 & passes & passes \\
     \midrule
-    \multicolumn{3}{l}{\emph{T-FEN, energy-conserving form (trained: RK4,
-      45-day steps): passes}} \\
-    RK4, 90-day steps & 0.5470 & $-0.0015$ \\
-    RK4, 45-day steps (trained) & 0.5485 & $+0.0000$ \\
-    RK4, 30-day steps & 0.5488 & $+0.0003$ \\
-    RK4, 22.5-day steps & 0.5486 & $+0.0001$ \\
-    RK4, 15-day steps & 0.5486 & $+0.0001$ \\
+    \multicolumn{6}{l}{\emph{T-FEN, energy-conserving form (trained: RK4,
+      45-day steps)}} \\
+    0 & $-0.003$ & $+0.000$ & 0.000 & passes & passes \\
+    1 & $-0.004$ & $+0.001$ & 0.001 & passes & passes \\
+    2 & $-0.004$ & $-0.002$ & 0.002 & passes & passes \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-% Figure: images/scripts/fig_experiments_swap.py (values of
-% SOLVER_FINAL_RUNS sections 9.17 and 9.19b, checked against the table above).
+% Figure: to be redrawn from the step-ladder cache (images/scripts/
+% fig_experiments_swap.py still draws the earlier fold-2 / fold-0 test).
 \begin{figure}[t]
   \centering
   % \includegraphics[width=\textwidth]{images/fig_experiments_swap.pdf}
   % TODO: figure not final (2026-10-02); restore the line above when ready.
+  % TODO (2026-10-19): redraw from images/data/step_ladder before restoring.
   \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering\itshape Placeholder
     for Figure~\ref{fig:experiments:swap}: the solver-swap test against the step size.}}
   \caption[The solver-swap test against the step size.]{%
     The solver-swap test of Table~\ref{tab:experiments:swap} against the
-    integration step. Each trained model is re-evaluated, without retraining,
-    with explicit Euler (solid, filled circles) or classical RK4 (dotted,
-    open squares) at a changed step. The step is given relative to the step
-    used in training (one step over the visit interval for the graph
-    networks, 45 days for the T-FEN), with finer steps to the right; the
-    vertical axis gives the change of the change-region Dice at the
-    one-year anchor against the trained setting (ring). The shaded band
-    marks $\pm 0.0127$, the run-to-run standard deviation.
+    integration step. Each trained model is re-evaluated, without
+    retraining, with explicit Euler (solid) or classical RK4 (dotted) at a
+    fixed step of 365 to 11.4 days, on a logarithmic axis with finer steps
+    to the right. The vertical axis gives the change of the change-region
+    Dice at the one-year anchor against the trained setting; one line per
+    fold (folds 0 to 2, seed 42). The shaded band marks $\pm 0.0127$, the
+    run-to-run standard deviation.
     \emph{(a)}~The canonical dilated-stencil network, trained with one
     Euler step and with $\Delta t$ as an input;
     \emph{(b)}~the same network trained inside the autonomous RK4 wrapper;
-    \emph{(c)}~the T-FEN in its energy-conserving form, integrated with RK4
-    only, at steps of 90, 45, 30, 22.5 and 15 days (the 30-day tick is
-    unlabelled). The graph networks were evaluated on fold~2, the T-FEN on
-    fold~0, one seed each.}
+    \emph{(c)}~the T-FEN in its energy-conserving form, trained with RK4
+    in steps of 45 days.}
   \label{fig:experiments:swap}
 \end{figure}
 
@@ -1689,10 +1718,10 @@ fold. Tracing the rollouts step by step showed where the divergence comes
 from. It starts at the edge of the crop, in a layer channel, driven by the
 transport term, and only after about 1.6 to 2 years: later than the
 one-year anchor and later than the 360 days that training unrolls. A
-smaller step did not help, and the velocities at the onset were within the
-stability limit of RK4, so the step size was not the cause. The cause was
-the defect of the Galerkin operator at the domain edge described
-in~\S\ref{sec:method:family:fen}. Because the divergence starts after the
+smaller step left the divergence in place, and the velocities at the onset
+were within the stability limit of RK4. The divergence therefore comes from
+the defect of the Galerkin operator at the domain edge
+(\S\ref{sec:method:family:fen}), not from the step size. Because the divergence starts after the
 anchor and away from the lesion, it did not affect the change-region Dice
 of the Galerkin T-FEN at one year.
 % Details (SOLVER_FINAL_RUNS 9.19, three runs traced): onset within 7 columns
@@ -1713,29 +1742,32 @@ Repeated with the second seed, it passes on every fold as well. The
 energy-conserving form is also at least as accurate as the Galerkin form:
 $0.5428 \pm 0.0401$ against $0.5337 \pm 0.0453$, higher on all five folds,
 by
-$+0.009$, which is under the noise level. The gain sits where the defect
-was: on lesions that touch the crop border the change-region Dice rises
-from 0.516 to 0.544, while interior lesions are unchanged (0.535 and
-0.536), and the growth-region Dice beyond three years rises from 0.537 to
+$+0.009$, which is under the noise level. The gain lies on the lesions that
+touch the crop border, where the defect acted: their change-region Dice
+rises from 0.516 to 0.544, while interior lesions are unchanged (0.535 and
+0.536). The growth-region Dice beyond three years rises from 0.537 to
 0.611. The energy-conserving T-FEN is therefore the one reported
 in~\S\ref{sec:experiments:main-results}
 and~\S\ref{sec:experiments:ingredients}.
 
-A small residual remains, and it has a different cause. Reading back the
-Courant number over every sub-step of the free-running rollout on fold 0,
-the layer channels stay at or below 1.36, inside the RK4 limit of about
-2.4, but the mask channel lies slightly above it at the 45-day training
-step (median 2.64, maximum 2.85). In 9 of the 20 validation eyes a few
-mask values on the top or bottom row of the grid eventually leave the
-plausible range, at most 26 values per eye and at most 36 in normalised
-units, starting around day 1\,260 and growing by a factor of about 1.04
-per sub-step. This is the step-size limit of RK4, now a minor effect
-compared with the defect of the Galerkin form, which produced growth by a
-factor of about 1.3 per sub-step from around day 585. It does not affect
-the stability criterion, which the run passes, and an evaluation step of
-30 days, at which the Courant number of the mask channel falls to about
-1.8, removes it without changing the Dice
-(\S\ref{sec:experiments:validity:swap}).
+The energy-conserving form leaves a small residual with a different cause.
+Read back over every sub-step of the free-running rollout on fold 0, the
+Courant number (\S\ref{sec:method:family:fen}) of the layer channels stays
+at or below 1.36, inside the RK4 limit of about 2.4, but that of the mask
+channel lies slightly above it at the 45-day training step (median 2.64,
+maximum 2.85). In 9 of the 20 validation eyes a few mask values on the top
+or bottom row of the grid eventually leave the plausible range: at most 26
+mask values per eye, each at most 36 in normalised units. They start
+around day 1\,260 and grow by a factor of about 1.04 per sub-step. This
+growth matches the step-size limit of RK4. It is a minor effect compared
+with the defect of the Galerkin form, which produced growth by a factor of
+about 1.3 per sub-step from around day 585. The run still passes the
+stability criterion. An evaluation step of 30 days, at which the Courant
+number of the mask channel falls to about 1.8, removes the residual
+without changing the Dice (\S\ref{sec:experiments:validity:swap}).
+% 2026-10-19 (AI 5d.14-5d.21): staged "was not the cause. The cause was",
+% the colon reveal, the teaser and the dangling participle removed; count
+% and magnitude of the residual separated.
 % Source: SOLVER_FINAL_RUNS section 9.19b (fold 0, 2026-10-01). Consequence
 % recorded there: the learned velocity map may be quoted if the rollout is
 % evaluated at a 30-day step; the thesis does not interpret it.
@@ -1748,9 +1780,9 @@ the stability criterion, which the run passes, and an evaluation step of
   \caption[Stability of the T-FEN in both operator forms.]{%
     Stability of the T-FEN in the Galerkin and the energy-conserving form
     of its transport operator, seed 42. For each fold: the number of late
-    epochs (10 to 29) on which the free-running mask and layer errors stay
-    at or below 5, and the largest late-epoch mask and layer error, in
-    normalised units. A run is stable if both counts are at least 19.}
+    epochs (10 to 29) on which the root mean squared errors of the mask and
+    of the layer channels in the free-running rollout stay at or below 5,
+    and the largest late-epoch value of each, in normalised units. A run is stable if both counts are at least 19.}
   \label{tab:experiments:tfen-stability}
   \small
   \begin{tabular}{c c c c c}

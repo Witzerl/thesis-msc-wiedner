@@ -461,6 +461,73 @@ are those of~\S\ref{app:full-results:criteria}.
 % FEN_final_w96ftp7rk4d45skew; SOLVER_FINAL_RUNS 9.23, 2026-10-02).
 
 
+\section{The Step-Size Ladder}
+\label{app:full-results:step-ladder}
+
+Table~\ref{tab:appendix:step-ladder} lists every setting of the
+solver-swap test of~\S\ref{sec:experiments:validity:swap}. Each trained
+model is re-evaluated, without retraining, with a fixed step $h$ and with
+explicit Euler or classical RK4. Each visit interval is split into the
+smallest number of equal sub-steps no longer than $h$. Because the median
+interval between visits is 180 days, the steps of one and of half a year
+leave almost every interval in one piece: on folds 0, 1 and 2, only 2, 0
+and 3 of 135, 65 and 100 intervals are split at one year, and 23, 4 and 9
+at half a year.
+
+\begin{table}[ht]
+  \centering
+  \caption[The step-size ladder.]{%
+    The step-size ladder of the solver-swap test, folds 0 to 2, seed 42.
+    Each cell is the change of the change-region Dice at the one-year
+    anchor against the setting the model was trained with, when the same
+    weights are evaluated with a fixed step $h$ (in years, with days below)
+    and with explicit Euler or classical RK4. The trained setting itself
+    reproduces the change-region Dice recorded at the end of training on
+    every fold. Rows that change only the step of the trained scheme start
+    at 0 for the graph networks, whose trained setting is one step per
+    interval and coincides with $h = 1$~year for almost every interval.}
+  \label{tab:appendix:step-ladder}
+  \footnotesize
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{l r r r r r r}
+    \toprule
+    $h$ (year) & 1 & 1/2 & 1/4 & 1/8 & 1/16 & 1/32 \\
+    $h$ (days) & 365 & 182.5 & 91.3 & 45.6 & 22.8 & 11.4 \\
+    \midrule
+    \multicolumn{7}{l}{\emph{Canonical dilated-stencil network (trained: Euler, one step per interval)}} \\
+    Fold 0, Euler & $+0.000$ & $-0.006$ & $-0.005$ & $-0.020$ & $-0.030$ & $-0.037$ \\
+    Fold 0, RK4 & $+0.017$ & $+0.013$ & $+0.012$ & $+0.001$ & $-0.017$ & $-0.028$ \\
+    Fold 1, Euler & $+0.000$ & $-0.012$ & $+0.021$ & $+0.041$ & $+0.046$ & $+0.043$ \\
+    Fold 1, RK4 & $+0.027$ & $+0.017$ & $+0.049$ & $+0.065$ & $+0.057$ & $+0.048$ \\
+    Fold 2, Euler & $+0.000$ & $+0.001$ & $-0.016$ & $-0.081$ & $-0.158$ & $-0.187$ \\
+    Fold 2, RK4 & $+0.010$ & $+0.011$ & $-0.017$ & $-0.090$ & $-0.162$ & $-0.190$ \\
+    \midrule
+    \multicolumn{7}{l}{\emph{Network trained in the RK4 wrapper (trained: RK4, one step per interval)}} \\
+    Fold 0, Euler & $-0.113$ & $-0.063$ & $+0.003$ & $+0.016$ & $+0.018$ & $+0.018$ \\
+    Fold 0, RK4 & $+0.000$ & $+0.008$ & $+0.020$ & $+0.018$ & $+0.018$ & $+0.018$ \\
+    Fold 1, Euler & $-0.043$ & $-0.046$ & $+0.015$ & $+0.028$ & $+0.023$ & $+0.020$ \\
+    Fold 1, RK4 & $+0.000$ & $+0.003$ & $+0.018$ & $+0.017$ & $+0.018$ & $+0.018$ \\
+    Fold 2, Euler & $-0.020$ & $-0.016$ & $+0.004$ & $+0.004$ & $+0.003$ & $+0.001$ \\
+    Fold 2, RK4 & $+0.000$ & $+0.000$ & $+0.000$ & $+0.000$ & $+0.000$ & $+0.000$ \\
+    \midrule
+    \multicolumn{7}{l}{\emph{T-FEN, energy-conserving form (trained: RK4, 45-day steps)}} \\
+    Fold 0, Euler & $-0.258$ & $-0.248$ & $-0.088$ & $-0.014$ & $-0.006$ & $-0.003$ \\
+    Fold 0, RK4 & $-0.201$ & $-0.159$ & $-0.001$ & $+0.000$ & $+0.000$ & $+0.000$ \\
+    Fold 1, Euler & $-0.175$ & $-0.168$ & $-0.067$ & $-0.024$ & $-0.009$ & $-0.004$ \\
+    Fold 1, RK4 & $-0.095$ & $-0.068$ & $-0.004$ & $+0.000$ & $+0.001$ & $+0.001$ \\
+    Fold 2, Euler & $-0.165$ & $-0.158$ & $-0.081$ & $-0.022$ & $-0.007$ & $-0.004$ \\
+    Fold 2, RK4 & $-0.131$ & $-0.129$ & $-0.012$ & $+0.000$ & $-0.002$ & $-0.002$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+% Source: images/scripts/table_step_ladder.py, reading the cache of
+% images/scripts/step_ladder.py (images/data/step_ladder, git-ignored; run
+% 2026-10-17 on the RTX 5080, epoch-29 checkpoints, unmodified evaluation,
+% GAIntegrator(step_days = h)). Folds 3 and 4 have no local precompute.
+% Trained Dice per fold: canonical 0.5397 / 0.4534 / 0.5964; RK4 network
+% 0.5275 / 0.4392 / 0.5667; T-FEN 0.5485 / 0.5242 / 0.6066.
+
+
 \cleardoubleoddpage
 \chapter{Code Structure}
 \label{app:code}

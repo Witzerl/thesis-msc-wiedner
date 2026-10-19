@@ -1778,8 +1778,22 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
   conclusion on the weighting rests on runs 1 and 2; §5.5.3 step-down rows explained, FNO + 3x3 at widths 2 and 9
   now stated as below width 5 (z = -2.4 / -2.2), width-192 divergence in the width paragraph, "not a lever"
   removed. AI 5c.1-5c.29 done. Two overfull boxes (Table 5.1, 4.99 pt; lines 417-452, 6.6 pt) predate this pass.
-- [ ] **TODO (author, 2026-10-19): review the placement of the step-size ladder explicitly** -- planned for §5.6.1
-  (solver-swap test) together with SV-5.16, with one pointer sentence in §5.5.1 (inline TODO there).
+- [x] 2026-10-19 **§5.6 Validity Diagnostics** (SV-5.15, SV-5.16, author sign-off): opener rewritten; the
+  step-size ladder replaces the earlier solver-swap test (fold 2 / fold 0, intervals split into 1, 2, 4
+  steps). §5.6.1: setup with fixed steps h = 1 ... 1/32 year, three models on folds 0-2; C1 read at the two
+  finest steps (fixed after the ladder ran, stated in a comment); results: canonical fails C2 on all folds
+  (C1 passes on folds 0 and 1, fails on fold 2), RK4-trained network converges everywhere but passes C2 on
+  fold 2 only (+0.018 between trained and converged value on folds 0 and 1), T-FEN passes everywhere. New
+  Table 5.4 = per model and fold summary; new Appendix E section "The Step-Size Ladder"
+  (`app:full-results:step-ladder`, Table `tab:appendix:step-ladder`) with every setting; both tables from
+  `images/scripts/table_step_ladder.py` (asserts the control setting reproduces the logged Dice). Figure 5.x
+  caption respecified for the ladder; figure still disabled, script must be redrawn from the ladder cache.
+  §5.6.2 wording fixed (AI 5d.14-5d.21). Follow-ups: §6.1 (only the T-FEN is called a continuous-time model;
+  the wrapper network would need a finer training step) and §6.3 ("three of the five folds per model").
+- [ ] TODO: redraw `fig:experiments:swap` from `images/data/step_ladder` (three panels, one line per fold,
+  Euler solid / RK4 dotted, log step axis) before restoring it.
+- [ ] **TODO (author, 2026-10-19): review the placement of the step-size ladder explicitly** -- now in §5.6.1
+  (Table 5.4 summary + Appendix E full table), with one pointer sentence in §5.5.1 (inline TODOs in both).
 - [ ] **Reply mail (2026-10-20): ask the supervisor about SV-5.12** -- is the post-hoc step-size ladder (trained
   networks re-evaluated with fixed steps h = 1 ... 1/32 year, no retraining; three networks, folds 0-2) what he
   meant, or did he want networks trained at different step sizes?
@@ -1893,6 +1907,11 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
   - Canonical network: **fails on all three folds**, as in Table 5.4. No common limit, and the drift
     has a fold-dependent sign (1/32 year: -0.037 / +0.043 / -0.187); spans over the settings at least
     as fine as training: Euler 0.037 / 0.058 / 0.188, with RK4 0.054 / 0.077 / 0.201.
+    **Corrected 2026-10-19** (images/scripts/table_step_ladder.py): "no common limit" was too strong.
+    It fails C2 on all three folds, but on folds 0 and 1 Euler and RK4 approach a common value at the
+    finest steps (last per-halving changes below 0.0127, Euler - RK4 at 11.4 d -0.009 / -0.005), far
+    from the trained value; only fold 2 still moves by ~0.03 per halving (C1 fails there). A fold-
+    dependent sign of the drift is not by itself a C1 failure.
   - RK4-wrapper network: **C1 passes on all folds** (RK4 changes < 0.002 from h = 1/4 year on, and
     Euler converges to the same limit, within 0.0021 at 1/32 year); **C2 passes on fold 2 only**. On
     folds 0 and 1 the trained one-RK4-step setting is not yet converged: the limit lies +0.018 above

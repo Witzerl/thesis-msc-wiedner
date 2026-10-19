@@ -135,12 +135,16 @@ Two attempts were made to make the model meaningful between visits. An
 intermediate-time-point regulariser, which penalised predictions at times
 inside an interval against the linear interpolation between the two
 visits, brought no benefit and was removed early in the project. The
-network trained inside the Runge--Kutta wrapper, and the T-FEN in its
-energy-conserving form, pass the solver-swap test and can therefore be
-read as continuous-time models (\S\ref{sec:experiments:validity:swap}).
+T-FEN in its energy-conserving form passes the solver-swap test on all
+three tested folds and can therefore be read as a continuous-time model
+(\S\ref{sec:experiments:validity:swap}). The network trained inside the
+Runge--Kutta wrapper also defines a vector field, but its training step of
+one RK4 step per interval resolves it on only one of the three folds.
 Neither is more accurate than the canonical network at the anchor, and the
 wrapper costs about $4.8\times$ the training time. If predictions between
-visits are needed clinically, these two are the principled choice. Their
+visits are needed clinically, these two are the principled choice; the
+wrapper network would need a finer training step.
+% 2026-10-19: updated to the step-size ladder of 5.6.1 (three folds). Their
 predictions between visits remain unverified, however, because no ground
 truth exists between two observations.
 
@@ -275,7 +279,7 @@ has no upper bound, so a few eyes are scored later, where more change has
 accumulated. The change-region Dice was logged only as a cohort mean per
 run, so the eye counts use the growth-region Dice instead
 (\S\ref{sec:experiments:protocol:stats}). Several findings rest on one
-seed, and the solver-swap test on one fold per model.
+seed, and the solver-swap test on three of the five folds per model.
 
 The scope of the models is limited as well. Every operator sees one visit
 and has no memory of the trajectory so far,
