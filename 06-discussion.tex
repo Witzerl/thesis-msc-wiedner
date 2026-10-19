@@ -10,87 +10,127 @@
 
 \section{Interpretation of Results}
 \label{sec:discussion:interpretation}
+% 2026-10-19 rewritten (supervisor review 2, SV-6.1: self-contained for a
+% reader who skipped the thesis; SV-6.2 micrometres; SV-6.5, SV-6.6; AI S14,
+% S20, 6-7.1-6-7.12, 6-7.22-6-7.24). Run-in headings replaced by subsections;
+% the paragraphs on capacity and on the equation features kept as they were
+% (SV-6.3).
 
 This thesis asked what is needed to forecast the progression of GA from
-longitudinal OCT, split into a question about the framework and a question
-about the operator (\S\ref{par:introduction:research-question}). The
-results answer the two parts differently. The framework transferred: one
-setup served operators from unrelated literatures without change. The
-operator class did not decide the outcome; a small number of properties of
-the operator did.
+longitudinal OCT. The question had two parts: what kind of framework the
+forecast needs, and what kind of operator that framework needs
+(\S\ref{par:introduction:research-question}). The task was to predict,
+from the lesion mask and ten retinal layer boundaries of one visit, the
+lesion at the later visits of the same eye. The intervals between visits
+range from 90 to 720 days and are most often 180 days. The data were 75
+eyes of 51 patients from the Medical University of Vienna, evaluated in
+five-fold cross-validation. Every model was scored by the change-region
+Dice at one year: the overlap between the pixels the model predicts to
+change and the pixels that do change. Predicting no change, persistence,
+scores 0 by construction. This section interprets the results for each
+part of the question and then draws the implications for modelling.
 
-\paragraph{The framework.}
-The framework fixes everything except the operator: the
-$\Delta t$-conditioned residual update, the zero-initialised head that
-starts every operator at persistence, the curriculum measured in elapsed
-days, the loss, and one evaluation for all arms
-(\S\ref{sec:method:framework}). Under these conditions, every operator
-with any spatial context learned, and every one of them lies far above
-persistence. This is what made the comparison of
-Chapter~\ref{ch:experiments} possible at all, and it is the answer to the
-first part of the question.
+\subsection{The Framework}
+\label{sec:discussion:framework}
 
-How time enters the update turned out to matter less than that it enters.
-A fourth-order Runge--Kutta step in place of one Euler step changed
-nothing measurable, over a local and over a global operator
-(\S\ref{sec:experiments:ablations:time}). The multiplication of the
-operator output by $\Delta t$ is, on the mask channel, a change of
-parameterisation rather than additional knowledge, and removing it does
-not change the result.
-The objective is part of the framework, and two of its parts are needed
-(\S\ref{sec:experiments:ablations:loss}). Without the weighting of the
-mask channel, the canonical operator learned no change at all: with plain
-MSE every eye stayed at its baseline. The soft-Dice term raised the
-change-region Dice by about 0.05 and made training steadier. A penalty
-against lesion shrinkage added nothing. These ablations were run on the
-canonical operator only.
-What the framework needs, in short, is a loss that puts weight on the
-lesion mask, an interval length that reaches the operator, and everything
-else held fixed.
+The framework is everything that stays fixed while the operator changes
+(\S\ref{sec:method:framework}). It predicts the next visit from the
+current one by a residual update,
+$u_{t+\Delta t} = u_t + \Delta t \cdot f_\theta(u_t, \Delta t, z)$, whose
+operator $f_\theta$ starts at zero, so that every model begins at
+persistence. It trains with a loss that weights the mask channel five
+times and adds a soft-Dice term, and it unrolls its own predictions over up
+to 360 days during training. Inside this framework, every operator with
+spatial context learned to predict change: the eleven such arms reach a
+change-region Dice of 0.45 to 0.54 at one year
+(Table~\ref{tab:experiments:arms}), while the per-pixel floor, which sees
+no neighbours, stays at 0. One framework thus served operators from
+unrelated literatures without change. This is the answer to the first
+part of the question.
 
-\paragraph{The operator: its properties.}
-The three highest arms come from three unrelated classes --- a
-finite-element network, a graph network and a U-Net --- and lie within
-about 0.04 of each other (\S\ref{sec:experiments:main-results}). The
-finite-element network is highest: it lies above the U-Net at both seeds
-and only slightly above the graph network. The two highest are the two
-that carry a remedy for the reach deficit discussed below. If the class
-decided the outcome, such a result would be unlikely. What separates
-operators is instead a set of properties that can be switched on and off
-one at a time (\S\ref{sec:experiments:ingredients}): spatial context at
-all, physical reach at the scale of the lesion front, and an explicit
-transport term.
+Its parts do not matter equally. The objective matters most. Trained with
+a plain mean squared error, without the weighting of the mask channel and
+without the soft-Dice term, the canonical network learned no change at
+all: at the last epoch, 74 of the 75 eyes are predicted exactly as at
+baseline (\S\ref{sec:experiments:ablations:loss}). With the weighting but
+without the soft-Dice term, it learned change, but later and to a score
+lower by 0.050. A penalty against lesion shrinkage added nothing. The time
+handling, in contrast, can be simplified without loss. Removing the
+multiplication by $\Delta t$ left the result unchanged, because the
+operator learns the division by the interval internally. Replacing the
+single Euler step by four Runge--Kutta evaluations made no measurable
+difference for either a graph network or a Fourier Neural Operator
+(\S\ref{sec:experiments:ablations:time}). The update needs the length of
+the interval, but not in a particular form. These tests were run on the
+canonical network, or on two operators for the integration scheme, so
+they describe the framework as it is used here, not in general.
 
-The most informative of these is the pair of reach and transport. The GA
-front moves about 10 to 25 columns between two visits, while one hop on
-the index-space graph reaches about two columns along a row. Two unrelated
-constructions close this gap: the dilated stencil, which lets one hop
-reach 21 columns, and the transport term of the T-FEN, which moves the
-state along a learned velocity. Each is established against its own
-control, and the two are indistinguishable from each other. Both point
-to the same deficit: a mismatch between how far one update can see and
-how far the disease moves between two observations. This is the
-situation that the stability condition of \citet{Courant1928} describes
-for explicit schemes, whose stencil must cover the region the solution
-depends on within one step (\S\ref{sec:background:pde-solvers:time}).
-\S\ref{sec:introduction:why-pde} stated this as an expectation for GA; the
-survey is consistent with it. The coincidence of two routes is suggestive
-rather than a proof of mechanism, but it is a more specific statement
-than any ranking of architectures.
+\subsection{The Operator}
+\label{sec:discussion:operator}
 
-% Author decision (b), 2026-10-01: global + local demoted to an observation.
-Whether global and local context are separate properties remains open.
-The FNO, which sees the whole grid in every layer but has no local path,
-lies below the U-Net at the one-year anchor at both seeds. A
-$3 \times 3$ local path of 800 parameters brought it level at one seed but
-not at the second (\S\ref{sec:experiments:ingredients:global}), so whether
-local detail is what the FNO lacks is not established.
-Beyond one year the plain FNO catches up with the U-Net and lies above it
-after three years. These horizon values are descriptive and were not
-tested, but they suggest that global support matters more for long
-forecasts than for the one-year anchor.
+Within the framework, the three highest arms come from three unrelated
+classes: the T-FEN, a finite-element network with a transport term, at
+0.543; the dilated-stencil graph network at 0.526; and a U-Net at 0.505
+(\S\ref{sec:experiments:main-results}). The T-FEN lies above the U-Net at
+both seeds, and its lead of 0.017 over the graph network is not
+established. The class of an operator therefore does not decide its
+score. The ablations of~\S\ref{sec:experiments:ingredients} tested three
+properties one at a time on otherwise unchanged operators:
+\begin{itemize}
+  \item Spatial context is required: a graph network that sees only each
+    pixel itself predicts no change.
+  \item The reach of one update along the direction in which the lesion
+    front moves is the largest lever. Replacing the index-space
+    neighbourhood of the graph network by the dilated stencil raises its
+    score by 0.064, at the same parameter count.
+  \item An explicit transport term raises the finite-element network by
+    0.062 against the same network without it, and by 0.072 against a
+    control of the same size.
+\end{itemize}
+A local path for the global FNO brought it level with the U-Net at one
+seed but not at the second, and its own effect is not established.
 
-\paragraph{Capacity.}
+Reach and transport are the most informative pair. The GA front advances
+about 57 to 142\,\textmu{}m between two visits, 10 to 25 columns of the
+grid, while one hop of the index-space graph reaches about 11\,\textmu{}m
+along a row (\S\ref{sec:method:graph}). The dilated stencil lets one hop
+reach about 119\,\textmu{}m, and the transport term moves the state along
+a learned velocity. These two unrelated constructions each remove the same
+limit, and the two arms built with them are the two highest of the survey.
+The limit is the one that the stability condition of~\citet{Courant1928}
+describes for explicit schemes: the stencil of one step must cover the
+region on which the solution depends
+(\S\ref{sec:background:pde-solvers:time}).
+Section~\ref{sec:introduction:why-pde} stated this as an expectation for
+GA, and the survey is consistent with it. The agreement of the two
+constructions is suggestive but does not prove a mechanism. It is
+nevertheless a more specific statement than a ranking of architectures.
+% 10-25 columns x 5.68 um = 57-142 um; +/-2 columns = 11.4 um; +/-21
+% columns = 119 um (SV-6.2).
+
+More reach does not keep helping. Reaches of $\pm 35$ and $\pm 42$ columns
+score lower than $\pm 21$, the latter beyond the noise level. Widening the
+stencil across rows lowers the score most. Four message-passing rounds
+instead of two, which double the reach, lower the canonical network by
+0.009 (\S\ref{sec:experiments:ingredients:reach},
+\S\ref{sec:experiments:ablations:capacity}). The best tested reach, about
+119\,\textmu{}m, lies close to the 90th percentile of the advance between
+visits. Why reach beyond that point hurts was not tested. With mean
+aggregation, far neighbours may dilute the near ones, and the extra reach
+may bring in tissue unrelated to the next visit's change.
+% Resolves the TODO of 2026-10-19 (author) on why more rounds or more reach
+% stop helping.
+
+Global context behaves differently. The FNO sees the whole grid in every
+layer but lies below the U-Net at one year. Beyond one year it catches up,
+and after three years it lies above the U-Net
+(\S\ref{sec:experiments:ingredients:global}). These horizon values are
+descriptive and were not tested statistically, but they suggest that
+global context matters more for long forecasts than at one year.
+
+\subsection{Capacity}
+\label{sec:discussion:capacity}
+
 Capacity was not a lever in any of the four classes tested
 (\S\ref{sec:experiments:ablations:capacity}): no width step raised a class
 above the noise level, and the smaller versions lost little. With 75 eyes, this is what the low-data argument of
@@ -98,15 +138,10 @@ above the noise level, and the smaller versions lost little. With 75 eyes, this 
 into an operator weigh more than its size. The capacity study shows that
 size did not help; that the built-in assumptions are the reason is an
 interpretation, supported by the ablation studies.
-% TODO (2026-10-19, author): discuss why more message-passing rounds or more
-% reach stop helping: the second round on the k-NN graph adds about 0.01, not
-% established (5.3.1); four rounds on the dilated stencil are lower by 0.009
-% (5.5.3); reaches of +/-35 and +/-42 columns and rows +/-2 are lower than
-% +/-21 (5.3.2). Untested candidate explanations: with mean aggregation, far
-% neighbours beyond the front advance dilute the near ones; the extra reach
-% brings in tissue unrelated to the next visit's change.
 
-\paragraph{A missing counterpart to the equation features.}
+\subsection{A Missing Counterpart to the Equation Features}
+\label{sec:discussion:equation-features}
+
 In MP-PDE, a vector of equation features $\theta_{\text{PDE}}$ --- the
 coefficients and boundary conditions of the equation being solved --- is
 passed to every layer, and it is what lets one trained solver handle a
@@ -123,42 +158,48 @@ configuration and in one design only, without a detectable benefit.
 What is lost is an eye-specific description of how this eye progresses.
 Two eyes with the same lesion shape but different speeds receive the same
 conditioning, and the operator can only infer the speed from the current
-state. This is a plausible contributor to the growth-speed gap discussed
-in \S\ref{sec:discussion:clinical}, but it was not tested. Candidates for
-the slot are descriptors that do vary between eyes: lesion-level
-quantities such as size, shape or focality, a learned summary of the
-observed layers, or --- with trajectory memory --- the eye's own past
-growth.
+state. This is a plausible contributor to the weaker prediction of growth
+speed discussed in~\S\ref{sec:discussion:clinical}, but it was not tested.
+Candidates for the slot are descriptors that do vary between eyes:
+lesion-level quantities such as size, shape or focality, a learned summary
+of the observed layers, or --- with trajectory memory --- the eye's own
+past growth.
 
-\paragraph{Predictions between visits.}
-Two attempts were made to make the model meaningful between visits. An
-intermediate-time-point regulariser, which penalised predictions at times
-inside an interval against the linear interpolation between the two
-visits, brought no benefit and was removed early in the project. The
-T-FEN in its energy-conserving form passes the solver-swap test on all
-three tested folds and can therefore be read as a continuous-time model
+\subsection{Predictions Between Visits}
+\label{sec:discussion:between-visits}
+
+Every operator of the survey is trained to predict the state at the next
+visit, so its predictions between visits are not constrained by the data.
+Two models nevertheless define a prediction at any time. The T-FEN in its
+energy-conserving form passes the solver-swap test on all three tested
+folds and can therefore be read as a continuous-time model
 (\S\ref{sec:experiments:validity:swap}). The network trained inside the
-Runge--Kutta wrapper also defines a vector field, but its training step of
-one RK4 step per interval resolves it on only one of the three folds.
-Neither is more accurate than the canonical network at the anchor, and the
-wrapper costs about $4.8\times$ the training time. If predictions between
-visits are needed clinically, these two are the principled choice; the
-wrapper network would need a finer training step.
-Their predictions between visits remain unverified, however, because no
-ground truth exists between two observations.
-% 2026-10-19: updated to the step-size ladder of 5.6.1 (three folds).
+Runge--Kutta wrapper also defines a vector field, but its training step,
+one RK4 step per interval, resolves that field on only one of the three
+folds. Neither is more accurate than the canonical network at one year,
+and the wrapper costs about $4.8\times$ the training time. If predictions
+between visits are needed clinically, these two models give predictions
+between visits that are consistent with those at the visits; the wrapper
+network would need a finer training step. Whether these predictions are
+correct cannot be checked, because no ground truth exists between two
+observations. An earlier attempt to constrain them, a regulariser that
+penalised predictions between visits against the linear interpolation of
+the two visits, brought no benefit and was removed before the experiments
+of Chapter~\ref{ch:experiments}.
 
-\paragraph{Where modelling effort pays.}
-Taken together, the positive results and the nulls indicate where effort
-paid off in this survey. Changing where an operator looks --- its reach
-along the direction in which the front moves --- or adding a mechanism
-that transports the state produced the largest effects. Larger models, a
-higher integration order, a penalty against lesion shrinkage and the
-moving-mesh extension of Appendix~\ref{app:mm-pde}, whose correction
+\subsection{Implications for Modelling}
+\label{sec:discussion:implications}
+
+Across the survey, the largest effects came from two changes to the
+operator: extending the reach of one update along the direction in which
+the front moves, and adding a mechanism that transports the state. Larger
+models, a higher integration order, a penalty against lesion shrinkage and
+the moving-mesh extension of Appendix~\ref{app:mm-pde}, whose correction
 branch never engaged, did not improve accuracy at the available precision.
-The objective, by contrast, did matter: whether the loss emphasised the
-mask decided whether anything was learned at all. For a new disease-forecasting task of this kind, the first
-question to ask of an operator is therefore how far one update reaches
+In the framework, the objective decided whether the model learned any
+change at all. For a new disease-forecasting task of this kind, two
+questions therefore come first: whether the loss puts enough weight on the
+region that changes, and how far one update of the operator reaches
 compared with how far the disease moves between visits.
 
 

@@ -1822,10 +1822,17 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
   baseline reaches about one year"), §3.3 points to §3.6, and the §6.1 rewrite says "at one year". A thesis-wide rename to
   "the one-year visit" (57 places, e6c0535 + 43b1955) was reverted the same day (af06ea9, ff8053d); the §6.1 sentence repair
   of e6c0535 was re-applied.
+- [x] 2026-10-19 **§6.1 rewritten** (SV-6.1, SV-6.2, SV-6.5, SV-6.6, author sign-off): self-contained for a reader who
+  skipped the thesis (task, data, measure, then each result with its number); run-in headings replaced by subsections
+  6.1.1 The Framework, 6.1.2 The Operator, 6.1.3 Capacity, 6.1.4 A Missing Counterpart to the Equation Features,
+  6.1.5 Predictions Between Visits, 6.1.6 Implications for Modelling; one answer to part 1 (AI S14); distances in µm
+  (57-142 / 11 / 119 µm); why more reach stops helping (author TODO) now in 6.1.2; regulariser placed as an earlier
+  attempt (S20). The capacity and equation-feature paragraphs are unchanged (SV-6.3) apart from "growth-speed gap".
+  AI 6-7.1-6-7.12, 6-7.20, 6-7.22-6-7.24 done; 6-7.19/6-7.21 dropped. Numbers from Table 5.1, §5.3, §5.5 (unchanged).
 - [ ] **Reply mail (2026-10-20): ask the supervisor about SV-5.12** -- is the post-hoc step-size ladder (trained
   networks re-evaluated with fixed steps h = 1 ... 1/32 year, no retraining; three networks, folds 0-2) what he
   meant, or did he want networks trained at different step sizes?
-- [ ] TODO (inline in §6.1, author 2026-10-19): discuss why more message-passing rounds or more reach stop
+- [x] (2026-10-19: in §6.1.2, "More reach does not keep helping") TODO (inline in §6.1, author 2026-10-19): discuss why more message-passing rounds or more reach stop
   helping (second round on the k-NN graph +0.011, not established; four rounds on the stencil -0.009; reaches
   ±35/±42 and rows ±2 lower than ±21), with the untested candidate explanations (mean aggregation diluting
   near neighbours; extra reach bringing in unrelated tissue).
