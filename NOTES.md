@@ -1770,6 +1770,19 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
   width-48 T-FEN (20 455 params, fewer than the width-96 control, same score) added; §5.3.5 heading
   "Summary of the Ablation Studies", closing now the two magnitudes (one property within a class 0.06-0.07,
   the three highest classes within 0.04). AI 5b.13-5b.34 done. Numbers unchanged.
+- [x] 2026-10-19 **§5.5 Negative Results** (SV-5.11, SV-5.13, SV-5.14, author sign-off; heading kept): opener
+  names the two objective effects as exceptions to the nulls; §5.5.1 without "the tests ask", FNO named in the
+  opener, f_theta algebra corrected (f_theta outputs the distance divided by Delta t), 4.8x scoped to the
+  stencil network, pointer to §5.6.1 for refining the step; §5.5.2 new Table `tab:experiments:objective` (full /
+  without soft-Dice / plain MSE / with penalty, values from SOLVER_FINAL_RUNS §9.22), "teacher-forced" replaced,
+  conclusion on the weighting rests on runs 1 and 2; §5.5.3 step-down rows explained, FNO + 3x3 at widths 2 and 9
+  now stated as below width 5 (z = -2.4 / -2.2), width-192 divergence in the width paragraph, "not a lever"
+  removed. AI 5c.1-5c.29 done. Two overfull boxes (Table 5.1, 4.99 pt; lines 417-452, 6.6 pt) predate this pass.
+- [ ] **TODO (author, 2026-10-19): review the placement of the step-size ladder explicitly** -- planned for §5.6.1
+  (solver-swap test) together with SV-5.16, with one pointer sentence in §5.5.1 (inline TODO there).
+- [ ] **Reply mail (2026-10-20): ask the supervisor about SV-5.12** -- is the post-hoc step-size ladder (trained
+  networks re-evaluated with fixed steps h = 1 ... 1/32 year, no retraining; three networks, folds 0-2) what he
+  meant, or did he want networks trained at different step sizes?
 - [ ] TODO (inline in §6.1, author 2026-10-19): discuss why more message-passing rounds or more reach stop
   helping (second round on the k-NN graph +0.011, not established; four rounds on the stencil -0.009; reaches
   ±35/±42 and rows ±2 lower than ±21), with the untested candidate explanations (mean aggregation diluting

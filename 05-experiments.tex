@@ -1007,77 +1007,89 @@ affected by the shift that all operators share.
 \section{Negative Results}
 \label{sec:experiments:ablations}
 
-A negative result here is a comparison whose difference stays within the
-noise level of~\S\ref{sec:experiments:protocol:stats}. It is a null at the
-available precision. It does not show that the tested
-alternative is equivalent, or that the mechanism behind it has no effect,
-and each finding is scoped to the backbone, the folds and the seed on which
-it was measured. This section reports three groups of such results: the
-time handling of the update (\S\ref{sec:experiments:ablations:time}), the
-composition of the training objective (\S\ref{sec:experiments:ablations:loss})
-and the capacity of the operators
-(\S\ref{sec:experiments:ablations:capacity}).
+This section tests the settings that every operator shares, namely the
+time handling of the update (\S\ref{sec:experiments:ablations:time}) and
+the training objective (\S\ref{sec:experiments:ablations:loss}), and the
+size of the operators (\S\ref{sec:experiments:ablations:capacity}). Most of
+these tests are negative results: comparisons whose difference stays
+within the noise level of~\S\ref{sec:experiments:protocol:stats}. Such a
+result is a null at the available precision only. It does not show that
+the tested alternative is equivalent, and it is scoped to the operator,
+the folds and the seed on which it was measured. Two parts of the
+objective are the exception: removing them lowers the score clearly
+(\S\ref{sec:experiments:ablations:loss}).
+% 2026-10-19 (AI 5c.1, 5c.2): the opener no longer says that every result
+% below is a null. Heading kept (author: the supervisor did not flag it).
 
 \subsection{Time Handling}
 \label{sec:experiments:ablations:time}
 
-The framework handles time in a deliberately simple way
-(\S\ref{sec:method:dt-residual}): the operator makes one step over the
-whole interval to the next visit, and $\Delta t$ enters twice, as an input
+The framework handles time in a simple way
+(\S\ref{sec:method:dt-residual}). The operator makes one step over the
+whole interval to the next visit, and $\Delta t$ enters twice: as an input
 of the operator and as a multiplier of its output,
-$u_{t+\Delta t} = u_t + \Delta t \cdot f_\theta(u_t, \Delta t, z)$. This
-design is part of the framework that every operator shares, so it matters
-whether its details carry any of the accuracy. Two tests ask this, both on
-the canonical dilated-stencil network.
+$u_{t+\Delta t} = u_t + \Delta t \cdot f_\theta(u_t, \Delta t, z)$.
+Because every operator shares this update, two of its details were tested
+on the canonical dilated-stencil network: the multiplication by
+$\Delta t$, and the single step. The single step was also tested on the
+FNO, a global operator.
 
-The first test asks whether the multiplication by $\Delta t$ is needed.
-The multiplication was removed, so the update became
-$u_t + f_\theta(u_t, \Delta t, z)$, while $\Delta t$ remained an input of
-the operator. The change-region Dice does not change: $-0.0006$ on average,
-higher on two of the five folds and on 30 of the 75 eyes.
+Without the multiplication, the update becomes
+$u_t + f_\theta(u_t, \Delta t, z)$, while $\Delta t$ remains an input of
+the operator. The change-region Dice does not change: $-0.0006$ on
+average, higher on two of the five folds and on 30 of the 75 eyes.
 % Values: thesis_numbers.py pair ANISOGNN_final_dilmean_nodts
 % ANISOGNN_final_dilmean, 2026-10-01 (arm 0.5252 +/- 0.0425 vs 0.5258).
 % The k-NN run of this ablation is deliberately not reported (author).
-The reason lies in the mask channel. Its two values are a fixed distance
-apart in normalised units, $-0.602$ and $+1.660$
+The mask channel explains why. Its two values are a fixed distance apart
+in normalised units, $-0.602$ and $+1.660$
 (\S\ref{sec:data:normalization}). At a pixel that changes between two
-visits, the scaled update therefore has to produce exactly that distance
-divided by $\Delta t$, whatever the interval, and the operator learns to divide by $\Delta t$ internally. The multiplication is a change
-of parameterisation, not additional knowledge. It is kept because it makes
-the prediction fall back to the current state as $\Delta t$ approaches zero
-(under the assumption of~\S\ref{sec:method:dt-residual}), and because it is the form MP-PDE uses
-\citep{Brandstetter2022}. It also means that $f_\theta$ is not a growth
-rate that could be read off; whether the operator can be read as a
-continuous-time model at all is tested
-in~\S\ref{sec:experiments:validity:swap}.
+visits, the update must add this distance whatever the interval. With the
+multiplication, $f_\theta$ must therefore output the distance divided by
+$\Delta t$, and the operator learns this division internally. The
+multiplication changes how the same prediction is parameterised. It is
+kept because the prediction then falls back to the current state as
+$\Delta t$ approaches zero (under the assumption
+of~\S\ref{sec:method:dt-residual}), and because it is the form MP-PDE uses
+\citep{Brandstetter2022}. As a consequence, $f_\theta$ cannot be read as a
+growth rate; whether the operator can be read as a continuous-time model
+is tested in~\S\ref{sec:experiments:validity:swap}.
 
-The second test asks whether the time-stepping scheme matters. The single
-step was replaced by a classical
-fourth-order Runge--Kutta step (\S\ref{sec:method:family:rk}), which
-evaluates the operator four times within the interval and combines the
-results. In this setting the operator does not receive $\Delta t$ as an
-input (the autonomous field of \S\ref{sec:method:family:rk}); time enters
-only through the integrator, which steps over the
-interval. Over the dilated-stencil network, the change-region Dice is 0.012
-lower than with the single step, on four of the five folds; over the FNO it
-is 0.006 higher. Both differences lie within the noise level, and the Runge--Kutta
-step costs about 4.8 times the training time (\S\ref{sec:experiments:cost}).
+Replacing the single step by a classical fourth-order Runge--Kutta step
+(\S\ref{sec:method:family:rk}) evaluates the operator four times within the
+interval and combines the results. In this setting the operator does not
+receive $\Delta t$ as an input (the autonomous field
+of~\S\ref{sec:method:family:rk}); time enters only through the integrator.
+Over the dilated-stencil network, the change-region Dice is 0.012 lower
+than with the single step, on four of the five folds; over the FNO it is
+0.006 higher. Both differences lie within the noise level. For the
+dilated-stencil network, the Runge--Kutta step costs about 4.8 times the
+training time of the single step (\S\ref{sec:experiments:cost}). How the
+result of a trained network changes when its step is refined, without
+retraining, is tested in~\S\ref{sec:experiments:validity:swap}.
 % Values: ANISOGNN_final_oderk4n1 - ANISOGNN_final_dilmean -0.0119 +/-
 % 0.0037 SE (1/5 higher), per eye -0.0132 +/- 0.0055 (28/75);
 % FNO_final_w5rk4 - FNO_final_w5 +0.0062 +/- 0.0056 SE (4/5), per eye
 % +0.0064 +/- 0.0069 (43/75). The fold-2 decomposition (wrapper offset,
 % Delta t input removed, order) was dropped, author review v4 #33.
+% TODO (2026-10-19, SV-5.12): the supervisor asked for a test with step sizes
+% h = 1, 1/2, ..., 1/32 year. The post-hoc step-size ladder (no retraining,
+% three networks, folds 0-2; NOTES.md) is planned for 5.6.1 with only the
+% pointer sentence above here. Ask the supervisor in the next e-mail whether
+% this post-hoc ladder is what he meant, or training at different step sizes.
+% TODO (author): review this placement explicitly once 5.6.1 is rewritten.
 
-Together, the two tests show that neither the multiplication by
-$\Delta t$ nor the integration scheme changes the result. What the update needs is that the length of the interval
-reaches the operator at all, either as an input to a single step or through
-an integrator that steps over the interval; how it arrives makes no
-measurable difference. The simple update of the framework is therefore
-sufficient, and the accuracy is decided by the spatial operator
-(\S\ref{sec:experiments:ingredients}), not by the way time is stepped.
-% Note: no model without any time information was trained; "needs the
-% interval at all" is argued (a 3-month and a 2-year gap must give different
-% predictions), not measured.
+Neither the multiplication by $\Delta t$ nor the integration scheme
+changes the result. In every tested variant the length of the interval
+reaches the operator, either as an input to a single step or through an
+integrator, and the way it arrives makes no measurable difference. The
+simple update of the framework is therefore sufficient.
+% Note: no model without any time information was trained; that the
+% interval must reach the operator is argued (a 3-month and a 2-year gap
+% must give different predictions), not measured.
+% 2026-10-19 (SV-5.11, AI 5c.3, 5c.5-5c.10): no "the tests ask"; the FNO
+% named in the opener; the f_theta algebra corrected; the 4.8x scoped to the
+% dilated-stencil network; no pseudo-cleft closer.
 
 \subsection{The Objective}
 \label{sec:experiments:ablations:loss}
@@ -1085,46 +1097,78 @@ sufficient, and the accuracy is decided by the spatial operator
 Every operator is trained with the same objective
 (\S\ref{sec:method:training:loss}): a mean squared error in which the mask
 channel is weighted five times more than each layer channel, plus a
-soft-Dice term on the mask channel, with no monotonic-growth penalty. Like
-the time handling, this objective is part of the shared framework, so it
-matters which of its parts carry the result. Three runs on the canonical
-dilated-stencil network ask this: one without any emphasis on the mask,
-one without the soft-Dice term, and one with a monotonic-growth penalty
-added.
+soft-Dice term on the mask channel, with no monotonic-growth penalty.
+Because the objective is shared, three runs on the canonical
+dilated-stencil network test which of its parts carry the result
+(Table~\ref{tab:experiments:objective}). The first uses a plain mean
+squared error, without mask weighting and without the soft-Dice term. The
+second removes only the soft-Dice term. The third adds a monotonic-growth
+penalty.
 
-The first run tests whether the mask needs any emphasis at all. Almost
-every pixel of the mask stays the same between two visits. With an
-unweighted mean squared error, a model can therefore reach a low loss by
-copying its input, which predicts no change at all and scores 0 on the
-change-region Dice. The collapse counter of~\S\ref{sec:experiments:protocol:metrics}
-detects this. Trained with a plain, unweighted mean squared error and no
-soft-Dice term, the network falls into this collapse and never leaves it
-within the 30 epochs: its change-region Dice is 0 on every fold and at
-every epoch, and at the last epoch 74 of the 75 validation eyes have a
-prediction identical to their baseline mask. The objective, not the
-operator, decides whether the model learns any change at all.
+\begin{table}[t]
+  \centering
+  \caption[The objective tests.]{%
+    The objective tests on the dilated-stencil graph network.
+    Change-region Dice at the one-year anchor, five folds, seed 42; the
+    mean $\pm$ sd is over the five fold values. The difference is against
+    the full objective, as the mean over the five folds of the per-fold
+    difference; the columns Folds and Eyes count the folds and the eyes on
+    which the variant is higher. The last column gives, for each fold, the first
+    epoch at which the change-region Dice rises above 0. Standard errors
+    are given in Appendix~\ref{app:full-results:seeds}.}
+  \label{tab:experiments:objective}
+  \footnotesize
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{p{0.25\textwidth} c c c c p{0.16\textwidth}}
+    \toprule
+    Objective & Mean $\pm$ sd & Difference & Folds & Eyes
+      & First epoch with change \\
+    \midrule
+    Full (mask $\times 5$, soft-Dice) & $0.526 \pm 0.050$ & --- & --- & ---
+      & 0 on every fold \\
+    Without soft-Dice & $0.476 \pm 0.063$ & $-0.050$ & 0/5 & 19/75
+      & 2, 8, 3, 7, 12 \\
+    Plain mean squared error & $0.000 \pm 0.000$ & $-0.526$ & 0/5 & 0/75
+      & never \\
+    With monotonic penalty (2.0) & $0.522 \pm 0.043$ & $-0.004$ & 2/5 & 34/75
+      & not recorded \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+% SV-5.13 (2026-10-19). Values: SOLVER_FINAL_RUNS section 9.22 (thesis_numbers.py
+% pair against ANISOGNN_final_dilmean): full 0.5258 +/- 0.0497; nodice 0.4762 +/-
+% 0.0631, -0.0496 (0/5), per eye 19/75; plainmse 0.0000, -0.5258 (0/5), per eye
+% 0/75; mono2 0.5221 +/- 0.0432, -0.0036 (2/5), per eye 34/75. Escape epochs
+% from metrics.jsonl (images/scripts/fig_experiments_objective.py).
 
-The second run keeps the mask weighting and removes only the soft-Dice
-term. The network then does leave the collapse, but late: on the five folds, its
-change-region Dice first rises above 0 at epochs 2, 8, 3, 7 and 12, against
-epoch 0 with the full objective (Figure~\ref{fig:experiments:objective}).
-It also ends lower, by 0.050 on average, on all five folds and on 56 of
-the 75 eyes. The largest part comes from fold 4, where the collapse lasts
-longest: the difference is $-0.114$ there and $-0.012$ to $-0.044$ on the
-other folds. The same fold makes the run less steady. It leaves the
-collapse only at epoch 12, inside the late-epoch window, so averaged over
-the folds the epoch-to-epoch standard deviation of the late-epoch Dice is
-0.043 against 0.015 with the full objective, but only 0.017 against 0.013
-on folds 0 to 3. The weighting is therefore what lets the model escape the
-collapse, and the soft-Dice term adds an immediate escape and a higher
-score.
+Almost every pixel of the mask stays the same between two visits, so under
+an unweighted mean squared error a model reaches a low loss by copying its
+input. Such a model predicts no change and scores 0 on the change-region
+Dice; the collapse counter (\S\ref{sec:experiments:protocol:metrics})
+detects it. Trained with the plain mean squared error, the network stays in
+this collapse for all 30 epochs. Its change-region Dice is 0 on every fold
+and at every epoch, and at the last epoch 74 of the 75 validation eyes have
+a prediction identical to their baseline mask.
+
+Without the soft-Dice term but with the mask weighting, the network leaves
+the collapse, though later than with the full objective. On the five
+folds, its change-region Dice first rises above 0 at epochs 2, 8, 3, 7 and
+12, against epoch 0 with the full objective
+(Figure~\ref{fig:experiments:objective}). It also ends lower, by 0.050 on
+average, on all five folds and on 56 of the 75 eyes. Most of the difference
+comes from fold 4, where the network starts to predict change last:
+$-0.114$ there, and $-0.012$ to $-0.044$ on the other folds. Because that
+start falls at epoch 12, inside the late-epoch window, the late-epoch Dice
+also varies more from epoch to epoch: its standard deviation is 0.043
+against 0.015 with the full objective, but on folds 0 to 3 the two are
+close (0.017 against 0.013).
 % Corrected 2026-10-01: the text said the run is "about three times" less
 % steady without qualification; per-fold late sd nodice 0.013/0.020/0.023/
 % 0.013/0.147 vs full 0.011/0.019/0.010/0.012/0.022 (fold 4 carries it).
-Its cost is the stretch of the raw mask regression described
-in~\S\ref{sec:method:training:loss}: the raw mask error of the free-running
-rollout is about twice as large with the term as without it (1.10 against
-0.51). It does not change any thresholded metric.
+The soft-Dice term has one cost. It stretches the raw mask regression
+(\S\ref{sec:method:training:loss}), so the raw mask error of the
+free-running rollout is about twice as large with the term as without it
+(1.10 against 0.51). No thresholded metric is affected.
 % Values: thesis_numbers.py pair ANISOGNN_final_dilmean_{plainmse,nodice}
 % ANISOGNN_final_dilmean, 2026-10-01; escape epochs, late sd and raw
 % rollout_mask_rmse (late-epoch means) read from metrics.jsonl. plainmse:
@@ -1155,23 +1199,23 @@ rollout is about twice as large with the term as without it (1.10 against
 The third run adds a monotonic-growth penalty. Atrophic tissue does not
 regenerate, so a penalty on any decrease of the mask where the previous
 state is atrophic is a natural prior. It is implemented
-(\S\ref{sec:method:training:loss}) but switched off in every other run.
-With the penalty at weight 2.0, the change-region Dice is $-0.004$ on
-average, higher on two of the five folds and on 34 of the 75 eyes: no
-measurable effect, so the simpler objective is kept.
+(\S\ref{sec:method:training:loss}) but switched off in every other run. At
+weight 2.0, the change-region Dice changes by $-0.004$ on average, higher
+on two of the five folds and on 34 of the 75 eyes. This is within the
+noise level, and the objective is kept without the penalty.
 % Values: thesis_numbers.py pair ANISOGNN_final_dilmean_mono2
 % ANISOGNN_final_dilmean, 2026-10-01 (arm 0.5221 +/- 0.0432).
-Two arguments speak against the penalty independently of its effect on the
-score. Under the pushforward curriculum
-(\S\ref{sec:method:training:curriculum}), the previous state on an unrolled
-step is the model's own earlier prediction, so the penalty locks in the
-model's own false positives: a pixel wrongly marked as atrophic can no
-longer be corrected toward the ground truth without paying the penalty. A
-direct computation with the training loss on one such pixel, at penalty
+
+Two further arguments speak against the penalty. Under the pushforward
+curriculum (\S\ref{sec:method:training:curriculum}), the previous state on
+an unrolled step is the model's own earlier prediction. A pixel the model
+wrongly marked as atrophic can then be corrected only by raising the
+penalty. A direct computation with the training loss on one such pixel, at
 weight 2.0, gives a penalty gradient 31.8 times that of the data terms, so
-the total gradient points away from the ground truth. The penalty therefore enforces different
-priors on teacher-forced and on unrolled steps. In addition, the reference
-segmentations themselves shrink locally between most pairs of visits
+the total gradient points away from the ground truth. The penalty
+therefore acts differently on steps that start from an observed state and
+on unrolled steps. In addition, the reference segmentations themselves
+shrink locally between most pairs of visits
 (\S\ref{sec:method:dt-residual}), which a strict growth constraint would
 contradict.
 % Source of 31.8x: code review 2026-08-14, item F2a (commit 45529fd in
@@ -1179,6 +1223,15 @@ contradict.
 % then-canonical weights (penalty 2.0), not a model measurement; it holds for
 % every backbone. The per-graph fix of 2026-08-15 leaves the single-eye case
 % unchanged.
+
+Taken together, the first two runs show that the network learns change
+only when the loss emphasises the mask: with the mask weighting it escapes
+the collapse, without any emphasis it does not. The soft-Dice term makes
+it predict change from the first epoch and raises the score, and the
+monotonic penalty adds nothing.
+% 2026-10-19 (SV-5.13, SV-5.14, AI 5c.12-5c.20): small table added; the
+% figure sits in this subsection since 2026-10-18; "teacher-forced" replaced;
+% the conclusion on the weighting now says that it rests on runs 1 and 2.
 
 % ---------------------------------------------------------------------------
 % PREPARED, NOT ENABLED (2026-10-18, author): pad-position exclusion as a fourth
@@ -1220,27 +1273,28 @@ contradict.
 \subsection{Capacity}
 \label{sec:experiments:ablations:capacity}
 
-Every architecture arm of Table~\ref{tab:experiments:arms} runs at 67 to 83
-thousand parameters (\S\ref{sec:method:family:params}). Whether the
-comparisons of~\S\ref{sec:experiments:main-results}
-and~\S\ref{sec:experiments:ingredients} depend on that size was tested
-separately. Each architecture class was scaled while everything else was
-held fixed: the same loss, curriculum, epoch budget and five folds, seed 42.
-Each run changes one size setting only. Width is the setting compared
-across classes, because it adds parameters without changing how far one
-step reaches. Depth does change the reach of the graph network, so it is
-read for each class on its own; the U-Net and the FNO have no depth
-setting. The design and a decision rule were fixed before the first run: a
-width step that raises the score beyond the noise level earns a further
-step up, and a width step without a gain earns a step down instead, to
-between about a sixth and a third of the original size.
+Every architecture arm of Table~\ref{tab:experiments:arms} has 67 to 83
+thousand parameters (\S\ref{sec:method:family:params}). The capacity study
+tests whether the comparisons of~\S\ref{sec:experiments:main-results}
+and~\S\ref{sec:experiments:ingredients} depend on that size. Each class was
+scaled in one size setting at a time, with the loss, curriculum, epoch
+budget and the five folds at seed 42 unchanged. Width is compared across
+classes, because it adds parameters without changing how far one step
+reaches. Depth changes the reach of the graph network, so it is read for
+each class separately; the U-Net and the FNO have no depth setting. The
+design and a decision rule were fixed before the first run. A width step
+that raised the score beyond the noise level would have been followed by a
+further step up, and a step without a gain by a step down, to between
+about a sixth and a third of the original size. No width step raised the
+score, so every class was also run at a smaller width; these runs form the
+remaining rows of Table~\ref{tab:experiments:capacity}.
 
 \begin{table}[t]
   \centering
   \caption[The capacity study.]{%
     The capacity study. Change-region Dice at the one-year anchor, five
     folds, seed 42; the mean is over the five fold values. The ratio is the
-    parameter count against the arm's own original size (1). The difference
+    parameter count divided by that of the arm at its original size. The difference
     is against that original size, as the mean over the five folds of the
     per-fold difference; the counts give the folds and the eyes on which
     the scaled arm is higher. Standard errors are given in
@@ -1319,31 +1373,40 @@ between about a sixth and a third of the original size.
   \label{fig:experiments:capacity}
 \end{figure}
 
-Table~\ref{tab:experiments:capacity} gives the result. No width step raises
-any class beyond the noise level. The dilated-stencil graph
-network is flat from a quarter to four times its size (0.520, 0.526,
-0.518; Figure~\ref{fig:experiments:capacity}). The U-Net and the FNO with a local path do best at or near their
-original size.
-Scaling down costs little: the graph network at 18\,219 parameters stays
-within 0.005 of the canonical configuration, and the T-FEN at width 48 is
-level with width 96.
+No width step raises any class beyond the noise level
+(Table~\ref{tab:experiments:capacity},
+Figure~\ref{fig:experiments:capacity}). The dilated-stencil graph network
+is flat from a quarter to four times its size (0.520, 0.526, 0.518), and
+the U-Net does best at or near its original size. The FNO with a local
+path is lower at both other widths, by 0.019 at width 2 and by 0.018 at
+width 9, each beyond the variation of retraining
+(Appendix~\ref{app:full-results:seeds}); its original width is the best
+tested one. Elsewhere, scaling down costs little: the graph network at
+18\,219 parameters stays within 0.005 of the canonical configuration, the
+U-Net at width 2 stays within the noise level, and the T-FEN at width 48
+is level with width 96. At width 192, the T-FEN diverges during training on
+folds 1 and 4 and ties width 96 on the other three.
+% z-test (2026-10-18, Appendix E): FNO + 3x3 width 2 z = -2.4, width 9
+% z = -2.2; U-Net width 2 z = -1.4 (sigma_UNet).
 
 Depth does not help where it was tested. Four message-passing rounds
 instead of two, which also double the reach of the dilated stencil, lower
-the graph network on every fold, by 0.009 on average, a small difference
-within the noise level. The T-FEN with an eight-layer free-form network
-does not train on any fold: its training error barely falls. At width 192,
-the T-FEN diverges during training on folds 1 and 4 and ties width 96 on the
-other three.
+the graph network on every fold, by 0.009 on average, within the noise
+level. The T-FEN with an eight-layer free-form network does not train on
+any fold: its training error barely falls.
 
-Capacity is therefore not a lever on this task in any of the four classes,
-and the comparisons at matched size in~\S\ref{sec:experiments:main-results}
-and~\S\ref{sec:experiments:ingredients} are not an artefact of the size at
-which they were made. The finding is scoped to one seed. In both forms of
-the transport operator, width 192 diverges on the same two folds, and the
-eight-layer network fails to train in both; the failures therefore lie in
-training the larger network, not in the form of the operator. Their cause
-was not tested.
+More parameters therefore improve none of the four classes, and the
+comparisons at matched size in~\S\ref{sec:experiments:main-results}
+and~\S\ref{sec:experiments:ingredients} do not depend on the size at which
+they were made. The result is scoped to one seed. The failures of the
+larger T-FEN networks occur in both forms of the transport operator:
+width 192 diverges on the same two folds, and the eight-layer network
+fails to train in both. They therefore come from training the larger
+network rather than from the form of the operator; their cause was not
+tested.
+% 2026-10-19 (AI 5c.21-5c.29, z-test note of 2026-10-18): step-down rows
+% explained; width-192 divergence moved to the width paragraph; FNO + 3x3
+% widths 2 and 9 now stated as below width 5; "not a lever" removed.
 % Skew w192 per fold 0.527 / 0.054 (NaN from epoch 3) / 0.610 / 0.518 / 0.028
 % (NaN from epoch 2); Galerkin w192 0.532 / 0.256 / 0.606 / 0.507 / 0.314
 % (SOLVER_FINAL_RUNS 9.18, 9.23).
