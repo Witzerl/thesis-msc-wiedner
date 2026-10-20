@@ -3,7 +3,7 @@
     cd images/scripts && python fig_data_example_state.py
 
 Panels (one visit, same eye and baseline day as fig:bg:ga-faf, PEAT0021_OD day 0):
-  (a) near-infrared SLO image (slo_global.png) and (b) FAF image (faf_global.png), each
+  (a) FAF image (faf_global.png) and (b) near-infrared SLO image (slo_global.png), each
       contrast-stretched on its own (1st-99th percentile), with the 49 x 1024 modelling
       window drawn through the visit's T_mask (as in fig_bg_ga_faf.py) and the outline of
       the GA mask in the global frame (mask_global.png). Both are shown because the
@@ -99,11 +99,11 @@ def main():
     fig = plt.figure(figsize=pal.fig_size(1.0, 0.33))
     gs = fig.add_gridspec(2, 4, height_ratios=[1, 0.05], left=0.005, right=0.995,
                           top=0.92, bottom=0.13, wspace=0.10, hspace=0.12)
-    axs, axf, axb, axc = (fig.add_subplot(gs[0, k]) for k in range(4))
+    axf, axs, axb, axc = (fig.add_subplot(gs[0, k]) for k in range(4))
     cax = fig.add_subplot(gs[1, 3])
     lesion = pal.PAL["accent"]
 
-    # (a) SLO and (b) FAF with the modelling window and the lesion outline
+    # (a) FAF and (b) SLO with the modelling window and the lesion outline
     (rr, cc), py, px = window_global(vd)
     mr, mc = MARGIN_MM / py, MARGIN_MM / px
     R0, R1 = int(max(rr[0] - mr, 0)), int(min(rr[1] + mr, slo.shape[0]))
@@ -139,7 +139,7 @@ def main():
     axc.contour(xs, ys, mask_w.astype(float), levels=[0.5], colors=["white"], linewidths=2.2)
     axc.contour(xs, ys, mask_w.astype(float), levels=[0.5], colors=[lesion], linewidths=1.0)
     cb = fig.colorbar(im, cax=cax, orientation="horizontal")
-    cb.set_label("ILM depth (axial pixels)", fontsize=6.5)
+    cb.set_label("depth (axial pixels)", fontsize=6.5)
     cb.ax.tick_params(labelsize=6.5, length=2)
     cb.outline.set_edgecolor(pal.PAL["line"])
 
@@ -149,8 +149,10 @@ def main():
         for s in ax.spines.values():
             s.set_visible(True); s.set_edgecolor(pal.PAL["line"])
         ax.set_xticks([]); ax.set_yticks([])
-    for ax, s in zip((axs, axf, axb, axc), "abcd"):
-        panel_label(ax, f"({s})", x=0.0, y=1.01)
+    titles = ("FAF", "Near-infrared SLO", "Binary GA mask", "ILM depth map")
+    for ax, s, t in zip((axf, axs, axb, axc), "abcd", titles):
+        panel_label(ax, f"({s}) {t}", x=0.0, y=1.01)
+        ax.texts[-1].set_fontsize(8)
         ax.texts[-1].set_ha("left")
 
     save(fig, "fig_data_example_state", raster=True)
