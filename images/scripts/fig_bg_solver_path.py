@@ -53,8 +53,9 @@ def main():
                           left=0.02, right=0.98, top=0.95, bottom=0.04, wspace=0.22,
                           hspace=0.62)
     a1, a2 = fig.add_subplot(gs[0, 0]), fig.add_subplot(gs[0, 1])
-    a3 = fig.add_subplot(gs[1, 0])
-    sub = gs[1, 1].subgridspec(2, 1, height_ratios=[1, 1], hspace=0.30)
+    sub3 = gs[1, 0].subgridspec(1, 2, wspace=0.10)
+    a3, a3g = fig.add_subplot(sub3[0]), fig.add_subplot(sub3[1])
+    sub =gs[1, 1].subgridspec(2, 1, height_ratios=[1, 1], hspace=0.30)
     a4u, a4 = fig.add_subplot(sub[0]), fig.add_subplot(sub[1])
     a5, a6 = fig.add_subplot(gs[2, 0]), fig.add_subplot(gs[2, 1])
 
@@ -90,26 +91,46 @@ def main():
     tidy(a2, (0, 1.05))
     a2.set_title("2  Discretise: grid values $u_i^k$")
 
-    # 3 stencil at cell i: every part of the formula is drawn
+    # 3 stencil at cell i: classical (left, weights fixed) and GNN (right, learned)
     xi = np.array([I - 1, I, I + 1])
     uz = 0.72 * u  # zoomed bars, shortened to leave room for the formula (no y-axis here)
-    a3.bar(xi, uz[xi], width=0.55, color=[nb, hi, nb])
-    for xx, nm, w in zip(xi, ("$u_{i-1}$", "$u_i$", "$u_{i+1}$"),
-                         ("$\\alpha\\!=\\!+1$", "$\\alpha\\!=\\!-2$", "$\\alpha\\!=\\!+1$")):
+    names = ("$u_{i-1}$", "$u_i$", "$u_{i+1}$")
+    a3.bar(xi, uz[xi], width=0.62, color=[nb, hi, nb])
+    for xx, nm, w in zip(xi, names, ("$\\alpha_{i-1}$", "$\\alpha_i$", "$\\alpha_{i+1}$")):
         a3.text(xx, uz[xx] + 0.05, nm, ha="center", va="bottom", fontsize=7.5, color=P["ink"])
-        a3.text(xx, 0.12, w, ha="center", va="center", fontsize=6.5, color="white")
+        a3.text(xx, 0.13, w, ha="center", va="center", fontsize=7, color="white")
     a3.annotate("", xy=(I - 1, -0.10), xytext=(I, -0.10),
                 arrowprops=dict(arrowstyle="<->", color=P["ink_2"], lw=0.7, mutation_scale=6),
                 annotation_clip=False)
     a3.text(I - 0.5, -0.13, "$\\Delta x$", ha="center", va="top", fontsize=7, color=P["ink_2"])
-    a3.text(I, 1.42,
-            "$f_i = \\dfrac{1}{\\Delta x^2} \\sum_{j=i-1}^{i+1} \\alpha_j\\, u_j$",
+    a3.text(I, 1.40, "$f_i = \\dfrac{1}{\\Delta x^2} \\sum_{j} \\alpha_j\\, u_j$",
             ha="center", va="center", fontsize=8, color=P["ink"])
-    a3.set_xlim(I - 1.6, I + 1.6); a3.set_ylim(0, 1.75)
+    a3.text(I, 1.08, "classical: $\\alpha_j$ fixed", ha="center", va="center", fontsize=7,
+            color=P["ink_2"], style="italic")
+    a3.set_xlim(I - 1.55, I + 1.55); a3.set_ylim(0, 1.75)
     a3.set_xticks(xi); a3.set_xticklabels(lab)
     a3.tick_params(axis="x", length=0, pad=12, labelsize=7)
     a3.set_yticks([]); a3.grid(False); a3.spines["left"].set_visible(False)
     a3.set_title("3  Stencil at cell $i$")
+
+    # GNN version of the same stencil: the cells are graph nodes, the weights become
+    # learned messages phi along the edges into node i (intuition only, cf. Eqs. 4.3-4.4)
+    a3g.set_xlim(I - 1.55, I + 1.55); a3g.set_ylim(0, 1.75); a3g.set_axis_off()
+    yn = 0.40
+    xg = np.array([I - 1.15, I, I + 1.15])     # node positions, spread a little for the edges
+    a3g.scatter(xg, [yn] * 3, s=260, c=[nb, hi, nb], zorder=3, linewidths=0)
+    for xx, nm in zip(xg, names):
+        a3g.text(xx, yn, nm, ha="center", va="center", fontsize=6.5, color="white", zorder=4)
+    for xx in (xg[0], xg[2]):
+        a3g.annotate("", xy=(I, yn), xytext=(xx, yn),
+                     arrowprops=dict(arrowstyle="-|>", color=P["ink"], lw=0.9, mutation_scale=8,
+                                     shrinkA=8, shrinkB=8))
+        a3g.text((xx + I) / 2, yn + 0.20, "$\\varphi_\\theta$", ha="center", va="center",
+                 fontsize=7.5, color=P["ink"])
+    a3g.text(I, 1.40, "$f_i = \\psi_\\theta\\left(u_i, \\sum_j \\varphi_\\theta(u_i, u_j)\\right)$",
+             ha="center", va="center", fontsize=7.5, color=P["ink"])
+    a3g.text(I, 1.08, "GNN: $\\varphi_\\theta, \\psi_\\theta$ learned", ha="center",
+             va="center", fontsize=7, color=P["ink_2"], style="italic")
 
     # 4 slide the stencil over u^k (top strip) -> rates (bottom strip)
     a4u.bar(x, u, width=0.86, color=P["line"])

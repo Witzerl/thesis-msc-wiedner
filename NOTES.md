@@ -1403,6 +1403,11 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
   stencil panel labels u_{i-1}, u_i, u_{i+1}, weights in the bars, dx, formula with explicit weights;
   panel 4 shows u^k with the stencil window at cells 1, 4, 7 linked to their rates. Rest still to
   discuss with the author.
+  Fourth pass (author): parabola removed; formula 1/dx^2 sum_j alpha_j u_j with a real fraction; bars
+  carry alpha_{i-1}, alpha_i, alpha_{i+1} instead of numbers; panel 3 split: left classical stencil
+  ("alpha_j fixed"), right the GNN intuition (nodes, messages phi_theta along the edges, update psi_theta,
+  f_i = psi(u_i, sum_j phi(u_i, u_j)), simplified from Eqs. 4.3-4.4; "learned"). The MP-PDE paragraph
+  of 2.3 now points to panel 3. Float set to [!t] to keep it on p. 15 next to its text.
 - [ ] Author to review Fig. 3.1 (choice of the ILM for panel (d); whether the SLO/FAF images may be
   printed -- same question as the reply-mail item below).
 - [ ] Reply mail: confirm that de-identified MUW FAF/SLO fundus images may be printed in the thesis

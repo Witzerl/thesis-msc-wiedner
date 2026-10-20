@@ -555,7 +555,7 @@ enough to cover the distance the solution moves during that step.
 % step, illustrative values (not data): nine cells sampled from a smooth
 % bump, stencil alpha = (1, -2, 1) with dx = 1, one Euler step dt = 0.3.
 % Redrawn 2026-10-20 at the author's request (the TikZ version was unclear).
-\begin{figure}[t]
+\begin{figure}[!t]
   \centering
   \includegraphics[width=\textwidth]{images/fig_bg_solver_path.pdf}
   \caption[The computational path of a numerical PDE solver.]{%
@@ -564,10 +564,14 @@ enough to cover the distance the solution moves during that step.
     (6) share one horizontal axis, and cell~$i$ is orange throughout.
     \emph{(1)}~Continuous field.
     \emph{(2)}~Discretisation: the field is sampled at the cell centres.
-    \emph{(3)}~The stencil of cell~$i$ is a weighted sum of its own value
-    and those of its two neighbours (blue), a distance $\Delta x$ apart
-    (Eq.~\ref{eq:bg:stencil}). The weights $\alpha_j = +1, -2, +1$ shown
-    are the three-point stencil of the second derivative.
+    \emph{(3)}~Left: a classical stencil is a weighted sum of the values of
+    cell~$i$ and its two neighbours (blue), a distance $\Delta x$ apart
+    (Eq.~\ref{eq:bg:stencil}). Its weights $\alpha_j$ are fixed by the
+    derivative it approximates; the second derivative shown here has
+    $+1, -2, +1$. Right: a graph neural network replaces the fixed weights
+    by learned functions, a message $\varphi_\theta$ along each edge into
+    node~$i$ and an update $\psi_\theta$ that combines them (simplified;
+    \S\ref{sec:background:neural-pde}).
     \emph{(4)}~The same stencil is applied at every cell (three positions
     shown); each position yields the rate of its centre cell.
     \emph{(5)}~One explicit Euler step (Eq.~\ref{eq:bg:euler}) moves each
@@ -630,7 +634,8 @@ explicit. The grid becomes a graph whose nodes are
 the cells and whose edges connect each cell to its stencil
 neighbourhood. One round of message passing computes, at every node, a
 learned function of its neighbours' values and of their differences to
-its own value; it thus acts as a learned, non-linear stencil. The authors show that one, two and three rounds can
+its own value; it thus acts as a learned, non-linear stencil
+(Figure~\ref{fig:bg:solver-path}, panel~3). The authors show that one, two and three rounds can
 represent finite differences, finite volumes and WENO respectively, so
 the classical schemes are special cases of the learned one. The output
 is applied in the residual form of~\eqref{eq:bg:euler}, which keeps the
