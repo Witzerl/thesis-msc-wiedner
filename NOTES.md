@@ -1391,6 +1391,13 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
   box (Euler / RK4 / any scheme that calls f), (6) next state with the old values dashed; dashed
   rollout arrow back to (2). One real step, illustrative values (9 cells, dx = 1, dt = 0.3). The TikZ
   file `images/fig_bg_solver_path.tex` was removed. Author to review.
+  Second redesign the same day (author: no rollout arrow; explain where the weights and dx come from;
+  link the rates, the time step and the next state visibly): zig-zag 3 x 2 layout, right column
+  (grid / rates / next state) on one shared x-axis, left column works out cell i -- (3) parabola
+  through the three values, dx marked, weights +1/-2/+1 in the bars, neighbours' mean as a line,
+  formula with the numbers (0.61 - 2 * 0.90 + 0.61 = -0.58); (5) Euler with the numbers
+  (0.90 + 0.3 * (-0.58) = 0.73, from the rounded values shown); (6) arrows dt * f_i per cell. A 2-D
+  draft (five-point stencil) was tried and rejected by the author (harder to read).
 - [ ] Author to review Fig. 3.1 (choice of the ILM for panel (d); whether the SLO/FAF images may be
   printed -- same question as the reply-mail item below).
 - [ ] Reply mail: confirm that de-identified MUW FAF/SLO fundus images may be printed in the thesis

@@ -559,23 +559,24 @@ enough to cover the distance the solution moves during that step.
   \centering
   \includegraphics[width=\textwidth]{images/fig_bg_solver_path.pdf}
   \caption[The computational path of a numerical PDE solver.]{%
-    The computational path of a numerical PDE solver, in one dimension.
-    \emph{(1)}~The continuous field.
-    \emph{(2)}~The grid stores one value per cell, taken at the cell
-    centres (dots).
-    \emph{(3)}~A stencil computes the rate of change of cell~$i$ (orange)
-    as a weighted sum of its own value and those of its neighbours (blue),
-    Eq.~\eqref{eq:bg:stencil}. The weights shown, $+1, -2, +1$, are the
-    three-point stencil of the second derivative.
-    \emph{(4)}~Applied at every cell, the stencil gives the rate field $f$;
-    here the peak falls and its flanks rise.
-    \emph{(5)}~A time-stepping scheme advances the grid by $\Delta t$
-    using only $f$, here one explicit Euler step,
-    Eq.~\eqref{eq:bg:euler}. Any scheme that evaluates $f$, such as
-    Runge--Kutta, can take its place without changing the stencil.
-    \emph{(6)}~The next state; dashed: the values before the step.
-    Using it as the input of the next step and repeating produces a
-    rollout. The values are illustrative.}
+    The computational path of a numerical PDE solver, in one dimension,
+    worked out for cell~$i$ (orange). Panels (2), (4) and (6) share one
+    horizontal axis.
+    \emph{(1)}~Continuous field.
+    \emph{(2)}~One value per cell, taken at the cell centres.
+    \emph{(3)}~The stencil of cell~$i$ uses its own value and those of
+    its neighbours (blue), a distance $\Delta x$ apart. The second
+    derivative of the parabola through the three values (dashed) gives
+    the weights $+1, -2, +1$ divided by $\Delta x^2$
+    (Eq.~\ref{eq:bg:stencil}). A cell above the mean of its neighbours
+    (line) therefore gets a negative rate.
+    \emph{(4)}~The same stencil at every cell gives the rates $f_i$.
+    \emph{(5)}~One explicit Euler step (Eq.~\ref{eq:bg:euler}) moves each
+    cell by $\Delta t$ times its rate. Any scheme that only evaluates $f$,
+    such as Runge--Kutta, can replace it without changing the stencil.
+    \emph{(6)}~The next state; dashed: the values before the step, arrows:
+    the change $\Delta t\, f_i$. Values illustrative ($\Delta x = 1$,
+    $\Delta t = 0.3$).}
   \label{fig:bg:solver-path}
 \end{figure}
 
