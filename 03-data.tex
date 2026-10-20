@@ -125,6 +125,11 @@ distributions are shown in Appendix~\ref{app:dataset}
 % Median ILM depth 132 axial px inside the
 % lesion, 102 outside; retinal thickness (channel 10 - channel 1) 56
 % inside, 74 outside.
+% 2026-10-20 (author): caption of (d) now names both causes of the ILM dip.
+% Checked: the lesion is subfoveal; by distance from the lesion edge the inner
+% retina (ch1-5) is 20 px inside vs 33-39 px at 0-1000 um, while ONL+HFL
+% (23 vs 23-24), photoreceptors ch7-9 (3 vs 5) and RPE ch9-10 (5 vs 6) change
+% little, so most of the dip is the foveal pit (NOTES, Fig. 3.1 item).
 \begin{figure}[t]
   \centering
   \includegraphics[width=\textwidth]{images/fig_data_example_state.png}
@@ -145,8 +150,12 @@ distributions are shown in Appendix~\ref{app:dataset}
     steps along the lesion outline.
     \emph{(d)}~The depth map of the inner limiting membrane (channel~1) on
     the same grid, in axial pixels, with the lesion outline from (c).
-    The membrane lies deeper inside the lesion, where the retina is
-    thinner. Hatched: positions without a depth value.
+    The lesion lies on the fovea (subfoveal,
+    \S\ref{sec:background:ga-oct:anatomy}), so the membrane lies deeper
+    inside it for two reasons: the foveal pit, where the inner layers thin
+    out (Figure~\ref{fig:bg:retinal-anatomy}a), and the loss of the outer
+    retina in GA (\S\ref{sec:background:ga-oct:disease}).
+    Hatched: positions without a depth value.
     Panels (c) and (d) show two of the eleven channels of the state
     tensor before normalisation.}
   \label{fig:data:example-state}

@@ -1429,7 +1429,7 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
   (only the figure pointer was added; SUPPORTED).
 - [x] (2026-10-20, author: fine; nothing in either repo restricts printing dataset images) Author to
   review Fig. 3.1 -- image permission part. The layer choice for panel (d) is the next item.
-- [ ] **Fig. 3.1 panel (d): ILM probably shows the foveal pit, not the lesion (checked 2026-10-20,
+- [x] **Fig. 3.1 panel (d): ILM probably shows the foveal pit, not the lesion (checked 2026-10-20,
   scratchpad scripts `layer_contrast.py`, `fovea_split.py`, render `images/data/layer_candidates_PEAT0058_OD_360.png`,
   git-ignored).** Candidates: all ten channels plus the thicknesses named in §3.2 (total retina ch10-ch1;
   inner retina ch5-ch1; INL ch5-ch4, Ebneter; ONL+HFL ch7-ch6, Vogl; photoreceptor OS ch9-ch7; RPE-PR
@@ -1454,6 +1454,9 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
   ring is the normal parafoveal thickness peak, not RPE-BM thickening (Chu R1 mean ~11 um, ~3 px).
   Cohort, rim 0-300 um minus 600-1500 um: RPE ch9-10 change > 0 in 2 % of the 64 off-fovea visits.
   Total thickness has no lesion contrast off the fovea (ring AUC 0.53).
+  **Decided 2026-10-20 (author):** keep the ILM; the caption of (d) now names both causes of the dip,
+  each pointing to existing text (subfoveal §2.1.1; foveal pit Fig. 2.4a; outer-retinal loss §2.1.3).
+  The sentence "most of the dip comes from the pit" was left out (author). Item closed.
 
 - [x] Chapter 5 data figures (author approved all eight, 2026-10-01), all in the text with a
   referencing sentence, every plotted value checked against the text: `fig:experiments:curves`
