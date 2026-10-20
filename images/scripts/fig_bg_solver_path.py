@@ -8,9 +8,8 @@ one x-axis, so a cell's value, its rate and its new value sit directly above one
 the left column (1, 3, 5) shows the operation, worked out for cell i:
   1 continuous field u(t_k, x)
   2 discretise: the field sampled at the cell centres, u_i^k
-  3 stencil at cell i: u_{i-1}, u_i, u_{i+1} a distance dx apart, weights +1, -2, +1 in
-    the bars, the parabola through the three values (dashed; its second derivative gives
-    the weights), formula f_i = [(+1) u_{i-1} + (-2) u_i + (+1) u_{i+1}] / dx^2
+  3 stencil at cell i: u_{i-1}, u_i, u_{i+1} a distance dx apart, weights alpha = +1, -2, +1 in
+    the bars, formula f_i = sum_{j=i-1}^{i+1} alpha_j u_j / dx^2
   4 slide the stencil: top strip u^k with the stencil window at three positions (the one
     at cell i solid), each linked to the rate it produces in the bottom strip, f_i
   5 time step for cell i, one explicit Euler step; RK4 or any scheme that evaluates f
@@ -93,21 +92,20 @@ def main():
 
     # 3 stencil at cell i: every part of the formula is drawn
     xi = np.array([I - 1, I, I + 1])
-    a3.bar(xi, u[xi], width=0.55, color=[nb, hi, nb])
-    c2, c1, c0 = np.polyfit(xi - I, u[xi], 2)
-    xp = np.linspace(-1.35, 1.35, 100)
-    a3.plot(xp + I, c2 * xp ** 2 + c1 * xp + c0, color=P["ink_2"], lw=0.7, ls=(0, (3, 2)))
-    for xx, nm, w in zip(xi, ("$u_{i-1}$", "$u_i$", "$u_{i+1}$"), ("$+1$", "$-2$", "$+1$")):
-        a3.text(xx, u[xx] + 0.05, nm, ha="center", va="bottom", fontsize=7.5, color=P["ink"])
-        a3.text(xx, 0.12, w, ha="center", va="center", fontsize=7.5, color="white")
+    uz = 0.72 * u  # zoomed bars, shortened to leave room for the formula (no y-axis here)
+    a3.bar(xi, uz[xi], width=0.55, color=[nb, hi, nb])
+    for xx, nm, w in zip(xi, ("$u_{i-1}$", "$u_i$", "$u_{i+1}$"),
+                         ("$\\alpha\\!=\\!+1$", "$\\alpha\\!=\\!-2$", "$\\alpha\\!=\\!+1$")):
+        a3.text(xx, uz[xx] + 0.05, nm, ha="center", va="bottom", fontsize=7.5, color=P["ink"])
+        a3.text(xx, 0.12, w, ha="center", va="center", fontsize=6.5, color="white")
     a3.annotate("", xy=(I - 1, -0.10), xytext=(I, -0.10),
                 arrowprops=dict(arrowstyle="<->", color=P["ink_2"], lw=0.7, mutation_scale=6),
                 annotation_clip=False)
     a3.text(I - 0.5, -0.13, "$\\Delta x$", ha="center", va="top", fontsize=7, color=P["ink_2"])
-    a3.text(I, 1.50,
-            "$f_i = \\left[(+1)\\,u_{i-1} + (-2)\\,u_i + (+1)\\,u_{i+1}\\right] / \\Delta x^2$",
-            ha="center", va="center", fontsize=7.5, color=P["ink"])
-    a3.set_xlim(I - 1.6, I + 1.6); a3.set_ylim(0, 1.65)
+    a3.text(I, 1.42,
+            "$f_i = \\sum_{j=i-1}^{i+1} \\alpha_j\\, u_j \\,/\\, \\Delta x^2$",
+            ha="center", va="center", fontsize=8, color=P["ink"])
+    a3.set_xlim(I - 1.6, I + 1.6); a3.set_ylim(0, 1.75)
     a3.set_xticks(xi); a3.set_xticklabels(lab)
     a3.tick_params(axis="x", length=0, pad=12, labelsize=7)
     a3.set_yticks([]); a3.grid(False); a3.spines["left"].set_visible(False)

@@ -564,11 +564,10 @@ enough to cover the distance the solution moves during that step.
     (6) share one horizontal axis, and cell~$i$ is orange throughout.
     \emph{(1)}~Continuous field.
     \emph{(2)}~Discretisation: the field is sampled at the cell centres.
-    \emph{(3)}~The stencil of cell~$i$ combines its own value and those
-    of its two neighbours (blue), a distance $\Delta x$ apart, with the
-    weights $+1, -2, +1$ (Eq.~\ref{eq:bg:stencil}). These weights,
-    divided by $\Delta x^2$, are the second derivative of the parabola
-    through the three values (dashed).
+    \emph{(3)}~The stencil of cell~$i$ is a weighted sum of its own value
+    and those of its two neighbours (blue), a distance $\Delta x$ apart
+    (Eq.~\ref{eq:bg:stencil}). The weights $\alpha_j = +1, -2, +1$ shown
+    are the three-point stencil of the second derivative.
     \emph{(4)}~The same stencil is applied at every cell (three positions
     shown); each position yields the rate of its centre cell.
     \emph{(5)}~One explicit Euler step (Eq.~\ref{eq:bg:euler}) moves each
