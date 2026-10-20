@@ -1446,6 +1446,14 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
   RPE-PR complex thickness (derived from channels 7 and 10, caption changed accordingly; matches the
   definition of GA as RPE + photoreceptor loss) with a new eye rule; (ii) keep the ILM and reword the
   caption (foveal pit).
+  Follow-up (author asked whether total thickness works and whether its ring is RPE-BM thickening;
+  `rim_decomp.py`): at PEAT0058_OD/360 total thickness by distance from the lesion is 56 (inside) /
+  71 / 76 / 79 / 80 / 77 / 72 / 68 px at 0-150 / 150-300 / 300-600 / 600-1000 / 1000-1500 /
+  1500-2500 / >2500 um. The ring (peak 300-1000 um, +12 px over far) is entirely inner retina
+  (ch1-5: 39 vs 27 px); RPE ch9-10 is 6 px (~23 um) at every distance, ONL flat at 23-24 px. So the
+  ring is the normal parafoveal thickness peak, not RPE-BM thickening (Chu R1 mean ~11 um, ~3 px).
+  Cohort, rim 0-300 um minus 600-1500 um: RPE ch9-10 change > 0 in 2 % of the 64 off-fovea visits.
+  Total thickness has no lesion contrast off the fovea (ring AUC 0.53).
 
 - [x] Chapter 5 data figures (author approved all eight, 2026-10-01), all in the text with a
   referencing sentence, every plotted value checked against the text: `fig:experiments:curves`
