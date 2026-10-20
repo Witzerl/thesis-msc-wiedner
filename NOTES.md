@@ -1414,6 +1414,16 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
   grey lines from the three values into a theta box; caption: message-passing networks go further),
   5 slide the stencil -> rates, 6 time step with next state (Euler formula; RK4 note). 2.3 points to
   panel 4. Shared-x-axis column given up (panel 5 carries its own u^k strip).
+  Fact check and fixes (author asked whether it is still correct): learned stencil checked against
+  Bar-Sinai et al. (2019, p. 3: coefficients output by the network, depending on the field values in
+  the neighbouring cells; a generalisation of ENO/WENO); caption now says (i) the stencil output is the
+  rate only for the diffusion equation du/dt = d2u/dx2, in general F turns the derivative into the rate;
+  (ii) a standard stencil uses the same weights at every cell, WENO already varies them (panel 3 title
+  "Standard stencil"); (iii) panel 5 applies the same rule (fixed weights or the same network), the
+  learned weights differ per cell; (iv) 1/dx^2 is written outside the sum, unlike Eq. 2.3. Also more
+  space between bars, note and formula in panels 3-4, and one orange arrow "learn the weights" from
+  panel 3's weights to panel 4's. Simplification left as is: panel 4 draws the network reading only
+  the three stencil values (Bar-Sinai: 6-point stencils, wider input).
 - [ ] Author to review Fig. 3.1 (choice of the ILM for panel (d); whether the SLO/FAF images may be
   printed -- same question as the reply-mail item below).
 - [ ] Reply mail: confirm that de-identified MUW FAF/SLO fundus images may be printed in the thesis

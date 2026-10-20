@@ -563,17 +563,23 @@ enough to cover the distance the solution moves during that step.
     title names the step that leads to it; cell~$i$ is orange throughout.
     \emph{(1)}~Continuous field.
     \emph{(2)}~Discretisation: the field is sampled at the cell centres.
-    \emph{(3)}~A classical stencil is a weighted sum of the values of
+    \emph{(3)}~A standard stencil is a weighted sum of the values of
     cell~$i$ and its two neighbours (blue), a distance $\Delta x$ apart
-    (Eq.~\ref{eq:bg:stencil}). Its weights $\alpha_j$ are fixed by the
-    derivative it approximates; for the second derivative they are
-    $+1, -2, +1$.
+    (Eq.~\ref{eq:bg:stencil}, with the factor $1/\Delta x^2$ written
+    separately). It uses the same weights $\alpha_j$ at every cell,
+    chosen for the derivative it approximates: $+1, -2, +1$ for the
+    second derivative shown. For the diffusion equation
+    $\partial u / \partial t = \partial^2 u / \partial x^2$ this second
+    derivative is the rate $f_i$; in general the stencil estimates a
+    derivative and $F$ turns it into the rate. Adaptive schemes such as
+    WENO already vary the weights with the values.
     \emph{(4)}~A learned stencil keeps the same sum, but a network with
-    parameters $\theta$ computes the weights from the values
-    (\S\ref{sec:background:neural-pde}); message-passing networks go
-    further and learn the whole combination.
-    \emph{(5)}~The same stencil is applied at every cell (three positions
-    shown); each position yields the rate of its centre cell.
+    parameters $\theta$ computes the weights from the local values, so
+    they differ from cell to cell (\S\ref{sec:background:neural-pde});
+    message-passing networks go further and learn the whole combination.
+    \emph{(5)}~The same rule, fixed weights or the same network, is
+    applied at every cell (three positions shown); each position yields
+    the rate of its centre cell.
     \emph{(6)}~One explicit Euler step (Eq.~\ref{eq:bg:euler}) moves each
     cell by $\Delta t$ times its rate; dashed: the values before the step,
     arrows: the change $\Delta t\, f_i$. Any scheme that only evaluates

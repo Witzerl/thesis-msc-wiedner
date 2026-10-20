@@ -51,8 +51,8 @@ def main():
     print("u   ", np.round(u, 3)); print("f   ", np.round(f, 3)); print("u+1 ", np.round(u1, 3))
 
     fig = plt.figure(figsize=pal.fig_size(1.0, 0.66))
-    gs = fig.add_gridspec(3, 2, height_ratios=[0.8, 1.15, 1.25], left=0.02, right=0.98,
-                          top=0.95, bottom=0.06, wspace=0.16, hspace=0.62)
+    gs = fig.add_gridspec(3, 2, height_ratios=[0.65, 1.55, 1.15], left=0.02, right=0.98,
+                          top=0.95, bottom=0.06, wspace=0.16, hspace=0.75)
     a1, a2 = fig.add_subplot(gs[0, 0]), fig.add_subplot(gs[0, 1])
     a3, a4 = fig.add_subplot(gs[1, 0]), fig.add_subplot(gs[1, 1])
     sub = gs[2, 0].subgridspec(2, 1, height_ratios=[1, 1], hspace=0.30)
@@ -92,7 +92,7 @@ def main():
 
     # 3 and 4: the same stencil, weights fixed (3) or computed by a network (4)
     xi = np.array([I - 1, I, I + 1])
-    uz = 0.50 * u  # zoomed bars, shortened to leave room for the formula (no y-axis here)
+    uz = 0.58 * u  # zoomed bars, shortened to leave room for the formula (no y-axis here)
     names = ("$u_{i-1}$", "$u_i$", "$u_{i+1}$")
 
     def stencil(a, weights, formula, note, learned=False):
@@ -109,25 +109,31 @@ def main():
                                    mutation_scale=6), annotation_clip=False)
         a.text(I - 0.5, -0.13, "$\\Delta x$", ha="center", va="top", fontsize=7,
                color=P["ink_2"])
-        a.text(I, 1.60, formula, ha="center", va="center", fontsize=8, color=P["ink"])
-        a.text(I, 1.28, note, ha="center", va="center", fontsize=7, color=P["ink_2"],
+        a.text(I, 1.98, formula, ha="center", va="center", fontsize=8, color=P["ink"])
+        a.text(I, 1.52, note, ha="center", va="center", fontsize=7, color=P["ink_2"],
                style="italic")
-        a.set_xlim(I - 1.9, I + 1.9); a.set_ylim(0, 1.9)
+        a.set_xlim(I - 1.9, I + 1.9); a.set_ylim(0, 2.35)
         a.set_xticks(xi); a.set_xticklabels(lab)
         a.tick_params(axis="x", length=0, pad=12, labelsize=7)
         a.set_yticks([]); a.grid(False); a.spines["left"].set_visible(False)
 
     stencil(a3, ("$\\alpha_{i-1}$", "$\\alpha_i$", "$\\alpha_{i+1}$"),
             "$f_i = \\dfrac{1}{\\Delta x^2} \\sum_{j} \\alpha_j\\, u_j$",
-            "weights $\\alpha_j$ fixed")
-    a3.set_title("3  Classical stencil at cell $i$")
+            "the same weights $\\alpha_j$ at every cell")
+    a3.set_title("3  Standard stencil at cell $i$")
 
     stencil(a4, ("$\\alpha_{i-1}$", "$\\alpha_i$", "$\\alpha_{i+1}$"),
             "$f_i = \\dfrac{1}{\\Delta x^2} \\sum_{j} \\alpha_j(u;\\,\\theta)\\, u_j$",
-            "weights $\\alpha_j$ computed from the values by a network $\\theta$",
+            "weights $\\alpha_j$ computed by a network $\\theta$",
             learned=True)
+    # the one change from 3 to 4: the weights become learned (arrow at the weights' height)
+    fig.add_artist(ConnectionPatch((I + 1.45, 0.13), (I - 1.45, 0.13), "data", "data",
+                                   axesA=a3, axesB=a4, color=hi, lw=0.9, arrowstyle="-|>",
+                                   mutation_scale=8))
+    a4.text(I - 1.72, 0.30, "learn the\nweights", ha="right", va="bottom", fontsize=6.5,
+            color=hi, clip_on=False)
     # the network theta reads the three values (grey lines from the value labels)
-    net = (I, 1.06)
+    net = (I, 1.10)
     a4.add_patch(FancyBboxPatch((net[0] - 0.30, net[1] - 0.08), 0.60, 0.16,
                                 boxstyle="round,pad=0.0,rounding_size=0.05",
                                 fc=P["accent_tint"], ec=hi, lw=0.8, zorder=4))
