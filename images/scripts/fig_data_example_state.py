@@ -3,16 +3,19 @@
     cd images/scripts && python fig_data_example_state.py
 
 Panels (one visit, same eye and baseline day as fig:bg:ga-faf, PEAT0021_OD day 0):
-  (a) SLO fundus image (slo_global.png), contrast-stretched (1st-99th percentile),
-      with the 49 x 1024 modelling window drawn through the visit's T_mask (as in
-      fig_bg_ga_faf.py) and the outline of the GA mask in the global frame
-      (mask_global.png);
-  (b) channel 0, the binary GA mask on the 49 x 1024 modelling grid (centre crop /
+  (a) near-infrared SLO image (slo_global.png) and (b) FAF image (faf_global.png), each
+      contrast-stretched on its own (1st-99th percentile), with the 49 x 1024 modelling
+      window drawn through the visit's T_mask (as in fig_bg_ga_faf.py) and the outline of
+      the GA mask in the global frame (mask_global.png). Both are shown because the
+      lesion looks different on the two: bright on the SLO, dark on FAF, where it was
+      annotated; other bright spots on the SLO are not part of the annotation
+      (median brightness inside / in a 30 px ring: SLO 124 / 93, FAF 63 / 90);
+  (c) channel 0, the binary GA mask on the 49 x 1024 modelling grid (centre crop /
       zero pad of mask_oct.png, same arithmetic as the precompute), at the physical
       aspect ratio, nearest-neighbour, so the tall thin pixels are visible;
-  (c) channel 1, the ILM depth map (axial pixel index), on the same grid, with the
-      lesion outline of (b).
-Hatched: positions without data -- zero padding of the crop (all channels) and, in (c),
+  (d) channel 1, the ILM depth map (axial pixel index), on the same grid, with the
+      lesion outline of (c).
+Hatched: positions without data -- zero padding of the crop (all channels) and, in (d),
 positions where the stored layer value is 0 (no segmentation at this visit).
 
 Source (read-only): data/MUW_GA/scans/<EYE>/<DAY>/{slo_global.png, mask_global.png,
@@ -35,7 +38,7 @@ from fig_bg_ga_faf import window_global, stretch
 
 EYE, DAY = "PEAT0021_OD", 0
 CHANNEL = 1            # ILM (most superficial boundary)
-MARGIN_MM = 1.2
+MARGIN_MM = 0.4
 
 
 def to_window(a: np.ndarray, fill=0):
@@ -80,6 +83,7 @@ def main():
     vd = SCANS / EYE / str(DAY)
 
     slo = np.asarray(Image.open(vd / "slo_global.png").convert("L")).astype(float)
+    faf = np.asarray(Image.open(vd / "faf_global.png").convert("L")).astype(float)
     m_glb = np.asarray(Image.open(vd / "mask_global.png")) > 127
     m_oct = np.asarray(Image.open(vd / "mask_oct.png")) > 127
     layers = np.load(vd / "layers_oct.npz.npy").astype(float)
@@ -92,30 +96,32 @@ def main():
     print(f"window: {(~inside).mean():.1%} zero pad, {nodata_layer.mean():.1%} inside the "
           f"scan without a layer value; lesion {mask_w.sum()} px")
 
-    fig = plt.figure(figsize=pal.fig_size(1.0, 0.40))
-    gs = fig.add_gridspec(2, 3, height_ratios=[1, 0.045], left=0.005, right=0.995,
-                          top=0.93, bottom=0.10, wspace=0.12, hspace=0.10)
-    axa, axb, axc = (fig.add_subplot(gs[0, k]) for k in range(3))
-    cax = fig.add_subplot(gs[1, 2])
+    fig = plt.figure(figsize=pal.fig_size(1.0, 0.33))
+    gs = fig.add_gridspec(2, 4, height_ratios=[1, 0.05], left=0.005, right=0.995,
+                          top=0.92, bottom=0.13, wspace=0.10, hspace=0.12)
+    axs, axf, axb, axc = (fig.add_subplot(gs[0, k]) for k in range(4))
+    cax = fig.add_subplot(gs[1, 3])
     lesion = pal.PAL["accent"]
 
-    # (a) SLO with the modelling window and the lesion outline
+    # (a) SLO and (b) FAF with the modelling window and the lesion outline
     (rr, cc), py, px = window_global(vd)
     mr, mc = MARGIN_MM / py, MARGIN_MM / px
     R0, R1 = int(max(rr[0] - mr, 0)), int(min(rr[1] + mr, slo.shape[0]))
     C0, C1 = int(max(cc[0] - mc, 0)), int(min(cc[1] + mc, slo.shape[1]))
     ext = ((C0 - cc[0]) * px, (C1 - cc[0]) * px, (R1 - rr[0]) * py, (R0 - rr[0]) * py)
-    axa.imshow(stretch(slo[R0:R1, C0:C1]), cmap="gray", vmin=0, vmax=1, extent=ext,
-               interpolation="lanczos")
     gy = (np.arange(R0, R1) - rr[0]) * py
     gx = (np.arange(C0, C1) - cc[0]) * px
-    axa.contour(gx, gy, m_glb[R0:R1, C0:C1].astype(float), levels=[0.5], colors=[lesion],
-                linewidths=1.0)
-    rect = dict(xy=(0, 0), width=(cc[1] - cc[0]) * px, height=(rr[1] - rr[0]) * py, fill=False)
-    axa.add_patch(mpatches.Rectangle(**rect, ec="white", lw=2.6))
-    axa.add_patch(mpatches.Rectangle(**rect, ec=pal.PAL["primary"], lw=1.4, ls=(0, (4, 3))))
-    axa.set_xlim(ext[0], ext[1]); axa.set_ylim(ext[2], ext[3])
-    axa.set_axis_off()
+    for ax, img in ((axs, slo), (axf, faf)):
+        ax.imshow(stretch(img[R0:R1, C0:C1]), cmap="gray", vmin=0, vmax=1, extent=ext,
+                  interpolation="lanczos")
+        ax.contour(gx, gy, m_glb[R0:R1, C0:C1].astype(float), levels=[0.5],
+                   colors=[lesion], linewidths=0.9)
+        rect = dict(xy=(0, 0), width=(cc[1] - cc[0]) * px, height=(rr[1] - rr[0]) * py,
+                    fill=False)
+        ax.add_patch(mpatches.Rectangle(**rect, ec="white", lw=2.2))
+        ax.add_patch(mpatches.Rectangle(**rect, ec=pal.PAL["primary"], lw=1.2, ls=(0, (4, 3))))
+        ax.set_xlim(ext[0], ext[1]); ax.set_ylim(ext[2], ext[3])
+        ax.set_axis_off()
 
     # (b) channel 0 on the modelling grid, nearest neighbour, physical aspect
     cmap_mask = mpl.colors.ListedColormap(["white", pal.MASK["gt"]])
@@ -133,7 +139,7 @@ def main():
     axc.contour(xs, ys, mask_w.astype(float), levels=[0.5], colors=["white"], linewidths=2.2)
     axc.contour(xs, ys, mask_w.astype(float), levels=[0.5], colors=[lesion], linewidths=1.0)
     cb = fig.colorbar(im, cax=cax, orientation="horizontal")
-    cb.set_label("ILM depth (axial pixels)", fontsize=7)
+    cb.set_label("ILM depth (axial pixels)", fontsize=6.5)
     cb.ax.tick_params(labelsize=6.5, length=2)
     cb.outline.set_edgecolor(pal.PAL["line"])
 
@@ -143,7 +149,7 @@ def main():
         for s in ax.spines.values():
             s.set_visible(True); s.set_edgecolor(pal.PAL["line"])
         ax.set_xticks([]); ax.set_yticks([])
-    for ax, s in zip((axa, axb, axc), "abc"):
+    for ax, s in zip((axs, axf, axb, axc), "abcd"):
         panel_label(ax, f"({s})", x=0.0, y=1.01)
         ax.texts[-1].set_ha("left")
 

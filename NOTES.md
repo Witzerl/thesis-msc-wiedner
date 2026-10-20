@@ -1370,8 +1370,16 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
   window at physical aspect (native 38 x 1059 -> 22.4 % zero pad, hatched), (c) channel 1 (ILM) depth
   map with the lesion outline; IoU mask_global vs mask_oct 1.000. Caption: ILM deeper inside the
   lesion (median 114 vs 83 axial px), retina thinner there (channel 10 - 1: 66 vs 83).
-- [ ] Author to review Fig. 2.5 and Fig. 3.1 (choice of the ILM for panel (c); whether the SLO image
-  may be printed -- same question as the reply-mail item below).
+- [x] 2026-10-20 (author): Fig. 3.1 now shows the visit on both fundus images, captioned by modality:
+  (a) near-infrared SLO (lesion bright; the other bright spots are not dark on FAF and not part of the
+  annotation), (b) FAF (lesion dark, the image it was annotated on), (c) mask, (d) ILM depth. Reason:
+  with Fig. 2.3 a reader could take every white spot on the SLO for GA. Brightness inside / ring:
+  SLO 124 / 93, FAF 63 / 90. §3.1 sentence reworded.
+- [ ] Fig. 2.5 (author 2026-10-20: "from the vis I don't get it"): the TikZ version stays in for now; a
+  three-panel bar redesign (values u_i^k with the stencil -> rates f_i -> u^{k+1} = u^k + dt f with
+  the old heights dashed; one real heat-equation step) was proposed, awaiting the author's answer.
+- [ ] Author to review Fig. 3.1 (choice of the ILM for panel (d); whether the SLO/FAF images may be
+  printed -- same question as the reply-mail item below).
 - [ ] Reply mail: confirm that de-identified MUW FAF/SLO fundus images may be printed in the thesis
   (needed for `fig:bg:ga-faf` and `fig:data:example-state`).
 

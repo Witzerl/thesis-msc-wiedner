@@ -71,9 +71,9 @@ markedly decreased or absent autofluorescence
 (Figure~\ref{fig:bg:ga-faf} shows such an image). The outline was then
 registered automatically to the near-infrared image that is aligned with
 the OCT, which yields the en-face annotation on the OCT grid.
-Figure~\ref{fig:data:example-state} shows one visit as the SLO fundus
-image with the OCT field of view, the GA mask on the modelling grid and a
-layer-boundary depth map.
+Figure~\ref{fig:data:example-state} shows one visit on the near-infrared
+image and on the FAF image, together with the GA mask on the modelling
+grid and a layer-boundary depth map.
 % FAF origin of the mask confirmed by the supervisor (review 2, 2026-10-17,
 % SV-6.7: "it was"). Layer segmentation: Iowa Reference Algorithms (3.2).
 % TODO: confirm the device model (Spectralis) with the MUW data provider.
@@ -116,6 +116,9 @@ distributions are shown in Appendix~\ref{app:dataset}
 % fig:bg:ga-faf (a)). Native grid 38 x 1059, so 22.4 % of the window is zero
 % padding (11 rows); 2.0 % of the window lies inside the scan without an ILM
 % value. mask_global through T_mask reproduces mask_oct at IoU 1.000.
+% Median brightness inside the lesion / in a 30 px ring around it: SLO
+% 124 / 93, FAF 63 / 90 (2026-10-20). The bright SLO spots outside the
+% outline are not dark on FAF; what they are is not recorded in the data.
 % Median ILM depth 114 axial px inside the lesion, 83 outside; retinal
 % thickness (channel 10 - channel 1) 66 inside, 83 outside.
 \begin{figure}[t]
@@ -123,20 +126,24 @@ distributions are shown in Appendix~\ref{app:dataset}
   \includegraphics[width=\textwidth]{images/fig_data_example_state.png}
   \caption[One visit of the MUW cohort.]{%
     One visit of the MUW cohort: the first visit of the eye shown in
-    Figure~\ref{fig:bg:ga-faf}.
-    \emph{(a)}~SLO fundus image. The dashed square marks the
-    $49 \times 1024$ modelling window, the orange line the outline of the
-    GA lesion.
-    \emph{(b)}~The binary GA mask (channel~0) on the modelling grid, drawn
+    Figure~\ref{fig:bg:ga-faf}. In (a) and (b), the dashed square marks
+    the $49 \times 1024$ modelling window and the orange line the outline
+    of the GA annotation.
+    \emph{(a)}~Near-infrared SLO image. The lesion appears bright. The
+    other bright spots are not dark on FAF and are not part of the
+    annotation.
+    \emph{(b)}~FAF image of the same visit, on which the lesion was
+    annotated. The lesion appears dark.
+    \emph{(c)}~The binary GA mask (channel~0) on the modelling grid, drawn
     at its physical aspect ratio of about $5.94 \times 5.82$\,mm; each
     pixel is about 21 times taller than it is wide, which shows as steps
     along the lesion outline. The native grid of this eye has 38 rows, so
     the window is zero-padded at the top and bottom (hatched).
-    \emph{(c)}~The depth map of the inner limiting membrane (channel~1) on
-    the same grid, in axial pixels, with the lesion outline from (b).
+    \emph{(d)}~The depth map of the inner limiting membrane (channel~1) on
+    the same grid, in axial pixels, with the lesion outline from (c).
     The membrane lies deeper inside the lesion, where the retina is
     thinner. Hatched: positions without data.
-    Panels (b) and (c) show two of the eleven channels of the state
+    Panels (c) and (d) show two of the eleven channels of the state
     tensor before normalisation.}
   \label{fig:data:example-state}
 \end{figure}
