@@ -1198,9 +1198,9 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
     most of the RAM.
 - [x] §4.3.3 `fig:method:stencils` -- done 2026-10-01 (`fig_method_stencils.py`).
 - [x] (done 2026-10-18: TikZ `images/fig_method_pipeline.tex`, update loop only; author accepted) §4.1 `fig:method:pipeline` -- schematic (TikZ draft), needs author review.
-- [ ] §3.1 `fig:data:example-state` -- Python from raw data; needs the author's decision whether
+- [x] (done 2026-10-20, see below) §3.1 `fig:data:example-state` -- Python from raw data; needs the author's decision whether
   a patient's SLO image may be printed.
-- [ ] §2.2.2 `fig:bg:solver-path` -- schematic (TikZ draft), needs author review.
+- [x] (done 2026-10-20, see below) §2.2.2 `fig:bg:solver-path` -- schematic (TikZ draft), needs author review.
 - [x] 2026-10-16 §2.1.1 `fig:bg:eye-anatomy` (Fig. 2.1) done with two openly licensed Wikimedia
   Commons images instead of an LLM drawing (author's choice): left Schematic_diagram_of_the_human_eye_en.svg
   (Rhcastilhos, Jmarchn; CC BY-SA 3.0; background made white), right Macula.svg (photo Danny Hope,
@@ -1360,6 +1360,18 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
   the caption's interval and describe only what that eye shows. Script
   `images/scripts/fig_bg_ga_faf.py`. Earlier there was no figure showing GA on a real eye (only the
   schematic Fig. 2.3(b) and the still unbuilt `fig:data:example-state`).
+- [x] 2026-10-20 **Chapters 1-4 have no figure placeholders left.** (i) `fig:bg:solver-path` (Fig. 2.5,
+  p. 15): TikZ `images/fig_bg_solver_path.tex`, one dimension -- field u(t_k, x) with the cell centres
+  as dots -> seven cells u^k, cell i orange, its stencil framed blue -> f_i -> time-step box (Euler) ->
+  u^{k+1}, dashed loop "rollout"; cell values illustrative (caption says so); caption names stencil and
+  time step as independent choices. (ii) `fig:data:example-state` (Fig. 3.1, p. 25):
+  `images/scripts/fig_data_example_state.py`, PEAT0021_OD day 0 (= first visit of `fig:bg:ga-faf`):
+  (a) SLO with the 49 x 1024 window (via T_mask) and the mask_global outline, (b) channel 0 on the
+  window at physical aspect (native 38 x 1059 -> 22.4 % zero pad, hatched), (c) channel 1 (ILM) depth
+  map with the lesion outline; IoU mask_global vs mask_oct 1.000. Caption: ILM deeper inside the
+  lesion (median 114 vs 83 axial px), retina thinner there (channel 10 - 1: 66 vs 83).
+- [ ] Author to review Fig. 2.5 and Fig. 3.1 (choice of the ILM for panel (c); whether the SLO image
+  may be printed -- same question as the reply-mail item below).
 - [ ] Reply mail: confirm that de-identified MUW FAF/SLO fundus images may be printed in the thesis
   (needed for `fig:bg:ga-faf` and `fig:data:example-state`).
 
@@ -2325,7 +2337,7 @@ Pulled from the code repository (`masterthesis-docker/NOTES.md` + `PROJECT_CONTE
   as $\mathcal{A}$ (`eq:bg:update-operator`); remove the repeat or point back, one symbol.
   Also: THESIS_STRUCTURE.md §2.2 entry still names the method of lines and omits the FEM
   paragraph. Overview of this session's open items: `prompts/open.txt` section 11 [s25].
-- [ ] TODO: produce Figure `fig:bg:solver-path` (§2.2.2) -- the classical computational
+- [x] (done 2026-10-20) TODO: produce Figure `fig:bg:solver-path` (§2.2.2) -- the classical computational
   path as a pipeline: continuous field -> grid of cell values -> spatial discretisation
   (one cell and its stencil, yielding f_i) -> time integrator (Euler step) -> next state,
   with a loop arrow labelled "rollout"; the two boxes marked as independent choices.
@@ -2337,7 +2349,7 @@ Pulled from the code repository (`masterthesis-docker/NOTES.md` + `PROJECT_CONTE
   learned stencil) once Chapters 4--5 are drafted and it is clear how much background
   they actually lean on.
 - [x] (done 2026-10-16 with Wikimedia Commons images, see the Figure plan) TODO: produce Figure `fig:bg:eye-anatomy` placed in `02-background.tex` §2.1.1 -- two-panel anatomy reference for ML readers without clinical background: (left) sagittal cross-section of the human eye labelling cornea, lens, vitreous body, retina, fovea, optic-nerve head (ONH) / optic disc, optic nerve, choroid, sclera, with the macular region highlighted on the retina near the posterior pole; (right) en-face fundus view of the posterior pole labelling macula (~6 mm-wide central region), fovea (central pit), foveola (innermost ~0.35 mm of the fovea), parafovea (~0.5--1.5 mm eccentric ring), perifovea (~1.5--3 mm eccentric ring), and ONH / optic disc (~4 mm nasal to the fovea). Overlay the 6 x 6 mm OCT scanning window used by the thesis cohort as a dashed square centred on the fovea. Currently rendered as an `\fbox` placeholder pending a real graphic.
-- [ ] TODO: produce Figure `fig:bg:retinal-anatomy` placed in `02-background.tex` §2.1.2 (formerly §2.1.1) -- two-panel schematic for readers without a clinical background: (left) labelled cross-section through a healthy macula showing the principal retinal layers from ILM through RNFL, GCL+IPL, INL+OPL, ONL, photoreceptor IS/OS bands (including the ellipsoid zone), RPE, and Bruch's membrane, with the choriocapillaris immediately beneath; (right) a representative OCT B-scan through a GA-affected macula highlighting the dropout of the outer-retinal layers within the lesion and the corresponding choroidal hypertransmission signature beneath. Mirror the channel ordering of the eleven-channel state tensor used in the thesis. Currently rendered as an `\fbox` placeholder pending a real graphic.
+- [x] (done 2026-10-16, see the Figure plan) TODO: produce Figure `fig:bg:retinal-anatomy` placed in `02-background.tex` §2.1.2 (formerly §2.1.1) -- two-panel schematic for readers without a clinical background: (left) labelled cross-section through a healthy macula showing the principal retinal layers from ILM through RNFL, GCL+IPL, INL+OPL, ONL, photoreceptor IS/OS bands (including the ellipsoid zone), RPE, and Bruch's membrane, with the choriocapillaris immediately beneath; (right) a representative OCT B-scan through a GA-affected macula highlighting the dropout of the outer-retinal layers within the lesion and the corresponding choroidal hypertransmission signature beneath. Mirror the channel ordering of the eleven-channel state tensor used in the thesis. Currently rendered as an `\fbox` placeholder pending a real graphic.
 - [x] (done 2026-10-16, two panels instead of four) TODO: produce Figure `fig:bg:oct-acquisition` placed in `02-background.tex` §2.1.3 -- four-panel schematic of OCT acquisition geometry intended to anchor the geometric vocabulary (A-scan, B-scan, volume, en-face) for ML readers without imaging background: (a) eye + single probe beam + inset depth-vs-reflectivity profile of one A-scan; (b) the same with the beam scanned laterally along one axis to form a B-scan; (c) the beam scanned in both lateral directions to form a 3D volume with the 6 x 6 mm physical footprint annotated (do NOT annotate a fixed voxel count -- native shapes vary per eye: 38-66 B-scans x 961-1719 A-scans, 67 distinct shapes); (d) the volume projected axially onto the fundus plane to yield the 49 x 1024 en-face image used by the model, with a representative GA lesion visible as a region of altered signal. Currently rendered as an `\fbox` placeholder pending a real graphic.
 - [ ] TODO: confirm with supervisor the exact provenance of the eleven state-tensor channels in the MUW cohort (mask: manual grading vs trained network vs combination; layer boundaries: which segmentation algorithm, which boundary list, which post-processing) before drafting `03-data.tex` §3.1. The §2.1.4 text is currently agnostic of those details so it does not need to be revisited once the answer is in hand.
 
@@ -2391,7 +2403,7 @@ Pulled from the code repository (`masterthesis-docker/NOTES.md` + `PROJECT_CONTE
 - [ ] TODO: settle the constant-spacing assumption (~2 % deviation against the visits' own
   transform files) from the DICOM spacing fields. Marked inline in §3.1; also mirrored in
   §2.1.6.
-- [ ] TODO: produce Figure `fig:data:example-state` in §3.1 -- (a) SLO fundus image with
+- [x] (done 2026-10-20) TODO: produce Figure `fig:data:example-state` in §3.1 -- (a) SLO fundus image with
   the OCT field of view as a rectangle and the SLO-frame GA mask overlaid; (b) channel 0 on
   the 49 x 1024 grid at the physical aspect ratio (~5.94 x 5.82 mm), so the ~21:1 pixel
   anisotropy is visible; (c) one or two layer depth maps as heatmaps with the mask outline

@@ -111,39 +111,33 @@ distributions are shown in Appendix~\ref{app:dataset}
 % TODO: a baseline-characteristics table in the format of Mai et al. (2024)
 % (if wanted for the comparison in 5.5.1).
 
-% TODO: produce Figure fig:data:example-state --- three panels for one
-% representative visit, all generated from files that exist in the
-% repository (the raw B-scans are NOT part of the repository data; a
-% B-scan panel would have to be sourced from MUW separately):
-% (a) the SLO fundus image with the OCT field of view drawn as a
-%     rectangle and the SLO-frame GA mask overlaid;
-% (b) channel 0, the binary GA mask on the 49 x 1024 modelling grid,
-%     drawn at the physical aspect ratio (about 5.94 x 5.82 mm), so
-%     that the ~21:1 pixel anisotropy is visible as tall, thin pixels;
-% (c) one or two layer-boundary depth maps (channels 1--10) on the same
-%     grid as heatmaps coloured by axial depth, with the GA mask
-%     outline from (b) overlaid.
-% Any padded region should be marked, since it is visible in about one
-% visit in four.
+% Figure fig:data:example-state: images/scripts/fig_data_example_state.py
+% (read-only source data/MUW_GA/scans/PEAT0021_OD/0/; same eye and day as
+% fig:bg:ga-faf (a)). Native grid 38 x 1059, so 22.4 % of the window is zero
+% padding (11 rows); 2.0 % of the window lies inside the scan without an ILM
+% value. mask_global through T_mask reproduces mask_oct at IoU 1.000.
+% Median ILM depth 114 axial px inside the lesion, 83 outside; retinal
+% thickness (channel 10 - channel 1) 66 inside, 83 outside.
 \begin{figure}[t]
   \centering
-  \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering\itshape Placeholder
-    for Figure~\ref{fig:data:example-state}: one visit shown as the SLO
-    fundus image with the OCT field of view, the GA mask on the modelling
-    grid, and a layer-boundary depth map. See accompanying
-    \texttt{\% TODO} for the intended content.}}
+  \includegraphics[width=\textwidth]{images/fig_data_example_state.png}
   \caption[One visit of the MUW cohort.]{%
-    One visit of the MUW cohort.
-    \emph{(a)}~SLO fundus image with the OCT field of view marked and the
-    GA lesion overlaid.
-    \emph{(b)}~The binary GA mask (channel~0) on the $49 \times 1024$
-    modelling grid, drawn at its physical aspect ratio of about
-    $5.94 \times 5.82$\,mm; each pixel is about 21 times taller than it
-    is wide.
-    \emph{(c)}~A layer-boundary depth map (one of channels~1--10) on the
-    same grid, coloured by axial depth, with the lesion outline from (b)
-    overlaid. Panels (b) and (c) show two of the eleven channels of the
-    state tensor on the modelling grid, before normalisation.}
+    One visit of the MUW cohort: the first visit of the eye shown in
+    Figure~\ref{fig:bg:ga-faf}.
+    \emph{(a)}~SLO fundus image. The dashed square marks the
+    $49 \times 1024$ modelling window, the orange line the outline of the
+    GA lesion.
+    \emph{(b)}~The binary GA mask (channel~0) on the modelling grid, drawn
+    at its physical aspect ratio of about $5.94 \times 5.82$\,mm; each
+    pixel is about 21 times taller than it is wide, which shows as steps
+    along the lesion outline. The native grid of this eye has 38 rows, so
+    the window is zero-padded at the top and bottom (hatched).
+    \emph{(c)}~The depth map of the inner limiting membrane (channel~1) on
+    the same grid, in axial pixels, with the lesion outline from (b).
+    The membrane lies deeper inside the lesion, where the retina is
+    thinner. Hatched: positions without data.
+    Panels (b) and (c) show two of the eleven channels of the state
+    tensor before normalisation.}
   \label{fig:data:example-state}
 \end{figure}
 

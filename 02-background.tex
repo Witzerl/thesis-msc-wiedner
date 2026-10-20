@@ -551,25 +551,22 @@ with a constant $C_{\max}$ of order one that depends on the scheme.
 Equivalently, a stencil used with a given step must be wide
 enough to cover the distance the solution moves during that step.
 
-% TODO: produce Figure fig:bg:solver-path -- the classical computational
-% path as a left-to-right pipeline: continuous field u(t,x) -> grid of
-% cells with values u_i^k -> spatial stencil (a highlighted cell with its
-% neighbours, producing the rate f_i) -> time step (u^{k+1} = u^k + dt f
-% for Euler) -> u^{k+1}, with a loop arrow back to the grid labelled
-% "rollout".
+% Figure fig:bg:solver-path: images/fig_bg_solver_path.tex (TikZ, one
+% dimension, illustrative cell values; not data).
 \begin{figure}[t]
   \centering
-  \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering\itshape Placeholder
-    for Figure~\ref{fig:bg:solver-path}: the computational path of a
-    numerical PDE solver. See accompanying \texttt{\% TODO} for the
-    intended content.}}
+  \input{images/fig_bg_solver_path.tex}
   \caption[The computational path of a numerical PDE solver.]{%
-    The computational path of a numerical PDE solver. The continuous
-    field is stored as one value per grid cell. A \emph{stencil}
-    computes the rate of change of every cell from the values of its
-    neighbours; a \emph{time step} uses that rate to advance the grid by
-    $\Delta t$. Repeating the step from the initial condition produces a
-    rollout.}
+    The computational path of a numerical PDE solver, in one dimension.
+    The continuous field is stored as one value per grid cell (dots: the
+    cell centres). A \emph{stencil} computes the rate of change $f_i$ of
+    a cell (orange) from its own value and those of its neighbours (blue
+    frame); a \emph{time step} uses that rate to advance the cell by
+    $\Delta t$, here with the explicit Euler step of
+    Eq.~\eqref{eq:bg:euler}. Stencil and time step are independent
+    choices. Repeating the step from the initial condition, each time on
+    the output of the previous step, produces a rollout. Cell values are
+    illustrative.}
   \label{fig:bg:solver-path}
 \end{figure}
 
