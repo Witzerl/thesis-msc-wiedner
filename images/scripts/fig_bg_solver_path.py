@@ -9,7 +9,7 @@ the left column (1, 3, 5) shows the operation, worked out for cell i:
   1 continuous field u(t_k, x)
   2 discretise: the field sampled at the cell centres, u_i^k
   3 stencil at cell i: u_{i-1}, u_i, u_{i+1} a distance dx apart, weights alpha = +1, -2, +1 in
-    the bars, formula f_i = sum_{j=i-1}^{i+1} alpha_j u_j / dx^2
+    the bars, formula f_i = 1/dx^2 * sum_{j=i-1}^{i+1} alpha_j u_j
   4 slide the stencil: top strip u^k with the stencil window at three positions (the one
     at cell i solid), each linked to the rate it produces in the bottom strip, f_i
   5 time step for cell i, one explicit Euler step; RK4 or any scheme that evaluates f
@@ -103,7 +103,7 @@ def main():
                 annotation_clip=False)
     a3.text(I - 0.5, -0.13, "$\\Delta x$", ha="center", va="top", fontsize=7, color=P["ink_2"])
     a3.text(I, 1.42,
-            "$f_i = \\sum_{j=i-1}^{i+1} \\alpha_j\\, u_j \\,/\\, \\Delta x^2$",
+            "$f_i = \\dfrac{1}{\\Delta x^2} \\sum_{j=i-1}^{i+1} \\alpha_j\\, u_j$",
             ha="center", va="center", fontsize=8, color=P["ink"])
     a3.set_xlim(I - 1.6, I + 1.6); a3.set_ylim(0, 1.75)
     a3.set_xticks(xi); a3.set_xticklabels(lab)
