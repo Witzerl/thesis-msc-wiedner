@@ -559,18 +559,18 @@ enough to cover the distance the solution moves during that step.
   \centering
   \includegraphics[width=\textwidth]{images/fig_bg_solver_path.pdf}
   \caption[The computational path of a numerical PDE solver.]{%
-    The computational path of a numerical PDE solver, in one dimension,
-    worked out for cell~$i$ (orange). Panels (2), (4) and (6) share one
-    horizontal axis.
+    The computational path of a numerical PDE solver, in one dimension.
+    Each panel title names the step that leads to it; panels (2), (4) and
+    (6) share one horizontal axis, and cell~$i$ is orange throughout.
     \emph{(1)}~Continuous field.
-    \emph{(2)}~One value per cell, taken at the cell centres.
-    \emph{(3)}~The stencil of cell~$i$ uses its own value and those of
-    its neighbours (blue), a distance $\Delta x$ apart. The second
-    derivative of the parabola through the three values (dashed) gives
-    the weights $+1, -2, +1$ divided by $\Delta x^2$
-    (Eq.~\ref{eq:bg:stencil}). A cell above the mean of its neighbours
-    (line) therefore gets a negative rate.
-    \emph{(4)}~The same stencil at every cell gives the rates $f_i$.
+    \emph{(2)}~Discretisation: the field is sampled at the cell centres.
+    \emph{(3)}~The stencil of cell~$i$ combines its own value and those
+    of its two neighbours (blue), a distance $\Delta x$ apart, with the
+    weights $+1, -2, +1$ (Eq.~\ref{eq:bg:stencil}). These weights,
+    divided by $\Delta x^2$, are the second derivative of the parabola
+    through the three values (dashed).
+    \emph{(4)}~The same stencil is applied at every cell (three positions
+    shown); each position yields the rate of its centre cell.
     \emph{(5)}~One explicit Euler step (Eq.~\ref{eq:bg:euler}) moves each
     cell by $\Delta t$ times its rate. Any scheme that only evaluates $f$,
     such as Runge--Kutta, can replace it without changing the stencil.

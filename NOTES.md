@@ -1398,6 +1398,11 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
   formula with the numbers (0.61 - 2 * 0.90 + 0.61 = -0.58); (5) Euler with the numbers
   (0.90 + 0.3 * (-0.58) = 0.73, from the rounded values shown); (6) arrows dt * f_i per cell. A 2-D
   draft (five-point stencil) was tried and rejected by the author (harder to read).
+  Third pass (author): connector arrows removed; transitions named in the panel titles (Discretise /
+  Stencil at cell i / Slide the stencil / Time step); no numbers in the stencil or time-step panels;
+  stencil panel labels u_{i-1}, u_i, u_{i+1}, weights in the bars, dx, formula with explicit weights;
+  panel 4 shows u^k with the stencil window at cells 1, 4, 7 linked to their rates. Rest still to
+  discuss with the author.
 - [ ] Author to review Fig. 3.1 (choice of the ILM for panel (d); whether the SLO/FAF images may be
   printed -- same question as the reply-mail item below).
 - [ ] Reply mail: confirm that de-identified MUW FAF/SLO fundus images may be printed in the thesis
