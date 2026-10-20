@@ -1408,6 +1408,12 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
   ("alpha_j fixed"), right the GNN intuition (nodes, messages phi_theta along the edges, update psi_theta,
   f_i = psi(u_i, sum_j phi(u_i, u_j)), simplified from Eqs. 4.3-4.4; "learned"). The MP-PDE paragraph
   of 2.3 now points to panel 3. Float set to [!t] to keep it on p. 15 next to its text.
+  Fifth pass (author: learned stencil as its own panel, general concept rather than GNN notation):
+  six panels row by row -- 1 field, 2 discretise, 3 classical stencil (f_i = 1/dx^2 sum alpha_j u_j,
+  "weights fixed"), 4 learned stencil (same sum, alpha_j(u; theta), weights in orange-tinted boxes,
+  grey lines from the three values into a theta box; caption: message-passing networks go further),
+  5 slide the stencil -> rates, 6 time step with next state (Euler formula; RK4 note). 2.3 points to
+  panel 4. Shared-x-axis column given up (panel 5 carries its own u^k strip).
 - [ ] Author to review Fig. 3.1 (choice of the ILM for panel (d); whether the SLO/FAF images may be
   printed -- same question as the reply-mail item below).
 - [ ] Reply mail: confirm that de-identified MUW FAF/SLO fundus images may be printed in the thesis

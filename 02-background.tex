@@ -559,27 +559,26 @@ enough to cover the distance the solution moves during that step.
   \centering
   \includegraphics[width=\textwidth]{images/fig_bg_solver_path.pdf}
   \caption[The computational path of a numerical PDE solver.]{%
-    The computational path of a numerical PDE solver, in one dimension.
-    Each panel title names the step that leads to it; panels (2), (4) and
-    (6) share one horizontal axis, and cell~$i$ is orange throughout.
+    The computational path of a PDE solver, in one dimension. Each panel
+    title names the step that leads to it; cell~$i$ is orange throughout.
     \emph{(1)}~Continuous field.
     \emph{(2)}~Discretisation: the field is sampled at the cell centres.
-    \emph{(3)}~Left: a classical stencil is a weighted sum of the values of
+    \emph{(3)}~A classical stencil is a weighted sum of the values of
     cell~$i$ and its two neighbours (blue), a distance $\Delta x$ apart
     (Eq.~\ref{eq:bg:stencil}). Its weights $\alpha_j$ are fixed by the
-    derivative it approximates; the second derivative shown here has
-    $+1, -2, +1$. Right: a graph neural network replaces the fixed weights
-    by learned functions, a message $\varphi_\theta$ along each edge into
-    node~$i$ and an update $\psi_\theta$ that combines them (simplified;
-    \S\ref{sec:background:neural-pde}).
-    \emph{(4)}~The same stencil is applied at every cell (three positions
+    derivative it approximates; for the second derivative they are
+    $+1, -2, +1$.
+    \emph{(4)}~A learned stencil keeps the same sum, but a network with
+    parameters $\theta$ computes the weights from the values
+    (\S\ref{sec:background:neural-pde}); message-passing networks go
+    further and learn the whole combination.
+    \emph{(5)}~The same stencil is applied at every cell (three positions
     shown); each position yields the rate of its centre cell.
-    \emph{(5)}~One explicit Euler step (Eq.~\ref{eq:bg:euler}) moves each
-    cell by $\Delta t$ times its rate. Any scheme that only evaluates $f$,
-    such as Runge--Kutta, can replace it without changing the stencil.
-    \emph{(6)}~The next state; dashed: the values before the step, arrows:
-    the change $\Delta t\, f_i$. Values illustrative ($\Delta x = 1$,
-    $\Delta t = 0.3$).}
+    \emph{(6)}~One explicit Euler step (Eq.~\ref{eq:bg:euler}) moves each
+    cell by $\Delta t$ times its rate; dashed: the values before the step,
+    arrows: the change $\Delta t\, f_i$. Any scheme that only evaluates
+    $f$, such as Runge--Kutta, can replace Euler without changing the
+    stencil. Values illustrative ($\Delta x = 1$, $\Delta t = 0.3$).}
   \label{fig:bg:solver-path}
 \end{figure}
 
@@ -635,7 +634,7 @@ the cells and whose edges connect each cell to its stencil
 neighbourhood. One round of message passing computes, at every node, a
 learned function of its neighbours' values and of their differences to
 its own value; it thus acts as a learned, non-linear stencil
-(Figure~\ref{fig:bg:solver-path}, panel~3). The authors show that one, two and three rounds can
+(Figure~\ref{fig:bg:solver-path}, panel~4). The authors show that one, two and three rounds can
 represent finite differences, finite volumes and WENO respectively, so
 the classical schemes are special cases of the learned one. The output
 is applied in the residual form of~\eqref{eq:bg:euler}, which keeps the
