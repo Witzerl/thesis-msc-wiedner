@@ -121,7 +121,8 @@ distributions are shown in Appendix~\ref{app:dataset}
 % through T_mask reproduces mask_oct at IoU 1.000. Median brightness inside
 % the lesion / in a 30 px ring around it: SLO 88 / 62, FAF 25 / 47. The
 % bright SLO spots outside the outline are not dark on FAF; what they are
-% is not recorded in the data. Median ILM depth 132 axial px inside the
+% is not recorded in the data. Fundus pixel size at this visit (T_mask): 11.7 x 11.5 um.
+% Median ILM depth 132 axial px inside the
 % lesion, 102 outside; retinal thickness (channel 10 - channel 1) 56
 % inside, 74 outside.
 \begin{figure}[t]
@@ -135,11 +136,13 @@ distributions are shown in Appendix~\ref{app:dataset}
     appears dark.
     \emph{(b)}~Near-infrared SLO image of the same visit. The lesion
     appears bright. The other bright spots are not dark on FAF and are not
-    part of the annotation.
+    part of the annotation. In (a) and (b) the annotation is drawn at the
+    resolution of the fundus image, about 12\,\textmu{}m per pixel.
     \emph{(c)}~The binary GA mask (channel~0) on the modelling grid, drawn
-    at its physical aspect ratio of about $5.94 \times 5.82$\,mm; each
-    pixel is about 21 times taller than it is wide, which shows as steps
-    along the lesion outline.
+    at its physical aspect ratio of about $5.94 \times 5.82$\,mm. The rows
+    are 121\,\textmu{}m apart (one B-scan each), the columns 5.7\,\textmu{}m,
+    so each pixel is about 21 times taller than it is wide, which shows as
+    steps along the lesion outline.
     \emph{(d)}~The depth map of the inner limiting membrane (channel~1) on
     the same grid, in axial pixels, with the lesion outline from (c).
     The membrane lies deeper inside the lesion, where the retina is
