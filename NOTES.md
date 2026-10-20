@@ -1427,10 +1427,25 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
   Final (author 2026-10-20: "good like this"): orange arrow removed; caption panel (4) now cites
   BarSinai2019 (ledger C054 SUPPORTED, p. 3, quote checked by hand, PASS). Mai2024 C101 rechecked
   (only the figure pointer was added; SUPPORTED).
-- [ ] Author to review Fig. 3.1 (choice of the ILM for panel (d); whether the SLO/FAF images may be
-  printed -- same question as the reply-mail item below).
-- [ ] Reply mail: confirm that de-identified MUW FAF/SLO fundus images may be printed in the thesis
-  (needed for `fig:bg:ga-faf` and `fig:data:example-state`).
+- [x] (2026-10-20, author: fine; nothing in either repo restricts printing dataset images) Author to
+  review Fig. 3.1 -- image permission part. The layer choice for panel (d) is the next item.
+- [ ] **Fig. 3.1 panel (d): ILM probably shows the foveal pit, not the lesion (checked 2026-10-20,
+  scratchpad scripts `layer_contrast.py`, `fovea_split.py`, render `images/data/layer_candidates_PEAT0058_OD_360.png`,
+  git-ignored).** Candidates: all ten channels plus the thicknesses named in §3.2 (total retina ch10-ch1;
+  inner retina ch5-ch1; INL ch5-ch4, Ebneter; ONL+HFL ch7-ch6, Vogl; photoreceptor OS ch9-ch7; RPE-PR
+  complex ch10-ch7, Vogl; outer retina ch10-ch6; RPE ch10-ch9, Chu). Scores over 553 visits (AUC lesion
+  vs rest / vs a ring of rows +-2 x cols +-50; Dice of the N most extreme positions): every boundary lies
+  deeper inside the lesion, the outer RPE too (global AUC 0.79), so absolute depths partly reflect scan
+  curvature/position; best channel ILM (0.83 / 0.79, Dice-N 0.64); best overall RPE-PR complex ch10-ch7
+  (0.84 / 0.76, Dice-N 0.68). At PEAT0058_OD/360 the INL thickness is ~0 inside the lesion and the
+  total thickness shows a thin centre with a thicker ring, i.e. the lesion sits on the fovea and the deep
+  ILM is largely the foveal pit; the visit was itself picked by the ILM rule. With a crude fovea proxy,
+  on the 64 visits whose lesion is off the fovea the ring AUC falls to 0.68 (ILM), 0.53 (total), 0.50
+  (INL) but stays 0.73 for the RPE-PR complex. The caption sentence "The membrane lies deeper inside
+  the lesion, where the retina is thinner" is misleading as it stands. Options to decide: (i) panel (d) =
+  RPE-PR complex thickness (derived from channels 7 and 10, caption changed accordingly; matches the
+  definition of GA as RPE + photoreceptor loss) with a new eye rule; (ii) keep the ILM and reword the
+  caption (foveal pit).
 
 - [x] Chapter 5 data figures (author approved all eight, 2026-10-01), all in the text with a
   referencing sentence, every plotted value checked against the text: `fig:experiments:curves`
@@ -1571,8 +1586,10 @@ worked through one item at a time.
   effect in the project" removed from the reach bullet (the transport bullet below gives +0.072);
   §6.4 "about a third of the cropped lesions" -> "almost a third of the visits" (31.1 % of visits,
   correction of 2026-10-01 missed there). §6.1 and §6.4 keep their headings (not on the list).
-- [ ] #18/#19 "Figure 5.7:" / "Figure 5.8:" -- highlighted without comment; both figures are
-  disabled for now (placeholders). Ask the author when the figures come back.
+- [x] (2026-10-20, dropped by the author) #18/#19 "Figure 5.7:" / "Figure 5.8:" -- highlighted without
+  comment. In the build of 2026-10-01 these were the old solver-swap figure (since replaced by the
+  step-size ladder, to be redrawn) and the T-FEN stability figure; both disabled, both reviewed afresh
+  when they come back.
 - [x] #17 §5.7 GPU-sharing sentence -- red, "remove". Removed 2026-10-02.
 - [x] #21 Fig. D.1 panel (b) "Lowest Dice" -- red cross, "absolutely not". Done 2026-10-02:
   rule removed from `images/scripts/fig_appendix_rollouts.py` (three eyes now; the other picks
@@ -1967,8 +1984,8 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
 - [ ] For §5.4.3 (capacity) when it is reviewed: with the z-test, the FNO+3x3 at width 2 and at width 9 are both
   significantly *below* width 5 (z = -2.4 / -2.2), and the U-Net at width 2 is not (z = -1.4 with sigma_UNet).
   The conclusion "no width step raises a class" holds; check that "the smaller versions lost little" still fits.
-- [ ] Fig. 4.2 caption (redrawn by another session, 8e1db2a) still gives distances in mm (0.121, 0.0057,
-  0.034, 0.242, 0.011, 0.119 mm), while §4.3.3 now uses µm (X4); align when the figure is next touched.
+- [x] (stale, checked 2026-10-20: the redraw of 2026-10-17 already uses µm in the figure and the caption)
+  Fig. 4.2 caption still gives distances in mm, while §4.3.3 now uses µm (X4).
 - [ ] TODO (SV-4.2, inline in §4.1): reconsider whether the moving-mesh result goes into the main text as a
   negative result. Author 2026-10-17: not convinced (argumentation still loose; on the dilated stencil only one
   fold-2 dual run exists, no bypass control; the 5-fold dual/bypass arms are on the k-NN graph; it would take
