@@ -551,22 +551,31 @@ with a constant $C_{\max}$ of order one that depends on the scheme.
 Equivalently, a stencil used with a given step must be wide
 enough to cover the distance the solution moves during that step.
 
-% Figure fig:bg:solver-path: images/fig_bg_solver_path.tex (TikZ, one
-% dimension, illustrative cell values; not data).
+% Figure fig:bg:solver-path: images/scripts/fig_bg_solver_path.py. One real
+% step, illustrative values (not data): nine cells sampled from a smooth
+% bump, stencil alpha = (1, -2, 1) with dx = 1, one Euler step dt = 0.3.
+% Redrawn 2026-10-20 at the author's request (the TikZ version was unclear).
 \begin{figure}[t]
   \centering
-  \input{images/fig_bg_solver_path.tex}
+  \includegraphics[width=\textwidth]{images/fig_bg_solver_path.pdf}
   \caption[The computational path of a numerical PDE solver.]{%
     The computational path of a numerical PDE solver, in one dimension.
-    The continuous field is stored as one value per grid cell (dots: the
-    cell centres). A \emph{stencil} computes the rate of change $f_i$ of
-    a cell (orange) from its own value and those of its neighbours (blue
-    frame); a \emph{time step} uses that rate to advance the cell by
-    $\Delta t$, here with the explicit Euler step of
-    Eq.~\eqref{eq:bg:euler}. Stencil and time step are independent
-    choices. Repeating the step from the initial condition, each time on
-    the output of the previous step, produces a rollout. Cell values are
-    illustrative.}
+    \emph{(1)}~The continuous field.
+    \emph{(2)}~The grid stores one value per cell, taken at the cell
+    centres (dots).
+    \emph{(3)}~A stencil computes the rate of change of cell~$i$ (orange)
+    as a weighted sum of its own value and those of its neighbours (blue),
+    Eq.~\eqref{eq:bg:stencil}. The weights shown, $+1, -2, +1$, are the
+    three-point stencil of the second derivative.
+    \emph{(4)}~Applied at every cell, the stencil gives the rate field $f$;
+    here the peak falls and its flanks rise.
+    \emph{(5)}~A time-stepping scheme advances the grid by $\Delta t$
+    using only $f$, here one explicit Euler step,
+    Eq.~\eqref{eq:bg:euler}. Any scheme that evaluates $f$, such as
+    Runge--Kutta, can take its place without changing the stencil.
+    \emph{(6)}~The next state; dashed: the values before the step.
+    Using it as the input of the next step and repeating produces a
+    rollout. The values are illustrative.}
   \label{fig:bg:solver-path}
 \end{figure}
 

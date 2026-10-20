@@ -1383,9 +1383,14 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
   chosen 0.87, old 0.62, cohort median 0.64; six candidates rendered. No zero padding at this visit;
   the caption no longer links the figure to Fig. 2.3. Caption numbers recomputed (SLO 88 / 62, FAF
   25 / 47; ILM 132 vs 102 axial px; thickness 56 vs 74).
-- [ ] Fig. 2.5 (author 2026-10-20: "from the vis I don't get it"): the TikZ version stays in for now; a
-  three-panel bar redesign (values u_i^k with the stencil -> rates f_i -> u^{k+1} = u^k + dt f with
-  the old heights dashed; one real heat-equation step) was proposed, awaiting the author's answer.
+- [x] 2026-10-20 Fig. 2.5 redrawn (author: the TikZ version was unclear; asked for continuous field ->
+  discretised grid -> stencil with its formula -> how the rate is used by the solver, with a hint that
+  any time-stepping wrapper can use it). Now `images/scripts/fig_bg_solver_path.py` -> PDF, six
+  panels in two rows: (1) continuous field, (2) grid values at the cell centres, (3) stencil
+  f_i = sum alpha_j u_j / dx^2 with weights +1/-2/+1, (4) rates f_i for every cell, (5) time stepper
+  box (Euler / RK4 / any scheme that calls f), (6) next state with the old values dashed; dashed
+  rollout arrow back to (2). One real step, illustrative values (9 cells, dx = 1, dt = 0.3). The TikZ
+  file `images/fig_bg_solver_path.tex` was removed. Author to review.
 - [ ] Author to review Fig. 3.1 (choice of the ILM for panel (d); whether the SLO/FAF images may be
   printed -- same question as the reply-mail item below).
 - [ ] Reply mail: confirm that de-identified MUW FAF/SLO fundus images may be printed in the thesis
