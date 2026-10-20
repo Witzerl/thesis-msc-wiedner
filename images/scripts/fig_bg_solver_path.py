@@ -126,12 +126,6 @@ def main():
             "$f_i = \\dfrac{1}{\\Delta x^2} \\sum_{j} \\alpha_j(u;\\,\\theta)\\, u_j$",
             "weights $\\alpha_j$ computed by a network $\\theta$",
             learned=True)
-    # the one change from 3 to 4: the weights become learned (arrow at the weights' height)
-    fig.add_artist(ConnectionPatch((I + 1.45, 0.13), (I - 1.45, 0.13), "data", "data",
-                                   axesA=a3, axesB=a4, color=hi, lw=0.9, arrowstyle="-|>",
-                                   mutation_scale=8))
-    a4.text(I - 1.72, 0.30, "learn the\nweights", ha="right", va="bottom", fontsize=6.5,
-            color=hi, clip_on=False)
     # the network theta reads the three values (grey lines from the value labels)
     net = (I, 1.10)
     a4.add_patch(FancyBboxPatch((net[0] - 0.30, net[1] - 0.08), 0.60, 0.16,

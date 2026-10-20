@@ -575,7 +575,7 @@ enough to cover the distance the solution moves during that step.
     WENO already vary the weights with the values.
     \emph{(4)}~A learned stencil keeps the same sum, but a network with
     parameters $\theta$ computes the weights from the local values, so
-    they differ from cell to cell (\S\ref{sec:background:neural-pde});
+    they differ from cell to cell \citep{BarSinai2019};
     message-passing networks go further and learn the whole combination.
     \emph{(5)}~The same rule, fixed weights or the same network, is
     applied at every cell (three positions shown); each position yields

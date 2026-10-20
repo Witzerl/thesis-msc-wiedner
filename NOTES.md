@@ -1424,6 +1424,9 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
   space between bars, note and formula in panels 3-4, and one orange arrow "learn the weights" from
   panel 3's weights to panel 4's. Simplification left as is: panel 4 draws the network reading only
   the three stencil values (Bar-Sinai: 6-point stencils, wider input).
+  Final (author 2026-10-20: "good like this"): orange arrow removed; caption panel (4) now cites
+  BarSinai2019 (ledger C054 SUPPORTED, p. 3, quote checked by hand, PASS). Mai2024 C101 rechecked
+  (only the figure pointer was added; SUPPORTED).
 - [ ] Author to review Fig. 3.1 (choice of the ILM for panel (d); whether the SLO/FAF images may be
   printed -- same question as the reply-mail item below).
 - [ ] Reply mail: confirm that de-identified MUW FAF/SLO fundus images may be printed in the thesis
