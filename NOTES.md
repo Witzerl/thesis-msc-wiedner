@@ -1377,6 +1377,12 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
   SLO 124 / 93, FAF 63 / 90. §3.1 sentence reworded.
   Later the same day (author): order swapped to (a) FAF, (b) SLO; each panel now carries its title
   (FAF / Near-infrared SLO / Binary GA mask / ILM depth map).
+  Eye changed (author, "this maybe"): PEAT0058_OD day 360 instead of PEAT0021_OD day 0, because
+  the dark area of the ILM map did not follow the lesion well. Ranking: overlap (Dice) of the N deepest
+  ILM pixels with the lesion (N = lesion size), visits whose lesion does not touch the window edge:
+  chosen 0.87, old 0.62, cohort median 0.64; six candidates rendered. No zero padding at this visit;
+  the caption no longer links the figure to Fig. 2.3. Caption numbers recomputed (SLO 88 / 62, FAF
+  25 / 47; ILM 132 vs 102 axial px; thickness 56 vs 74).
 - [ ] Fig. 2.5 (author 2026-10-20: "from the vis I don't get it"): the TikZ version stays in for now; a
   three-panel bar redesign (values u_i^k with the stencil -> rates f_i -> u^{k+1} = u^k + dt f with
   the old heights dashed; one real heat-equation step) was proposed, awaiting the author's answer.

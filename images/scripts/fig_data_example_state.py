@@ -2,14 +2,16 @@
 
     cd images/scripts && python fig_data_example_state.py
 
-Panels (one visit, same eye and baseline day as fig:bg:ga-faf, PEAT0021_OD day 0):
+Panels (one visit, PEAT0058_OD day 360, chosen by the author 2026-10-20 from six candidates:
+the visits whose deepest ILM pixels, as many as the lesion has, overlap the lesion best
+(Dice 0.87; cohort median 0.64), lesion not touching the window edge):
   (a) FAF image (faf_global.png) and (b) near-infrared SLO image (slo_global.png), each
       contrast-stretched on its own (1st-99th percentile), with the 49 x 1024 modelling
       window drawn through the visit's T_mask (as in fig_bg_ga_faf.py) and the outline of
       the GA mask in the global frame (mask_global.png). Both are shown because the
       lesion looks different on the two: bright on the SLO, dark on FAF, where it was
       annotated; other bright spots on the SLO are not part of the annotation
-      (median brightness inside / in a 30 px ring: SLO 124 / 93, FAF 63 / 90);
+      (median brightness inside / in a 30 px ring: SLO 88 / 62, FAF 25 / 47);
   (c) channel 0, the binary GA mask on the 49 x 1024 modelling grid (centre crop /
       zero pad of mask_oct.png, same arithmetic as the precompute), at the physical
       aspect ratio, nearest-neighbour, so the tall thin pixels are visible;
@@ -36,7 +38,7 @@ from _common import setup, save, panel_label, SCANS, NROWS, NCOLS, LX_MM, LY_MM,
 from fig_appendix_cohort import _crop_slices
 from fig_bg_ga_faf import window_global, stretch
 
-EYE, DAY = "PEAT0021_OD", 0
+EYE, DAY = "PEAT0058_OD", 360
 CHANNEL = 1            # ILM (most superficial boundary)
 MARGIN_MM = 0.4
 

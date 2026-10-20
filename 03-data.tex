@@ -112,21 +112,23 @@ distributions are shown in Appendix~\ref{app:dataset}
 % (if wanted for the comparison in 5.5.1).
 
 % Figure fig:data:example-state: images/scripts/fig_data_example_state.py
-% (read-only source data/MUW_GA/scans/PEAT0021_OD/0/; same eye and day as
-% fig:bg:ga-faf (a)). Native grid 38 x 1059, so 22.4 % of the window is zero
-% padding (11 rows); 2.0 % of the window lies inside the scan without an ILM
-% value. mask_global through T_mask reproduces mask_oct at IoU 1.000.
-% Median brightness inside the lesion / in a 30 px ring around it: SLO
-% 124 / 93, FAF 63 / 90 (2026-10-20). The bright SLO spots outside the
-% outline are not dark on FAF; what they are is not recorded in the data.
-% Median ILM depth 114 axial px inside the lesion, 83 outside; retinal
-% thickness (channel 10 - channel 1) 66 inside, 83 outside.
+% (read-only source data/MUW_GA/scans/PEAT0058_OD/360/). Eye chosen by the
+% author (2026-10-20) from six candidates: the visits whose deepest ILM
+% pixels, as many as the lesion has, overlap the lesion best (Dice 0.87;
+% cohort median 0.64; earlier choice PEAT0021_OD day 0: 0.62), lesion not
+% touching the window edge. Native grid 49 x 1034: no zero padding; 2.1 %
+% of the window lies inside the scan without an ILM value. mask_global
+% through T_mask reproduces mask_oct at IoU 1.000. Median brightness inside
+% the lesion / in a 30 px ring around it: SLO 88 / 62, FAF 25 / 47. The
+% bright SLO spots outside the outline are not dark on FAF; what they are
+% is not recorded in the data. Median ILM depth 132 axial px inside the
+% lesion, 102 outside; retinal thickness (channel 10 - channel 1) 56
+% inside, 74 outside.
 \begin{figure}[t]
   \centering
   \includegraphics[width=\textwidth]{images/fig_data_example_state.png}
   \caption[One visit of the MUW cohort.]{%
-    One visit of the MUW cohort: the first visit of the eye shown in
-    Figure~\ref{fig:bg:ga-faf}. In (a) and (b), the dashed square marks
+    One visit of the MUW cohort. In (a) and (b), the dashed square marks
     the $49 \times 1024$ modelling window and the orange line the outline
     of the GA annotation.
     \emph{(a)}~FAF image, on which the lesion was annotated. The lesion
@@ -137,12 +139,11 @@ distributions are shown in Appendix~\ref{app:dataset}
     \emph{(c)}~The binary GA mask (channel~0) on the modelling grid, drawn
     at its physical aspect ratio of about $5.94 \times 5.82$\,mm; each
     pixel is about 21 times taller than it is wide, which shows as steps
-    along the lesion outline. The native grid of this eye has 38 rows, so
-    the window is zero-padded at the top and bottom (hatched).
+    along the lesion outline.
     \emph{(d)}~The depth map of the inner limiting membrane (channel~1) on
     the same grid, in axial pixels, with the lesion outline from (c).
     The membrane lies deeper inside the lesion, where the retina is
-    thinner. Hatched: positions without data.
+    thinner. Hatched: positions without a depth value.
     Panels (c) and (d) show two of the eleven channels of the state
     tensor before normalisation.}
   \label{fig:data:example-state}
