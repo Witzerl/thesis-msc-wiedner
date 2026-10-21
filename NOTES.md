@@ -2295,6 +2295,12 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
   (supervisor, external reviewer, examiner, colleague, clinical reader, copy editor) against
   `WRITING_GUIDE.md`, with severities S1-S4, a settled-decisions list, a verification step and one
   sequential findings list (`reviews/full-review-<date>/`). Not run yet.
+  2026-10-22 (later): rebuilt as a multi-agent workflow with the script embedded in the prompt
+  (15 units x 6 reviewers + inventory + completeness rounds, 7 whole-thesis passes, regression check
+  of all Done items of `reviews/feedback-log-2026-10-22.md`, three-lens verification, calibration,
+  chunked size-checked writing). Reviewed by three critic agents; their blockers and majors fixed;
+  dry-run with stub agents passes (ordering, merges, rendering, part checks). To start: in an
+  ultracode session, "run the full review described in prompts/PROMPT_full_review.md".
 - [x] 2026-10-22: supervisor's writing instructions from the e-mails of reviews 1 and 2 checked
   against the guide; most were missing and are now its §11 (abstract, prerequisite audit,
   opening-chapter order, intro/body/conclusion per section, LLM sentence patterns, one table or
