@@ -1546,6 +1546,9 @@ worked through one item at a time.
   0.488 -> 0.505 -> 0.508 is within noise; the width-192 T-FEN 0.552 is a 3-fold mean, +0.001 paired) or needed
   much explanation. §5.5.3 now points to Table tab:experiments:capacity only. Script kept. Still disabled (3):
   reach, horizon, App. A crop.
+- [x] 2026-10-21 `fig:experiments:horizon` restored unchanged (author: "it looks fine"); caption unchanged. Script
+  check list updated (k-NN 0-1 y 0.393 -> 0.397, the reported mean-aggregation arm). Not in the text, for reference:
+  first-year growth-region Dice FNO 0.446, U-Net 0.458, FNO + 3x3 0.464. Still disabled (2): reach, App. A crop.
 - [x] 2026-10-21 **App. D rollouts redrawn and restored** (author): the figure now shows kinds of lesion on which the
   model works instead of failure cases. Pool: folds 0-2 minus the Fig. 5.2 eye, change-region Dice at the anchor
   >= median (0.544), lesion not touching the border (15 eyes); rules smallest area / largest area / most lesions /

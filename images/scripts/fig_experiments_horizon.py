@@ -88,11 +88,10 @@ TEXT = [
     (0.519, "tfen", 0), (0.602, "tfen", 1), (0.633, "tfen", 2), (0.611, "tfen", 3),
     (0.546, "fno", 1), (0.583, "fno", 2), (0.594, "fno", 3),
     (0.553, "fno_local", 1), (0.571, "fno_local", 2), (0.553, "fno_local", 3),
-    (0.388, "fen", 0), (0.395, "onehop", 0), (0.393, "knn", 0),
+    (0.388, "fen", 0), (0.395, "onehop", 0), (0.397, "knn", 0),
 ]
-# Known (2026-10-01): the text's 0.393 for the k-NN graph network is the 0-1 y value of the
-# superseded mean+max arm MPPDE_final_dts; the reported k-NN arm since 2026-09-29 is the
-# mean-aggregation MPPDE_final_aggrmean, 0.397, which is what the figure shows.
+# 2026-10-21: k-NN value updated to the text's 0.397 (mean-aggregation MPPDE_final_aggrmean;
+# the earlier 0.393 was the superseded mean+max arm MPPDE_final_dts).
 print("\ncheck: text value vs computed (rounded to 3 decimals)")
 bad = 0
 for t, key, b in TEXT:
