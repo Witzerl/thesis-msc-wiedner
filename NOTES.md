@@ -1531,7 +1531,7 @@ worked through one item at a time.
   (17 % of the grid). Caption relates it to the trained Galerkin T-FEN (§5.6.2); §5.6.2 points to it. Not used: an
   eigenvalue/mode-profile figure (author: hard to read) and an error-vs-distance plot on real data
   (`images/scripts/tfen_edge_error.py`, cache `images/data/tfen_edge/`, fold 0, both forms reproduce their logged Dice).
-- [ ] Open (author): add the onset sentence to §5.6.2? From `tfen_edge_error.py`, fold 0, epoch 29: the Galerkin form
+- [x] (2026-10-21, author: yes; added to §5.6.2 after the onset sentence) Open (author): add the onset sentence to §5.6.2? From `tfen_edge_error.py`, fold 0, epoch 29: the Galerkin form
   exceeds a per-pixel layer error of 5 in all 20 eyes (first at visits 539-1079 d); in 14 of 20 the worst pixel at that
   visit lies within 7 columns (40 um) of the left/right field edge, a band holding 1.4 % of the grid; the
   energy-conserving form never exceeds 5. Proposed wording: "In 14 of the 20 eyes of fold 0, the first error above 5

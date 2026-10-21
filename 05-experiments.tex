@@ -1773,8 +1773,17 @@ repeated with the second seed, whereas the free-form FEN, which lacks only the t
 fold. Tracing the rollouts step by step showed where the divergence comes
 from. It starts at the edge of the crop, in a layer channel, driven by the
 transport term, and only after about 1.6 to 2 years: later than the
-one-year anchor and later than the 360 days that training unrolls. A
-smaller step left the divergence in place, and the velocities at the onset
+one-year anchor and later than the 360 days that training unrolls. In 14 of
+the 20 eyes of fold 0, the first layer error above 5 lies within
+40\,\textmu{}m of the left or right edge, a band that holds 1.4\,\% of the
+grid.
+% Source: images/scripts/tfen_edge_error.py (fold 0, epoch-29 weights, both forms
+% reproduce their logged change-region Dice; cache images/data/tfen_edge): per
+% eye, the first visit at which the per-pixel RMS error over the ten layer
+% channels exceeds 5, and the distance of the worst pixel from the left/right
+% edge of the imaged field in that row (7 columns = 40 um). The
+% energy-conserving form never exceeds 5.
+A smaller step left the divergence in place, and the velocities at the onset
 were within the stability limit of RK4. The divergence therefore comes from
 the defect of the Galerkin operator at the domain edge
 (\S\ref{sec:method:family:fen}, Figure~\ref{fig:method:fen-toy}), not from
