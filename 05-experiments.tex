@@ -1579,7 +1579,8 @@ each on folds 0 to 2 with one seed:
 
 Table~\ref{tab:experiments:swap} summarises the results per model and
 fold, Table~\ref{tab:appendix:step-ladder} lists every setting, and
-Figure~\ref{fig:experiments:swap} shows the change against the step. The
+Figure~\ref{fig:experiments:swap} shows the change against the step for
+the two graph networks. The
 canonical network fails C2 on all three folds. Over the settings at least
 as fine as its training setting, its Dice spans 0.054, 0.077 and 0.201 on
 folds 0, 1 and 2, four to sixteen times the run-to-run noise. At the
@@ -1682,29 +1683,30 @@ of the T-FEN comes from its transport term
   \end{tabular}
 \end{table}
 
-% Figure: to be redrawn from the step-ladder cache (images/scripts/
-% fig_experiments_swap.py still draws the earlier fold-2 / fold-0 test).
+% Figure: images/scripts/fig_experiments_swap.py (step-ladder cache, folds 0-2;
+% redrawn 2026-10-21 with the author: the two graph networks only, each with the
+% scheme it was trained with, one colour per fold; the T-FEN left out).
+% TODO (author, 2026-10-21): run the step-size ladder on folds 3 and 4 as well
+% (no local precompute for these folds); then update this figure,
+% Table tab:experiments:swap, Table tab:appendix:step-ladder and the text.
 \begin{figure}[t]
   \centering
-  % \includegraphics[width=\textwidth]{images/fig_experiments_swap.pdf}
-  % TODO: figure not final (2026-10-02); restore the line above when ready.
-  % TODO (2026-10-19): redraw from images/data/step_ladder before restoring.
-  \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering\itshape Placeholder
-    for Figure~\ref{fig:experiments:swap}: the solver-swap test against the step size.}}
-  \caption[The solver-swap test against the step size.]{%
-    The solver-swap test of Table~\ref{tab:experiments:swap} against the
-    integration step. Each trained model is re-evaluated, without
-    retraining, with explicit Euler (solid) or classical RK4 (dotted) at a
-    fixed step of 365 to 11.4 days, on a logarithmic axis with finer steps
-    to the right. The vertical axis gives the change of the change-region
-    Dice at the one-year anchor against the trained setting; one line per
-    fold (folds 0 to 2, seed 42). The shaded band marks $\pm 0.0127$, the
+  \includegraphics[width=0.85\textwidth]{images/fig_experiments_swap.pdf}
+  \caption[The step-size ladder for the graph network.]{%
+    The step-size ladder for the dilated-stencil graph network, trained in
+    two ways (Table~\ref{tab:experiments:swap}). Each trained network is
+    re-evaluated, without retraining, with the scheme it was trained with at
+    a fixed internal step of 365 to 11.4 days (logarithmic axis, finer steps
+    to the right). Each visit interval is split into equal sub-steps no
+    longer than the step, so every point forecasts the same visits. The
+    vertical axis gives the change of the change-region Dice at the
+    one-year anchor against the trained setting (ring), one line per fold
+    (folds 0 to 2, seed 42); the shaded band marks $\pm 0.0127$, the
     run-to-run standard deviation.
-    \emph{(a)}~The canonical dilated-stencil network, trained with one
-    Euler step and with $\Delta t$ as an input;
-    \emph{(b)}~the same network trained inside the autonomous RK4 wrapper;
-    \emph{(c)}~the T-FEN in its energy-conserving form, trained with RK4
-    in steps of 45 days.}
+    \emph{(a)}~The canonical network, trained with one Euler step per
+    visit interval and with $\Delta t$ as an input.
+    \emph{(b)}~The same network trained with one RK4 step per interval
+    inside the autonomous wrapper.}
   \label{fig:experiments:swap}
 \end{figure}
 

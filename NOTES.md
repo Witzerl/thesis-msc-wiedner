@@ -1516,6 +1516,7 @@ worked through one item at a time.
   checked against the PNG of 2026-10-01). Still disabled (8): reach, horizon, capacity, swap,
   T-FEN stability, growth rate (author: later; only the in-plot text needs moving to the
   caption), App. A crop, App. D rollouts.
+  2026-10-21: `fig:experiments:swap` restored (redrawn). Still disabled (7).
 - [x] #1 title page keywords: MP-PDE, MM-PDE and moving mesh removed, U-Net added
   (2026-10-02). Now: Geographic Atrophy, OCT, neural PDE solvers, graph neural networks, U-Net,
   medical imaging, longitudinal prediction.
@@ -1929,8 +1930,19 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
   caption respecified for the ladder; figure still disabled, script must be redrawn from the ladder cache.
   §5.6.2 wording fixed (AI 5d.14-5d.21). Follow-ups: §6.1 (only the T-FEN is called a continuous-time model;
   the wrapper network would need a finer training step) and §6.3 ("three of the five folds per model").
-- [ ] TODO: redraw `fig:experiments:swap` from `images/data/step_ladder` (three panels, one line per fold,
-  Euler solid / RK4 dotted, log step axis) before restoring it.
+- [x] 2026-10-21 `fig:experiments:swap` redrawn from `images/data/step_ladder` and restored, worked out with
+  the author: only the two graph networks (canonical Euler, RK4-trained), each with the scheme it was trained
+  with, one colour + marker per fold (SEQ blues), signed y-axis around 0, x = internal step 365-11.4 d.
+  Rejected on the way: three panels with Euler and RK4 per fold (too crowded); one panel with the largest
+  change over folds (hides the sign); mean over folds (hides that the folds move in opposite directions).
+  The T-FEN was left out: its coarse steps (365-91 d) are coarser than its 45-day training step, fail for the
+  Courant reason, and lie outside the test, but read as "the T-FEN fails"; its fine side is three points at 0.
+  Caption rewritten ("The step-size ladder for the graph network"); §5.6.1 pointer now "for the two graph
+  networks". Draft of a T-FEN-only figure (shaded coarse side) in the session scratchpad only, not used.
+- [ ] TODO (author, 2026-10-21): run the step-size ladder on folds 3 and 4 too (`images/scripts/step_ladder.py`;
+  these folds have no local precompute, so precompute them or run on the cluster), then update
+  `fig:experiments:swap`, Table `tab:experiments:swap`, Table `tab:appendix:step-ladder` and the §5.6.1 text
+  (inline TODO above the figure).
 - [ ] **TODO (author, 2026-10-19): review the placement of the step-size ladder explicitly** -- now in §5.6.1
   (Table 5.4 summary + Appendix E full table), with one pointer sentence in §5.5.1 (inline TODOs in both).
 - [x] 2026-10-19 **§5.7 "Comparison with Prior Work"** (author sign-off; heading was "Qualitative Analysis and
