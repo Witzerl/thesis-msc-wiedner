@@ -1541,6 +1541,11 @@ worked through one item at a time.
   [0.10, 0.52] (mean true 0.204 vs predicted 0.205); r among the 15 fastest 0.18 [-0.26, 0.61], median predicted/true
   0.50. Largest over-prediction fold 4 eye 8 (1.24 mm^2, true 0.27 vs predicted 0.58 mm/yr). Still disabled (4):
   reach, horizon, capacity, App. A crop.
+- [x] 2026-10-21 `fig:experiments:capacity` **removed** (author): every version (old delta + SE plot, absolute
+  lines, zero-centred with noise band, dot strip) either suggested trends the numbers do not support (U-Net
+  0.488 -> 0.505 -> 0.508 is within noise; the width-192 T-FEN 0.552 is a 3-fold mean, +0.001 paired) or needed
+  much explanation. §5.5.3 now points to Table tab:experiments:capacity only. Script kept. Still disabled (3):
+  reach, horizon, App. A crop.
 - [x] 2026-10-21 **App. D rollouts redrawn and restored** (author): the figure now shows kinds of lesion on which the
   model works instead of failure cases. Pool: folds 0-2 minus the Fig. 5.2 eye, change-region Dice at the anchor
   >= median (0.544), lesion not touching the border (15 eyes); rules smallest area / largest area / most lesions /

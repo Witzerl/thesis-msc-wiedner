@@ -1365,36 +1365,12 @@ remaining rows of Table~\ref{tab:experiments:capacity}.
 % 2026-10-01: four cells corrected for double rounding (exact values 0.52047,
 % 0.01547, -0.02046, -0.09047; images/scripts/fig_experiments_capacity.py).
 
-% Figure: images/scripts/fig_experiments_capacity.py (TFEN_FORM = 'galerkin',
-% to be switched to 'skew' together with the table rows).
-\begin{figure}[t]
-  \centering
-  % \includegraphics[width=0.8\textwidth]{images/fig_experiments_capacity.pdf}
-  % TODO: figure not final (2026-10-02); restore the line above when ready.
-  \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering\itshape Placeholder
-    for Figure~\ref{fig:experiments:capacity}: the capacity study.}}
-  \caption[The capacity study.]{%
-    The capacity study of Table~\ref{tab:experiments:capacity}. Each point
-    is the fold-paired difference of the change-region Dice at the one-year
-    anchor between an operator scaled in size and the same operator at its
-    original size, over five folds at seed 42, with the between-fold
-    standard error, plotted against the ratio of their parameter counts on
-    a logarithmic axis. Lines and filled markers change the width; open
-    markers change the depth (four message-passing rounds for the graph
-    network, an eight-layer free-form network for the T-FEN). All operators
-    meet at the original size. The shaded band marks the noise level
-    ($\pm 0.016$, or $\pm 0.020$ for the U-Net;
-    Appendix~\ref{app:full-results:criteria}). Two T-FEN points lie below the
-    plotted range and are drawn at its lower edge with their value: width
-    192 over all five folds, including the two on which it diverged during
-    training, and the eight-layer network, which did not train. All T-FEN
-    points use the energy-conserving form of the transport operator.}
-  \label{fig:experiments:capacity}
-\end{figure}
+% Figure fig:experiments:capacity removed 2026-10-21 (author): every plotted
+% version suggested trends the numbers do not support; the table carries the
+% result. Script kept: images/scripts/fig_experiments_capacity.py.
 
 No width step raises any class beyond the noise level
-(Table~\ref{tab:experiments:capacity},
-Figure~\ref{fig:experiments:capacity}). The dilated-stencil graph network
+(Table~\ref{tab:experiments:capacity}). The dilated-stencil graph network
 is flat from a quarter to four times its size (0.520, 0.526, 0.518), and
 the U-Net does best at or near its original size. The FNO with a local
 path is lower at both other widths, by 0.019 at width 2 and by 0.018 at
