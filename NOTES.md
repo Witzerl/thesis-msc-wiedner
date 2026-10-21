@@ -1523,6 +1523,19 @@ worked through one item at a time.
   five folds with one SD of the log error shaded; caption says the criterion is applied per fold (Table 5.6).
   Drawn and not chosen: median + range, worst fold per epoch (the mean puts the Galerkin line near the
   threshold, although 4 of 5 folds fail). Still disabled (5): reach, horizon, capacity, growth rate, App. A crop.
+- [x] 2026-10-21 (author) **New Fig. `fig:method:fen-toy` in §4.3.6** (`images/scripts/fig_method_fen_toy.py`): the T-FEN
+  transport operator assembled as in fen.py on a 10 x 60 toy grid, velocity (0.2, 1.0) + noise per triangle, both forms
+  integrated exactly from the same random start (sd 0.1) to time 10. Galerkin grows to 145 at the left (inflow) edge,
+  interior <= 11.8, largest eigenvalue real part +0.595; energy-conserving stays <= 0.39, real parts < 1e-15. Robustness
+  (scratch, five velocity seeds): 61-80 % (median) of the 10 fastest Galerkin modes lie in the outer 5 columns each side
+  (17 % of the grid). Caption relates it to the trained Galerkin T-FEN (§5.6.2); §5.6.2 points to it. Not used: an
+  eigenvalue/mode-profile figure (author: hard to read) and an error-vs-distance plot on real data
+  (`images/scripts/tfen_edge_error.py`, cache `images/data/tfen_edge/`, fold 0, both forms reproduce their logged Dice).
+- [ ] Open (author): add the onset sentence to §5.6.2? From `tfen_edge_error.py`, fold 0, epoch 29: the Galerkin form
+  exceeds a per-pixel layer error of 5 in all 20 eyes (first at visits 539-1079 d); in 14 of 20 the worst pixel at that
+  visit lies within 7 columns (40 um) of the left/right field edge, a band holding 1.4 % of the grid; the
+  energy-conserving form never exceeds 5. Proposed wording: "In 14 of the 20 eyes of fold 0, the first error above 5
+  lies within 40 um of the left or right edge, a band that holds 1.4 % of the grid."
 - [x] 2026-10-21 **App. D rollouts redrawn and restored** (author): the figure now shows kinds of lesion on which the
   model works instead of failure cases. Pool: folds 0-2 minus the Fig. 5.2 eye, change-region Dice at the anchor
   >= median (0.544), lesion not touching the border (15 eyes); rules smallest area / largest area / most lesions /

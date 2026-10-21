@@ -1070,7 +1070,35 @@ energy-conserving part,
 which conserves $u^\top M u$ for any per-triangle velocity, including at
 the edge, where it acts as a closed wall. In the interior and at a constant
 velocity, the two forms coincide. The energy-conserving form adds no
-parameters and no measurable cost.
+parameters and no measurable cost. Figure~\ref{fig:method:fen-toy} shows
+the difference between the two forms on a small grid.
+
+% Figure: images/scripts/fig_method_fen_toy.py (author 2026-10-21). The operator
+% is assembled as in GraphPDE/baselines/fen.py at pitch 1; velocity (0.2, 1.0)
+% grid steps per unit time plus noise (sd 0.5) per triangle, start sd 0.1,
+% exact integration to time 10. Galerkin: largest eigenvalue real part +0.595,
+% largest value 145 in column 0, interior (columns 5-54) at most 11.8;
+% energy-conserving: real parts below 1e-15, largest value 0.39.
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{images/fig_method_fen_toy.pdf}
+  \caption[The transport operator of the T-FEN in its two forms.]{%
+    The transport operator of the T-FEN in its two forms, on a toy grid of
+    $10 \times 60$ nodes with a velocity that points mainly from left to
+    right and varies from cell to cell. No learned part is involved: both
+    forms are applied to the same small random start (a) and integrated
+    over the same time. (b)~The energy-conserving form
+    (Equation~\ref{eq:method:fen-skew}) only moves the values; none grows.
+    (c)~The Galerkin form lets values grow from about 0.1 to about 145 at
+    the left edge, where content enters the grid and no flux term is
+    assembled; in the interior they stay below 12. The trained Galerkin
+    T-FEN shows the same behaviour on the $49 \times 1024$ grid: its
+    free-running rollout diverges at the left or right edge of the crop
+    after about 1.6 to 2 years
+    (\S\ref{sec:experiments:validity:tfen}), while the energy-conserving
+    form, which the main comparison uses, stays stable.}
+  \label{fig:method:fen-toy}
+\end{figure}
 
 % AI review 4b.31/4b.32 (2026-10-18): the definition of a stable run moved to
 % Section 5.5.2, where the result is reported and "late epochs" is defined.
