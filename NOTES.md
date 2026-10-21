@@ -1938,7 +1938,13 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
   The T-FEN was left out: its coarse steps (365-91 d) are coarser than its 45-day training step, fail for the
   Courant reason, and lie outside the test, but read as "the T-FEN fails"; its fine side is three points at 0.
   Caption rewritten ("The step-size ladder for the graph network"); §5.6.1 pointer now "for the two graph
-  networks". Draft of a T-FEN-only figure (shaded coarse side) in the session scratchpad only, not used.
+  networks".
+- [x] 2026-10-21 (author) T-FEN step ladder as its own figure `fig:experiments:swap-tfen`
+  (`images/scripts/fig_experiments_swap_tfen.py`), in §5.6.1 after the T-FEN paragraph: trained with 45-day RK4
+  steps (ring), steps coarser than training shaded and stated as outside C2; 91 d still agrees (0.001-0.012
+  lower), 183 and 365 d drop by 0.07-0.20. The paragraph's "Coarser steps lose accuracy" now says the same.
+  New palette entry `FOLD_TFEN` (#CC79A7 / #995B7D / #663C54) in `style/palette.py` and `foldTfenA-C` in
+  `style/thesis-colors.sty` (darkened T-FEN pink, so no fold shade coincides with ARM["fen"]).
 - [x] 2026-10-21 (author): the RK4-trained network's C2 failure comes from an improvement and the text now
   says so plainly: with finer steps its Dice rises by 0.018 on folds 0 and 1 (level with the canonical network
   there) and is unchanged on fold 2. Added in §5.6.1, §5.5.1 (RK4 paragraph), §6.1.5 and the Fig. 5.9 caption;

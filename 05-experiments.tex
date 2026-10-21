@@ -1616,13 +1616,37 @@ vector field less accurately than finer steps do.
 
 The T-FEN passes both criteria on all three folds. Between its training
 step of 45 days and the finest step of 11.4 days, its RK4 predictions
-change by at most 0.002. Coarser steps lose accuracy: 0.001 to 0.012 at a
-quarter year, and 0.07 to 0.20 at half a year and one year. Explicit Euler
+change by at most 0.002. Steps coarser than its training step are not
+covered by C2. At a quarter year the predictions still agree with the
+trained one, 0.001 to 0.012 lower; at half a year and one year they drop by
+0.07 to 0.20 (Figure~\ref{fig:experiments:swap-tfen}). Explicit Euler
 amplifies every mode of the transport operator
 (\S\ref{sec:method:family:fen}). At small steps, however, this growth stays
 small over one year, and the Euler predictions approach the RK4 value with
 an error that roughly halves with each halving of the step, as expected of
 a first-order scheme.
+
+% Figure: images/scripts/fig_experiments_swap_tfen.py (step-ladder cache, folds
+% 0-2; author 2026-10-21: the T-FEN in its own figure, coarse side shaded).
+% TODO (author, 2026-10-21): revise once the step-size ladder has run on folds 3 and 4 (NOTES.md).
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.55\textwidth]{images/fig_experiments_swap_tfen.pdf}
+  \caption[The step-size ladder for the T-FEN.]{%
+    The step-size ladder for the T-FEN in its energy-conserving form. The
+    network was trained with RK4 in steps of 45 days (ring) and is
+    re-evaluated, without retraining, with RK4 at a fixed internal step of
+    365 to 11.4 days (logarithmic axis, finer steps to the right); every
+    point forecasts the same visits. The vertical axis gives the change of
+    the change-region Dice at the one-year anchor against the trained
+    setting, one line per fold (folds 0 to 2, seed 42); the band marks
+    $\pm 0.0127$, the run-to-run standard deviation. Criterion C2 covers
+    the training step and every finer step; there the forecast changes by
+    at most 0.002. Steps coarser than training (shaded) lie outside the
+    test: at 91 days the forecast still agrees with the trained one, at
+    183 and 365 days it drops by 0.07 to 0.20.}
+  \label{fig:experiments:swap-tfen}
+\end{figure}
 
 The canonical network, and with it every headline result, may therefore
 not be described as a continuous-time model: no statement about an ordinary
