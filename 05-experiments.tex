@@ -1082,6 +1082,7 @@ than with the single step, on four of the five folds; over the FNO it is
 0.006 higher. Both differences lie within the noise level. For the
 dilated-stencil network, the Runge--Kutta step costs about 4.8 times the
 training time of the single step (\S\ref{sec:experiments:cost}).
+% TODO (author, 2026-10-21): revise once the step-size ladder has run on folds 3 and 4 (NOTES.md).
 Evaluated with finer steps after training, the Runge--Kutta network scores
 0.018 higher on folds 0 and 1 and the same on fold 2
 (\S\ref{sec:experiments:validity:swap}).
@@ -1608,6 +1609,7 @@ of 0.528 on fold 0 and 0.457 instead of 0.439 on fold 1, level with the
 canonical network (0.540 and 0.453). On fold 2 the Dice does not change.
 The network fails C2 because one RK4 step per interval integrates its
 vector field less accurately than finer steps do.
+% TODO (author, 2026-10-21): revise once the step-size ladder has run on folds 3 and 4 (NOTES.md).
 % Values: images/data/step_ladder (rk4:d11.4062 vs rk4:n1 and the canonical
 % euler:n1), folds 0/1/2: RK4 network 0.5451/0.4573/0.5667 against trained
 % 0.5275/0.4392/0.5667; canonical 0.5397/0.4534/0.5964.
@@ -1695,8 +1697,9 @@ of the T-FEN comes from its transport term
 % redrawn 2026-10-21 with the author: the two graph networks only, each with the
 % scheme it was trained with, one colour per fold; the T-FEN left out).
 % TODO (author, 2026-10-21): run the step-size ladder on folds 3 and 4 as well
-% (no local precompute for these folds); then update this figure,
-% Table tab:experiments:swap, Table tab:appendix:step-ladder and the text.
+% (no local precompute for these folds); then revise this figure and caption,
+% Table tab:experiments:swap, Table tab:appendix:step-ladder, every fold count
+% and number of 5.6.1, the RK4 sentence of 5.5.1 and 6.1.5 ("two of the three").
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.85\textwidth]{images/fig_experiments_swap.pdf}

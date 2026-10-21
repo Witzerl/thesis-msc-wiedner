@@ -1946,7 +1946,10 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
 - [ ] TODO (author, 2026-10-21): run the step-size ladder on folds 3 and 4 too (`images/scripts/step_ladder.py`;
   these folds have no local precompute, so precompute them or run on the cluster), then update
   `fig:experiments:swap`, Table `tab:experiments:swap`, Table `tab:appendix:step-ladder` and the §5.6.1 text
-  (inline TODO above the figure).
+  (inline TODO above the figure). **Then revise everything quoted from folds 0-2** (author 2026-10-21): every
+  fold count and number of §5.6.1 (canonical, RK4 network, T-FEN), the RK4 sentence in §5.5.1 ("0.018 higher
+  on folds 0 and 1"), §6.1.5 ("two of the three tested folds", "all three tested folds"), the Fig. 5.9 caption,
+  and the T-FEN step-ladder figure if it goes in. Inline TODOs at each place.
 - [ ] **TODO (author, 2026-10-19): review the placement of the step-size ladder explicitly** -- now in §5.6.1
   (Table 5.4 summary + Appendix E full table), with one pointer sentence in §5.5.1 (inline TODOs in both).
 - [x] 2026-10-19 **§5.7 "Comparison with Prior Work"** (author sign-off; heading was "Qualitative Analysis and
