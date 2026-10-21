@@ -1857,22 +1857,27 @@ without changing the Dice (\S\ref{sec:experiments:validity:swap}).
   \end{tabular}
 \end{table}
 % Figure: images/scripts/fig_experiments_tfen_stability.py (metrics.jsonl,
-% rollout_mask_rmse / rollout_layer_rmse; reproduces the table above).
+% rollout_mask_rmse / rollout_layer_rmse; reproduces the table above). Redrawn
+% 2026-10-21 (author): one line per form, geometric mean over the five folds,
+% shaded one standard deviation of the log error (the five lines per form were
+% too cluttered). Late-epoch geometric means: Galerkin 5.1 (mask) / 4.6
+% (layers), energy-conserving 1.37 / 0.91. Alternatives drawn and not used:
+% median with range over folds, and the worst fold per epoch.
 \begin{figure}[t]
   \centering
-  % \includegraphics[width=\textwidth]{images/fig_experiments_tfen_stability.pdf}
-  % TODO: figure not final (2026-10-02); restore the line above when ready.
-  \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering\itshape Placeholder
-    for Figure~\ref{fig:experiments:tfen-stability}: free-running error of the T-FEN in both operator forms.}}
+  \includegraphics[width=\textwidth]{images/fig_experiments_tfen_stability.pdf}
   \caption[Free-running error of the T-FEN in both operator forms.]{%
     Free-running rollout error of the T-FEN per training epoch, for the
     Galerkin form (dashed) and the energy-conserving form (solid) of its
-    transport operator; one line per fold, five folds, seed 42.
+    transport operator, five folds, seed 42. The line is the geometric mean
+    over the folds, the shading one standard deviation of the logarithm of
+    the error.
     \emph{(a)}~Mask channel, \emph{(b)}~layer channels; root mean squared
     error in normalised units, on a logarithmic scale. The grey dashed line
-    marks the stability threshold of 5 and the shaded region the late
+    marks the stability threshold of 5 and the shaded background the late
     epochs 10 to 29 over which the criterion is evaluated: a run is stable
-    if both errors stay at or below 5 on at least 19 of the 20 late epochs
+    if both errors stay at or below 5 on at least 19 of the 20 late epochs.
+    The criterion is applied to each fold separately
     (Table~\ref{tab:experiments:tfen-stability}).}
   \label{fig:experiments:tfen-stability}
 \end{figure}

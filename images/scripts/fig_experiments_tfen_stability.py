@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import numpy as np
 
-from _common import LATE_FROM, panel_label, save, setup, thesis_numbers
+from _common import LATE_FROM, save, setup, thesis_numbers
 
 pal = setup()
 ARM, PAL = pal.ARM, pal.PAL
@@ -87,36 +87,36 @@ for key, (tm, tl, xm, xl) in TABLE.items():
 print(f"  {'all values match' if not nbad else f'{nbad} MISMATCHES'}")
 
 # ---------------------------------------------------------------- figure
-fig, axes = plt.subplots(1, 2, figsize=pal.fig_size(1.146, 0.349), sharey=True,
+# One line per form: geometric mean over the five folds (mean of log10 error), shaded one
+# standard deviation of log10 error (author 2026-10-21: the five lines per form were too cluttered).
+# Non-finite epoch values would be dropped from that epoch's mean; there are none (checked above).
+assert not nonfinite
+STY = {"galerkin": dict(col=pal.FOLD_TFEN[2], ls=(0, (3, 1.5)), label="Galerkin form"),
+       "skew": dict(col=ARM["tfen"], ls="-", label="energy-conserving form")}
+fig, axes = plt.subplots(1, 2, figsize=pal.fig_size(1.0, 0.40), sharey=True,
                          gridspec_kw=dict(wspace=0.08))
-YLIM = (0.3, 1e5)
-for ax, (c, head) in zip(axes, [("mask", "Mask channel"), ("layer", "Layer channels")]):
+YLIM = (0.3, 1e4)
+ep = np.arange(30)
+for ax, lab, (c, head) in zip(axes, "ab", [("mask", "Mask channel"), ("layer", "Layer channels")]):
     ax.axvspan(LATE_FROM - 0.5, 29.5, color=PAL["bg_soft"], lw=0, zorder=0)
     ax.axhline(THR, color=PAL["muted"], ls="--", lw=0.9, zorder=1)
     for form in ("galerkin", "skew"):
-        for f in tn.FOLDS:
-            d = data[(form, f)]
-            v = d[c].copy()
-            fin = np.isfinite(v)
-            kw = (dict(ls=(0, (3, 1.5)), lw=0.9, alpha=0.9) if form == "galerkin"
-                  else dict(ls="-", lw=1.1, alpha=0.9))
-            ax.plot(d["epoch"][fin], v[fin], color=ARM["tfen"], zorder=3, **kw)
-            if (~fin).any():                                       # non-finite: mark at the top edge
-                ax.plot(d["epoch"][~fin], np.full((~fin).sum(), YLIM[1]), ls="none", marker="^",
-                        ms=4, color=ARM["tfen"], clip_on=False, zorder=4)
+        L = np.log10(np.array([data[(form, f)][c] for f in tn.FOLDS]))
+        m, sd = L.mean(0), L.std(0, ddof=1)
+        st = STY[form]
+        ax.fill_between(ep, 10 ** (m - sd), 10 ** (m + sd), color=st["col"], alpha=0.18, lw=0, zorder=2)
+        ax.plot(ep, 10 ** m, color=st["col"], ls=st["ls"], lw=1.4, zorder=3, label=st["label"])
+        late = ep >= LATE_FROM
+        print(f"{form:8s} {c:5s}: geometric mean over late epochs {10 ** m[late].mean():.3g}, "
+              f"band up to {10 ** (m + sd)[late].max():.3g}")
     ax.set_yscale("log")
     ax.set_ylim(*YLIM)
     ax.set_xlim(-0.5, 29.5)
     ax.set_xticks([0, 5, 10, 15, 20, 25, 29])
     ax.set_xlabel("Epoch")
-    ax.set_title(head, fontsize=7.5, loc="left", pad=3)
+    ax.set_title(f"({lab}) {head}", fontsize=7.5, loc="left", pad=3)
 axes[0].set_ylabel("Free-running rollout error\n(RMSE, normalised units)")
-axes[1].text(29.2, YLIM[1] * 0.7, "late epochs", fontsize=6.5, color=PAL["ink_2"], va="top", ha="right")
-
-h = [Line2D([], [], color=ARM["tfen"], ls=(0, (3, 1.5)), lw=0.9, label="Galerkin form"),
-     Line2D([], [], color=ARM["tfen"], ls="-", lw=1.1, label="energy-conserving form"),
-     Line2D([], [], color=PAL["muted"], ls="--", lw=0.9, label="stability threshold (5)")]
-axes[1].legend(handles=h, loc="upper left", handlelength=2.4, borderaxespad=0.3)
-for ax, l in zip(axes, ("(a)", "(b)")):
-    panel_label(ax, l, x=-0.03, y=1.04)
+h = axes[0].get_legend_handles_labels()[0] + [
+    Line2D([], [], color=PAL["muted"], ls="--", lw=0.9, label="stability threshold")]
+axes[0].legend(handles=h, loc="upper left", handlelength=2.4, borderaxespad=0.3, frameon=False)
 save(fig, "fig_experiments_tfen_stability")

@@ -1519,6 +1519,10 @@ worked through one item at a time.
   2026-10-21: `fig:experiments:swap` restored (redrawn). Still disabled (7).
   2026-10-21: `fig:appendix:rollouts` restored (redrawn, see below). Still disabled (6): reach, horizon,
   capacity, T-FEN stability, growth rate, App. A crop.
+  2026-10-21: `fig:experiments:tfen-stability` restored (author): one line per form, geometric mean over the
+  five folds with one SD of the log error shaded; caption says the criterion is applied per fold (Table 5.6).
+  Drawn and not chosen: median + range, worst fold per epoch (the mean puts the Galerkin line near the
+  threshold, although 4 of 5 folds fail). Still disabled (5): reach, horizon, capacity, growth rate, App. A crop.
 - [x] 2026-10-21 **App. D rollouts redrawn and restored** (author): the figure now shows kinds of lesion on which the
   model works instead of failure cases. Pool: folds 0-2 minus the Fig. 5.2 eye, change-region Dice at the anchor
   >= median (0.544), lesion not touching the border (15 eyes); rules smallest area / largest area / most lesions /
