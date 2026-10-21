@@ -582,8 +582,7 @@ separate the two, the $\pm 35$ geometry keeps the default spacing and adds
 neighbours (32 in total). It is also lower, by 0.010, within the noise
 level, so a longer reach does not help even at the default spacing.
 Widening the stencil across rows, to $\pm 2$ rows, lowers the score most of
-all geometries, by 0.039. Figure~\ref{fig:experiments:reach} places these
-geometries and the index-space graph on one axis of physical reach.
+all geometries, by 0.039.
 % Corrected 2026-10-01: the text and table said "same number of neighbours"
 % for the +/-35 geometry. Per baselines/anisognn.py, ANISOGNN_final_meant5 is
 % pitch 7, taps 5 (columns 0, +/-7..+/-35; 32 neighbours) and
@@ -616,34 +615,9 @@ geometries and the index-space graph on one axis of physical reach.
   \end{tabular}
 \end{table}
 
-% Figure: images/scripts/fig_experiments_reach.py (thesis_numbers pair against
-% ANISOGNN_final_dilmean; geometry from args.json and baselines/anisognn.py).
-\begin{figure}[t]
-  \centering
-  % \includegraphics[width=0.8\textwidth]{images/fig_experiments_reach.pdf}
-  % TODO: figure not final (2026-10-02); restore the line above when ready.
-  \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering\itshape Placeholder
-    for Figure~\ref{fig:experiments:reach}: the reach ladder.}}
-  \caption[The reach ladder.]{%
-    The reach ladder of the dilated-stencil graph network. Each point is
-    the fold-paired difference of the change-region Dice at the one-year
-    anchor against the default stencil (rows $\pm 1$, columns
-    $\{0, \pm 7, \pm 14, \pm 21\}$, 20 neighbours), over five folds at
-    seed 42, with the between-fold standard error; the shaded band marks
-    the noise level ($\pm 0.016$, Appendix~\ref{app:full-results:criteria}).
-    The horizontal axis gives the reach
-    of one hop along a row, in columns (bottom) and millimetres (top). The
-    connected points keep rows $\pm 1$ and vary the columns: a spacing of 4
-    (reach $\pm 12$, 20 neighbours), the default spacing of 7 ($\pm 21$),
-    the default spacing extended to five steps per side ($\pm 35$, 32
-    neighbours) and a spacing of 14 ($\pm 42$, 20 neighbours). The open
-    diamond widens the default to rows $\pm 2$ (34 neighbours). The
-    light-blue point is the index-space $k$-nearest-neighbour graph
-    ($k = 12$), whose single hop reaches $\pm 2$ columns. Dashed lines mark
-    the median (12 columns) and the 90th percentile (23 columns) of the
-    per-visit advance of the GA front.}
-  \label{fig:experiments:reach}
-\end{figure}
+% Figure fig:experiments:reach removed 2026-10-21 (author): the table gives the
+% numbers and Fig. fig:method:stencils the geometry. Script kept:
+% images/scripts/fig_experiments_reach.py.
 
 The number of neighbours was also varied at a fixed reach. With $k = 20$
 neighbours, the index-space graph reaches as far as with $k = 12$. It is
