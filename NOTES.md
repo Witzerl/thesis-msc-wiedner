@@ -1939,6 +1939,10 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
   Courant reason, and lie outside the test, but read as "the T-FEN fails"; its fine side is three points at 0.
   Caption rewritten ("The step-size ladder for the graph network"); §5.6.1 pointer now "for the two graph
   networks". Draft of a T-FEN-only figure (shaded coarse side) in the session scratchpad only, not used.
+- [x] 2026-10-21 (author): the RK4-trained network's C2 failure comes from an improvement and the text now
+  says so plainly: with finer steps its Dice rises by 0.018 on folds 0 and 1 (level with the canonical network
+  there) and is unchanged on fold 2. Added in §5.6.1, §5.5.1 (RK4 paragraph), §6.1.5 and the Fig. 5.9 caption;
+  Table 5.5 retitled "The step-size ladder" (was "The solver-swap test"). Author: no "not tested" hedges.
 - [ ] TODO (author, 2026-10-21): run the step-size ladder on folds 3 and 4 too (`images/scripts/step_ladder.py`;
   these folds have no local precompute, so precompute them or run on the cluster), then update
   `fig:experiments:swap`, Table `tab:experiments:swap`, Table `tab:appendix:step-ladder` and the §5.6.1 text

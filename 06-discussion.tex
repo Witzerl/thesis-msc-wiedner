@@ -180,7 +180,8 @@ folds. Neither is more accurate than the canonical network at one year,
 and the wrapper costs about $4.8\times$ the training time. If predictions
 between visits are needed clinically, these two models give predictions
 between visits that are consistent with those at the visits; the wrapper
-network would need a finer training step. Whether these predictions are
+network would need a finer step, with which its predictions at the visits
+are also 0.018 better on two of the three tested folds. Whether these predictions are
 correct cannot be checked, because no ground truth exists between two
 observations. An earlier attempt to constrain them, a regulariser that
 penalised predictions between visits against the linear interpolation of

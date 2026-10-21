@@ -1081,9 +1081,10 @@ Over the dilated-stencil network, the change-region Dice is 0.012 lower
 than with the single step, on four of the five folds; over the FNO it is
 0.006 higher. Both differences lie within the noise level. For the
 dilated-stencil network, the Runge--Kutta step costs about 4.8 times the
-training time of the single step (\S\ref{sec:experiments:cost}). How the
-result of a trained network changes when its step is refined, without
-retraining, is tested in~\S\ref{sec:experiments:validity:swap}.
+training time of the single step (\S\ref{sec:experiments:cost}).
+Evaluated with finer steps after training, the Runge--Kutta network scores
+0.018 higher on folds 0 and 1 and the same on fold 2
+(\S\ref{sec:experiments:validity:swap}).
 % Values: ANISOGNN_final_oderk4n1 - ANISOGNN_final_dilmean -0.0119 +/-
 % 0.0037 SE (1/5 higher), per eye -0.0132 +/- 0.0055 (28/75);
 % FNO_final_w5rk4 - FNO_final_w5 +0.0062 +/- 0.0056 SE (4/5), per eye
@@ -1602,7 +1603,14 @@ within 0.002 at the finest step. It therefore defines a single vector field.
 C2 holds on fold 2 only. On folds 0 and 1, the converged value lies about
 0.018 above the value of the trained setting, one RK4 step per interval. On
 these folds, that step is too coarse to resolve the vector field to within
-the run-to-run noise.
+the run-to-run noise. The finer steps give the higher Dice: 0.545 instead
+of 0.528 on fold 0 and 0.457 instead of 0.439 on fold 1, level with the
+canonical network (0.540 and 0.453). On fold 2 the Dice does not change.
+The network fails C2 because one RK4 step per interval integrates its
+vector field less accurately than finer steps do.
+% Values: images/data/step_ladder (rk4:d11.4062 vs rk4:n1 and the canonical
+% euler:n1), folds 0/1/2: RK4 network 0.5451/0.4573/0.5667 against trained
+% 0.5275/0.4392/0.5667; canonical 0.5397/0.4534/0.5964.
 
 The T-FEN passes both criteria on all three folds. Between its training
 step of 45 days and the finest step of 11.4 days, its RK4 predictions
@@ -1644,8 +1652,8 @@ of the T-FEN comes from its transport term
 
 \begin{table}[t]
   \centering
-  \caption[The solver-swap test.]{%
-    The solver-swap test. Each trained model is re-evaluated, without
+  \caption[The step-size ladder.]{%
+    The step-size ladder. Each trained model is re-evaluated, without
     retraining, with a fixed step of $h = 1$ to $1/32$ year (365 to 11.4
     days) and with explicit Euler or classical RK4; folds 0 to 2, seed 42.
     The table gives the change of the change-region Dice at the one-year
@@ -1706,7 +1714,9 @@ of the T-FEN comes from its transport term
     \emph{(a)}~The canonical network, trained with one Euler step per
     visit interval and with $\Delta t$ as an input.
     \emph{(b)}~The same network trained with one RK4 step per interval
-    inside the autonomous wrapper.}
+    inside the autonomous wrapper. Its forecast settles 0.018 above the
+    trained one on folds 0 and 1, just outside the band, and does not
+    change on fold 2.}
   \label{fig:experiments:swap}
 \end{figure}
 
