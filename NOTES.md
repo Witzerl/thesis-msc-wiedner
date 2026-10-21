@@ -2300,6 +2300,24 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
   opening-chapter order, intro/body/conclusion per section, LLM sentence patterns, one table or
   plot per results subsection, contributions as bullets, figure tools).
 
+### Consolidated feedback log (2026-10-22)
+
+- [x] 2026-10-22: `reviews/feedback-log-2026-10-22.md` collects all feedback in order: supervisor
+  review 1 (34 items: 23 done, 2 decided, 7 deferred = abstract), supervisor review 2 (53 items:
+  39 done, 3 decided, 11 open or partly), the AI review's structural items (69: 44 done) and all 544
+  AI sentence items (437 done, 74 superseded by later rewrites, 12 decided, 10 deferred = abstract,
+  11 open, 10 of them in Appendices A-F). Each item gives the feedback, the issue and the fix with date
+  and commit. The status of every AI item was checked against today's `.tex` (old passage still
+  present? suggested wording present?), and the passage was located by a line diff from the reviewed
+  commit `08534e6`.
+- [ ] Cohort wording is inconsistent: after SV-3.1, §2.4 and §3.1 say the data are the Mai et al.
+  (2024) cohort with tighter registration and cleaner segmentations, but `238a8bc` (2026-10-22) set the
+  horizon-figure caption to "a larger cohort of the same clinic" (`05-experiments.tex:806`). Pick one.
+- [ ] Open AI items in Appendices A-F (A.1, A.3, A.6-A.11, A.13, A.14; neither supervisor review
+  covered the appendices) and G.40; structural items still open: S13/R15 (shrinkage quantified only in
+  §6.3), T7 (Ch. 7 re-runs §6.1), T13 (Appendices B and C empty, App. E titled "Ablation Details"),
+  R11, R16, the 365.25 footnote of S24.
+
 ### Assets that now exist and should be reused
 
 - **The Practical Work report** (`masterthesis-docker/practical/`) was handed in
