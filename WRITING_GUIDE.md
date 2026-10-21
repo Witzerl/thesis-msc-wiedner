@@ -7,6 +7,9 @@ unchanged. Where it clashes with the rules this thesis already follows (CLAUDE.m
 reviews), the clash is stated and the thesis rule wins. Section numbers in brackets point to the
 book, e.g. [2.1.6].
 
+**Section 11 holds the supervisor's instructions** (Dmitrii Lachinov, e-mails with reviews 1 and 2,
+2026-10-12 and 2026-10-17). They take precedence over the book.
+
 The guide is a summary in my own words. The examples are drawn from this thesis, not from the
 book.
 
@@ -271,7 +274,9 @@ add decisions there as they are made (e.g. µm vs mm, "late-epoch mean").
 - Process images only as far as necessary; never to make them look nicer.
 - A figure that shows no difference, or that the text never refers to, is redundant.
 - Split a figure that carries too much; never show the same data as both a figure and a table;
-  describe a very small table in the text instead.
+  describe a very small table in the text instead. *Supervisor (§11.6):* repeating a small
+  excerpt of a main results table next to the ablation that discusses it is wanted; the book's
+  rule applies to figure-vs-table duplication only.
 - Remove information repeated in every row or column of a table: move it to the title, a single
   column, or a footnote. Round to the significant figures that matter.
 - **Captions**: a short title that states either what was done or what was found, then the details
@@ -451,6 +456,8 @@ ran out of energy halfway.
 | vary words to avoid repetition | one term, one meaning (CLAUDE.md terminology) | vary ordinary words, never technical terms |
 | use linking words generously | editorial review flags chains of linking words as machine-like | one link where the relation needs saying, not at every sentence |
 | keep the list of future experiments short (journal) | thesis has a Future Work section | keep it, but tie each item to a result |
+| never show the same data twice [4.3.1] | repeat a small excerpt of the main table next to each ablation (supervisor) | excerpt tables allowed; no figure and table of the same numbers |
+| the Results section is about the data, the Discussion about meaning | every section has intro (with thesis statement), body and conclusion (supervisor) | results subsections state their conclusion briefly; the wider interpretation stays in Ch. 6 |
 | double spacing, Arial 12 pt | JKU template | template wins |
 | figures and tables at the end of the manuscript | thesis floats figures in the text | template wins |
 
@@ -475,12 +482,105 @@ ran out of energy halfway.
 - [ ] referred to in the text, which says what to look at
 - [ ] not duplicated by another figure or table
 
+**Every new term**
+- [ ] defined before or at its first use, especially medical terms (§11.2)
+
+**Every sentence (supervisor)**
+- [ ] none of the LLM patterns of §11.5 ("What it does is that …", "not X but Y", "X is not what
+  decides Y", dramatic or story-like phrasing)
+
 **Every section**
-- [ ] opens with its purpose, closes with what it showed (supervisor review 2)
+- [ ] intro paragraph with purpose and thesis statement, body that supports it, conclusion that
+  states what follows (§11.4)
+- [ ] a results subsection has its own table or plot (§11.6)
 - [ ] results: aim → done → found → next; interpretation saved for the discussion
 - [ ] discussion: opens with the main outcome, weighs evidence for and against
 
 **The whole thesis**
 - [ ] read on paper, aloud, and once backwards
+- [ ] read once from start to end only to tick off new terms (§11.2)
 - [ ] numbers and terms identical everywhere
-- [ ] abstract matches the text; title states without overstating
+- [ ] abstract polished last and to near perfection; matches the text; title states without
+  overstating (§11.1)
+- [ ] contributions as bullets, each saying what is new and why it matters (§11.7)
+
+---
+
+## 11. The supervisor's instructions
+
+Writing-related instructions from Dmitrii Lachinov's two review e-mails, in his order. They take
+precedence over the book. The comments inside the review PDFs are tracked separately in
+`reviews/supervisor-rev1-2026-10-12.md` and `reviews/worklist-ch4-7-2026-10-17.md`.
+
+### 11.1 The abstract comes first in importance (review 1)
+Most readers read only the abstract, and the examiners read it first, so it sets the first
+impression. Polish it to near perfection. Combine with §5.7: write it once the rest is settled,
+then revise it several times.
+
+### 11.2 Define every term before it is needed (review 1)
+Read the thesis from start to end and tick each new term (GA, AMD, fovea, VA, OCT, …) at its first
+appearance. Each must be explained there or earlier. Assume the reader knows the mathematics (what
+a PDE or a boundary value problem is) but **not** the medical part. A reader who meets AMD, GA,
+fovea, visual acuity and OCT in the Introduction without explanation is lost from the start.
+(Status: prerequisite audit done 2026-10-14, `reviews/m2-term-table-2026-10-14.md`; repeat it
+after large edits.)
+
+### 11.3 The opening chapters follow a fixed order (review 1)
+1. **Medical background**: the eye, the retina and its layers (schematic), photoreceptors, RPE;
+   how the retina is imaged (OCT, SLO, FAF); GA and its pathophysiology; the new drugs; the needs
+   of patient management, predictive methods and personalised medicine.
+2. **PDEs and solvers**: formalism and current methods only, **without mentioning GA**.
+3. **Motivation**: placed here, where the reader has the medical and mathematical context.
+4. **Problem statement**: clear, sharp, concise and **formal**, along the lines of "given
+   measurements X sampled at times T on an anisotropic lattice, learn a parametric operator that
+   maps the input to the solution". Introduce here the notation used in the rest of the thesis,
+   with a few equations.
+5. **Thesis outline.**
+
+Headings state a topic, not a question ("Why Neural PDE Solvers?" → "Choice of the Modelling
+Approach"). Introduction and Background may stay separate chapters (the supervisor accepted
+this), as long as this order holds inside them.
+
+### 11.4 Every section: introduction, body, conclusion (review 2)
+1. **Introduction paragraph** with the section's purpose and a **thesis statement** (or a stand-in
+   for one), e.g. "As a result, the parameter count had no effect." In a results section, repeat
+   briefly what the experiment is and what it is for.
+2. **Body**: as many paragraphs as needed, each supporting the thesis statement (e.g. comparing
+   large and small models).
+3. **Conclusion**: what can be inferred (e.g. "small models suffice").
+
+### 11.5 Academic sentences, not fiction (review 2)
+Avoid non-academic language and sentence structures. LLMs ignore Skern's rules and write prose that
+can be engaging but suits fiction better. Constructions he names, which are hardly found in real
+papers:
+- "What it *does* is that …"
+- "Not this, but that." / "X is not Y but Z."
+- "X is not what decides Y."
+
+To these the reviews of this thesis add: dramatic sentence openers, slogan-like closing sentences,
+"What separates … is …", chains of linking words, and emphatic adverbs (*crucially, fundamentally,
+entirely*). As a reference for the register, read the MM-PDE paper (Hu et al., ICLR 2024,
+<https://openreview.net/pdf?id=hj9ZuNimRl>) or any other paper in `literature/`: state the fact, the
+number and the source, in that order.
+
+### 11.6 Tables and plots carry the results (review 2)
+- A few large tables that collect all results are good.
+- When a subsection discusses one ablation, repeat **a small part of the main table** on the same
+  page as the discussion.
+- Use box plots, scatter plots and other plots to carry the message.
+- Roughly **one results subsection = one plot or table.**
+
+### 11.7 Contributions as bullet points (review 1)
+State what was achieved and what is new, and why it is valuable, as a bullet list.
+
+### 11.8 Making figures (review 2)
+LLM help with figures is fine. The supervisor himself avoids image generators and instead (i) writes
+Python scripts with matplotlib or seaborn for PDF/SVG data plots, (ii) does the same for
+simulations or animations of the data, (iii) for complex schematics such as a workflow, generates
+SVG sub-elements with Claude and merges them by hand in draw.io. *Thesis:* data figures already
+follow (i) through `images/scripts/` and `style/`; Figs. 2.1–2.3 are image-generated drawings with
+an AI note in the caption.
+
+### Not writing guidance
+The list of the ten layer boundaries (ILM … outer boundary of the RPE) in review 2 is data, not
+style. It is already in `03-data.tex` §3.2 (lines 182–193).

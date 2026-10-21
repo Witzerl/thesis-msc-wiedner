@@ -2290,7 +2290,11 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
   open with *Because* (e.g. `02-background.tex:404`, `04-method.tex:165`, `05-experiments.tex:141`);
   `03-data.tex:448` "The data is partitioned" (-> "are"); 12 em-dashes (`---`) in prose or tables;
   the title-page keywords partly repeat the title (the guide suggests terms that extend it).
-- [ ] Decide whether CLAUDE.md "Writing Style" should point to `WRITING_GUIDE.md`.
+- [x] (author 2026-10-22: no) Decide whether CLAUDE.md "Writing Style" should point to `WRITING_GUIDE.md`.
+- [x] 2026-10-22: supervisor's writing instructions from the e-mails of reviews 1 and 2 checked
+  against the guide; most were missing and are now its §11 (abstract, prerequisite audit,
+  opening-chapter order, intro/body/conclusion per section, LLM sentence patterns, one table or
+  plot per results subsection, contributions as bullets, figure tools).
 
 ### Assets that now exist and should be reused
 
