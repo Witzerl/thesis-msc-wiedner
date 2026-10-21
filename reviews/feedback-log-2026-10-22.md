@@ -34,7 +34,7 @@ rechecks; both are logged in `NOTES.md`.
 **Open points that need someone else:** reply mail to the supervisor (operator definition, framework
 vs methodology, drugs kept in §1.1, SV-5.12 step-size ladder, JKU rule on AI-generated figures).
 
-**One inconsistency found while compiling this list:** after SV-3.1 the thesis says the data *are*
+**One inconsistency found while compiling this list (fixed 2026-10-22, caption reworded to match §2.4 and §3.1):** after SV-3.1 the thesis says the data *are*
 the Mai et al. (2024) cohort with tighter registration and cleaner segmentations (§2.4, §3.1), but the
 caption of the horizon figure was changed back on 2026-10-22 (238a8bc) to "a larger cohort of the
 same clinic" (`05-experiments.tex:806`). Both are true; pick one wording.

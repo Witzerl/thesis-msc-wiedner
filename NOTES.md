@@ -2310,7 +2310,7 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
   and commit. The status of every AI item was checked against today's `.tex` (old passage still
   present? suggested wording present?), and the passage was located by a line diff from the reviewed
   commit `08534e6`.
-- [ ] Cohort wording is inconsistent: after SV-3.1, §2.4 and §3.1 say the data are the Mai et al.
+- [x] (fixed 2026-10-22: caption back to "the full cohort from which the data here are drawn") Cohort wording is inconsistent: after SV-3.1, §2.4 and §3.1 say the data are the Mai et al.
   (2024) cohort with tighter registration and cleaner segmentations, but `238a8bc` (2026-10-22) set the
   horizon-figure caption to "a larger cohort of the same clinic" (`05-experiments.tex:806`). Pick one.
 - [ ] Open AI items in Appendices A-F (A.1, A.3, A.6-A.11, A.13, A.14; neither supervisor review
