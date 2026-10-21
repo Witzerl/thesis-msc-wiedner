@@ -1536,6 +1536,11 @@ worked through one item at a time.
   visit lies within 7 columns (40 um) of the left/right field edge, a band holding 1.4 % of the grid; the
   energy-conserving form never exceeds 5. Proposed wording: "In 14 of the 20 eyes of fold 0, the first error above 5
   lies within 40 um of the left or right edge, a band that holds 1.4 % of the grid."
+- [x] 2026-10-21 `fig:experiments:growth-rate` restored unchanged (author: "as it was", in-plot r and identity
+  labels kept). Checked on the way, not in the thesis (author: include nothing): r without the 15 fastest eyes 0.32
+  [0.10, 0.52] (mean true 0.204 vs predicted 0.205); r among the 15 fastest 0.18 [-0.26, 0.61], median predicted/true
+  0.50. Largest over-prediction fold 4 eye 8 (1.24 mm^2, true 0.27 vs predicted 0.58 mm/yr). Still disabled (4):
+  reach, horizon, capacity, App. A crop.
 - [x] 2026-10-21 **App. D rollouts redrawn and restored** (author): the figure now shows kinds of lesion on which the
   model works instead of failure cases. Pool: folds 0-2 minus the Fig. 5.2 eye, change-region Dice at the anchor
   >= median (0.544), lesion not touching the border (15 eyes); rules smallest area / largest area / most lesions /
