@@ -2291,6 +2291,10 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
   `03-data.tex:448` "The data is partitioned" (-> "are"); 12 em-dashes (`---`) in prose or tables;
   the title-page keywords partly repeat the title (the guide suggests terms that extend it).
 - [x] (author 2026-10-22: no) Decide whether CLAUDE.md "Writing Style" should point to `WRITING_GUIDE.md`.
+- [ ] 2026-10-22: `prompts/PROMPT_full_review.md` written: full-thesis review from six perspectives
+  (supervisor, external reviewer, examiner, colleague, clinical reader, copy editor) against
+  `WRITING_GUIDE.md`, with severities S1-S4, a settled-decisions list, a verification step and one
+  sequential findings list (`reviews/full-review-<date>/`). Not run yet.
 - [x] 2026-10-22: supervisor's writing instructions from the e-mails of reviews 1 and 2 checked
   against the guide; most were missing and are now its §11 (abstract, prerequisite audit,
   opening-chapter order, intro/body/conclusion per section, LLM sentence patterns, one table or
