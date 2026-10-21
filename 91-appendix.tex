@@ -46,29 +46,22 @@ lesion area ranges from 0.11 to 20.8\,mm$^2$, with a median of
 \label{app:dataset:crop}
 
 Figure~\ref{fig:appendix:crop} relates the native grids of the eyes to the
-modelling window of~\S\ref{sec:data:spatial} and shows how much lesion
-area the window removes (\S\ref{sec:data:spatial}).
+modelling window of~\S\ref{sec:data:spatial}; how much lesion area the
+window removes is given there.
 
 % Figure: images/scripts/fig_appendix_crop.py (native mask_oct.png per visit,
-% the precompute's centre-crop / pad arithmetic).
+% the precompute's centre-crop / pad arithmetic). 2026-10-21 (author): only the
+% grid panel; the lesion-loss curve was dropped (its numbers are in 3.3).
 \begin{figure}[t]
   \centering
-  % \includegraphics[width=\textwidth]{images/fig_appendix_crop.pdf}
-  % TODO: figure not final (2026-10-02); restore the line above when ready.
-  \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering\itshape Placeholder
-    for Figure~\ref{fig:appendix:crop}: native grids and the lesion area removed by the modelling window.}}
-  \caption[Native grids and the lesion area removed by the modelling
-  window.]{%
-    Native en-face grids and the lesion area removed by the
-    $49 \times 1024$ window.
-    \emph{(a)}~Native grid of each of the 75 eyes, in B-scans (rows) and
-    A-scans per B-scan (columns). The grid is the same at every visit of an
-    eye, and eyes with identical grids overlap (67 distinct grids). Dashed
-    lines mark the window size: an eye left of or below a line is
-    zero-padded along that axis, and an eye right of or above it is
-    centre-cropped.
-    \emph{(b)}~Share of the 553 visits that lose more than a fraction $x$
-    of their lesion area to the window, measured on the native mask.}
+  \includegraphics[width=0.6\textwidth]{images/fig_appendix_crop.pdf}
+  \caption[Native grids and the modelling window.]{%
+    Native en-face grid of each of the 75 eyes, in B-scans (rows) and
+    A-scans per B-scan (columns), against the $49 \times 1024$ modelling
+    window. The grid is the same at every visit of an eye, and eyes with
+    identical grids overlap (67 distinct grids). Dashed lines mark the
+    window size: an eye left of or below a line is zero-padded along that
+    axis, and an eye right of or above it is centre-cropped.}
   \label{fig:appendix:crop}
 \end{figure}
 

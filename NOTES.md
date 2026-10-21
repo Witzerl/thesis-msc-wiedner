@@ -1508,7 +1508,7 @@ worked through one item at a time.
   (Fig. 4.2, 5.1-5.9, A.1, A.2, D.1, G.1): each `\includegraphics` line is commented out with a
   `% TODO: figure not final (2026-10-02); restore the line above when ready.` marker and replaced
   by a placeholder box; captions and labels unchanged. Scripts and image files are untouched.
-- [ ] TODO (14 inline markers above): restore each figure once it is final.
+- [x] (2026-10-21: all handled -- restored, redrawn or removed) TODO (14 inline markers above): restore each figure once it is final.
   2026-10-17: Fig. 4.2 (`fig:method:stencils`) restored (redrawn); Fig. A.1
   (`fig:appendix:cohort`) restored unchanged (author: fine); 12 left. Fig. A.2 (crop) and
   Fig. 5.3 (reach) need more work and discussion (author).
@@ -1552,6 +1552,10 @@ worked through one item at a time.
 - [x] 2026-10-21 `fig:experiments:reach` **removed** (author: looks bad, no clear purpose): Table tab:experiments:reach
   gives the numbers, Fig. fig:method:stencils the geometry, the text the +0.064 over k-NN. The §5.3.2 pointer sentence
   was removed with it. Script kept. Still disabled (1): App. A crop.
+- [x] 2026-10-21 `fig:appendix:crop` restored with panel (a) only (author: (a) fine, (b) not good); the lesion-loss
+  curve and its in-plot numbers (incl. "19.2 % lose > 1 %", not in the text) dropped; caption and the App. A.2
+  sentence rewritten for one panel. **All disabled figures are now handled** (restored, redrawn or removed); the
+  14-marker TODO of 2026-10-02 is closed.
 - [x] 2026-10-21 **App. D rollouts redrawn and restored** (author): the figure now shows kinds of lesion on which the
   model works instead of failure cases. Pool: folds 0-2 minus the Fig. 5.2 eye, change-region Dice at the anchor
   >= median (0.544), lesion not touching the border (15 eyes); rules smallest area / largest area / most lesions /
