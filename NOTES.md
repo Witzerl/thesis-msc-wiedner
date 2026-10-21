@@ -2278,6 +2278,20 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
     differs between folds. Recommendation: use the five-fold cluster estimate 0.0191 (sigma_Delta about 0.010,
     threshold about 0.020, i.e. the 0.020 already in the text).
 
+### Writing guide from Skern (2026-10-22)
+
+- [x] 2026-10-22: `WRITING_GUIDE.md` written from Tim Skern, *Writing Scientific English: A
+  Workbook* (2009), read in full: formal-English rules, the eight clarity guidelines, linking
+  words, document structure mapped onto the thesis chapters, tenses, summarising without
+  plagiarism, revision passes, a list of where the book conflicts with CLAUDE.md / the supervisor
+  (active voice and *we* vs the passive rule: resolved as impersonal active subjects), and a
+  one-page checklist. Advisory only; no `.tex` file changed.
+- [ ] Optional, from the guide's scan of the chapter files (comments excluded): about 28 sentences
+  open with *Because* (e.g. `02-background.tex:404`, `04-method.tex:165`, `05-experiments.tex:141`);
+  `03-data.tex:448` "The data is partitioned" (-> "are"); 12 em-dashes (`---`) in prose or tables;
+  the title-page keywords partly repeat the title (the guide suggests terms that extend it).
+- [ ] Decide whether CLAUDE.md "Writing Style" should point to `WRITING_GUIDE.md`.
+
 ### Assets that now exist and should be reused
 
 - **The Practical Work report** (`masterthesis-docker/practical/`) was handed in
