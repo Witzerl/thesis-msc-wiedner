@@ -1517,6 +1517,17 @@ worked through one item at a time.
   T-FEN stability, growth rate (author: later; only the in-plot text needs moving to the
   caption), App. A crop, App. D rollouts.
   2026-10-21: `fig:experiments:swap` restored (redrawn). Still disabled (7).
+  2026-10-21: `fig:appendix:rollouts` restored (redrawn, see below). Still disabled (6): reach, horizon,
+  capacity, T-FEN stability, growth rate, App. A crop.
+- [x] 2026-10-21 **App. D rollouts redrawn and restored** (author): the figure now shows kinds of lesion on which the
+  model works instead of failure cases. Pool: folds 0-2 minus the Fig. 5.2 eye, change-region Dice at the anchor
+  >= median (0.544), lesion not touching the border (15 eyes); rules smallest area / largest area / most lesions /
+  fastest growth -> PEAT0062_OS (1.3 mm^2, 0.649), GX511418_OD (13.2 mm^2, 0.659), GX511414_OD (7 lesions, 0.640),
+  PEA01810_OS (0.42 mm/yr, 0.552). Yearly columns only, each eye cropped to its lesion with its own scale bar (panels
+  about twice as large; full page, D.1). The selection rule is stated in the Appendix D text, not in the caption
+  (author). Text names three visible weaknesses (late over-prediction in (a), missed new satellite lesions in (c),
+  under-predicted fast growth in (d)) and points to §5.4 and §5.7. Fig. 5.2 caption no longer promises "typical and
+  difficult" eyes. Fixes the stale MAIN_FIG_EYE (panel (a) had become the Fig. 5.2 eye).
 - [x] #1 title page keywords: MP-PDE, MM-PDE and moving mesh removed, U-Net added
   (2026-10-02). Now: Geographic Atrophy, OCT, neural PDE solvers, graph neural networks, U-Net,
   medical imaging, longitudinal prediction.
@@ -1836,7 +1847,7 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
   the old fold-2 median eye (best fold, edge contact, large no-data area, 10 % shrinkage) and a folds 0-2
   median eye (fold 2 eye 6, 0.552: correct places but 40 % of the true change). §5.2 sentence changed to
   match. Old PNG removed.
-- [ ] Appendix D (`fig_appendix_rollouts`, still disabled) must show typical and difficult eyes: the Fig. 5.2
+- [x] (superseded 2026-10-21: App. D shows kinds of lesion on which the model works; Fig. 5.2 caption adjusted) Appendix D (`fig_appendix_rollouts`, still disabled) must show typical and difficult eyes: the Fig. 5.2
   caption now points there for them. Most eyes receive less predicted change than occurs (35 of 48, median
   ratio predicted/true 0.73, folds 0-2, epoch 29).
 - [x] 2026-10-18 **New §5.4 "Differences Between Folds"** (`sec:experiments:folds`, after the ingredient study;
