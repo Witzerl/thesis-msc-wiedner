@@ -41,6 +41,10 @@ clearly object to; mark its rule as `judgement` and say why.
   2026-10-18 (the agreed chapter structure and page budgets).
 - `NOTES.md`: skim for **decisions already taken** (see "Settled decisions" below). Do not take its
   open TODO list as findings; you review the text, not the to-do list.
+- **`reviews/feedback-log.md`, the log of all feedback received and how each item was resolved**
+  (supervisor reviews 1 and 2, the author's tablet reviews, the editorial review). Read it in full;
+  see "Using the feedback log" below. If the file does not exist, say so in the summary and rely on
+  the settled-decisions list alone.
 
 ## Material to review, in this order
 
@@ -148,8 +152,31 @@ not *implement* them correctly.
 - British spelling; the JKU template's layout.
 - The run-in headings of §6.4 stay.
 - Figures 2.1–2.3 are AI-generated drawings with a note in the caption.
-If a decision in `NOTES.md` is marked as decided and you believe it hurts the thesis, list it once in
-the summary under "Decisions worth reconsidering", not as a finding.
+If a decision in `NOTES.md` or the feedback log is marked as decided and you believe it hurts the
+thesis, list it once in the summary under "Decisions worth reconsidering", not as a finding.
+
+## Using the feedback log
+
+The log records, for each piece of feedback, who gave it, what it asked for, and what was done
+about it. Use it in three ways:
+
+1. **Decided items extend the settled-decisions list.** An item resolved as "keep as is",
+   "decided against" or "author's choice" is settled: do not raise it again.
+2. **Resolved items are checked for regressions.** For every item resolved by a change to the
+   text, check that the current text still implements it, since later edits may have undone it.
+   A regression is a finding: severity at least the level the original problem would have today,
+   rule `Feedback log <item ID>`, and `Text:` quoting what the thesis says now.
+3. **Recurrences are marked.** When a new finding is the same kind of problem as an earlier
+   feedback item (e.g. an LLM sentence pattern the supervisor already objected to, a term again
+   used before its definition), add `Recurs: <item ID>` to the finding. Repeat feedback from the
+   supervisor weighs more: raise such a finding one severity level, at most to S2.
+
+Open items in the log (not yet resolved) are not findings in themselves. If the current text still
+shows the problem, report it normally with `Recurs: <item ID>`.
+
+In `00-summary.md`, add a section **"Feedback log check"**: the number of items checked, the list
+of regressions (IDs), and the items whose resolution could not be confirmed in the text (with the
+reason, e.g. "the section was rewritten and the point no longer applies").
 
 ## Procedure
 
@@ -161,12 +188,14 @@ the summary under "Decisions worth reconsidering", not as a finding.
 3. **Chapter passes.** For each chapter (front matter, 1, 2, 3, 4, 5, 6–7, appendices), apply all six
    perspectives. If you can run subagents, give each chapter group to its own agent with the full
    guide and this prompt, and keep the whole-thesis pass separate.
-4. **Verification.** Check every finding before it enters the list (a second agent per chapter, if
+4. **Feedback-log check.** Go through the log item by item as described in "Using the feedback
+   log"; record regressions as findings at their location.
+5. **Verification.** Check every finding before it enters the list (a second agent per chapter, if
    available): the quoted text exists verbatim at the stated line and is not commented out; the
    cited rule says what the finding claims; the item is not a settled decision; the suggested fix
    keeps meaning, hedges, numbers, citations, `\ref`s and the passive-voice rule. Drop what fails;
    merge duplicates (list all reviewers who found it).
-5. **Ordering.** Sort strictly by position: front matter → Ch. 1 → … → Ch. 7 → Appendices A–G →
+6. **Ordering.** Sort strictly by position: front matter → Ch. 1 → … → Ch. 7 → Appendices A–G →
    bibliography; within a section by line. A cross-cutting finding sits at its first occurrence and
    lists the other locations.
 
@@ -198,7 +227,8 @@ Write two files to `reviews/full-review-<YYYY-MM-DD>/`.
    missing.
 6. The terminology table: concept | names used | locations | proposed single name.
 7. Build log: undefined references, undefined citations, overfull boxes above 5 pt, with pages.
-8. Decisions worth reconsidering (if any), each with one sentence of reasoning.
+8. Feedback log check (see "Using the feedback log").
+9. Decisions worth reconsidering (if any), each with one sentence of reasoning.
 
 **`01-findings.md`**, the full sequential list. Start with an index table
 `ID | Location | Severity | Reviewer(s) | One line`, then every finding in this form:
@@ -210,6 +240,7 @@ Rule: Guide §11.4 (intro paragraph with thesis statement)
 Text: "…verbatim, at most two lines…"
 Problem: what is wrong and why it matters to this reader.
 Fix: the concrete change or rewrite.
+Recurs: (feedback-log item ID, if any)
 Status: open
 ```
 
@@ -224,4 +255,18 @@ most serious, and where the files are.
 **Note for use outside this repository.** Attach the PDF and `WRITING_GUIDE.md`; replace
 "file:line" with "page, paragraph n"; skip the build step and the "Read first" files except the
 guide; keep the settled-decisions list in the prompt, since the external model cannot read
-`NOTES.md`.
+`NOTES.md`; attach the feedback log as a file.
+
+---
+
+**Format the review expects for `reviews/feedback-log.md`** (any layout works if these fields are
+there; one row or block per item):
+
+| Field | Example |
+|---|---|
+| ID | SV1-07 (supervisor review 1, comment 7); TAB6-12; ED-5c.11 |
+| Source and date | Supervisor review 1, 2026-10-12 |
+| Location then | §1.3, p. 4 |
+| Feedback | "Why Neural PDE Solvers?" is a poor heading; avoid questions |
+| Resolution | renamed to "Choice of the Modelling Approach" (§2.5.1) |
+| Status | fixed / decided: keep / decided: rejected / open |
