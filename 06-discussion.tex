@@ -110,6 +110,35 @@ nevertheless a more specific statement than a ranking of architectures.
 % 10-25 columns x 5.68 um = 57-142 um; +/-2 columns = 11.4 um; +/-21
 % columns = 119 um (SV-6.2).
 
+The T-FEN is on the verge of being the best operator of the survey. Its
+lead of 0.017 over the dilated-stencil network has almost the same size at
+both seeds and passes the fold-paired test at both, each time just above
+the bar ($z = 2.1$ against 1.96). Of the conditions
+of~\S\ref{sec:experiments:protocol:stats}, it misses a single one, and only
+narrowly: at the first seed its per-eye $t$ is 2.2 against a bar of about
+2.5, while at the second seed it clears that bar with 3.1. A third seed or
+a larger cohort would most likely decide the order. Even so, the lead is
+small next to the effects of the properties themselves: reach and
+transport each raise their operator by more than 0.06, almost four times
+as much. Both arms carry one of these two properties, so for the question
+of this thesis their order matters little.
+% Values: T-FEN - stencil +0.0170 (seed 42, 4/5 folds, 46/75 eyes, t 2.17)
+% / +0.0165 (seed 7, 5/5, 49/75, t 3.14); z = 2.1 at both; leave-one-fold-out
+% never changes sign (App. E). 0.064 / 0.017 = 3.8, 0.062 / 0.017 = 3.6.
+
+The dilated-stencil network nevertheless remains the canonical model, for
+two reasons. First, it trains about four times faster
+(\S\ref{sec:experiments:cost}). Second, it is the reference configuration
+on which the tests of the framework were run: the objective, the time
+handling, the capacity study and the step-size ladder
+(\S\ref{sec:experiments:ablations},
+\S\ref{sec:experiments:validity:swap}). Replacing it would require
+repeating these tests without changing what they show, because none of
+them depends on which of the two operators fills the slot.
+% 2026-10-22 (author): resolves the TODO on the borderline T-FEN; aligned
+% with the canonical-model paragraph of 5.2. Not used as reasons: the
+% chronology, the >3-year bin, numerical delicacy (dropped in 5.2, #57/#58).
+
 More reach does not keep helping. Reaches of $\pm 35$ and $\pm 42$ columns
 score lower than $\pm 21$, the latter beyond the noise level. Widening the
 stencil across rows lowers the score most. Four message-passing rounds
@@ -129,15 +158,6 @@ and after three years it lies above the U-Net
 (\S\ref{sec:experiments:ingredients:global}). This suggests that global
 context matters more for long forecasts than at one year.
 
-% TODO (author, 2026-10-22): add a paragraph that the T-FEN is borderline
-% better than the dilated-stencil network: +0.017 at both seeds, z = 2.1 at
-% both, per-eye t = 3.1 at seed 7 but 2.2 at seed 42, just under the bar of
-% about 2.5 (App. E.3), so very little is missing for it to count as the best
-% operator. Then give the reasoning why the stencil network nevertheless
-% stays the canonical model (cost about 4x lower, reference configuration of
-% the framework ablations, simpler long free-running rollouts; not the
-% chronology). Align with the canonical-model paragraph of 5.2 (review v8
-% #56-#58).
 
 \subsection{Capacity}
 \label{sec:discussion:capacity}

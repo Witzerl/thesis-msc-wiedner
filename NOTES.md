@@ -2365,7 +2365,7 @@ at a time, as dictated by the author.
 - [x] 2026-10-22 Ch. 6/7 marks #106-#116 done (review list). Ledger batch to check: Brandstetter2022 in
   §6.1.4 (new opener: removing the equation features worsens predictions on unseen equations, most when all
   parameters vary), Gigon2021 and Yoshida2025 newly cited in Ch. 7 (same values as §5.8).
-- [ ] TODO (author, 2026-10-22, inline in 06-discussion.tex 6.1.2): paragraph that the T-FEN is borderline
+- [x] (done 2026-10-22: two paragraphs after "Reach and transport" in 6.1.2, author-approved wording; "four criteria" corrected to "the conditions of 5.1.5") TODO (author, 2026-10-22, inline in 06-discussion.tex 6.1.2): paragraph that the T-FEN is borderline
   better than the stencil network (+0.017, misses the per-eye bar only at seed 42) and why the stencil
   network stays canonical anyway; align with 5.2 (#56-#58).
 
