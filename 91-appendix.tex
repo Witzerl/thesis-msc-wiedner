@@ -901,10 +901,7 @@ scaled by $\Delta t$, which the interpolation $\tilde I$ carries back to
 the uniform grid. Both branches are the graph network
 of~\S\ref{sec:method:mppde}, with two message-passing rounds of width 64.
 
-% TODO: cite Bachlechner2021 (ReZero, UAI 2021, arXiv:2003.04887) once the
-% PDF is filed and the entry added to references.bib.
-The gate $\alpha$ is a learnable scalar initialised to zero, the ReZero
-construction of Bachlechner et al. (2021). At the start, the dual model is
+The gate $\alpha$ is a learnable scalar initialised to zero. At the start, the dual model is
 therefore identical to the uniform branch alone, and the correction enters
 the prediction only if training increases $|\alpha|$. In the following,
 the gate is said to open when $|\alpha|$ grows well beyond zero and to stay

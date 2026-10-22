@@ -352,7 +352,7 @@ Being worked through one item at a time.
   values, "tightest null", ReZero author-year, the 2026-08-06 edge fix, v2 parameter counts,
   pool definitions, the probe explanation and the fold-2 probe details. Added from the sources:
   the L-BFGS refinement was not used; the GA monitor is scalar and log-compressed (unlike G.1).
-- [ ] TODO (Appendix G): cite **Bachlechner2021** (ReZero, UAI 2021) -- `% TODO: cite` marker in G.2.2.
+- [x] (removed 2026-10-22: uncited, ReZero mention dropped from G.2.2 (author)) TODO (Appendix G): cite **Bachlechner2021** (ReZero, UAI 2021) -- `% TODO: cite` marker in G.2.2.
 - [ ] TODO (Appendix G): produce Figure `fig:appendix:moved-mesh` (moved mesh over the GA mask,
   2-3 eyes, physical aspect ratio, uniform grid alongside).
 - [x] (superseded 2026-10-19 by the rewrite below) Author to review Appendix G (G.1 was not
@@ -1088,7 +1088,7 @@ AI-tone mitigation; citations, references, formatting and numbers excluded). The
 2026-10-01 (every chapter "AI Generated", 67-89 % of words flagged, including 82 % of the plain
 Ch. 3) were used as pointers, not as evidence. Advisory only: no `.tex` file was changed.
 English abstract, Ch. 1-7 and App. A-G were reviewed; the German Kurzfassung was not.
-- [ ] Author to work through `reviews/editorial-2026-10-01/`: `00-overview.md` (macro feedback,
+- [x] (2026-10-22, author: addressed) Author to work through `reviews/editorial-2026-10-01/`: `00-overview.md` (macro feedback,
   fix-first list, structure S1-S25, transitions T1-T13, repetition R1-R17, reader-lost points,
   terminology table, AI-tone patterns P1-P14, rules of thumb) and 14 micro files with 544 verified
   items (15 high, 277 medium, 252 low), each with `file:line`, GPTZero label and a suggested
@@ -1130,29 +1130,29 @@ English abstract, Ch. 1-7 and App. A-G were reviewed; the German Kurzfassung was
   happened" (true vs predicted), "purely global" (= global only), "clearly exceeds" (the
   criterion) and "clearly above zero" (interval excludes zero). The two "cut the sentence"
   items (4a.4, 5b.26) are left for the author.
-- [ ] Status of all 544 review items after the one-word pass: **fixed 32** (15 high, 4 medium,
+- [x] (2026-10-22, author: the editorial review is addressed) Status of all 544 review items after the one-word pass: **fixed 32** (15 high, 4 medium,
   13 low; incl. 4a.7 "arm" now defined); **partly addressed 21** (adverb removed, rest of the
   rewrite still open: 1.20, 1.25, 1.36, 2a.13, 2a.16, 2b.23, 2b.27, 2b.29, 2b.30, 2b.35, 2b.42,
   4a.10, 5b.19, 5c.5, G.1, G.3, G.4, G.5, G.6, G.8, G.9); **changed since the review, mostly by
   the author's own passes, 64** (37 medium, 27 low; check whether still needed); **open 427**
   (219 medium, 208 low). Open medium by kind: 81 flow, 59 clarity+tone, 48 clarity, 31 tone
   only. Status per item: session scratchpad `category_final.json` (not in the repo).
-- [ ] Contradictions and dead pointers found (review S4, S5, S9, S22): §1.2 promises the
+- [x] (2026-10-22, author: already addressed) Contradictions and dead pointers found (review S4, S5, S9, S22): §1.2 promises the
   covariates are "tested in this thesis" (the test is commented out, §6.3 says unsettled);
   layer channels "not auxiliary" (§2.1.5) vs "auxiliary targets" (§3.2, §4.2.2, §4.5.1); the Fig.
   2.2 caption maps strata onto the ten channels although the boundary names are unknown; §2.1.1
   points to §1.2 for subfoveal significance (it is §1.1); §3.7 promises fold heterogeneity is
   "revisited in §5.1" (it is not). The mask-provenance contradiction §2.1.2 vs §3.1 is the open
   FACT CHECK item of 2026-09-25 (review 2a.17).
-- [ ] Wording that changes a result's reading (review 5d.4, 5d.16, 5d.23, 4b.25, 5c.11): C2
+- [x] (2026-10-22, author: already addressed) Wording that changes a result's reading (review 5d.4, 5d.16, 5d.23, 4b.25, 5c.11): C2
   criterion "by step or by order" lets the RK4 arm fail; "Its accuracy" in §5.5.2 reads as seed 7;
   Pearson r described as checking scale; T-FEN transport mesh reads as one subsampled mesh; the
   objective-test opener says each run changes one part (the first changes two).
-- [ ] Terms used before definition or with several meanings: arm (never defined), canonical
+- [x] (2026-10-22, author: already addressed) Terms used before definition or with several meanings: arm (never defined), canonical
   (fold / normalisation / age mode / model), "the same deficit" (abstract, §1.3; defined §5.3.5),
   window (crop vs visit pair), floor, anchor, late epochs. Review suggests one definitions
   paragraph at the end of §4.1.
-- [ ] Structural suggestions to decide (review S2, S3, S7, S12): research-question mapping (Ch. 4
+- [x] (2026-10-22, author: already addressed) Structural suggestions to decide (review S2, S3, S7, S12): research-question mapping (Ch. 4
   never names sub-question 1; the framework evidence is in §5.4); §5.4 "Negative Results" holds
   the clearest positive framework result (§5.4.2); framework spread over §4.2/§4.4/§4.5; §5.6
   "Qualitative Analysis" contains only the Mai comparison. Repetition across chapters R1-R17
@@ -1235,7 +1235,7 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
   fovea-to-disc distance (disc then ~2.0 x 2.5 mm). Output `images/fig_bg_eye_anatomy.pdf`, printed at
   135 mm. Caption rewritten (schematic, AI-generated, labels added by the author); the Commons
   images, their SOURCES.md and the two old panel PNGs were removed.
-- [ ] TODO (Fig. 2.1 inline): JKU declaration of AI-generated figures -- supervisor asked, answer
+- [x] (2026-10-22: institute rule (any tool, author responsible, LLM content reviewed and declared); the caption label suffices; TODO comments removed) TODO (Fig. 2.1 inline): JKU declaration of AI-generated figures -- supervisor asked, answer
   pending; check the image tool's terms. Both drawings confirmed as ChatGPT (author, 2026-10-16).
 - [x] 2026-10-16 Fig. 2.1 sources added and cited in the caption: **Koksaldi2025** (Koksaldi, Kayabasi,
   Karti & Saatci, "Clinical anatomy of the macula", Med Hypothesis Discov Innov Ophthalmol 14(2):17-27,
@@ -1257,7 +1257,7 @@ Planned in the text (9 placeholders + 2 appendix chapters), in working order:
   caption/footnote, AI chatbots are "documentation-required", the sworn declaration for master
   theses follows the examinations office (the template notes it is now part of the submission
   process). Fig. 2.1 already carries the note in the caption. Supervisor asked (author, 2026-10-16).
-- [ ] Decide (after the supervisor's answer) whether the thesis needs a general statement on AI tools
+- [x] (2026-10-22, author: labelling the generated figures is enough) Decide (after the supervisor's answer) whether the thesis needs a general statement on AI tools
   used (image generation for Figs. 2.1-2.3, writing and coding assistants), e.g. in the front matter
   or the methods chapter.
 - [ ] Author to review Fig. 2.1 on page 5 (label choice: ciliary body, iris, cornea, lens, sclera,
@@ -1672,7 +1672,7 @@ polished to near perfection; do a prerequisite audit (every medical term defined
 opening chapter = medical background → PDEs and solvers (no GA) → motivation → formal problem
 statement with notation and equations → outline; no question in headings ("Why Neural PDE
 Solvers?"); contributions back as bullet points. He offers a meeting.
-- [ ] Ask the supervisor: "neural solver" (PDF) vs "parametric neural operator" (e-mail).
+- [x] (2026-10-22, author: no longer needed) Ask the supervisor: "neural solver" (PDF) vs "parametric neural operator" (e-mail).
 - [ ] **Reply mail to the supervisor -- points to mention:** (1) "operator" is kept but now defined
   once (first use in 1.2: "In this thesis, this map is called the operator"; formal definition in
   2.5.2: general sense, a map from one state to a later one, not the narrow neural-operator sense of
@@ -2413,10 +2413,31 @@ at a time, as dictated by the author.
 - [x] (fixed 2026-10-22: caption back to "the full cohort from which the data here are drawn") Cohort wording is inconsistent: after SV-3.1, §2.4 and §3.1 say the data are the Mai et al.
   (2024) cohort with tighter registration and cleaner segmentations, but `238a8bc` (2026-10-22) set the
   horizon-figure caption to "a larger cohort of the same clinic" (`05-experiments.tex:806`). Pick one.
-- [ ] Open AI items in Appendices A-F (A.1, A.3, A.6-A.11, A.13, A.14; neither supervisor review
+- [x] (2026-10-22, author: already addressed) Open AI items in Appendices A-F (A.1, A.3, A.6-A.11, A.13, A.14; neither supervisor review
   covered the appendices) and G.40; structural items still open: S13/R15 (shrinkage quantified only in
   §6.3), T7 (Ch. 7 re-runs §6.1), T13 (Appendices B and C empty, App. E titled "Ablation Details"),
   R11, R16, the 365.25 footnote of S24.
+
+### Open-item sweep and hand-in details (2026-10-22)
+
+- [x] 2026-10-22: open TODOs reviewed with the author; settled items ticked above. Title page:
+  degree "Artificial Intelligence" and "Institute for Machine Learning" confirmed, `\date{2026-10-22}`
+  set. Removed as settled: the ReZero mention (uncited), the AI-figure, device, spacing, baseline-table,
+  layer-name and window-count TODO comments. Table `tab:data:splits` now lists windows per partition.
+  The author decided: neural-solver wording, SV-4.4, drugs in 1.1 and the layer names need no mail;
+  the editorial review and the appendix AI items are addressed; the experiments of the open list are
+  optional and most likely not run.
+- [ ] **Hand-in file name** (institute convention:
+  `<year-semester>-<Matriculation_number>-<Lastname>_<Firstname>-<report>-<version>-<short title>.pdf`,
+  hand-in semester, version counting from v1, short title at most three words):
+  `26WS-K52001455-Wiedner_Christian-Thesis_MSc-v1-GA_Progression_Prediction.pdf`. Copy the final
+  PDF/A build to this name at hand-in (the build keeps producing `main-thesis.pdf`). Short title to be
+  confirmed by the author.
+- [ ] Reply mail to the supervisor, remaining points: how MUW assigned the fold split files; SV-4.2
+  (moving mesh into the main text?); SV-5.12 (post-hoc step-size ladder enough?); final thesis title.
+- [ ] Empty Appendices B (Extended Derivations) and C (Full Hyperparameters): fill or drop. Appendix A
+  still has the TODO for demographic tables, Appendix E the TODO "full tables for every ablation sweep"
+  (it already holds the border/interior, criteria, statistics, step-ladder and growth-speed tables).
 
 ### Assets that now exist and should be reused
 
@@ -2443,7 +2464,7 @@ at a time, as dictated by the author.
 
 - [ ] A plain **RNN** and a **transformer** baseline remain unrun (`--backbone` offers
   `gnn`/`unet`/`fno`/`gunet`/`anisognn`/`fen`). The supervisor asked for the RNN.
-- [ ] A **cohort-level baseline-area distribution table** comparable to Mai et al. 2024 is
+- [x] (2026-10-22, author: not needed) A **cohort-level baseline-area distribution table** comparable to Mai et al. 2024 is
   still missing for the data chapter; growth-rate statistics exist (median √area growth
   0.234 mm/yr, IQR 0.153–0.340, p90 0.473 over 75 eyes).
 - [x] (superseded 2026-10-01: matched control run; reported T-FEN is the stable skew form) The **T-FEN transport term has no matched-capacity control** (a width-≈139 control
@@ -2509,10 +2530,10 @@ Pulled from the code repository (`masterthesis-docker/NOTES.md` + `PROJECT_CONTE
 ### Title page / metadata (`main-thesis.tex`)
 
 - [ ] TODO: finalize thesis title with supervisor (current working title: "Neural PDE Solvers for Geographic Atrophy Progression Prediction from Longitudinal OCT Imaging").
-- [ ] TODO: fill in author name, academic prefix/suffix, and matriculation number on the title page.
-- [ ] TODO: confirm exact JKU degree program name (currently placeholder "Artificial Intelligence").
-- [ ] TODO: confirm submitting JKU institute (currently placeholder "Institute for Machine Learning").
-- [ ] TODO: set submission date once known.
+- [x] (2026-10-22: Christian Wiedner, K52001455 on the title page; TODO comment removed) TODO: fill in author name, academic prefix/suffix, and matriculation number on the title page.
+- [x] (2026-10-22, author: Artificial Intelligence is right) TODO: confirm exact JKU degree program name (currently placeholder "Artificial Intelligence").
+- [x] (2026-10-22, author: Institute for Machine Learning is right) TODO: confirm submitting JKU institute (currently placeholder "Institute for Machine Learning").
+- [x] (2026-10-22: \date{2026-10-22} set (author)) TODO: set submission date once known.
 
 ### Front matter
 
@@ -2649,7 +2670,7 @@ Pulled from the code repository (`masterthesis-docker/NOTES.md` + `PROJECT_CONTE
 - [x] (done 2026-10-16 with Wikimedia Commons images, see the Figure plan) TODO: produce Figure `fig:bg:eye-anatomy` placed in `02-background.tex` §2.1.1 -- two-panel anatomy reference for ML readers without clinical background: (left) sagittal cross-section of the human eye labelling cornea, lens, vitreous body, retina, fovea, optic-nerve head (ONH) / optic disc, optic nerve, choroid, sclera, with the macular region highlighted on the retina near the posterior pole; (right) en-face fundus view of the posterior pole labelling macula (~6 mm-wide central region), fovea (central pit), foveola (innermost ~0.35 mm of the fovea), parafovea (~0.5--1.5 mm eccentric ring), perifovea (~1.5--3 mm eccentric ring), and ONH / optic disc (~4 mm nasal to the fovea). Overlay the 6 x 6 mm OCT scanning window used by the thesis cohort as a dashed square centred on the fovea. Currently rendered as an `\fbox` placeholder pending a real graphic.
 - [x] (done 2026-10-16, see the Figure plan) TODO: produce Figure `fig:bg:retinal-anatomy` placed in `02-background.tex` §2.1.2 (formerly §2.1.1) -- two-panel schematic for readers without a clinical background: (left) labelled cross-section through a healthy macula showing the principal retinal layers from ILM through RNFL, GCL+IPL, INL+OPL, ONL, photoreceptor IS/OS bands (including the ellipsoid zone), RPE, and Bruch's membrane, with the choriocapillaris immediately beneath; (right) a representative OCT B-scan through a GA-affected macula highlighting the dropout of the outer-retinal layers within the lesion and the corresponding choroidal hypertransmission signature beneath. Mirror the channel ordering of the eleven-channel state tensor used in the thesis. Currently rendered as an `\fbox` placeholder pending a real graphic.
 - [x] (done 2026-10-16, two panels instead of four) TODO: produce Figure `fig:bg:oct-acquisition` placed in `02-background.tex` §2.1.3 -- four-panel schematic of OCT acquisition geometry intended to anchor the geometric vocabulary (A-scan, B-scan, volume, en-face) for ML readers without imaging background: (a) eye + single probe beam + inset depth-vs-reflectivity profile of one A-scan; (b) the same with the beam scanned laterally along one axis to form a B-scan; (c) the beam scanned in both lateral directions to form a 3D volume with the 6 x 6 mm physical footprint annotated (do NOT annotate a fixed voxel count -- native shapes vary per eye: 38-66 B-scans x 961-1719 A-scans, 67 distinct shapes); (d) the volume projected axially onto the fundus plane to yield the 49 x 1024 en-face image used by the model, with a representative GA lesion visible as a region of altered signal. Currently rendered as an `\fbox` placeholder pending a real graphic.
-- [ ] TODO: confirm with supervisor the exact provenance of the eleven state-tensor channels in the MUW cohort (mask: manual grading vs trained network vs combination; layer boundaries: which segmentation algorithm, which boundary list, which post-processing) before drafting `03-data.tex` §3.1. The §2.1.4 text is currently agnostic of those details so it does not need to be revisited once the answer is in hand.
+- [x] (2026-10-22: FAF mask confirmed (SV-6.7), layers = Iowa, names confirmed) TODO: confirm with supervisor the exact provenance of the eleven state-tensor channels in the MUW cohort (mask: manual grading vs trained network vs combination; layer boundaries: which segmentation algorithm, which boundary list, which post-processing) before drafting `03-data.tex` §3.1. The §2.1.4 text is currently agnostic of those details so it does not need to be revisited once the answer is in hand.
 
 ### Chapter 3 - Data and Preprocessing (`03-data.tex`)
 
@@ -2695,10 +2716,10 @@ Pulled from the code repository (`masterthesis-docker/NOTES.md` + `PROJECT_CONTE
     §3.7 "Splits and Cross-Validation"; all labels unchanged. The false "99 % / periphery
     irrelevant" placeholder TODO was replaced, not preserved; the string appears nowhere in
     the chapter.
-- [ ] TODO: confirm the device model (Heidelberg Spectralis) with the MUW data provider.
+- [x] (2026-10-22, author: confirmed; TODO comment removed) TODO: confirm the device model (Heidelberg Spectralis) with the MUW data provider.
   §3.1 currently reports it as an inference from Mai et al. (2024); the data records only
   vendor, scan mode and study identifier.
-- [ ] TODO: settle the constant-spacing assumption (~2 % deviation against the visits' own
+- [x] (2026-10-22, author: kept as an assumption (stated in 6.3); TODO comment removed) TODO: settle the constant-spacing assumption (~2 % deviation against the visits' own
   transform files) from the DICOM spacing fields. Marked inline in §3.1; also mirrored in
   §2.1.6.
 - [x] (done 2026-10-20) TODO: produce Figure `fig:data:example-state` in §3.1 -- (a) SLO fundus image with
@@ -2709,11 +2730,11 @@ Pulled from the code repository (`masterthesis-docker/NOTES.md` + `PROJECT_CONTE
 - [x] (obsolete 2026-09-27, table removed in review #2 of §3.4-§4.3) TODO: fill Table `tab:data:norm-stats` (§3.4) -- per-channel mean/std of the ten layer
   channels from `meta["norm_params"]` of the canonical fold (split 2) precompute. Means
   should rise monotonically from ~137 to ~204 axial px.
-- [ ] TODO: record the training/validation window counts for folds 0, 1, 3 and 4 (§3.7);
+- [x] (2026-10-22: counted from scans + split files (fold 2 reproduces 378/100); added as columns to Table tab:data:splits) TODO: record the training/validation window counts for folds 0, 1, 3 and 4 (§3.7);
   only fold 2 (378 / 100) is known.
 - [ ] TODO: keep every later chapter free of "test set" wording -- §3.7 states that the test
   split is structurally empty and every result is a validation result.
-- [ ] TODO: the anatomical names of the ten layer boundaries (§3.2 inline TODO) and the
+- [x] (2026-10-22: names in 3.2 (supervisor, review 2); baseline table not needed (author); TODO comments removed) TODO: the anatomical names of the ten layer boundaries (§3.2 inline TODO) and the
   cohort-level baseline lesion-area table (§3.1 inline TODO) remain open; both are also
   tracked in the 2026-09-17 sync section above.
 

@@ -76,7 +76,7 @@ the near-infrared image, together with the GA mask on the modelling
 grid and a layer-boundary depth map.
 % FAF origin of the mask confirmed by the supervisor (review 2, 2026-10-17,
 % SV-6.7: "it was"). Layer segmentation: Iowa Reference Algorithms (3.2).
-% TODO: confirm the device model (Spectralis) with the MUW data provider.
+% Device model (Spectralis) taken as confirmed (author, 2026-10-22).
 
 The native en-face grids do not all have the same size. The 553 visits have 67
 distinct grid shapes, with 38 to 66 rows and 961 to 1719 columns. The
@@ -89,11 +89,8 @@ en-face arrays were resampled onto one common pixel spacing:
 constant across the cohort. Pixel counts differ between eyes, and so does
 the physical extent of each native grid.
 
-% TODO: settle the constant-spacing assumption by obtaining the original
-% DICOM spacing fields from the data provider. (The paragraph stating it
-% as an assumption was removed at the author's request, review #27,
-% 2026-09-26; the preceding paragraph still says spacing is "treated as"
-% constant, and the ~2 % check belongs in the Limitations, §6.3.)
+% Constant spacing is kept as an assumption (author, 2026-10-22); the ~2 %
+% check against the visits' own transforms is stated in the Limitations, 6.3.
 
 Lesion growth is summarised as the yearly change in the square root of
 the lesion area, a transform used for GA because it removes the dependence
@@ -108,8 +105,6 @@ distributions are shown in Appendix~\ref{app:dataset}
 % Quantiles are order-statistic (nearest-rank) quantiles; linear
 % interpolation gives 0.157-0.337 / 0.461 mm per year and 2.41-9.42 mm^2.
 % Source: images/scripts/fig_appendix_cohort.py, 2026-10-01.
-% TODO: a baseline-characteristics table in the format of Mai et al. (2024)
-% (if wanted for the comparison in 5.5.1).
 
 % Figure fig:data:example-state: images/scripts/fig_data_example_state.py
 % (read-only source data/MUW_GA/scans/PEAT0058_OD/360/). Eye chosen by the
@@ -208,10 +203,8 @@ layer structure of the retina at every en-face position. Across the
 cohort, the raw depth values range from $-14$ to $499$ axial pixels,
 where 0 is the top of the scan volume and 496 its nominal depth.
 
-% TODO: obtain the anatomical names of the ten layer-boundary surfaces
-% from the MUW segmentation-pipeline documentation.
 % Provenance of channels 1-10: Iowa Reference Algorithms (supervisor
-% review 1, SV-3.4); boundary list and post-processing still to confirm.
+% review 1, SV-3.4); boundary names confirmed by the supervisor (see above).
 
 Retinal thickness, the distance between the deepest and the shallowest
 boundary, is not computed anywhere in this pipeline. It could be
@@ -459,29 +452,32 @@ eyes; Table~\ref{tab:data:splits} lists them. The folds also differ in
 baseline lesion size. The median baseline lesion area is about
 4.1\,mm$^2$ on fold~4, against 6.0 to 7.9\,mm$^2$ on the other four folds.
 This heterogeneity is one reason why arms are compared fold by fold
-(\S\ref{sec:experiments:protocol}). On fold~2, the split yields 378
-training windows and 100 validation windows.
-% TODO: record the training and validation window counts for folds 0,
-% 1, 3 and 4.
+(\S\ref{sec:experiments:protocol}). The table also gives the number of
+windows, pairs of consecutive visits, in each partition.
+% Window counts (2026-10-22): sum over the partition's eyes of (visits - 1),
+% from masterthesis-docker/data/MUW_GA/scans and splits/split_*.json; fold 2
+% reproduces the recorded 378 / 100, and the validation counts of folds 0-2
+% match the step-ladder intervals (135 / 65 / 100). Total 478 = 553 - 75.
 
 \begin{table}[h]
   \centering
   \caption[Patients and eyes per cross-validation fold.]{%
-    Number of training and validation patients and eyes in each of the
-    five cross-validation folds. The split is made at the patient level, so
-    both eyes of a patient always fall into the same partition.}
+    Number of training and validation patients, eyes and windows (pairs of
+    consecutive visits) in each of the five cross-validation folds. The
+    split is made at the patient level, so both eyes of a patient always
+    fall into the same partition.}
   \label{tab:data:splits}
-  \begin{tabular}{lrrrr}
+  \begin{tabular}{lrrrrrr}
     \toprule
-    & \multicolumn{2}{c}{Training} & \multicolumn{2}{c}{Validation} \\
-    \cmidrule(lr){2-3} \cmidrule(lr){4-5}
-    Fold & Patients & Eyes & Patients & Eyes \\
+    & \multicolumn{3}{c}{Training} & \multicolumn{3}{c}{Validation} \\
+    \cmidrule(lr){2-4} \cmidrule(lr){5-7}
+    Fold & Patients & Eyes & Windows & Patients & Eyes & Windows \\
     \midrule
-    0 & 38 & 55 & 13 & 20 \\
-    1 & 42 & 63 &  9 & 12 \\
-    2 & 40 & 59 & 11 & 16 \\
-    3 & 41 & 60 & 10 & 15 \\
-    4 & 43 & 63 &  8 & 12 \\
+    0 & 38 & 55 & 343 & 13 & 20 & 135 \\
+    1 & 42 & 63 & 413 &  9 & 12 &  65 \\
+    2 & 40 & 59 & 378 & 11 & 16 & 100 \\
+    3 & 41 & 60 & 386 & 10 & 15 &  92 \\
+    4 & 43 & 63 & 392 &  8 & 12 &  86 \\
     \bottomrule
   \end{tabular}
 \end{table}
