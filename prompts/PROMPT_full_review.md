@@ -143,6 +143,10 @@ and is the clinical framing careful?"*
   capitalisation of headings and hyphenation consistent.
 - A mechanical issue that recurs within a unit is reported **once**, with the count in the problem
   and up to five other locations in "also at". (The thesis-wide sweep lists all locations.)
+- **The same format in every chapter**: chapter openings and closings, section intros and
+  conclusions, headings, cross-reference forms, citations, numbers and units, captions, tables,
+  figures and equations follow one convention throughout. The per-unit copy editor checks its own
+  unit; two thesis-wide format passes compare the chapters with each other.
 
 ## Severity
 
@@ -240,8 +244,9 @@ piece of feedback with its ID, the problem, the fix, and a status: *Done*, *Deci
    agent; then up to two completeness rounds (a fresh agent reports what the six missed, until a
    round finds fewer than three new problems); then a merge of duplicates.
 3. **Whole thesis** (in parallel with 2). Structure and argument; consistency of facts and
-   definitions across chapters; consistency of numbers (four parts); a thesis-wide sweep for
-   recurring mechanical patterns; the regression check over all *Done* feedback items in batches of
+   definitions across chapters; consistency of numbers (four parts); consistency of format across
+   chapters (text conventions, and figures, tables and equations), each returning the convention
+   and its deviations; a thesis-wide sweep for recurring mechanical patterns; the regression check over all *Done* feedback items in batches of
    20; after the units, the prerequisite ledger, the terminology table and the acronym list.
 4. **Verify.** Every finding is judged by three independent lenses: *text* (quote exists and is
    printed, correct line, printed page, fix preserves facts), *rule* (rule real and applicable, not
@@ -272,11 +277,14 @@ In `reviews/full-review-<YYYY-MM-DD>/`: `00-summary.md`, `01-findings.md`, and t
 5. The prerequisite ledger: every medical and imaging term, and every term explained late or never
    (term | first use | explained | status); a count for the rest.
 6. The terminology table: concept | names used | locations | proposed single name.
-7. Build log: undefined references, undefined citations, overfull boxes above 5 pt, with pages.
-8. **Feedback log check**: items checked and their outcome, regressions (log ID → finding ID), items
+7. **Format conventions**: for each aspect (chapter openings and closings, headings,
+   cross-references, numbers and units, captions, tables, figures, equations, …) the convention the
+   thesis follows in most places, the number of deviations and where they are.
+8. Build log: undefined references, undefined citations, overfull boxes above 5 pt, with pages.
+9. **Feedback log check**: items checked and their outcome, regressions (log ID → finding ID), items
    whose resolution could not be confirmed (with the reason), deferred items still visible.
-9. Decisions worth reconsidering (if any), each with one sentence of reasoning.
-10. Coverage: units, passes, verification batches or writes that failed, and how many findings
+10. Decisions worth reconsidering (if any), each with one sentence of reasoning.
+11. Coverage: units, passes, verification batches or writes that failed, and how many findings
     could not be fully verified.
 
 **`01-findings.md`**, the full sequential list: an index table
@@ -500,6 +508,17 @@ const THEMES = {
     reconsider: { type: 'array', items: { type: 'object', properties: { decision: { type: 'string' }, reason: { type: 'string' } }, required: ['decision', 'reason'] } },
   },
   required: ['merges', 'crossCutting', 'fixFirst', 'reconsider'],
+}
+const FORMAT_RESULT = {
+  type: 'object',
+  properties: {
+    verdict: { type: 'string' }, findings: { type: 'array', items: FINDING }, reconsider: { type: 'array', items: { type: 'string' } },
+    conventions: { type: 'array', items: { type: 'object', properties: {
+      aspect: { type: 'string' }, convention: { type: 'string', description: 'the form used in most places, or the form the rules require' },
+      deviations: { type: 'integer' }, where: { type: 'string', description: 'chapters or file:line of the deviations, "" if none' },
+    }, required: ['aspect', 'convention', 'deviations', 'where'] } },
+  },
+  required: ['verdict', 'findings', 'reconsider', 'conventions'],
 }
 const PARAS = {
   type: 'object',
@@ -790,15 +809,17 @@ const MACRO = [
   { key: 'numbers-b', reviewers: ['External reviewer', 'Examiner'], prompt: () => numbersPrompt('§5.9 Summary and the result statements of §5.2 (05-experiments.tex)') },
   { key: 'numbers-c', reviewers: ['External reviewer', 'Examiner'], prompt: () => numbersPrompt('Chapter 6 (06-discussion.tex)') },
   { key: 'numbers-d', reviewers: ['External reviewer', 'Examiner'], prompt: () => numbersPrompt('Chapter 7 (07-conclusion.tex)') },
+  { key: 'format-text', reviewers: ['Copy editor', 'Examiner'], schema: FORMAT_RESULT, prompt: () => `Task: consistency of format ACROSS chapters (the per-unit reviewers only see one unit). Compare all chapters, the front matter and the appendices, with grep and by reading the chapter openings and closings, for these aspects: (1) chapter openings (does every chapter open with the same kind of paragraph, e.g. purpose plus a map of its sections?) and closings (summary or bridge to the next chapter: the same pattern everywhere?); (2) section intros and conclusions (Guide §11.4) as a pattern across chapters, not per section; (3) headings: capitalisation style, length, depth of nesting, numbering, no question marks, run-in \\paragraph headings; (4) cross-references: Section~\\ref vs \\S\\ref vs "Sec.", Chapter/Figure/Table/Equation vs "Fig."/"Tab."/"Eq.", non-breaking spaces before \\ref and \\cite, capitalised "Table 5.1"; (5) citations: \\citet/\\citep use (CLAUDE.md), placement before or after punctuation; (6) numbers and units: decimal places for the same kind of quantity (e.g. Dice to three decimals), thousands separators (67,147), ± and spacing, percentages, µm vs mm, \\times, en-dash ranges, numerals vs words for small numbers; (7) quotation marks, emphasis (\\emph vs \\textbf), lists (itemize vs enumerate, punctuation at item ends), abbreviations (defined once, then always used), British spelling, hyphenation of compounds. For each aspect return the convention (the form used in most places, unless a rule in WRITING_GUIDE.md or CLAUDE.md requires another) and the number of deviations. Report each group of deviations from one convention as ONE finding at its first location, with ALL other locations in "alsoAt" (file:line list). Set "persona" to "Copy editor" or "Examiner". verdict: 2-3 sentences on how uniform the format is.` },
+  { key: 'format-floats', reviewers: ['Copy editor', 'Supervisor'], schema: FORMAT_RESULT, prompt: () => `Task: consistency of figures, tables and equations ACROSS the whole thesis. Read every \\begin{figure}, \\begin{table} and displayed equation in all chapter files, and look at the rendered pages of ${WORK}/build/main-thesis.pdf where the look matters (you may open PDF pages with the Read tool). Aspects: (1) captions: same structure everywhere (a short title, then the details needed to read the float, Guide §5.2), self-contained (CLAUDE.md), ending punctuation, what "±" means stated where it is used ("mean ± sd over the five folds"), caption length; (2) caption position (table captions above, figure captions below, or whatever the majority does) and label placement; (3) tables: rule style (booktabs or not), alignment of numeric columns, decimal places, units in the header, bold or marking of best values, notes and footnotes, width within the text block; (4) figures: consistent sizes for figures of the same kind, fonts and colours following style/ (palette of style/README.md; one colour per arm everywhere), panel labels (a)/(b) and how captions refer to them; (5) every float referred to in the text before or near where it appears, and in the order of numbering; (6) equations: punctuation after displayed equations, numbering only where referred to later (CLAUDE.md), notation consistent with §2.5.2; (7) placeholder or disabled figures still printed. For each aspect return the convention and the number of deviations. Report each group of deviations as ONE finding at its first location, with ALL other locations in "alsoAt". Set "persona" to "Copy editor" or "Supervisor". verdict: 2-3 sentences on how uniform the floats are.` },
   { key: 'mechanics', reviewers: ['Copy editor'], prompt: () => `Task: thesis-wide sweep for recurring mechanical issues (Guide §1, §2.7, §3, §4, §6, §11.5) over the printed text of all chapter files, with grep (skip comment lines). For each pattern that occurs more than twice in the thesis, report ONE cross-cutting finding: the count in "problem", the first occurrence as file, line and quote, and ALL other locations in "alsoAt" as a list of file:line without quotes. Patterns at least: sentences starting with And/But/So/Because; contractions; get; vague quantities; prove/disprove for results; "it can be seen", "it is shown that"; "the fact that"; "in order to"; e.g./i.e. outside brackets; em-dash asides (---); "data is"; sentence-final too/also/though/yet; emphatic adverbs (crucially, fundamentally, entirely, clearly, simply, actually, naturally, notably); the LLM patterns of Guide §11.5 ("not X but Y", "X, not Y", "What ... is that ...", "is not what decides"); American spellings (-ize, -yze, color, behavior, modeling); mixed µm/mm for the same kind of quantity; inconsistent hyphenation of one compound (e.g. change-region / change region); \\cite instead of \\citet/\\citep. Set "persona" to "Copy editor". verdict: the counts in one or two sentences.` },
 ]
 
 async function runMacro(m) {
-  const r = await agent(`${BASE}\n\n${RULES}\n\n${supBlock}\n\n${m.prompt()}`, { label: `whole:${m.key}`, phase: 'Whole thesis', schema: FIND_RESULT })
+  const r = await agent(`${BASE}\n\n${RULES}\n\n${supBlock}\n\n${m.prompt()}`, { label: `whole:${m.key}`, phase: 'Whole thesis', schema: m.schema || FIND_RESULT })
   if (!r) { FAILS.push(`whole-thesis pass "${m.key}" failed`); return null }
   const fs = r.findings.map(f => ({ ...f, reviewers: [personaOf(f, m.reviewers[0])] }))
   const v = await verify(`whole:${m.key}`, 'the whole thesis', fs)
-  return { key: m.key, verdict: r.verdict, reconsider: r.reconsider || [], findings: v.map(f => ({ ...f, unit: 'whole' })) }
+  return { key: m.key, verdict: r.verdict, reconsider: r.reconsider || [], conventions: r.conventions || [], findings: v.map(f => ({ ...f, unit: 'whole' })) }
 }
 
 const REG_ITEMS = FB.filter(it => it.status === 'fixed')
@@ -1050,7 +1071,16 @@ const summaryText = [
   '|---|---|---|---|',
   ...((led && led.terminology) || []).map(t => `| ${cell(t.concept)} | ${cell(t.names.join(' / '))} | ${cell(oneLine(t.locations, 200))} | ${cell(t.proposed)} |`),
   '',
-  '## 7. Build log',
+  '## 7. Format conventions',
+  '',
+  'The conventions the thesis follows in most places (or that the rules require), and how often a chapter departs from them. Each group of deviations is one finding in 01-findings.md.',
+  '',
+  '| Aspect | Convention | Deviations | Where |',
+  '|---|---|---|---|',
+  ...macroOk.filter(m => m.key.startsWith('format')).flatMap(m => m.conventions).map(c => `| ${cell(oneLine(c.aspect, 80))} | ${cell(oneLine(c.convention, 200))} | ${c.deviations} | ${cell(oneLine(c.where, 200))} |`),
+  ...(macroOk.some(m => m.key.startsWith('format')) ? [] : ['| (the format passes failed) | | | |']),
+  '',
+  '## 8. Build log',
   '',
   build ? `PDF ${build.ok ? 'built' : 'not built'}, ${build.complete ? 'complete' : 'incomplete'}, ${build.pdfPages} pages, ${build.minutes} min.` : 'The build step failed.',
   '',
@@ -1058,7 +1088,7 @@ const summaryText = [
   '|---|---|---|---|',
   ...((build && build.problems) || []).map(p => `| ${p.kind} | ${normFile(p.file)}:${p.line} | ${cell(p.page)} | ${cell(oneLine(p.detail, 200))} |`),
   '',
-  '## 8. Feedback log check',
+  '## 9. Feedback log check',
   '',
   `${FEEDBACK}: ${FB.length} items parsed; ${REG_ITEMS.length} done items checked: ${tally}.`,
   '',
@@ -1076,11 +1106,11 @@ const summaryText = [
   '',
   ...deferred.map(it => `- ${it.id}: ${oneLine(it.feedback, 200)}`),
   '',
-  '## 9. Decisions worth reconsidering',
+  '## 10. Decisions worth reconsidering',
   '',
   ...((TH.reconsider || []).length ? TH.reconsider.map(r => `- **${oneLine(r.decision, 150)}.** ${oneLine(r.reason, 300)}`) : ['None.']),
   '',
-  '## 10. Coverage',
+  '## 11. Coverage',
   '',
   `${coverage.units}; whole-thesis passes ${coverage.wholeThesisPasses}; feedback log ${coverage.feedbackItems}. ${DROPPED} findings were dropped by verification; ${UNVERIFIED} were kept although a verifier failed.`,
   '',
