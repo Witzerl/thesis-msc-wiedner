@@ -91,7 +91,7 @@ print(f"  {'all values match' if not nbad else f'{nbad} MISMATCHES'}")
 # standard deviation of log10 error (author 2026-10-21: the five lines per form were too cluttered).
 # Non-finite epoch values would be dropped from that epoch's mean; there are none (checked above).
 assert not nonfinite
-STY = {"galerkin": dict(col=pal.FOLD_TFEN[2], ls=(0, (3, 1.5)), label="Galerkin form"),
+STY = {"galerkin": dict(col=pal.FOLD_TFEN[4], ls=(0, (3, 1.5)), label="Galerkin form"),
        "skew": dict(col=ARM["tfen"], ls="-", label="energy-conserving form")}
 fig, axes = plt.subplots(1, 2, figsize=pal.fig_size(1.0, 0.40), sharey=True,
                          gridspec_kw=dict(wspace=0.08))

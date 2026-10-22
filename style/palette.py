@@ -68,10 +68,12 @@ ARM = {
     "pixel":        "#56676E",  # per-pixel floor (no spatial context)
     "mai2024":      "#15242B",  # external clinical reference: ink, dashed
 }
-# Per-fold shades for plots that follow one arm across folds 0-2 (light to dark; always paired
-# with a distinct marker, so folds never rely on colour alone). The graph network uses SEQ[1:4];
-# the T-FEN uses its own colour darkened, so that no shade coincides with ARM["fen"].
-FOLD_TFEN = ["#CC79A7", "#995B7D", "#663C54"]
+# Per-fold shades for plots that follow one arm across folds 0-4 (light to dark; always paired
+# with a distinct marker, so folds never rely on colour alone). The graph network uses FOLD_SEQ
+# (SEQ[1] to SEQ[3] with two steps between); the T-FEN uses its own colour darkened, so that no
+# shade coincides with ARM["fen"].
+FOLD_SEQ = ["#6FC0DF", "#38A1CD", "#0082BA", "#075F86", "#0C3C52"]
+FOLD_TFEN = ["#CC79A7", "#B36A92", "#995B7D", "#804B69", "#663C54"]
 # RK4-wrapped arms reuse the colour of the wrapped backbone with hatch "//"
 # (bars) or linestyle ":" (lines): ARM["stencil"] + RK4 -> blue, dotted.
 

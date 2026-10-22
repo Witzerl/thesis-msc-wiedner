@@ -302,7 +302,7 @@ are those of~\S\ref{app:full-results:criteria}.
     $z$ statistic of \S\ref{app:full-results:criteria} ($|z| > 1.96$
     corresponds to $p < 0.05$). Per eye:
     mean $\pm$ SE of the differences of the growth-region Dice at the
-    anchor, with the number of eyes on which the first arm is higher and
+    one-year anchor, with the number of eyes on which the first arm is higher and
     the paired $t$ statistic.}
   \label{tab:appendix:seeds}
   \footnotesize
@@ -347,9 +347,7 @@ are those of~\S\ref{app:full-results:criteria}.
     Comparisons of
     \S\ref{sec:experiments:ingredients:global}--\S\ref{sec:experiments:ingredients:transport}
     at seed 42 and at the second seed 7, as in
-    Table~\ref{tab:appendix:seeds}. $^{a}$At seed 42 the matched control
-    (width 139) did not train on fold 4, so these rows cover folds 0 to 3
-    (63 eyes).}
+    Table~\ref{tab:appendix:seeds}.}
   \label{tab:appendix:seeds-b}
   \footnotesize
   \begin{tabular}{l c l l}
@@ -386,16 +384,7 @@ are those of~\S\ref{app:full-results:criteria}.
     \multicolumn{4}{l}{\textbf{Transport, Galerkin form: T-FEN $-$ free-form, same width}} \\
     & 42 & $+0.0527 \pm 0.0065$ (5/5, $z = 6.6$) & $+0.0555 \pm 0.0057$ (65/75, 9.7) \\
     & 7  & $+0.0758 \pm 0.0092$ (5/5, $z = 9.4$) & $+0.0761 \pm 0.0068$ (68/75, 11.3) \\
-    & \multicolumn{3}{l}{\emph{Reading:} established} \\[2pt]
-    \multicolumn{4}{l}{\textbf{Transport: T-FEN $-$ free-form, matched$^{a}$}} \\
-    & 42 & $+0.0716 \pm 0.0094$ (4/4, $z = 8.0$) & $+0.0737 \pm 0.0063$ (59/63, 11.7) \\
-    & 7  & $+0.0762 \pm 0.0105$ (5/5, $z = 9.5$) & $+0.0750 \pm 0.0062$ (73/75, 12.2) \\
-    & \multicolumn{3}{l}{\emph{Reading:} established} \\[2pt]
-    \multicolumn{4}{l}{\textbf{Free-form, width 139 $-$ width 96$^{a}$}} \\
-    & 42 & $-0.0084 \pm 0.0053$ (0/4, $z = -0.9$) & $-0.0085 \pm 0.0037$ (23/63, $-2.3$) \\
-    & 7  & $+0.0135 \pm 0.0046$ (4/5, $z = 1.7$) & $+0.0128 \pm 0.0046$ (47/75, 2.8) \\
-    & \multicolumn{3}{l}{\emph{Reading:} null (under the threshold at both
-      seeds)} \\
+    & \multicolumn{3}{l}{\emph{Reading:} established} \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -431,9 +420,9 @@ are those of~\S\ref{app:full-results:criteria}.
     Monotonic penalty, weight 2.0 & $-0.0036 \pm 0.0037$ (2/5, $z = -0.4$) & $-0.0042 \pm 0.0034$ (34/75, $-1.3$) \\
     \midrule
     \multicolumn{3}{l}{\emph{Capacity (\S\ref{sec:experiments:ablations:capacity})}} \\
-    Stencil GNN, width 32 & $-0.0053 \pm 0.0063$ (1/5, $z = -0.7$) & $-0.0050 \pm 0.0034$ (30/75, $-1.5$) \\
-    Stencil GNN, width 128 & $-0.0081 \pm 0.0056$ (2/5, $z = -1.0$) & $-0.0091 \pm 0.0036$ (22/75, $-2.5$) \\
-    Stencil GNN, 4 rounds & $-0.0090 \pm 0.0021$ (0/5, $z = -1.1$) & $-0.0097 \pm 0.0037$ (20/75, $-2.6$) \\
+    Dilated stencil, width 32 & $-0.0053 \pm 0.0063$ (1/5, $z = -0.7$) & $-0.0050 \pm 0.0034$ (30/75, $-1.5$) \\
+    Dilated stencil, width 128 & $-0.0081 \pm 0.0056$ (2/5, $z = -1.0$) & $-0.0091 \pm 0.0036$ (22/75, $-2.5$) \\
+    Dilated stencil, 4 rounds & $-0.0090 \pm 0.0021$ (0/5, $z = -1.1$) & $-0.0097 \pm 0.0037$ (20/75, $-2.6$) \\
     U-Net, width 2 & $-0.0163 \pm 0.0290$ (3/5, $z = -1.3$) & $-0.0186 \pm 0.0155$ (40/75, $-1.2$) \\
     U-Net, width 9 & $+0.0036 \pm 0.0126$ (1/5, $z = 0.3$) & $+0.0041 \pm 0.0082$ (38/75, 0.5) \\
     FNO $+ 3{\times}3$, width 2 & $-0.0192 \pm 0.0175$ (2/5, $z = -2.4$) & $-0.0205 \pm 0.0101$ (30/75, $-2.0$) \\
@@ -466,22 +455,23 @@ model is re-evaluated, without retraining, with a fixed step $h$ and with
 explicit Euler or classical RK4. Each visit interval is split into the
 smallest number of equal sub-steps no longer than $h$. Because the median
 interval between visits is 180 days, the steps of one and of half a year
-leave almost every interval in one piece: on folds 0, 1 and 2, only 2, 0
-and 3 of 135, 65 and 100 intervals are split at one year, and 23, 4 and 9
-at half a year.
+leave almost every interval in one piece: on folds 0 to 4, only 2, 0, 3,
+0 and 2 of 135, 65, 100, 92 and 86 intervals are split at one year, and
+23, 4, 9, 7 and 4 at half a year.
 
 \begin{table}[!h]
   \centering
   \caption[The step-size ladder.]{%
-    The step-size ladder of the solver-swap test, folds 0 to 2, seed 42.
+    The step-size ladder of the solver-swap test, all five folds, seed 42.
     Each cell is the change of the change-region Dice at the one-year
     anchor against the setting the model was trained with, when the same
     weights are evaluated with a fixed step $h$ (in years, with days below)
     and with explicit Euler or classical RK4. The trained setting itself
     reproduces the change-region Dice recorded at the end of training on
     every fold. Rows that change only the step of the trained scheme start
-    at 0 for the graph networks, whose trained setting is one step per
-    interval and coincides with $h = 1$~year for almost every interval.}
+    at or within 0.004 of 0 for the graph networks, whose trained setting
+    is one step per interval and coincides with $h = 1$~year for almost
+    every interval.}
   \label{tab:appendix:step-ladder}
   \footnotesize
   \setlength{\tabcolsep}{4pt}
@@ -497,6 +487,10 @@ at half a year.
     Fold 1, RK4 & $+0.027$ & $+0.017$ & $+0.049$ & $+0.065$ & $+0.057$ & $+0.048$ \\
     Fold 2, Euler & $+0.000$ & $+0.001$ & $-0.016$ & $-0.081$ & $-0.158$ & $-0.187$ \\
     Fold 2, RK4 & $+0.010$ & $+0.011$ & $-0.017$ & $-0.090$ & $-0.162$ & $-0.190$ \\
+    Fold 3, Euler & $+0.000$ & $+0.004$ & $-0.008$ & $-0.004$ & $-0.004$ & $-0.005$ \\
+    Fold 3, RK4 & $-0.004$ & $-0.003$ & $-0.022$ & $-0.015$ & $-0.010$ & $-0.008$ \\
+    Fold 4, Euler & $-0.002$ & $-0.001$ & $+0.026$ & $+0.031$ & $-0.031$ & $-0.085$ \\
+    Fold 4, RK4 & $+0.032$ & $+0.035$ & $+0.045$ & $+0.040$ & $-0.028$ & $-0.082$ \\
     \midrule
     \multicolumn{7}{l}{\emph{Network trained in the RK4 wrapper (trained: RK4, one step per interval)}} \\
     Fold 0, Euler & $-0.113$ & $-0.063$ & $+0.003$ & $+0.016$ & $+0.018$ & $+0.018$ \\
@@ -505,6 +499,10 @@ at half a year.
     Fold 1, RK4 & $+0.000$ & $+0.003$ & $+0.018$ & $+0.017$ & $+0.018$ & $+0.018$ \\
     Fold 2, Euler & $-0.020$ & $-0.016$ & $+0.004$ & $+0.004$ & $+0.003$ & $+0.001$ \\
     Fold 2, RK4 & $+0.000$ & $+0.000$ & $+0.000$ & $+0.000$ & $+0.000$ & $+0.000$ \\
+    Fold 3, Euler & $-0.015$ & $-0.013$ & $-0.004$ & $-0.010$ & $-0.014$ & $-0.016$ \\
+    Fold 3, RK4 & $+0.000$ & $+0.001$ & $-0.013$ & $-0.016$ & $-0.016$ & $-0.016$ \\
+    Fold 4, Euler & $-0.075$ & $-0.072$ & $-0.012$ & $-0.006$ & $-0.002$ & $-0.000$ \\
+    Fold 4, RK4 & $+0.004$ & $+0.006$ & $+0.003$ & $+0.003$ & $+0.003$ & $+0.003$ \\
     \midrule
     \multicolumn{7}{l}{\emph{T-FEN, energy-conserving form (trained: RK4, 45-day steps)}} \\
     Fold 0, Euler & $-0.258$ & $-0.248$ & $-0.088$ & $-0.014$ & $-0.006$ & $-0.003$ \\
@@ -513,15 +511,20 @@ at half a year.
     Fold 1, RK4 & $-0.095$ & $-0.068$ & $-0.004$ & $+0.000$ & $+0.001$ & $+0.001$ \\
     Fold 2, Euler & $-0.165$ & $-0.158$ & $-0.081$ & $-0.022$ & $-0.007$ & $-0.004$ \\
     Fold 2, RK4 & $-0.131$ & $-0.129$ & $-0.012$ & $+0.000$ & $-0.002$ & $-0.002$ \\
+    Fold 3, Euler & $-0.127$ & $-0.119$ & $-0.030$ & $-0.006$ & $-0.006$ & $-0.005$ \\
+    Fold 3, RK4 & $-0.090$ & $-0.054$ & $+0.001$ & $+0.000$ & $-0.001$ & $-0.001$ \\
+    Fold 4, Euler & $-0.181$ & $-0.183$ & $-0.074$ & $-0.018$ & $-0.013$ & $-0.010$ \\
+    Fold 4, RK4 & $-0.101$ & $-0.088$ & $+0.008$ & $+0.000$ & $-0.007$ & $-0.007$ \\
     \bottomrule
   \end{tabular}
 \end{table}
 % Source: images/scripts/table_step_ladder.py, reading the cache of
 % images/scripts/step_ladder.py (images/data/step_ladder, git-ignored; run
 % 2026-10-17 on the RTX 5080, epoch-29 checkpoints, unmodified evaluation,
-% GAIntegrator(step_days = h)). Folds 3 and 4 have no local precompute.
-% Trained Dice per fold: canonical 0.5397 / 0.4534 / 0.5964; RK4 network
-% 0.5275 / 0.4392 / 0.5667; T-FEN 0.5485 / 0.5242 / 0.6066.
+% GAIntegrator(step_days = h)); folds 3 and 4 run 2026-10-22.
+% Trained Dice per fold: canonical 0.5397 / 0.4534 / 0.5964 / 0.5216 /
+% 0.5166; RK4 network 0.5275 / 0.4392 / 0.5667 / 0.5163 / 0.5144; T-FEN
+% 0.5485 / 0.5242 / 0.6066 / 0.5292 / 0.5417.
 
 
 \cleardoubleoddpage
@@ -596,7 +599,6 @@ behind each arm; the five folds are the runs \texttt{<name>\_f0} to
     FNO, RK4                            & \texttt{FNO\_final\_w5rk4} \\
     FNO                                 & \texttt{FNO\_final\_w5} \\
     FEN, free-form only                 & \texttt{FEN\_final\_w96Frk4d45} \\
-    FEN, free-form, matched width 139   & \texttt{FEN\_final\_w139Frk4d45} \\
     Graph network, $k$-NN, $k = 12$     & \texttt{MPPDE\_final\_aggrmean} \\
     Graph network, $k$-NN, $k = 20$     & \texttt{MPPDE\_final\_k20} \\
     One-hop floor                       & \texttt{MPPDE\_final\_l1mean} \\

@@ -2003,13 +2003,24 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
   says so plainly: with finer steps its Dice rises by 0.018 on folds 0 and 1 (level with the canonical network
   there) and is unchanged on fold 2. Added in §5.6.1, §5.5.1 (RK4 paragraph), §6.1.5 and the Fig. 5.9 caption;
   Table 5.5 retitled "The step-size ladder" (was "The solver-swap test"). Author: no "not tested" hedges.
-- [ ] TODO (author, 2026-10-21): run the step-size ladder on folds 3 and 4 too (`images/scripts/step_ladder.py`;
+- [x] (done 2026-10-22, see the next entry) TODO (author, 2026-10-21): run the step-size ladder on folds 3 and 4 too (`images/scripts/step_ladder.py`;
   these folds have no local precompute, so precompute them or run on the cluster), then update
   `fig:experiments:swap`, Table `tab:experiments:swap`, Table `tab:appendix:step-ladder` and the §5.6.1 text
   (inline TODO above the figure). **Then revise everything quoted from folds 0-2** (author 2026-10-21): every
   fold count and number of §5.6.1 (canonical, RK4 network, T-FEN), the RK4 sentence in §5.5.1 ("0.018 higher
   on folds 0 and 1"), §6.1.5 ("two of the three tested folds", "all three tested folds"), the Fig. 5.9 caption,
   and the T-FEN step-ladder figure if it goes in. Inline TODOs at each place.
+- [x] 2026-10-22 **Step-size ladder on all five folds** (folds 3 and 4 run locally on the RTX 5080; the
+  precomputes for splits 3 and 4 do exist locally, `_common.PRECOMP` corrected). Every trained setting
+  reproduces its logged epoch-29 Dice. Updated: §5.7.1 text, Table `tab:experiments:swap`, Table
+  `tab:appendix:step-ladder` + its intro (split counts), both ladder figures (new palette entries
+  `FOLD_SEQ` / five-shade `FOLD_TFEN` in palette.py and thesis-colors.sty), the RK4 sentence of §5.6.1,
+  §6.1.5 and §6.3 (#114). Readings: canonical fails C2 on all five folds (span 0.026-0.201; C1 fails on
+  folds 2 and 4); T-FEN passes everywhere (span <= 0.007; coarse steps drop 0.05-0.20). **Changed reading
+  for the RK4-wrapper network (author to note):** C1 on all five, C2 on folds 2 and 4; finer steps change
+  its Dice by +0.018 / +0.018 / 0.000 / -0.016 / +0.003 (mean +0.004), so the earlier sentence "finer
+  steps raise its Dice by 0.018" no longer holds; the text now says the one-step setting integrates less
+  accurately, not that finer steps forecast better.
 - [ ] **TODO (author, 2026-10-19): review the placement of the step-size ladder explicitly** -- now in §5.6.1
   (Table 5.4 summary + Appendix E full table), with one pointer sentence in §5.5.1 (inline TODOs in both).
 - [x] 2026-10-19 **§5.7 "Comparison with Prior Work"** (author sign-off; heading was "Qualitative Analysis and
@@ -2314,6 +2325,30 @@ at a time, as dictated by the author.
   results in Chapter-5 wording with z; gradient probe and "untrained correction" reasoning removed;
   new reach paragraph and a scope paragraph (one design, not a general statement on adaptive meshes).
   Builds clean.
+- [x] 2026-10-22 Ch. 1-4 marks of v7/v8 done (#1-#47 except #26), see the review list. Notable: abbreviation
+  list matched to the text; operator / architecture / framework used consistently in Ch. 1; AI-figure
+  captions shortened to "Drawings generated with ChatGPT; labels added and verified by the author."; the
+  width-139 "matched" free-form control removed from the thesis (author: a width control, covered by the
+  capacity study); the transport term is now defended by the width-48 T-FEN (20 455 parameters, fewer
+  than the control, same score) and the capacity study. Inline TODOs for the author's re-review of 2.4
+  and 2.5.2.
+- [ ] TODO (tablet review v8 #39, author: probably not run): no pushforward ablation exists (every final
+  run uses unrolling 2 at a 180-day base; the code-side depth sweep was left unrun). If wanted: stencil
+  network with unrolling 0, 5 folds, cluster; otherwise one sentence in 6.3.
+- [ ] Open from review v8 #26: Fig. 2.2, the "B-scans" label should get an angled leader line.
+- [ ] TODO (author, review v8 #48/#65): review the new §5.3 "Forecasts Beyond One Year"
+  (`sec:experiments:horizon`, Table `tab:experiments:horizon`; growth-region Dice per year bin for eight
+  operators from `thesis_numbers.py horizon`, 2026-10-22). Chapter 5 renumbers from §5.4 on.
+- [x] 2026-10-22 Ch. 5 part 1 (#48-#66, #74, #113): §5.1.5 now states the per-eye bar (|t| of about 2.5,
+  App. E.3), so the T-FEN-vs-stencil reading in §5.2 names the criterion that fails; canonical-model
+  paragraph rewritten (criterion, 4x cost, reference configuration); Fig. 5.2 no longer says how the eye
+  was chosen (author decision; the eye is the best of 48 by change-region Dice, recorded in the
+  comment); Table 5.2 with means, reference rows, four rounds and k = 20; "not tested" phrasings in
+  Ch. 5-6 rephrased as hedged observations; remarks that the change-region Dice was logged per fold only
+  removed (5.1.5, 5.4, 6.3).
+- [x] 2026-10-22 Ch. 6/7 marks #106-#116 done (review list). Ledger batch to check: Brandstetter2022 in
+  §6.1.4 (new opener: removing the equation features worsens predictions on unseen equations, most when all
+  parameters vary), Gigon2021 and Yoshida2025 newly cited in Ch. 7 (same values as §5.8).
 - [ ] TODO (author, 2026-10-22, inline in 06-discussion.tex 6.1.2): paragraph that the T-FEN is borderline
   better than the stencil network (+0.017, misses the per-eye bar only at seed 42) and why the stencil
   network stays canonical anyway; align with 5.2 (#56-#58).

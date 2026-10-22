@@ -3,7 +3,7 @@ Table tab:appendix:step-ladder).
 
 Reads the cache written by images/scripts/step_ladder.py (images/data/step_ladder/*.json, git-ignored):
 trained checkpoints (epoch 29) re-evaluated without retraining with a fixed step h = 1, 1/2, ..., 1/32
-year, explicit Euler and classical RK4, folds 0-2. Prints the summary rows (Table tab:experiments:swap),
+year, explicit Euler and classical RK4, folds 0-4. Prints the summary rows (Table tab:experiments:swap),
 the full ladder rows (Table tab:appendix:step-ladder) and the per-halving changes behind the verdicts.
 
 Criteria (Section 5.6.1), against the run-to-run sd 0.0127:
@@ -36,7 +36,7 @@ def main():
     summary, full = [], []
     for arm, name, tr, c2_schemes, c2_from in MODELS:
         full.append(f"    \\multicolumn{{7}}{{l}}{{\\emph{{{name}}}}} \\\\")
-        for fold in (0, 1, 2):
+        for fold in (0, 1, 2, 3, 4):
             d = json.loads((CACHE / f"{arm}_f{fold}.json").read_text())
             c = {r["config"]: r["chg_dice"] for r in d["rows"]}
             t = c[tr]

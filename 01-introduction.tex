@@ -60,22 +60,27 @@ In the phase 3 trials, both drugs reduced the rate of GA enlargement by
 roughly 14\,\% to 27\,\% over twelve to twenty-four months. The lesions
 nevertheless continued to grow. Best-corrected visual acuity, the
 sharpness of vision with spectacles, did not differ significantly from a
-sham (simulated) injection at the trial endpoints \citep{Lad2023}. The clinical implication is twofold. First,
-treatment timing now matters: an intervention that only slows progression is
+sham (simulated) injection at the trial endpoints \citep{Lad2023}. Hence,
+two things matter for clinical practice. First, treatment timing: an intervention that only slows progression is
 most valuable when administered before foveal involvement, because central
 vision is largely preserved until the atrophy reaches the fovea
 \citep{Boyer2017,Vallino2024}. Second, both drugs are given as injections into the eye, which carry
 patient burden and procedural risk. Identifying which eyes will progress
 rapidly enough to justify therapy is therefore the critical
-decision-support task. Optical coherence tomography (OCT) produces
+decision-support task.
+
+Both decisions need a forecast of how fast, and where, the lesion of an
+individual eye will grow. Optical coherence tomography (OCT) produces
 three-dimensional images of the retina
-(\S\ref{sec:background:ga-oct:oct}). Biomarkers are measurable image
-features that indicate the course of the disease. As \citet{Vallino2024}
-note in their conclusions, the integration of artificial intelligence with
-structural OCT biomarkers holds significant promise. Artificial
-intelligence applied to OCT has the potential to provide predictive
-probabilities of GA development over time. This thesis pursues
-that avenue.
+(\S\ref{sec:background:ga-oct:oct}), and measurable features in these
+images, called biomarkers, indicate the course of the disease. As
+\citet{Vallino2024} note in their conclusions, combining artificial
+intelligence with structural OCT biomarkers holds significant promise: it
+could provide predictive probabilities of GA development over time. This
+thesis pursues that avenue.
+% 2026-10-22 (tablet review v7 #2, #3): "The clinical implication is
+% twofold" -> "Hence, two things matter"; OCT/biomarker sentences moved into
+% their own paragraph with a bridge. Vallino2024 content unchanged.
 
 
 \section{Aim of the Thesis}
@@ -94,24 +99,27 @@ traced. Given the
 most recent observed state and a target horizon $\Delta t$, the task is to
 predict the extent and shape of the lesion at the later visit. This differs from
 earlier work on AMD, which predicts or characterises the conversion of an eye
-to a later disease stage \citep{SchmidtErfurth2018, Vogl2021}. The output
-here is a complete map of the lesion at the future visit instead of a
-single risk score.
+to a later disease stage \citep{SchmidtErfurth2018, Vogl2021}. The forecast
+of this thesis is instead a complete map of the lesion at the future visit,
+not a single risk score.
 
 
-Such a forecast requires a model that maps the state at one visit to the
+Such a forecast requires a learned map from the state at one visit to the
 state at a later one. In this thesis, this map is called the operator.
-Many architectures can serve as this model, among
-them the neural solvers for partial differential equations on which this
-thesis builds (Chapter~\ref{ch:background}). Which of them GA progression
-requires cannot be decided by
-testing a single architecture: if one model succeeds, the reason may be
-its operator, its size, or the setup around it. This thesis therefore
-separates the model from the setup around it. The setup comprises how
-elapsed time enters the prediction and how models are trained and
-evaluated. It is fixed once, and only the operator changes, so that
-architectures from different families can be compared on equal terms. The closest forecasts of
-this kind are discussed in Section~\ref{sec:background:related-work}.
+Many architectures can serve as the operator, among them the neural
+solvers for partial differential equations on which this thesis builds
+(Chapter~\ref{ch:background}). Which architecture GA progression requires
+cannot be decided by testing a single one: if it succeeds, the reason may
+be the architecture, its size, or the setup around it. This thesis
+therefore separates the operator from the setup around it, called the
+framework. The framework fixes how elapsed time enters the prediction and
+how the operators are trained and evaluated. It is fixed once, and only the
+operator changes, so that architectures from different families can be
+compared on equal terms. The closest forecasts of this kind are discussed
+in Section~\ref{sec:background:related-work}.
+% 2026-10-22 (tablet review v7 #4-#7): terms used consistently in Chapter 1:
+% operator = the learned map, architecture = its class, framework = the
+% setup around it.
 
 
 \paragraph{Research question.}
@@ -127,9 +135,8 @@ This thesis addresses one question, divided into two parts:
   \end{enumerate}
 \end{quote}
 
-The first part concerns the setup described above, which is called the
-framework in the remainder of this thesis. The second concerns the
-operator that maps one visit to the next. Chapter~\ref{ch:method}
+The first part concerns the framework described above. The second
+concerns the operator that maps one visit to the next. Chapter~\ref{ch:method}
 develops a framework that answers the first part and leaves the operator
 as its only free component. Chapter~\ref{ch:experiments} then answers the
 second by comparing different operators within that framework.
@@ -149,17 +156,17 @@ The main contributions of this thesis are the following.
     pushforward curriculum measured in elapsed days, and a shared loss and
     evaluation. Operators from unrelated literatures are trained and
     evaluated in it under identical conditions, so that a difference in
-    accuracy can be attributed to the model rather than to its training
-    setup.
-  \item A controlled comparison of several operator classes for
+    accuracy can be attributed to the operator rather than to the
+    framework.
+  \item A controlled comparison of operators of several architectures for
     forecasting GA from longitudinal OCT, at matched parameter counts and
     with five-fold cross-validation.
   \item The identification of physical reach at the scale of the lesion
     front and an explicit transport term as two independent routes to the
     same deficit: a single update that cannot see as far as the lesion
-    front moves between two visits. This identifies the property a
-    forecasting model for GA has to provide.
-  \item Results on what did not help: larger models, a higher integration
+    front moves between two visits. This identifies the property an
+    operator for forecasting GA has to provide.
+  \item Results on what did not help: larger operators, a higher integration
     order, a monotonic-growth penalty and an extension with an adaptive
     moving mesh. These rule out directions that would otherwise appear
     promising.
@@ -174,18 +181,20 @@ The main contributions of this thesis are the following.
 
 The remainder of this thesis is organised as follows.
 Chapter~\ref{ch:background} introduces the anatomy of the eye, retinal
-imaging and GA, the numerical methods for partial differential equations
-(PDEs) and the neural solvers that learn parts of them, reviews related
-work, and closes with the motivation for the modelling approach and a
-formal statement of the problem. Chapter~\ref{ch:data} describes the Medical
-University of Vienna GA cohort and how each visit is turned into an
-eleven-channel state. Chapter~\ref{ch:method} addresses the first part of
-the research question by developing the framework, and describes the models
-that fill its one free component. Chapter~\ref{ch:experiments} addresses the
-second part by comparing these models.
-Chapter~\ref{ch:discussion} discusses what the results mean clinically and
-methodologically, together with their limitations, and
-Chapter~\ref{ch:conclusion} concludes. Appendix~\ref{app:mm-pde} reports an additional
+imaging and GA. It then covers the numerical methods for partial
+differential equations (PDEs) and the neural solvers that learn parts of
+them, reviews related work, and closes with the motivation for the
+modelling approach and a formal statement of the problem.
+Chapter~\ref{ch:data} describes the Medical University of Vienna GA cohort
+and how each visit is turned into an eleven-channel state.
+Chapter~\ref{ch:method} addresses the first part of the research question
+by developing the framework, and describes the operators that fill its one
+free component. Chapter~\ref{ch:experiments} addresses the second part by
+comparing these operators. Chapter~\ref{ch:discussion} discusses what the
+results mean clinically and methodologically, together with their
+limitations, and Chapter~\ref{ch:conclusion} concludes. The appendices give
+further details on the data, additional rollouts, the statistics of the
+comparisons and the code; Appendix~\ref{app:mm-pde} reports an additional
 experiment with an adaptive moving mesh.
 
 

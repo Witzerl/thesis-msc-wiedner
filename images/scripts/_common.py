@@ -34,7 +34,7 @@ RESULTS = CODE / "GraphPDE" / "results"
 DEMOS = CODE / "GraphPDE" / "demos & explanations"
 SCANS = CODE / "data" / "MUW_GA" / "scans"
 PRECOMP = {f: CODE / "data" / "GA" / f"split{f}_n12_zscore_slo256_agevisit" / "precomp"
-           for f in (0, 1, 2)}         # only splits 0-2 are present locally
+           for f in (0, 1, 2, 3, 4)}   # all five splits are present locally (checked 2026-10-22)
 
 # Grid geometry (THESIS_FRAMEWORK.md section 1): 49 rows (B-scans) x 1024 columns (A-scans)
 NROWS, NCOLS = 49, 1024

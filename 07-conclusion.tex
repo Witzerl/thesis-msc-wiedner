@@ -48,10 +48,8 @@ a time, separate the operators:
     at an unchanged parameter count.
   \item \textbf{An explicit transport term.} Adding a learned transport
     term to a Finite Element Network raised the change-region Dice by 0.062
-    over the same network without the term. Against a parameter-matched
-    control, the margin was 0.072 on the four folds on which that control
-    trained, and 0.076 at a second seed, where the control trained on all
-    five folds.
+    over the same network without the term, and a smaller T-FEN with
+    fewer parameters than that network scored the same.
 \end{itemize}
 Reach and transport are two unrelated ways to correct the same deficit: a
 single update that cannot see as far as the disease moves between two
@@ -76,9 +74,10 @@ Clinically, the operators predict where the lesion grows better than how
 fast an individual eye grows. On where it grows, the growth-region Dice of
 the canonical model lies within the range of prior work
 (\S\ref{sec:experiments:qualitative}). On how fast, the model reaches a
-correlation of 0.40 with the true growth rates, against 0.52 to 0.61 for
-comparable models, including the model of \citet{Mai2024}, which starts
-from the raw OCT volume instead of segmented masks.
+correlation of 0.40 with the true growth rates, against 0.61 for the model
+of \citet{Mai2024}, which starts from the raw OCT volume instead of
+segmented masks, 0.52 for \citet{Gigon2021} and about 0.57 to 0.59 for
+\citet{Yoshida2025}.
 
 Every conclusion drawn here is limited by the small cohort, the censoring
 by the fixed crop and the lack of memory of past visits. Within these

@@ -36,8 +36,10 @@ part of the question and then draws the implications for modelling.
 The framework is everything that stays fixed while the operator changes
 (\S\ref{sec:method:framework}). It predicts the next visit from the
 current one by a residual update,
-$u_{t+\Delta t} = u_t + \Delta t \cdot f_\theta(u_t, \Delta t, z)$, whose
-operator $f_\theta$ starts at zero, so that every model begins at
+\begin{equation*}
+  u_{t+\Delta t} = u_t + \Delta t \cdot f_\theta(u_t, \Delta t, z),
+\end{equation*}
+whose operator $f_\theta$ starts at zero, so that every model begins at
 persistence. It trains with a loss that weights the mask channel five
 times and adds a soft-Dice term, and it unrolls its own predictions over up
 to 360 days during training. Inside this framework, every operator with
@@ -84,8 +86,8 @@ properties one at a time on otherwise unchanged operators:
     neighbourhood of the graph network by the dilated stencil raises its
     score by 0.064, at the same parameter count.
   \item An explicit transport term raises the finite-element network by
-    0.062 against the same network without it, and by 0.072 against a
-    control of the same size.
+    0.062 against the same network without it; a T-FEN with fewer
+    parameters than that control scores the same.
 \end{itemize}
 A local path for the global FNO brought it level with the U-Net at one
 seed but not at the second, and its own effect is not established.
@@ -115,7 +117,7 @@ instead of two, which double the reach, lower the canonical network by
 0.009 (\S\ref{sec:experiments:ingredients:reach},
 \S\ref{sec:experiments:ablations:capacity}). The best tested reach, about
 119\,\textmu{}m, lies close to the 90th percentile of the advance between
-visits. Why reach beyond that point hurts was not tested. With mean
+visits. Reach beyond that point may hurt for two reasons. With mean
 aggregation, far neighbours may dilute the near ones, and the extra reach
 may bring in tissue unrelated to the next visit's change.
 % Resolves the TODO of 2026-10-19 (author) on why more rounds or more reach
@@ -124,9 +126,8 @@ may bring in tissue unrelated to the next visit's change.
 Global context behaves differently. The FNO sees the whole grid in every
 layer but lies below the U-Net at one year. Beyond one year it catches up,
 and after three years it lies above the U-Net
-(\S\ref{sec:experiments:ingredients:global}). These horizon values are
-descriptive and were not tested statistically, but they suggest that
-global context matters more for long forecasts than at one year.
+(\S\ref{sec:experiments:ingredients:global}). This suggests that global
+context matters more for long forecasts than at one year.
 
 % TODO (author, 2026-10-22): add a paragraph that the T-FEN is borderline
 % better than the dilated-stencil network: +0.017 at both seeds, z = 2.1 at
@@ -152,10 +153,12 @@ interpretation, supported by the ablation studies.
 \subsection{A Missing Counterpart to the Equation Features}
 \label{sec:discussion:equation-features}
 
-In MP-PDE, a vector of equation features $\theta_{\text{PDE}}$ --- the
-coefficients and boundary conditions of the equation being solved --- is
-passed to every layer, and it is what lets one trained solver handle a
-whole family of equations \citep{Brandstetter2022}. GA has no governing
+A solver trained on a family of equations predicts best when it is told
+which member of the family it faces. In MP-PDE, a vector of equation
+features $\theta_{\text{PDE}}$, the coefficients and boundary conditions of
+the equation being solved, is passed to every layer, and removing it
+worsens the predictions on unseen equations, most when all parameters vary
+\citep{Brandstetter2022}. GA has no governing
 equation, and so no such vector exists. In this thesis the slot is filled
 by $\Delta t$ and the two patient covariates (\S\ref{sec:method:covariates}).
 The covariates are two numbers per visit, shared by every grid position
@@ -169,7 +172,7 @@ What is lost is an eye-specific description of how this eye progresses.
 Two eyes with the same lesion shape but different speeds receive the same
 conditioning, and the operator can only infer the speed from the current
 state. This is a plausible contributor to the weaker prediction of growth
-speed discussed in~\S\ref{sec:discussion:clinical}, but it was not tested.
+speed discussed in~\S\ref{sec:discussion:clinical}.
 Candidates for the slot are descriptors that do vary between eyes:
 lesion-level quantities such as size, shape or focality, a learned summary
 of the observed layers, or --- with trajectory memory --- the eye's own
@@ -181,18 +184,16 @@ past growth.
 Every operator of the survey is trained to predict the state at the next
 visit, so its predictions between visits are not constrained by the data.
 Two models nevertheless define a prediction at any time. The T-FEN in its
-energy-conserving form passes the solver-swap test on all three tested
-folds and can therefore be read as a continuous-time model
+energy-conserving form passes the solver-swap test on all five folds and can therefore be read as a continuous-time model
 (\S\ref{sec:experiments:validity:swap}). The network trained inside the
 Runge--Kutta wrapper also defines a vector field, but its training step,
-one RK4 step per interval, resolves that field on only one of the three
+one RK4 step per interval, resolves that field on only two of the five
 folds. Neither is more accurate than the canonical network at one year,
 and the wrapper costs about $4.8\times$ the training time. If predictions
 between visits are needed clinically, these two models give predictions
 between visits that are consistent with those at the visits; the wrapper
-% TODO (author, 2026-10-21): revise once the step-size ladder has run on folds 3 and 4 (NOTES.md).
-network would need a finer step, with which its predictions at the visits
-are also 0.018 better on two of the three tested folds. Whether these predictions are
+network would need a finer step, which changes its predictions at the
+visits by up to 0.018 on single folds but not on average. Whether these predictions are
 correct cannot be checked, because no ground truth exists between two
 observations. An earlier attempt to constrain them, a regulariser that
 penalised predictions between visits against the linear interpolation of
@@ -235,7 +236,7 @@ The comparison is not like-for-like
 as input is weaker on growth speed than one that must find the lesion
 itself.
 
-Several explanations are possible; none of them was tested:
+Several explanations are possible:
 \begin{itemize}
   \item A local model applied autoregressively over several years can
     drift, and the growth rate is taken at the last visit, often three or
@@ -348,7 +349,9 @@ median of 2.6\,\%, but almost every pair (96\,\%) loses some atrophic
 pixels along the border, a median of 2.2\,\% of the lesion. This pattern is
 more consistent with annotation and registration noise at the boundary
 than with regression of the atrophy, although the masks alone cannot
-separate the two. The observed shrinkage is one reason why no
+separate the two. Boundary noise of this size is plausible: on the region
+that becomes atrophic, two graders reach a growth-region Dice of only 0.71
+to 0.73 (\S\ref{sec:discussion:clinical}). The observed shrinkage is one reason why no
 monotonic-growth constraint was imposed.
 % Computed 2026-10-01 from data/MUW_GA/scans/*/*/mask_oct.png (native grid;
 % the 49 x 1024 crop gives 5.4 % / 96 % / 2.1 %): 478 pairs, 75 eyes; net
@@ -358,10 +361,8 @@ monotonic-growth constraint was imposed.
 The evaluation has limits of its own. The one-year anchor is the first
 visit at or after about one year, and its time
 has no upper bound, so a few eyes are scored later, where more change has
-accumulated. The change-region Dice was logged only as a cohort mean per
-run, so the eye counts use the growth-region Dice instead
-(\S\ref{sec:experiments:protocol:stats}). Several findings rest on one
-seed, and the solver-swap test on three of the five folds per model.
+accumulated. Several findings rest on one
+seed.
 
 The scope of the models is limited as well. Every operator sees one visit
 and has no memory of the trajectory so far,
@@ -411,7 +412,14 @@ as a gradual change of this field rather than as jumps at single pixels,
 and the binary forecast would be recovered by thresholding at zero.
 Whether this makes the forecast easier to learn, including the growth
 speed that the binary state predicts less well
-(\S\ref{sec:discussion:clinical}), is untested.
+(\S\ref{sec:discussion:clinical}), remains open.
+
+\paragraph{Several scales of reach.}
+The graph network uses one neighbourhood with a fixed reach. A graph that
+combines edges at several scales, or a pyramid of coarsened graphs, would
+let one update see both the immediate surroundings of a node and the
+distance the front moves between visits, as the U-Net does on the grid.
+% 2026-10-22 (tablet review v8 #63, author).
 
 \paragraph{Trajectory memory.}
 Giving the operator several past visits, or a recurrent state carried
@@ -429,18 +437,19 @@ conditioned the operator globally. A next design should see the observed
 layers of the input visit, respect the physical spacing, and be able to
 condition locally.
 
-\paragraph{A valid transport model.}
+\paragraph{A bounded transport model.}
 The transport term is established, but the velocity field of the T-FEN
 is not interpreted in this thesis. A next step is a velocity
 parameterisation that is bounded by construction and builds on the
-energy-conserving form. A model with such a parameterisation would stay
-numerically valid over multi-year horizons, and its velocity field could
+energy-conserving form. Such a velocity would also keep the Courant number
+below the stability limit of the integrator at any step
+(\S\ref{sec:experiments:validity:tfen}), and the velocity field could then
 be read as a direction and speed of growth.
 
 \paragraph{From raw OCT, in 3-D.}
 One way to address the gap to \citet{Mai2024} is to learn from the raw
 OCT volume, either end to end or jointly with the segmentation. A further
-step is to work on the volumetric OCT rather than on en-face maps.
+step could be to work on the volumetric OCT rather than on en-face maps.
 
 \paragraph{Clinical use.}
 A forecast used for treatment decisions needs a measure of its own

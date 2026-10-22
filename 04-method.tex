@@ -44,7 +44,7 @@ not change the optimisation loop or carry training settings of its own.
 % 353 non-superseded "_final_" runs (fold 0-4 Dice: 0.8002, 0.8558, 0.8675,
 % 0.8261, 0.8187).
 The persistence baseline, which predicts no change, is computed in every
-run by the same evaluation code, and its one-year Dice and IoU are
+run by the same evaluation code, and its one-year Dice and intersection over union are
 identical across all arms in every fold. This indicates that every arm was
 evaluated on the same validation eyes with the same evaluation routine.
 
@@ -64,11 +64,8 @@ reference point of the comparison (\S\ref{sec:method:family:floors}).
 
 % Chapter reordered 2026-10-18 (supervisor review 2, E1; AI review S7/T9):
 % conditioning and training now belong to the framework section.
-\S\ref{sec:method:framework} defines the framework, that is, everything
-every arm shares: the time handling, the layout of the state, the
-conditioning inputs, the objective, the training curriculum and the
-optimisation. \S\ref{sec:method:family} then describes all operators on
-the same terms: each was taken from the literature, and for each the
+\S\ref{sec:method:framework} defines the framework, and
+\S\ref{sec:method:family} describes all operators on the same terms: each was taken from the literature, and for each the
 original is summarised before its adaptation to the framework.
 \S\ref{sec:method:implementation} closes with the implementation.
 Figure~\ref{fig:method:pipeline} summarises the pipeline.
@@ -116,17 +113,16 @@ This section defines what every arm shares: the input, the time handling
 (\S\ref{sec:method:training:loss}), the training curriculum
 (\S\ref{sec:method:training:curriculum}) and the optimisation
 (\S\ref{sec:method:training:optim}). These parts are the same for every
-operator of the survey, and Table~\ref{tab:method:hparams} lists the
-training settings; the shared evaluation follows
-in~\S\ref{sec:experiments:protocol}. Every operator receives exactly one
-visit and predicts the state at the next visit. It sees the current state,
-the interval to the next visit and the patient covariates, but no earlier
-visits, and therefore has no memory of the trajectory so far.
+operator of the survey; the shared evaluation follows
+in~\S\ref{sec:experiments:protocol}.
 
-This design follows from the length of the clinical sequences: with five
-to thirteen visits per eye (\S\ref{sec:data:dataset}), using several past
-visits as input would leave fewer visits as prediction targets. The
-framework also predicts one step at a time. Some neural PDE solvers, such
+Every operator receives exactly one visit, without earlier visits as
+input, and predicts the state at the next visit. With five to thirteen
+visits per eye (\S\ref{sec:data:dataset}), using several past visits as
+input would leave fewer visits as prediction targets; an operator with
+memory of the trajectory is left for future work
+(\S\ref{sec:discussion:future}). The framework also predicts one step at a
+time. Some neural PDE solvers, such
 as MP-PDE, predict several future steps in one forward pass (temporal
 bundling, \S\ref{sec:background:neural-pde}), but not all of the operators
 compared here support this. Bundling is therefore removed, so that every
@@ -137,14 +133,14 @@ operator makes the same kind of prediction.
 \subsection{\texorpdfstring{$\Delta t$}{Delta t}-Conditioned Residual Formulation}
 \label{sec:method:dt-residual}
 
-The original neural PDE solvers use a fixed time step and receive the
-absolute time as an input feature. The clinical data offers neither. Visits
+Neural PDE solvers such as MP-PDE (\S\ref{sec:method:mppde}) use a fixed
+time step and receive the absolute time as an input feature. The clinical data offers neither. Visits
 occur at irregular intervals, and patients share no common time origin. The
 absolute time is therefore replaced by the interval between two
 consecutive visits, $\Delta t$, measured in years (\S\ref{sec:data:temporal}).
 
-The update of the problem statement,
-Equation~\eqref{eq:bg:problem-update}, writes the transition from the
+The update of the problem statement (\S\ref{sec:background:problem},
+Equation~\eqref{eq:bg:problem-update}) writes the transition from the
 current state $u_t$ to the next state $u_{t+\Delta t}$ as a residual update
 scaled by the interval:
 \begin{equation}
@@ -188,8 +184,9 @@ over the interval.
 
 The output of $f_\theta$ is signed and unbounded, so the model can in
 principle also predict a shrinking lesion. Atrophic tissue does not
-regenerate, and a shrinking lesion is not clinically plausible. No
-monotonic-growth constraint is imposed nonetheless, because the reference
+regenerate, and a shrinking lesion is not clinically plausible. A
+constraint that prevents the lesion from shrinking is nevertheless not
+imposed, because the reference
 segmentations themselves shrink locally between most pairs of visits
 (\S\ref{sec:discussion:limitations}). The persistence prior therefore rests
 on slow change alone.
@@ -201,8 +198,7 @@ exact persistence. Every arm starts from the same function.
 
 Equation~\eqref{eq:method:residual-update} has the form of one explicit
 Euler step (\S\ref{sec:background:pde-solvers:time}) whose step size
-differs from window to window, and this form is the same for every
-operator in the slot. The Euler form does not, however, make $f_\theta$ a
+differs from window to window. The Euler form does not, however, make $f_\theta$ a
 time derivative: a network trained with this update need not be a
 consistent discretisation of any continuous-time system \citep{Ott2021}.
 Whether such a reading holds is tested
@@ -352,8 +348,7 @@ not compare operators on raw errors (Chapter~\ref{ch:experiments}).
 % "off in every reported run".
 A monotonic-growth penalty can be added to the objective, which penalises a
 decrease of the mask where the previous state is atrophic. It is set to
-zero for every operator of the comparison, because the reference
-segmentations themselves shrink locally between visits
+zero for every operator of the comparison
 (\S\ref{sec:method:dt-residual}); \S\ref{sec:experiments:ablations:loss}
 tests it on the canonical operator.
 % Commented out 2026-10-18 (author): the pad-exclusion option is mentioned only
@@ -426,7 +421,9 @@ weighted by the share of the batch its group holds.
 \subsection{Optimisation}
 \label{sec:method:training:optim}
 
-All operators are trained with AdamW \citep{Loshchilov2019}, a
+Table~\ref{tab:method:hparams} lists the training settings that every
+operator shares; this subsection explains the optimiser and the
+schedule. All operators are trained with AdamW \citep{Loshchilov2019}, a
 learning rate of $2 \times 10^{-3}$ and a weight decay of
 $1 \times 10^{-2}$ on all trainable parameters. The learning rate is
 multiplied by 0.4 at the start of epoch 5 and again at the start of epoch
@@ -650,14 +647,10 @@ their mean, as written in Equation~\eqref{eq:method:update}, and uses two
 message-passing rounds and a hidden width of 64; larger and smaller
 settings are compared in~\S\ref{sec:experiments:ablations:capacity}.
 
-All normalisation layers are per-node layer normalisations \citep{Ba2016}. Each node is normalised over its own feature vector. No running
-statistics are kept, and no nodes or graphs are coupled, so the operator is
-identical in training and in evaluation, as the contract
-of~\S\ref{sec:method:family:contract} requires. In earlier runs with batch
-normalisation, training and evaluation measurably behaved as two different
-operators. A graph-level variant that normalises a whole
-batch as one graph was avoided as well, because it would couple the
-samples of a batch.
+All normalisation layers are per-node layer normalisations
+\citep{Ba2016}. Each node is normalised over its own feature vector, so the
+operator keeps no batch statistics, as the contract
+of~\S\ref{sec:method:family:contract} requires.
 
 Because the framework predicts one step ($K = 1$,
 \S\ref{sec:method:framework}), the one-dimensional convolutional head of
@@ -842,8 +835,9 @@ reaches.
 \label{sec:method:family:dense}
 
 The three operators of this subsection are dense grid operators: they act
-on the state as an image on the full $49 \times 1024$ grid and receive the
-sixteen input channels of~\S\ref{sec:method:family:contract}. The first
+on the state as an image on the full $49 \times 1024$ grid and receive
+sixteen input channels: the eleven state channels, $\Delta t$, the two
+covariates and two coordinate ramps (\S\ref{sec:method:family:contract}). The first
 dense operator is a U-Net \citep{Ronneberger2015}. The
 original was designed for biomedical image segmentation. It consists of a
 contracting and an expansive path. Each contracting step applies two
@@ -1187,8 +1181,8 @@ chosen to come as close to this count as the width granularity allows, so
 that differences between arms cannot be attributed to extra parameters.
 Table~\ref{tab:method:params} lists every configuration. A separate
 experiment tests whether the size at which the arms are matched affects the
-comparison, by scaling every architecture class from about a quarter to
-about four times its size (\S\ref{sec:experiments:ablations:capacity}).
+comparison, by scaling every architecture class from about a sixth to
+three to four times its size (\S\ref{sec:experiments:ablations:capacity}).
 
 All architecture arms lie within a factor of 1.25 of the reference. The two
 floors lie below this band because they are not architecture arms: the
@@ -1201,9 +1195,11 @@ The free-form FEN control at width 96 has 34\,785 parameters, half the
 reference and a factor of 1.97 below the T-FEN it controls, because it is
 the T-FEN with the transport head removed (\S\ref{sec:method:family:fen}):
 of the T-FEN's 68\,503 parameters, 34\,785 belong to the free-form term and
-33\,718 to the transport head.
-A second free-form control at width 139 has 68\,282 parameters and is
-matched to the T-FEN.
+33\,718 to the transport head. Why this gap does not explain the
+effect of the transport term is discussed
+in~\S\ref{sec:experiments:ingredients:transport}.
+% 2026-10-22 (tablet review v8 #46/#47): the width-139 control is no longer
+% reported (see 5.3.4).
 
 \begin{table}[t]
   \centering
@@ -1215,8 +1211,7 @@ matched to the T-FEN.
     a control without spatial context; the one-hop floor, a rung of the
     locality ladder and a truncation of the index-space arm; and the
     free-form FEN at width 96, which is smaller than the T-FEN it is
-    compared with by a factor of 1.97. The free-form FEN at width 139 is
-    matched to the T-FEN.}
+    compared with by a factor of 1.97.}
   \label{tab:method:params}
   \small
   \begin{tabular}{p{0.34\textwidth} r r p{0.30\textwidth}}
@@ -1226,10 +1221,7 @@ matched to the T-FEN.
     Graph solver, dilated stencil (canonical) & 67\,147 & 1.00 & reference \\
     Graph solver, index-space $k$-NN & 67\,147 & 1.00 & graph geometry \\
     T-FEN & 68\,503 & 1.02 & finite-element operator with transport \\
-    FEN, free-form only, width 96 & 34\,785 & 0.52 & transport term (not
-      matched) \\
-    FEN, free-form only, width 139 & 68\,282 & 1.02 & transport term
-      (matched) \\
+    FEN, free-form only, width 96 & 34\,785 & 0.52 & transport term \\
     % Graph U-Net & 72\,713 & 1.08 & pyramid with a graph operator \\ % arm dropped 2026-09-27
     FNO & 79\,160 & 1.18 & global support, no local path \\
     FNO with $3 \times 3$ local path & 79\,960 & 1.19 & global support plus

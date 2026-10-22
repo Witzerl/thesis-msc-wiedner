@@ -54,17 +54,15 @@ the forecasting of GA and states the problem formally.
     optic disc, the mean measured in healthy right eyes
     \citep{Nair2021}. The dashed square is the
     $6 \times 6$\,mm fovea-centred OCT scanning window used in this
-    thesis (\S\ref{sec:background:ga-oct:muw}). Both drawings were
-    generated with an image-generation model (ChatGPT, OpenAI) and
-    checked against the anatomy by the author; labels, zone circles and
-    the scanning window were added by the author.}
+    thesis (\S\ref{sec:background:ga-oct:muw}). Drawings generated with
+    ChatGPT; labels added and verified by the author.}
   \label{fig:bg:eye-anatomy}
 \end{figure}
 
 Figure~\ref{fig:bg:eye-anatomy} (left) shows the eye in cross-section.
 Light enters at the front through
 the \emph{cornea} and \emph{lens}, traverses the gel-filled vitreous
-body, and is focused onto the \emph{retina} --- a thin
+body, and is focused onto the \emph{retina}. The retina is a thin
 neural-tissue lining at the back of the eye that converts the
 incoming light pattern into electrical signals. The conversion takes
 place in the \emph{photoreceptors}, the light-sensitive cells of the
@@ -83,8 +81,9 @@ region, the \emph{macula}, is specialised for
 high-acuity central vision, while the rest of the retina handles
 peripheral vision at lower resolution. The macula has a diameter of
 roughly five to six millimetres and is the only part of the retina
-that GA affects clinically. The OCT scanning window used throughout
-the thesis is therefore centred on the macula and covers a $6 \times 6$\,mm field
+that GA affects clinically (\S\ref{sec:background:ga-oct:disease}). The
+OCT scanning window used throughout the thesis
+(\S\ref{sec:background:ga-oct:oct}) is therefore centred on the macula and covers a $6 \times 6$\,mm field
 (\S\ref{sec:background:ga-oct:muw}). Within the macula, four
 concentric anatomical zones are conventionally distinguished, in
 order of increasing radius from the centre: the \emph{foveola}, the
@@ -153,10 +152,8 @@ Chapter~\ref{ch:data}.
     appears as a patch. The highlighted A-scan, B-scan and line correspond
     to each other. The lateral footprint of the scans used in this thesis
     is approximately $6 \times 6$\,mm (\S\ref{sec:background:ga-oct:muw}).
-    Panel~(a) was generated with an image-generation model (ChatGPT,
-    OpenAI) and checked by the author; its labels and the A-scan curve,
-    and panel~(b), were drawn by the author, the latter with the layer
-    drawing of Figure~\ref{fig:bg:retinal-anatomy} as the B-scan.}
+    Drawings generated with ChatGPT; labels added and verified by the
+    author.}
   \label{fig:bg:oct-acquisition}
 \end{figure}
 
@@ -232,8 +229,8 @@ and FAF has become the gold standard for detecting and measuring GA area
   \label{fig:bg:ga-faf}
 \end{figure}
 
-OCT is preferred over fundus autofluorescence (FAF), the other common
-imaging modality for GA, for three reasons given by \citet{Vallino2024}: it
+Although FAF is the standard for measuring GA area, \citet{Vallino2024}
+give three reasons to prefer OCT: it
 shows each retinal layer in cross-section and so permits layer-wise
 quantitative analysis, it detects atrophy earlier in its natural history,
 and it remains reliable near the fovea, where blue-light FAF is less reliable.
@@ -261,8 +258,8 @@ modelled at native voxel resolution. The clinical literature works with an \emph
 retina seen from the front, as in a fundus photograph, in which every pixel
 corresponds to one A-scan of the volume and summarises what lies along it
 \citep{Pilotto2015,Chu2022,Yehoshua2011,Vallino2024}
-(Figure~\ref{fig:bg:oct-acquisition}(b), right). The present work
-adopts the same convention.
+(Figure~\ref{fig:bg:oct-acquisition}(b), right). This thesis adopts the
+same convention.
 
 Several ways of forming the en-face image from the volume are used in the
 literature, for example summing the full depth of each A-scan
@@ -309,9 +306,8 @@ chapters.
     (choroidal hypertransmission); (iii)~the RPE--BM complex is
     thickened at the lesion margin
     \citep{Sadda2018,Chu2022}. The choriocapillaris is lost under the
-    lesion \citep{Boopathiraj2024}. Both drawings were generated with an
-    image-generation model (ChatGPT, OpenAI) and checked against the
-    anatomy by the author; the labels were added by the author.}
+    lesion \citep{Boopathiraj2024}. Drawings generated with ChatGPT;
+    labels added and verified by the author.}
   \label{fig:bg:retinal-anatomy}
 \end{figure}
 
@@ -485,7 +481,12 @@ WENO the classical mechanism closest to what a learned operator does.
 \paragraph{Global methods.}
 Pseudospectral methods compute derivatives in Fourier space instead of from a neighbourhood: the
 field is transformed, each mode is multiplied by $(i\omega)^n$, and the
-result is transformed back. The derivative at every point then depends
+result is transformed back,
+\begin{equation*}
+  \partial_x^n u \;=\; \mathcal{F}^{-1}\big[(i\omega)^n\, \hat u(\omega)\big],
+  \qquad \hat u = \mathcal{F}[u].
+\end{equation*}
+The derivative at every point then depends
 on all grid values. The accuracy is excellent for smooth solutions on
 periodic domains, but the method breaks down for non-smooth solutions
 \citep{GottliebOrszag1977, Trefethen2000}.
@@ -644,8 +645,8 @@ is applied in the residual form of~\eqref{eq:bg:euler}, which keeps the
 update consistent. The graph operator of this thesis is built on this
 solver and is described in~\S\ref{sec:method:mppde}.
 
-A learned solver does not require $f$ to be written down. Because $f$
-is fitted to data, the solver can be used where the equation is
+A learned solver does not require $f$ to be written down, because $f$
+is fitted to data. The solver can therefore be used where the equation is
 expensive to solve, known only approximately, or unknown, and it can
 often run on coarser grids with larger steps. In exchange, the classical
 guarantees are lost. A learned solver needs training data, has no
@@ -761,13 +762,14 @@ Chapter~\ref{ch:experiments} measures the four properties one at a time.
 % pixel-wise GA growth prediction from OCT), Zhang2021 (Med Image Anal,
 % time-adaptive GA prediction with explicit time factors).
 
-Work related to this thesis falls into four groups: models that predict
-the risk or the rate of AMD and GA progression, models that forecast
-where a GA lesion will grow, models that forecast disease progression
-from irregularly sampled longitudinal data in general, and PDE-based
-models in biomedicine. The original papers of the architectures used as
-the operator are cited where each is introduced, in
-\S\ref{sec:background:neural-pde} and~\S\ref{sec:method:family}.
+% TODO (author, 2026-10-22, tablet review v7 #16): review Section 2.4 again.
+Related work is discussed in four groups.
+Section~\ref{sec:background:related-work:rate} covers models that predict
+the risk or the rate of AMD and GA progression,
+\S\ref{sec:background:related-work:spatial} models that forecast where a
+GA lesion will grow, \S\ref{sec:background:related-work:irregular}
+forecasts from irregularly sampled longitudinal data in general, and
+\S\ref{sec:background:related-work:pde} PDE-based models in biomedicine.
 
 \subsection{Predicting the Risk and Rate of Progression}
 \label{sec:background:related-work:rate}
@@ -791,13 +793,22 @@ reached a squared correlation of 0.33 to 0.35 between predicted and
 observed growth rate on a holdout set \citep{Yoshida2025}. For growth-rate
 models trained on FAF images, occlusion experiments showed that a rim of
 tissue around the lesion contributes more to the prediction than the
-lesion itself or the background \citep{Cluceru2024}.
+lesion itself or the background \citep{Cluceru2024}. Most of this
+literature formulates prediction at cohort level or per eye, as a
+categorical time to conversion or a single rate. The formulation used here
+instead requires a per-eye, per-time-step prediction of the full spatial
+next state.
 
 \subsection{Spatial Forecasting of GA Lesions}
 \label{sec:background:related-work:spatial}
 
-Closer to the task of this thesis are models that forecast the lesion
-itself. \citet{Gigon2021} predicted the progression of RORA from OCT
+A single rate per eye does not describe where a lesion grows, because
+the border of a GA lesion advances at different local speeds. The lateral
+spread of GA was slowest at regular borders, at about 63\,\textmu{}m per
+year, faster at irregular borders, at about 91\,\textmu{}m per year, and
+fastest at splitting borders, at about 183\,\textmu{}m per year
+\citep{Lindner2018}. Closer to the task of this thesis are therefore
+models that forecast the lesion itself. \citet{Gigon2021} predicted the progression of RORA from OCT
 en-face maps of layer thicknesses, mean reflectivity and drusen height in
 129 eyes of 119 patients. Their model gives each en-face pixel a
 probability of atrophy over time, from which a map of the time to
@@ -824,17 +835,8 @@ uses pre-segmented lesion masks and layer surfaces.
 As a precedent for dense convolutional architectures on this task,
 \citet{Salvi2025} predicted future GA growth with a two-dimensional
 U-Net on fundus autofluorescence images.
-
-On a finer scale, the border of a GA lesion advances at different local
-speeds. The lateral spread of GA was slowest at regular borders, at about
-63\,\textmu{}m per year, faster at irregular borders, at about
-91\,\textmu{}m per year, and fastest at splitting borders, at about
-183\,\textmu{}m per year \citep{Lindner2018}.
-
-Most of the clinical literature formulates prediction at cohort level,
-as a categorical time-to-conversion problem. The formulation used here
-instead requires a per-eye, per-time-step prediction of the full spatial
-next state.
+% 2026-10-22 (tablet review v7 #19): the Lindner paragraph now opens this
+% subsection, the cohort-level sentence closes 2.4.1.
 
 \subsection{Forecasting from Irregularly Sampled Longitudinal Data}
 \label{sec:background:related-work:irregular}
@@ -1014,8 +1016,9 @@ Chapter~\ref{ch:experiments} compares them.
 % Section 4.2.1 still defines the same update (Eq. method:residual-update)
 % and should refer back to Eq. bg:problem-update.
 
+% TODO (author, 2026-10-22, tablet review v7 #20): review Section 2.5.2 again.
 Each eye of the cohort is observed at a sequence of visits at times
-$t_0 < t_1 < \dots < t_K$, with between five and thirteen visits per eye
+\mbox{$t_0 < t_1 < \dots < t_K$}, with between five and thirteen visits per eye
 and irregular intervals $\Delta t_k = t_{k+1} - t_k$, measured in years.
 At visit $k$, the state of the eye is a tensor
 \begin{equation*}
