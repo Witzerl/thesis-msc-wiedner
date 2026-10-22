@@ -1812,12 +1812,15 @@ Solvers?"); contributions back as bullet points. He offers a meeting.
 - [ ] **Abstract: deferred (author, 2026-10-14) until the rest of the thesis is settled**, so it is
   written once. Then rewrite to the supervisor's three-part structure (EN + DE); he calls it the most
   important part.
-  - [ ] 2026-10-22: **English abstract drafted** to SV-A1-A6 (problem / difficulty / aim / three
+  - [x] 2026-10-22: **English abstract rewritten** to SV-A1-A6 (problem / difficulty / aim / three
     contributions; data, framework, operators, measure, tests; results and a realistic closing estimate),
-    fits on one page (p. ii). Every number sourced in the comment block of `00-abstract.tex`. Left out
-    to fit the page: the 2023 US drug approvals, the 0.064/0.062 controls named in full. **Author to
-    approve**, then the German Kurzfassung (still the 2026-10-02 version, now out of step with the
-    English) is translated from it.
+    then revised after two external LLM reviews (author approved): the two Dice measures told apart,
+    "main difference is reach" scoped to operators with spatial context, binary mask annotated by graders,
+    reach defined by neighbour distance, closing limited to this cohort. Fits on p. ii; cut to fit: the
+    2023 US drug approvals, visits per eye, the no-change initialisation. Every number sourced in the
+    comment block of `00-abstract.tex`. German Kurzfassung translated from it (pp. iii-iv, as before).
+  - [ ] Author to check the German Kurzfassung (terms kept from the 2026-10-02 version: Rahmen, Operator,
+    Change-Region-Dice, Folds; new: "von Befundern annotierte GA-Maske", "gedehnter Stencil").
 - [ ] **Worklist for Ch. 1-3** (2026-10-14): `reviews/worklist-ch1-3-2026-10-14.md` -- supervisor
   items and the still-open AI-review items in one list, by current section (15 supervisor points,
   119 AI items: 65 medium, 54 low; 23 AI items resolved by the restructure and bridges).
