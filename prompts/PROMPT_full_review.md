@@ -143,10 +143,38 @@ and is the clinical framing careful?"*
   capitalisation of headings and hyphenation consistent.
 - A mechanical issue that recurs within a unit is reported **once**, with the count in the problem
   and up to five other locations in "also at". (The thesis-wide sweep lists all locations.)
-- **The same format in every chapter**: chapter openings and closings, section intros and
-  conclusions, headings, cross-reference forms, citations, numbers and units, captions, tables,
-  figures and equations follow one convention throughout. The per-unit copy editor checks its own
-  unit; two thesis-wide format passes compare the chapters with each other.
+## Thesis-wide checks
+
+The six reviewers see one unit each, so they cannot judge what only shows across chapters. Separate
+passes read the whole thesis for that. Each reports its findings in the same format, at the place to
+change, with the other places in "also at".
+
+- **Structure and argument**: chapter and section order (THESIS_STRUCTURE.md, Guide §11.3), the two
+  sub-questions stated in Chapter 1 and answered in Chapter 7, abstract, contributions, §5.9, §6.1
+  and Chapter 7 saying the same thing, page budgets, every float and appendix referred to.
+- **Flow** (four passes, each reading one stretch of the thesis front to back, overlapping at the
+  chapter boundaries): every chapter and section opening connects to what came before and says
+  what follows, every closing hands over; the paragraphs of a section build its argument in order
+  (Guide §2.1, §5); links between paragraphs (§3); no topic introduced and dropped; forward
+  references the reader cannot follow yet; places where the reader loses the thread; the
+  hour-glass shape of the whole.
+- **Repetition**: the same fact, caveat, argument, definition or explanation stated in full in more
+  than one place (the author's rule: state it once, elsewhere a short pointer; summaries the
+  structure requires, i.e. the abstract, §5.9, Chapter 7 and the short purpose statement at the
+  start of a results section (Guide §11.4), are allowed but stay shorter than the original); and
+  the same wording reused (sentences or stock phrases that recur across chapters), found with a
+  script.
+- **Consistency**:
+  - *facts and definitions*: every definition and every claim about the data and the setting
+    agrees wherever it is stated;
+  - *numbers*: every number that appears more than once has the same value, rounding and
+    comparison everywhere (four passes);
+  - *terminology*: one concept, one name (the ledger step, CLAUDE.md Terminology);
+  - *format*: chapter openings and closings, section intros and conclusions, headings,
+    cross-reference forms, citations, numbers and units, captions, tables, figures and equations
+    follow one convention throughout (two passes, which also report the convention and its
+    deviations);
+  - *mechanics*: recurring language patterns, with all locations.
 
 ## Severity
 
@@ -243,11 +271,10 @@ piece of feedback with its ID, the problem, the fix, and a status: *Done*, *Deci
 2. **Review** (15 units, in parallel). Six reviewer agents per unit, plus a prerequisite-inventory
    agent; then up to two completeness rounds (a fresh agent reports what the six missed, until a
    round finds fewer than three new problems); then a merge of duplicates.
-3. **Whole thesis** (in parallel with 2). Structure and argument; consistency of facts and
-   definitions across chapters; consistency of numbers (four parts); consistency of format across
-   chapters (text conventions, and figures, tables and equations), each returning the convention
-   and its deviations; a thesis-wide sweep for recurring mechanical patterns; the regression check over all *Done* feedback items in batches of
-   20; after the units, the prerequisite ledger, the terminology table and the acronym list.
+3. **Whole thesis** (in parallel with 2). The passes of "Thesis-wide checks" (structure, four flow
+   passes, two repetition passes, facts, four number passes, two format passes, mechanics); the
+   regression check over all *Done* feedback items in batches of 20; after the units, the
+   prerequisite ledger, the terminology table and the acronym list.
 4. **Verify.** Every finding is judged by three independent lenses: *text* (quote exists and is
    printed, correct line, printed page, fix preserves facts), *rule* (rule real and applicable, not
    a settled or decided item), *sceptic* (tries to refute it). A finding is dropped if the text lens
@@ -280,11 +307,13 @@ In `reviews/full-review-<YYYY-MM-DD>/`: `00-summary.md`, `01-findings.md`, and t
 7. **Format conventions**: for each aspect (chapter openings and closings, headings,
    cross-references, numbers and units, captions, tables, figures, equations, …) the convention the
    thesis follows in most places, the number of deviations and where they are.
-8. Build log: undefined references, undefined citations, overfull boxes above 5 pt, with pages.
-9. **Feedback log check**: items checked and their outcome, regressions (log ID → finding ID), items
+8. **Repetition across chapters**: each topic stated in full more than once, where it appears and
+   where it should be stated in full.
+9. Build log: undefined references, undefined citations, overfull boxes above 5 pt, with pages.
+10. **Feedback log check**: items checked and their outcome, regressions (log ID → finding ID), items
    whose resolution could not be confirmed (with the reason), deferred items still visible.
-10. Decisions worth reconsidering (if any), each with one sentence of reasoning.
-11. Coverage: units, passes, verification batches or writes that failed, and how many findings
+11. Decisions worth reconsidering (if any), each with one sentence of reasoning.
+12. Coverage: units, passes, verification batches or writes that failed, and how many findings
     could not be fully verified.
 
 **`01-findings.md`**, the full sequential list: an index table
@@ -519,6 +548,17 @@ const FORMAT_RESULT = {
     }, required: ['aspect', 'convention', 'deviations', 'where'] } },
   },
   required: ['verdict', 'findings', 'reconsider', 'conventions'],
+}
+const REPEAT_RESULT = {
+  type: 'object',
+  properties: {
+    verdict: { type: 'string' }, findings: { type: 'array', items: FINDING }, reconsider: { type: 'array', items: { type: 'string' } },
+    repeats: { type: 'array', items: { type: 'object', properties: {
+      topic: { type: 'string' }, places: { type: 'string', description: 'every place it is stated, as file:line; ...' },
+      keep: { type: 'string', description: 'the place where it should be stated in full' },
+    }, required: ['topic', 'places', 'keep'] } },
+  },
+  required: ['verdict', 'findings', 'reconsider', 'repeats'],
 }
 const PARAS = {
   type: 'object',
@@ -801,6 +841,13 @@ async function reviewUnit(u) {
 
 // ---------- phase 3: whole-thesis passes ----------
 const supBlock = `Feedback-log items (use their IDs in "recurs"; decided items must not be raised; a problem a deferred item covers is not a finding):\n${supText}`
+const FLOW_STRETCHES = [
+  { key: 'a', scope: 'the English abstract (00-abstract.tex), Chapter 1 (01-introduction.tex) and Chapter 2 (02-background.tex), up to the opening of Chapter 3 (03-data.tex)' },
+  { key: 'b', scope: 'from the last section of Chapter 2 (02-background.tex, \\section{Modelling Approach and Problem Statement}) through Chapter 3 (03-data.tex) and Chapter 4 (04-method.tex), up to the opening of Chapter 5 (05-experiments.tex)' },
+  { key: 'c', scope: 'from the last section of Chapter 4 (04-method.tex) through Chapter 5 (05-experiments.tex), Chapter 6 (06-discussion.tex) and Chapter 7 (07-conclusion.tex)' },
+  { key: 'd', scope: 'the appendices (91-appendix.tex): each appendix and its link to the place in the main text that points to it' },
+]
+const flowPrompt = st => `Task: FLOW of one stretch of the thesis: ${st.scope}. Read this stretch front to back in order, as a reader would, without skimming (skip comment lines). Check: (1) every chapter and section opening connects to what came before and says what follows; every closing hands over to the next part; (2) within each section the paragraphs build its argument in a sensible order (Guide §2.1, §5); (3) the link from paragraph to paragraph (§3): no abrupt jump, no topic introduced and then dropped, no paragraph that belongs elsewhere; (4) forward references that ask the reader to accept something not yet explained, and backward references that repeat instead of pointing; (5) places where a reader loses the thread or cannot tell why the passage is there; (6) the hour-glass shape of the thesis (THESIS_STRUCTURE.md, Narrative Constraint) as far as this stretch shows it. Do not report single-sentence wording, mechanics or terminology (other passes cover them). Report each problem at the place to change: for a transition, at the opening of the later part, with the earlier place in alsoAt; the fix is a concrete bridge sentence or a concrete move. Set "persona" to "Colleague" or "Supervisor". verdict: 3-5 sentences on the flow of this stretch, naming its weakest transition.`
 const numbersPrompt = part => `Task: internal consistency of numbers, part: ${part}. Collect every quantitative result stated in this part (scores, differences, counts of folds and eyes, parameter counts, ratios, cohort statistics). For each, find all other places in the thesis where it appears: grep -F the exact printed form (e.g. 0.064) with --include="*.tex" and skip lines that start with %, including tables, captions and appendices. Check that value, rounding and the stated comparison (which arm minus which, which seed, which measure) agree. Report every mismatch as a finding, located in this part, with the other place in alsoAt: S1 for a different value or comparison, S3 for inconsistent rounding. Do not check numbers against run records or sources. Set "persona" to "External reviewer". verdict: "<checked> numbers checked, <n> disagree".`
 const MACRO = [
   { key: 'structure', reviewers: ['Examiner', 'Supervisor'], prompt: () => `Task: whole-thesis structure and argument (examiner and supervisor perspectives; set "persona" to "Examiner" or "Supervisor"). Read in full the abstract (English and German), Chapter 1 and Chapter 7; read the opening and the closing paragraph of every chapter and section; read THESIS_STRUCTURE.md (Framing and the revisions of 2026-09-25, 2026-10-12 and 2026-10-18; the agreed structure and page budgets, not ground truth for facts). Check: the chapter and section order against THESIS_STRUCTURE.md and Guide §11.3; both sub-questions stated in Chapter 1 and answered explicitly in Chapter 7; the abstract, the contributions (§1.3), the results summary (§5.9), the interpretation (§6.1) and the conclusion say the same thing; chapter lengths against the page budgets (chapter start pages: ${JSON.stringify((build && build.chapterStartPages) || [])}); every figure, table and appendix referred to in the text; nothing called a test-set result; English abstract and Kurzfassung agree in content. Report each problem at the location you would change (for a mismatch, the other place in alsoAt). verdict: 4-6 sentences on the thesis as a whole, ending with the main risk to the grade.` },
@@ -811,6 +858,9 @@ const MACRO = [
   { key: 'numbers-d', reviewers: ['External reviewer', 'Examiner'], prompt: () => numbersPrompt('Chapter 7 (07-conclusion.tex)') },
   { key: 'format-text', reviewers: ['Copy editor', 'Examiner'], schema: FORMAT_RESULT, prompt: () => `Task: consistency of format ACROSS chapters (the per-unit reviewers only see one unit). Compare all chapters, the front matter and the appendices, with grep and by reading the chapter openings and closings, for these aspects: (1) chapter openings (does every chapter open with the same kind of paragraph, e.g. purpose plus a map of its sections?) and closings (summary or bridge to the next chapter: the same pattern everywhere?); (2) section intros and conclusions (Guide §11.4) as a pattern across chapters, not per section; (3) headings: capitalisation style, length, depth of nesting, numbering, no question marks, run-in \\paragraph headings; (4) cross-references: Section~\\ref vs \\S\\ref vs "Sec.", Chapter/Figure/Table/Equation vs "Fig."/"Tab."/"Eq.", non-breaking spaces before \\ref and \\cite, capitalised "Table 5.1"; (5) citations: \\citet/\\citep use (CLAUDE.md), placement before or after punctuation; (6) numbers and units: decimal places for the same kind of quantity (e.g. Dice to three decimals), thousands separators (67,147), ± and spacing, percentages, µm vs mm, \\times, en-dash ranges, numerals vs words for small numbers; (7) quotation marks, emphasis (\\emph vs \\textbf), lists (itemize vs enumerate, punctuation at item ends), abbreviations (defined once, then always used), British spelling, hyphenation of compounds. For each aspect return the convention (the form used in most places, unless a rule in WRITING_GUIDE.md or CLAUDE.md requires another) and the number of deviations. Report each group of deviations from one convention as ONE finding at its first location, with ALL other locations in "alsoAt" (file:line list). Set "persona" to "Copy editor" or "Examiner". verdict: 2-3 sentences on how uniform the format is.` },
   { key: 'format-floats', reviewers: ['Copy editor', 'Supervisor'], schema: FORMAT_RESULT, prompt: () => `Task: consistency of figures, tables and equations ACROSS the whole thesis. Read every \\begin{figure}, \\begin{table} and displayed equation in all chapter files, and look at the rendered pages of ${WORK}/build/main-thesis.pdf where the look matters (you may open PDF pages with the Read tool). Aspects: (1) captions: same structure everywhere (a short title, then the details needed to read the float, Guide §5.2), self-contained (CLAUDE.md), ending punctuation, what "±" means stated where it is used ("mean ± sd over the five folds"), caption length; (2) caption position (table captions above, figure captions below, or whatever the majority does) and label placement; (3) tables: rule style (booktabs or not), alignment of numeric columns, decimal places, units in the header, bold or marking of best values, notes and footnotes, width within the text block; (4) figures: consistent sizes for figures of the same kind, fonts and colours following style/ (palette of style/README.md; one colour per arm everywhere), panel labels (a)/(b) and how captions refer to them; (5) every float referred to in the text before or near where it appears, and in the order of numbering; (6) equations: punctuation after displayed equations, numbering only where referred to later (CLAUDE.md), notation consistent with §2.5.2; (7) placeholder or disabled figures still printed. For each aspect return the convention and the number of deviations. Report each group of deviations as ONE finding at its first location, with ALL other locations in "alsoAt". Set "persona" to "Copy editor" or "Supervisor". verdict: 2-3 sentences on how uniform the floats are.` },
+  ...FLOW_STRETCHES.map(st => ({ key: `flow-${st.key}`, reviewers: ['Colleague', 'Supervisor'], prompt: () => flowPrompt(st) })),
+  { key: 'repetition-content', reviewers: ['Supervisor', 'Examiner'], schema: REPEAT_RESULT, prompt: () => `Task: repetition of CONTENT across the whole thesis. Find every fact, caveat, argument, definition, explanation of a method or result summary that is stated in full in more than one place (typical candidates: the crop census, the cohort description, the caveats of the comparison with Mai et al. 2024, the continuous-time caution, the reach argument, the research question and its answer, descriptions of the framework). The author's rule: state a thing in full once, elsewhere a short pointer. Summaries the structure requires are allowed (the abstract, §5.9 Summary, Chapter 7, and the short purpose statement at the start of a results section, Guide §11.4), but they must stay shorter than the original and must not repeat its detail; a number quoted again in such a summary is not a repetition. Method: collect candidate topics from the chapter openings and closings and by grepping key numbers and terms; then read every occurrence in context (skip comment lines). For each repeated topic return a "repeats" entry (topic, every place, where it should be stated in full) and ONE finding located at the first redundant place, with the other redundant places in alsoAt; rule "Guide §4" or the feedback-log item that set the rule; the fix names the pointer that replaces the copy. Set "persona" to "Supervisor" or "Examiner". verdict: 2-3 sentences on how much the thesis repeats itself.` },
+  { key: 'repetition-wording', reviewers: ['Copy editor'], prompt: () => `Task: repetition of WORDING across the whole thesis. Write and run a short script (${PY}) over the chapter files 00-abstract.tex (English part), 01-introduction.tex ... 07-conclusion.tex and 91-appendix.tex that drops comment lines and \iffalse blocks, strips LaTeX commands, math and citations, normalises case and whitespace, and lists (a) every sequence of 7 or more words that occurs in more than one place, and (b) every phrase of 3-5 words, other than technical terms and ordinary function-word combinations, that occurs 4 or more times. Read each hit in context. Report as findings those that read as repetition: the same sentence or half-sentence reused, a stock phrase that recurs ("on equal terms" and the like), the same sentence opening used again and again. Group each phrase into ONE finding at its first occurrence with ALL other places in alsoAt (rule Guide §4, or Guide §11.5 for LLM-like stock phrases). Skip defined terms, headings, labels and captions that repeat a table title, and phrases fixed by the terminology rules. Set "persona" to "Copy editor". verdict: the number of repeated phrases found and reported.` },
   { key: 'mechanics', reviewers: ['Copy editor'], prompt: () => `Task: thesis-wide sweep for recurring mechanical issues (Guide §1, §2.7, §3, §4, §6, §11.5) over the printed text of all chapter files, with grep (skip comment lines). For each pattern that occurs more than twice in the thesis, report ONE cross-cutting finding: the count in "problem", the first occurrence as file, line and quote, and ALL other locations in "alsoAt" as a list of file:line without quotes. Patterns at least: sentences starting with And/But/So/Because; contractions; get; vague quantities; prove/disprove for results; "it can be seen", "it is shown that"; "the fact that"; "in order to"; e.g./i.e. outside brackets; em-dash asides (---); "data is"; sentence-final too/also/though/yet; emphatic adverbs (crucially, fundamentally, entirely, clearly, simply, actually, naturally, notably); the LLM patterns of Guide §11.5 ("not X but Y", "X, not Y", "What ... is that ...", "is not what decides"); American spellings (-ize, -yze, color, behavior, modeling); mixed µm/mm for the same kind of quantity; inconsistent hyphenation of one compound (e.g. change-region / change region); \\cite instead of \\citet/\\citep. Set "persona" to "Copy editor". verdict: the counts in one or two sentences.` },
 ]
 
@@ -819,7 +869,7 @@ async function runMacro(m) {
   if (!r) { FAILS.push(`whole-thesis pass "${m.key}" failed`); return null }
   const fs = r.findings.map(f => ({ ...f, reviewers: [personaOf(f, m.reviewers[0])] }))
   const v = await verify(`whole:${m.key}`, 'the whole thesis', fs)
-  return { key: m.key, verdict: r.verdict, reconsider: r.reconsider || [], conventions: r.conventions || [], findings: v.map(f => ({ ...f, unit: 'whole' })) }
+  return { key: m.key, verdict: r.verdict, reconsider: r.reconsider || [], conventions: r.conventions || [], repeats: r.repeats || [], findings: v.map(f => ({ ...f, unit: 'whole' })) }
 }
 
 const REG_ITEMS = FB.filter(it => it.status === 'fixed')
@@ -1080,7 +1130,16 @@ const summaryText = [
   ...macroOk.filter(m => m.key.startsWith('format')).flatMap(m => m.conventions).map(c => `| ${cell(oneLine(c.aspect, 80))} | ${cell(oneLine(c.convention, 200))} | ${c.deviations} | ${cell(oneLine(c.where, 200))} |`),
   ...(macroOk.some(m => m.key.startsWith('format')) ? [] : ['| (the format passes failed) | | | |']),
   '',
-  '## 8. Build log',
+  '## 8. Repetition across chapters',
+  '',
+  'Topics stated in full in more than one place, and where they should be stated in full (elsewhere a short pointer). Each is one finding in 01-findings.md.',
+  '',
+  '| Topic | Stated at | State in full at |',
+  '|---|---|---|',
+  ...macroOk.filter(m => m.key === 'repetition-content').flatMap(m => m.repeats).map(r => `| ${cell(oneLine(r.topic, 100))} | ${cell(oneLine(r.places, 300))} | ${cell(oneLine(r.keep, 80))} |`),
+  ...(macroOk.some(m => m.key === 'repetition-content') ? [] : ['| (the repetition pass failed) | | |']),
+  '',
+  '## 9. Build log',
   '',
   build ? `PDF ${build.ok ? 'built' : 'not built'}, ${build.complete ? 'complete' : 'incomplete'}, ${build.pdfPages} pages, ${build.minutes} min.` : 'The build step failed.',
   '',
@@ -1088,7 +1147,7 @@ const summaryText = [
   '|---|---|---|---|',
   ...((build && build.problems) || []).map(p => `| ${p.kind} | ${normFile(p.file)}:${p.line} | ${cell(p.page)} | ${cell(oneLine(p.detail, 200))} |`),
   '',
-  '## 9. Feedback log check',
+  '## 10. Feedback log check',
   '',
   `${FEEDBACK}: ${FB.length} items parsed; ${REG_ITEMS.length} done items checked: ${tally}.`,
   '',
@@ -1106,11 +1165,11 @@ const summaryText = [
   '',
   ...deferred.map(it => `- ${it.id}: ${oneLine(it.feedback, 200)}`),
   '',
-  '## 10. Decisions worth reconsidering',
+  '## 11. Decisions worth reconsidering',
   '',
   ...((TH.reconsider || []).length ? TH.reconsider.map(r => `- **${oneLine(r.decision, 150)}.** ${oneLine(r.reason, 300)}`) : ['None.']),
   '',
-  '## 11. Coverage',
+  '## 12. Coverage',
   '',
   `${coverage.units}; whole-thesis passes ${coverage.wholeThesisPasses}; feedback log ${coverage.feedbackItems}. ${DROPPED} findings were dropped by verification; ${UNVERIFIED} were kept although a verifier failed.`,
   '',
