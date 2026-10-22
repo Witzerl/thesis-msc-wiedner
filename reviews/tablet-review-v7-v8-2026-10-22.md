@@ -179,7 +179,7 @@ Decoded from `main-thesis_v7_261019_191032.sdocx` (marks on the thesis build of 
 | 118 | v8 p.97 | B | bracket: Figure D.1 shows rollouts | this has changed since | `91-appendix.tex:86` | done (text redone 2026-10-21); author ok |
 | 119 | v8 p.99 | B | note: Table E.1 | global methods much worse on borders? | `91-appendix.tex:156` | done 2026-10-22: one sentence after Table E.1 |
 | 120 | v8 p.99 | B | note: E.2 heading | new page + table, then E.3 | `91-appendix.tex:179` | done 2026-10-22: E.2 on new page, Table E.2 below, then E.3 |
-| 121 | v8 p.99 | B | highlight: “for the late-epoch change-region Dice of a single run of a graph network …” | check number (sigma = 0.0127) | `91-appendix.tex:240` | [ ] |
+| 121 | v8 p.99 | B | highlight: “for the late-epoch change-region Dice of a single run of a graph network …” | check number (sigma = 0.0127) | `91-appendix.tex:240` | done 2026-10-22: checked, 0.0127 = mean |difference| of the seven replicate pairs (0.0143) x sqrt(pi)/2 |
 | 122 | v8 p.100 | B | highlight: “is about 2.5 or larger in magnitude” | really? | `91-appendix.tex:267` | done 2026-10-22: bar kept at about 2.5, reason given in E.3 (fellow eyes, about 50 tests, set when read); only T-FEN - stencil depends on it |
 | 123 | v8 p.101 | B | note: E.5 heading | new page | `91-appendix.tex:456` | done 2026-10-22: \clearpage before E.5 |
 | 124 | v8 p.103 | B | note: Table E.4 | this needs to go below Table E.3 | `91-appendix.tex:350` | done 2026-10-22: Tables E.3-E.5 on new pages after the E.4 text |

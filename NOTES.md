@@ -2304,7 +2304,7 @@ byte 0x65 at point-list offset -7, as before; page offset -1 against the embedde
 each matched to the current `.tex`: `reviews/tablet-review-v7-v8-2026-10-22.md`; numbered overlay
 `reviews/tablet-review-v7-v8-2026-10-22-overlay.pdf` (git-ignored, 8.5 MB). Being worked through one item
 at a time, as dictated by the author.
-- [ ] Work through the 151 marks of `reviews/tablet-review-v7-v8-2026-10-22.md` (8 already done since the
+- [x] (all 151 done or decided 2026-10-22) Work through the 151 marks of `reviews/tablet-review-v7-v8-2026-10-22.md` (8 already done since the
   reviewed builds: #22, #27, #28, #66, #71, #118 and partly #85, #97).
 - [x] 2026-10-22 App. A/D/E/F marks done (#117-#127): figure and table placement, Table E.1 sentence,
   code-version sentence removed; E.3 rewritten in three short paragraphs (noise, the two tests, the rule).
