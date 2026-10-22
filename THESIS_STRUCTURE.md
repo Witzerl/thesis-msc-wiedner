@@ -226,6 +226,8 @@ BibTeX file. Expect 40-80 references: clinical GA literature, OCT imaging, PDE n
 
 ## Appendices
 
+**Revision 2026-10-22 (author):** B (Extended derivations) and C (Full hyperparameters) are **dropped** — their content is in the main text (§4.2 hyperparameter table, §4.3.8 parameter table, §5.5.3 and Appendix E for widths and seeds), and no derivation is promised anywhere. Appendix A keeps its two figures without demographic tables; Appendix E keeps the tables Chapter 5 points to. The letters below are the original plan: in the PDF, D → B, E → C, F → D, G → E. Code comments and older notes still use the old letters.
+
 - **A. Dataset details** — Full demographic tables, visit-interval histograms, per-channel statistics, the crop-censoring census, lesion-area and growth-rate distributions.
 - **B. Extended derivations** — pushforward stability argument, the Courant/CFL bound used to read the transport velocity (Monge–Ampère and the monitor function move to Appendix G).
 - **C. Full hyperparameters** — Everything not in the main text: all architecture widths per arm, all training schedules, random seeds, the parameter-matching table.

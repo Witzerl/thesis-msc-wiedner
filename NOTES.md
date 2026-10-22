@@ -2435,9 +2435,13 @@ at a time, as dictated by the author.
   confirmed by the author.
 - [ ] Reply mail to the supervisor, remaining points: how MUW assigned the fold split files; SV-4.2
   (moving mesh into the main text?); SV-5.12 (post-hoc step-size ladder enough?); final thesis title.
-- [ ] Empty Appendices B (Extended Derivations) and C (Full Hyperparameters): fill or drop. Appendix A
+- [x] (2026-10-22, author: dropped) Empty Appendices B (Extended Derivations) and C (Full Hyperparameters): fill or drop. Appendix A
   still has the TODO for demographic tables, Appendix E the TODO "full tables for every ablation sweep"
   (it already holds the border/interior, criteria, statistics, step-ladder and growth-speed tables).
+  Done: B and C removed (nothing referenced them), both TODO comments removed. **Appendix letters in the
+  PDF shift: Rollouts D -> B, Ablation Details E -> C, Code F -> D, MM-PDE G -> E.** All printed
+  references use `\ref`; old letters remain only in LaTeX comments, script docstrings and these notes.
+  The older Appendices A-F TODO entries (Open TODOs section) are superseded by this.
 
 ### Assets that now exist and should be reused
 
