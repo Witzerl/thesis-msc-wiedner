@@ -495,8 +495,9 @@ the framework.
 
 Figure~\ref{fig:experiments:rollout} shows the rollout of the canonical
 model for one eye. Most of the lesion stays as it is, and the metric scores
-only the band of change along its border. Further eyes, including failure
-cases, are shown in Appendix~\ref{app:rollouts}.
+only the band of change along its border. Four further eyes with lesions
+of different size, number and growth rate are shown in
+Appendix~\ref{app:rollouts}.
 
 In summary, operators of different classes reach similar scores: the three
 highest arms come from three classes and lie within about 0.04 of each
@@ -531,7 +532,8 @@ over the whole follow-up of an eye, up to about six years. This section
 follows the forecast over that time. For every rollout step, the
 growth-region Dice of the predicted against the observed visit is assigned
 to a bin by the time since baseline; the values are averaged over the late
-epochs and pooled over the five folds (Table~\ref{tab:experiments:horizon}).
+epochs and pooled over the five folds (Table~\ref{tab:experiments:horizon});
+Figure~\ref{fig:experiments:horizon} shows the profile of four of them.
 The four bins hold 149, 149, 109 and 71 follow-up visits.
 
 \begin{table}[h]
@@ -568,6 +570,29 @@ visits, the $k$-NN graph network, the one-hop floor and the free-form FEN,
 score 0.388 to 0.397. The dense operators score 0.446 to 0.464, and the
 two operators that extend the reach of a local update, the dilated stencil
 and the T-FEN, score 0.503 and 0.519.
+
+% Figure: images/scripts/fig_experiments_horizon.py (thesis_numbers horizon
+% aggregation; Mai et al. 2024, Table 2).
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{images/fig_experiments_horizon.pdf}
+  \caption[Growth-region Dice by time since baseline.]{%
+    Growth-region Dice by time since baseline, averaged over the late
+    epochs and pooled over every rollout step in each bin and over the five
+    folds, seed 42.
+    \emph{(a)}~Profile over the four horizon bins for the dilated-stencil
+    graph network, the T-FEN, the U-Net (width 5) and the FNO; the bins
+    hold 149, 149, 109 and 71 follow-up visits. The dashed line gives the
+    values reported by \citet{Mai2024} on the full cohort from which the
+    data here are drawn; it is a reference, not a head-to-head
+    comparison (\S\ref{sec:experiments:qualitative:mai}).
+    \emph{(b)}~The first-year bin alone, on the same scale: the three
+    operators whose single step reaches less far than the per-visit front
+    advance (the $k$-NN graph network, the one-hop floor and the free-form
+    FEN) against the two constructions that remedy this deficit, the
+    dilated stencil and the transport term of the T-FEN.}
+  \label{fig:experiments:horizon}
+\end{figure}
 
 In the second and third year, the dilated stencil and the T-FEN stay level
 with each other and above all other operators. Beyond three years, the
@@ -865,29 +890,6 @@ those of the dilated stencil.
 % control's limit stated (a wider free-form term is one use of the
 % parameters, not every use) and the width-48 T-FEN added.
 
-% Figure: images/scripts/fig_experiments_horizon.py (thesis_numbers horizon
-% aggregation; Mai et al. 2024, Table 2).
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=\textwidth]{images/fig_experiments_horizon.pdf}
-  \caption[Growth-region Dice by time since baseline.]{%
-    Growth-region Dice by time since baseline, averaged over the late
-    epochs and pooled over every rollout step in each bin and over the five
-    folds, seed 42.
-    \emph{(a)}~Profile over the four horizon bins for the dilated-stencil
-    graph network, the T-FEN, the U-Net (width 5) and the FNO; the bins
-    hold 149, 149, 109 and 71 follow-up visits. The dashed line gives the
-    values reported by \citet{Mai2024} on the full cohort from which the
-    data here are drawn; it is a reference, not a head-to-head
-    comparison (\S\ref{sec:experiments:qualitative:mai}).
-    \emph{(b)}~The first-year bin alone, on the same scale: the three
-    operators whose single step reaches less far than the per-visit front
-    advance (the $k$-NN graph network, the one-hop floor and the free-form
-    FEN) against the two constructions that remedy this deficit, the
-    dilated stencil and the transport term of the T-FEN.}
-  \label{fig:experiments:horizon}
-\end{figure}
-
 \subsection{Summary of the Ablation Studies}
 \label{sec:experiments:ingredients:convergence}
 % Supervisor review 2, SV-5.10 (2026-10-19): heading was "Two Routes to One
@@ -964,7 +966,7 @@ when two operators are compared fold by fold.
 % Figure: images/scripts/fig_experiments_arms_folds.py (thesis_numbers
 % fold_late; every plotted fold value checked, five-fold means against
 % Table 5.1).
-\begin{figure}[t]
+\begin{figure}[h]
   \centering
   \includegraphics[width=\textwidth]{images/fig_experiments_arms_folds.pdf}
   \caption[Fold values of the five main operators.]{%

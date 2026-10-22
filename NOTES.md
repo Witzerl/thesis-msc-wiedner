@@ -2336,6 +2336,22 @@ at a time, as dictated by the author.
   run uses unrolling 2 at a 180-day base; the code-side depth sweep was left unrun). If wanted: stencil
   network with unrolling 0, 5 folds, cluster; otherwise one sentence in 6.3.
 - [x] (done 2026-10-22: anchor on the highlighted (thick) B-scan line, label below right) Open from review v8 #26: Fig. 2.2, the "B-scans" label should get an angled leader line.
+- [ ] 2026-10-22 §5.3, why every operator scores higher after the first year (author asked: unrolling?).
+  Checked on the canonical arm (late epochs, five folds; scratchpad `horizon_why.py`, not in the repo):
+  the rise sits in the first rollout step -- growth-region Dice by step 0.459 / 0.558 / 0.591 / 0.618 /
+  0.618 / 0.626; within the first-year bin step 0 0.459 vs step 1 0.556. It rises within the same eye
+  (bin 1 > bin 0 in 65/74 eyes, +0.096), so not eye composition. Not the amount of growth: within each
+  bin Dice does not depend on the true growth area (Spearman -0.03 to 0.04), and in every growth-area
+  tercile Dice still rises with the bin. Unrolling does not fit either: budgets of 0 and 180 days train
+  the first step from observed inputs (2/3 of passes), and beyond 360 days the model is outside its
+  training horizon yet keeps rising. Mai et al. (0.25 -> 0.38) and Gigon et al. (0.46 -> 0.57) show
+  the same first-year jump without any rollout, so it looks like a property of the task / reference
+  masks. First-year growth is a thin band (median 0.97 mm^2, proxy width ~130 um). Cause not
+  identified; decide whether §5.3 gets a sentence.
+- [x] 2026-10-22 Fig. `fig:experiments:horizon` moved into §5.3 (after the three-groups paragraph; it
+  lands at the top of the page where §5.4 starts); §5.3 references it. Fig. `fig:experiments:arms-folds`
+  set to [h], now under its first reference in §5.5 (it had floated above the §5.5 heading). §5.2
+  sentence on Appendix D no longer says "including failure cases".
 - [ ] TODO (author, review v8 #48/#65): review the new §5.3 "Forecasts Beyond One Year"
   (`sec:experiments:horizon`, Table `tab:experiments:horizon`; growth-region Dice per year bin for eight
   operators from `thesis_numbers.py horizon`, 2026-10-22). Chapter 5 renumbers from §5.4 on.
