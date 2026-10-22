@@ -2336,7 +2336,7 @@ at a time, as dictated by the author.
   run uses unrolling 2 at a 180-day base; the code-side depth sweep was left unrun). If wanted: stencil
   network with unrolling 0, 5 folds, cluster; otherwise one sentence in 6.3.
 - [x] (done 2026-10-22: anchor on the highlighted (thick) B-scan line, label below right) Open from review v8 #26: Fig. 2.2, the "B-scans" label should get an angled leader line.
-- [ ] 2026-10-22 §5.3, why every operator scores higher after the first year (author asked: unrolling?).
+- [x] (author 2026-10-22: no sentence in §5.3, left as is) 2026-10-22 §5.3, why every operator scores higher after the first year (author asked: unrolling?).
   Checked on the canonical arm (late epochs, five folds; scratchpad `horizon_why.py`, not in the repo):
   the rise sits in the first rollout step -- growth-region Dice by step 0.459 / 0.558 / 0.591 / 0.618 /
   0.618 / 0.626; within the first-year bin step 0 0.459 vs step 1 0.556. It rises within the same eye
