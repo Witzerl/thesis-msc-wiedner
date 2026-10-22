@@ -46,3 +46,6 @@ pdfs/
 images/_preview/
 images/data/
 images/scripts/__pycache__/
+
+# Tablet-review overlay PDFs (large, kept local)
+reviews/*-overlay.pdf

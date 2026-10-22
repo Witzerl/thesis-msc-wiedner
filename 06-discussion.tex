@@ -128,6 +128,16 @@ and after three years it lies above the U-Net
 descriptive and were not tested statistically, but they suggest that
 global context matters more for long forecasts than at one year.
 
+% TODO (author, 2026-10-22): add a paragraph that the T-FEN is borderline
+% better than the dilated-stencil network: +0.017 at both seeds, z = 2.1 at
+% both, per-eye t = 3.1 at seed 7 but 2.2 at seed 42, just under the bar of
+% about 2.5 (App. E.3), so very little is missing for it to count as the best
+% operator. Then give the reasoning why the stencil network nevertheless
+% stays the canonical model (cost about 4x lower, reference configuration of
+% the framework ablations, simpler long free-running rollouts; not the
+% chronology). Align with the canonical-model paragraph of 5.2 (review v8
+% #56-#58).
+
 \subsection{Capacity}
 \label{sec:discussion:capacity}
 

@@ -1812,6 +1812,12 @@ Solvers?"); contributions back as bullet points. He offers a meeting.
 - [ ] **Abstract: deferred (author, 2026-10-14) until the rest of the thesis is settled**, so it is
   written once. Then rewrite to the supervisor's three-part structure (EN + DE); he calls it the most
   important part.
+  - [ ] 2026-10-22: **English abstract drafted** to SV-A1-A6 (problem / difficulty / aim / three
+    contributions; data, framework, operators, measure, tests; results and a realistic closing estimate),
+    fits on one page (p. ii). Every number sourced in the comment block of `00-abstract.tex`. Left out
+    to fit the page: the 2023 US drug approvals, the 0.064/0.062 controls named in full. **Author to
+    approve**, then the German Kurzfassung (still the 2026-10-02 version, now out of step with the
+    English) is translated from it.
 - [ ] **Worklist for Ch. 1-3** (2026-10-14): `reviews/worklist-ch1-3-2026-10-14.md` -- supervisor
   items and the still-open AI-review items in one list, by current section (15 supervisor points,
   119 AI items: 65 medium, 54 low; 23 AI items resolved by the restructure and bridges).
@@ -2277,6 +2283,40 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
     (0.0050) would make the FNO arms count at seed 7 as well; it should not be used, since the U-Net's spread
     differs between folds. Recommendation: use the five-fold cluster estimate 0.0191 (sigma_Delta about 0.010,
     threshold about 0.020, i.e. the 0.020 already in the text).
+
+### Author's tablet reviews v7 + v8 (2026-10-22)
+
+Seventh and eighth handwritten reviews, decoded from `main-thesis_v7_261019_191032.sdocx` (build of
+2026-10-15, Ch. 1-3, 13 pages) and `main-thesis_v8_261022_121822.sdocx` (build of 2026-10-19, Ch. 2 to
+App. G, 62 pages). Blue = rewrite/question, red = wrong/remove. Highlighter strokes are now flagged by
+byte 0x65 at point-list offset -7, as before; page offset -1 against the embedded PDF. 151 marks (24 + 127),
+each matched to the current `.tex`: `reviews/tablet-review-v7-v8-2026-10-22.md`; numbered overlay
+`reviews/tablet-review-v7-v8-2026-10-22-overlay.pdf` (git-ignored, 8.5 MB). Being worked through one item
+at a time, as dictated by the author.
+- [ ] Work through the 151 marks of `reviews/tablet-review-v7-v8-2026-10-22.md` (8 already done since the
+  reviewed builds: #22, #27, #28, #66, #71, #118 and partly #85, #97).
+- [x] 2026-10-22 App. A/D/E/F marks done (#117-#127): figure and table placement, Table E.1 sentence,
+  code-version sentence removed; E.3 rewritten in three short paragraphs (noise, the two tests, the rule).
+  The per-eye bar stays at |t| of about 2.5, now justified by fellow-eye dependence (inflates t, not the
+  fold test) and about fifty comparisons. Only T-FEN - stencil depends on the bar (z = 2.1 at both seeds;
+  t = 2.17 at seed 42, 3.14 at seed 7; LOFO never changes sign). Dropped from E.3: the same-seed vs
+  cross-seed sentence (not true for the seven pairs: 0.021 vs 0.012), the "1.5 times" U-Net ratio, the
+  caveat that sigma rests on seven pairs.
+- [x] 2026-10-22 App. G marks done (#129-#151; #128 deferred to the existing TODO of moving MM-PDE out of
+  the appendix). Intro: two reasons for the appendix placement (modified considerably, may not suit the
+  setup); a drafted paragraph calling Hu et al.'s gains modest was dropped (cylinder: about half the error
+  of a larger GNN, not modest). G.2: author's argument why the correction branch needs k-NN (the mesh
+  gathers nodes, a dilated stencil would skip them). G.2.1: blur paragraph rewritten, anisotropic-blur /
+  Jacobian / 256x256 sentences removed, loss "weighted as in the original", new paragraph why training on
+  all masks needs no held-out set (honest limit kept: predicted masks after step 1 are unscored). G.2.2:
+  6 August sentence and "second reason for one-step" removed. G.3: only the 16-mask set over 13 eyes
+  (head-16 was a scorer bug); boundary weight justified via Hu App. C.3. G.4: no mean/max wording;
+  results in Chapter-5 wording with z; gradient probe and "untrained correction" reasoning removed;
+  new reach paragraph and a scope paragraph (one design, not a general statement on adaptive meshes).
+  Builds clean.
+- [ ] TODO (author, 2026-10-22, inline in 06-discussion.tex 6.1.2): paragraph that the T-FEN is borderline
+  better than the stencil network (+0.017, misses the per-eye bar only at seed 42) and why the stencil
+  network stays canonical anyway; align with 5.2 (#56-#58).
 
 ### Writing guide from Skern (2026-10-22)
 

@@ -23,7 +23,7 @@ lesion area ranges from 0.11 to 20.8\,mm$^2$, with a median of
 % the 49 x 1024 grid; gaps from tools/cohort_visit_stats.py). Reproduces every
 % cohort number of Chapter 3; growth-rate quantiles are order-statistic
 % (nearest-rank) quantiles, as in 3.1.
-\begin{figure}[t]
+\begin{figure}[h]
   \centering
   \includegraphics[width=\textwidth]{images/fig_appendix_cohort.pdf}
   \caption[Visit schedule and lesion scale of the cohort.]{%
@@ -52,7 +52,7 @@ window removes is given there.
 % Figure: images/scripts/fig_appendix_crop.py (native mask_oct.png per visit,
 % the precompute's centre-crop / pad arithmetic). 2026-10-21 (author): only the
 % grid panel; the lesion-loss curve was dropped (its numbers are in 3.3).
-\begin{figure}[t]
+\begin{figure}[h]
   \centering
   \includegraphics[width=0.6\textwidth]{images/fig_appendix_crop.pdf}
   \caption[Native grids and the modelling window.]{%
@@ -176,10 +176,17 @@ and~\S\ref{sec:experiments:qualitative}.
 % FEN_final_w96Frk4d45, MPPDE_final_aggrmean, MPPDE_final_l1mean; one row per
 % fold, none superseded; computed 2026-10-01.
 
+The global operators, the U-Net and both FNO arms, score lower on the
+border-touching eyes than on the interior ones, whereas the local
+operators score about the same on both groups
+(\S\ref{sec:experiments:folds}).
+% 2026-10-22 (tablet review v8 #119).
+
+\clearpage
 \section{Growth-Speed Measures for All Arms}
 \label{app:full-results:growth-speed}
 
-\begin{table}[h]
+\begin{table}[!h]
   \centering
   \caption[Growth-speed measures for all arms.]{%
     Eye-level growth-speed measures for every arm of
@@ -234,51 +241,46 @@ and~\S\ref{sec:experiments:qualitative}.
 % sd sqrt(mean(d^2)/2) = 0.0191 (NOTES, "U-Net run-to-run spread"); local
 % repeats on fold 2 vary less (0.005), fold 2 is a quiet fold. z values:
 % images/scripts/appendix_ztests.py.
-The noise level of~\S\ref{sec:experiments:protocol:stats} rests on seven
-pairs of runs with the same configuration on the same fold, two with the
-same seed and five with different seeds. They give a standard deviation of
-$\sigma \approx 0.0127$ for the late-epoch change-region Dice of a single
-run of a graph network. Same-seed and different-seed repeats spread about
-equally, so the seed adds nothing measurable on top of the variation
-between runs. The runs of the parameter-matched U-Net vary more: its two
-seeds on the five folds give $\sigma \approx 0.019$, about 1.5 times as
-much.
+Retraining the same model on the same fold changes its late-epoch
+change-region Dice by a standard deviation of $\sigma \approx 0.0127$ for a
+graph network, estimated from seven pairs of repeated runs, and of
+$\sigma \approx 0.019$ for the parameter-matched U-Net, estimated from its
+two seeds on the five folds.
 
-Every comparison is measured in two ways. The fold-paired test uses the
-mean $\bar{\Delta}$ of the per-fold differences of the late-epoch
-change-region Dice. If the two arms did not differ, $\bar{\Delta}$ would
-vary only through retraining, with a standard deviation
-$\sigma_\Delta = \sqrt{\sigma_A^2 + \sigma_B^2} / \sqrt{n}$ over $n$ folds:
-about 0.008 for two graph networks over five folds, and about 0.010 when
-one arm is the U-Net. The statistic $z = \bar{\Delta} / \sigma_\Delta$ is
-compared with a standard normal distribution; $|z| > 1.96$ (two-sided
-$p < 0.05$) corresponds to a mean difference above about 0.016, or about
-0.020 with a U-Net, and to about 0.036 for a difference on a single fold.
-The tables give $\bar{\Delta}$ with its standard error over the folds, the
-number of folds on which the first arm is higher, and $z$. The per-eye
-test pairs the two arms eye by eye. For each of the 75 validation
-eyes, the growth-region Dice at the eye's first rollout step at or beyond
-0.95 years (about 347 days) is averaged over the late epochs, and the
-tables give the mean difference, its standard error, the number of eyes on
-which the first arm is higher and the paired $t$ statistic. Both values are
-also recomputed with each fold left out in turn.
+Two arms are compared in two ways. The fold-paired test averages the
+differences of the two arms over the five folds. Without a real
+difference, this mean $\bar{\Delta}$ varies only through retraining, with
+a standard deviation $\sigma_\Delta = \sqrt{\sigma_A^2 + \sigma_B^2} /
+\sqrt{n}$ over $n$ folds: about 0.008 for two graph networks and about
+0.010 when one arm is the U-Net. The tables give
+$z = \bar{\Delta} / \sigma_\Delta$. A value of $|z| > 1.96$ ($p < 0.05$)
+corresponds to a mean difference of about 0.016, or 0.020 with a U-Net,
+and to about 0.036 for a difference on a single fold. The per-eye test
+compares the two arms on each of the 75 validation eyes, using the
+growth-region Dice at the eye's first rollout step at or beyond 0.95 years
+(about 347 days), averaged over the late epochs. The tables give its paired
+$t$ statistic.
 
-A difference is counted as established when $|z| > 1.96$, the per-eye $t$
-statistic is about 2.5 or larger in magnitude, and neither value changes
-sign when any one fold is left out. For the comparisons that were repeated
-at the second seed, the difference also has to hold there. No threshold on
-$t$ was fixed in advance; the value of about 2.5 describes how the
-comparisons were read and should be taken as descriptive. Three caveats
-apply. The standard deviation $\sigma$ is itself estimated from only seven
-pairs of runs, and that of the U-Net from five. About fifty comparisons are
-tested, so one or two may pass the 5\,\% level by chance. The 75 eyes come
-from 51 patients, and the two eyes of one patient are not independent, so
-the per-eye standard errors are somewhat optimistic.
+A difference is counted as established when $|z| > 1.96$, the per-eye $|t|$
+is about 2.5 or larger, neither changes sign when any one fold is left out,
+and, for the comparisons run at both seeds, it holds at both. At the
+5\,\% level, the bar on $t$ would be about 2.0. It is set higher because
+the 75 eyes come from 51 patients: the two eyes of one patient are not
+independent, which makes $t$ too large. The fold-paired test is not
+affected, because the folds are split by patient. The higher bar also
+allows for the about fifty comparisons tested, of which one or two may
+pass the 5\,\% level by chance.
 % Written 2026-10-02 from the former Section 5.1.4 (reporting scheme). The
 % earlier scheme note said |t| >~ 2.7; the readings actually made (FNO - U-Net
 % at seed 42, t = -2.51, counted as established in SOLVER_FINAL_RUNS 9.8b;
 % T-FEN - stencil at seed 42, t = 2.17, and one - two rounds, t = -2.39, not)
 % correspond to about 2.5.
+% 2026-10-22 (tablet review v8 #122, author): the bar is kept and now
+% justified (fellow eyes inflate the per-eye t but not the fold-paired test;
+% about fifty comparisons). Only T-FEN - stencil depends on it (seed 42
+% t = 2.17, seed 7 t = 3.14; z = 2.1 at both; LOFO never changes sign), so
+% "not established" in 5.2 follows from the stated rule. "About" is kept on
+% purpose: FNO+3x3 - k-NN at seed 7 has t = 2.48 and is read as established.
 
 \section{Statistics of the Comparisons}
 \label{app:full-results:seeds}
@@ -288,7 +290,8 @@ comparisons of Chapter~\ref{ch:experiments} that were run at both seeds,
 Table~\ref{tab:appendix:seed42} those run at seed 42 only. The criteria
 are those of~\S\ref{app:full-results:criteria}.
 
-\begin{table}[h]
+\clearpage
+\begin{table}[!h]
   \centering
   \caption[Comparisons at both seeds, part 1.]{%
     Comparisons of \S\ref{sec:experiments:main-results} and
@@ -338,7 +341,7 @@ are those of~\S\ref{app:full-results:criteria}.
   \end{tabular}
 \end{table}
 
-\begin{table}[h]
+\begin{table}[!h]
   \centering
   \caption[Comparisons at both seeds, part 2.]{%
     Comparisons of
@@ -397,7 +400,7 @@ are those of~\S\ref{app:full-results:criteria}.
   \end{tabular}
 \end{table}
 
-\begin{table}[h]
+\begin{table}[!h]
   \centering
   \caption[Comparisons at seed 42 only.]{%
     Comparisons of Chapter~\ref{ch:experiments} that were run at seed 42
@@ -453,6 +456,7 @@ are those of~\S\ref{app:full-results:criteria}.
 % FEN_final_w96ftp7rk4d45skew; SOLVER_FINAL_RUNS 9.23, 2026-10-02).
 
 
+\clearpage
 \section{The Step-Size Ladder}
 \label{app:full-results:step-ladder}
 
@@ -466,7 +470,7 @@ leave almost every interval in one piece: on folds 0, 1 and 2, only 2, 0
 and 3 of 135, 65 and 100 intervals are split at one year, and 23, 4 and 9
 at half a year.
 
-\begin{table}[ht]
+\begin{table}[!h]
   \centering
   \caption[The step-size ladder.]{%
     The step-size ladder of the solver-swap test, folds 0 to 2, seed 42.
@@ -564,9 +568,7 @@ Table~\ref{tab:appendix:repo}.
 \paragraph{Run identity.}
 Every run writes its complete configuration into its run directory at the
 start. The name of the directory encodes the key settings, the fold and the
-data variant. Since 2 September 2026, each run also records the version of
-the code it ran; earlier runs are dated by the timestamp of their
-directory. Because every fold is mounted at the same path on the cluster,
+data variant. Because every fold is mounted at the same path on the cluster,
 each run also records which fold and data variant it loaded. Resuming an
 interrupted run is disabled, so every reported run was trained in one
 piece. The per-epoch metrics of all runs are collected into one
@@ -630,8 +632,9 @@ Section~\ref{app:mm-pde:background} summarises the original method,
 \S\ref{app:mm-pde:mesh-quality} the quality of the meshes,
 \S\ref{app:mm-pde:result} the result and \S\ref{app:mm-pde:outlook} an
 outlook. The extension was built in full and evaluated on five folds. It
-gave no measurable gain over the uniform grid, which is why it is reported
-here and not in the main text.
+gave no measurable gain over the uniform grid. The method also had to be
+modified considerably for GA, and it may not suit the present setup well.
+For these reasons it is reported here and not in the main text.
 
 \section{Background: MM-PDE}
 \label{app:mm-pde:background}
@@ -653,7 +656,7 @@ optimal meshes from an expensive classical solver as training targets.
 The mesh is guided by a monitor function. \citet{Hu2024} use the
 matrix-valued monitor
 $M = (1 + \lVert \nabla u \rVert_2 / \alpha_M)\, I$, which is large where
-the solution varies sharply. The identity matrix $I$ makes the refinement
+the solution varies sharply, that is, where its gradient is large. The identity matrix $I$ makes the refinement
 the same in every direction, the constant 1 keeps $M$ away from zero so
 that nodes do not collapse in smooth regions, and the constant $\alpha_M$
 sets the balance between adaptivity and numerical stability. The mesh
@@ -720,6 +723,15 @@ mesh, the residual cut and a well-defined moving mesh are all needed for
 accuracy. The original method thus has two parts that a GA version has to
 provide: a mesh mover for the GA state and a dual-branch composition.
 
+% 2026-10-22 (tablet review v8 #129, #131): a paragraph judging the gains of
+% Hu et al. as modest was drafted and dropped (author). On the cylinder the
+% error is about half that of the larger GNN, which is not modest. For
+% reference, Hu2024 Table 1: Burgers MM-PDE
+% 1.04e-05 (0.5192 s), GNN 3.10e-05, bigger GNN 1.19e-05 (0.3298 s), CNN
+% 1.26e-05 (0.0027 s), FNO 1.18e-05 (0.0159 s), LAMP 1.61e-05; cylinder
+% MM-PDE 0.0846, GNN 0.2892, bigger GNN 0.1548, LAMP 0.4040, Geo-FNO 0.2844,
+% CNN and FNO "-". No seeds or spreads in the paper.
+
 \section{The Moving-Mesh Extension for GA}
 \label{app:mm-pde:extension}
 
@@ -735,9 +747,18 @@ of the correction computed on the moved mesh enters the prediction, so its
 trajectory shows whether the correction is used. A parameter-matched
 bypass control runs the same machinery on the uniform grid, which
 separates the effect of the mesh geometry from the effect of the extra
-parameters. All reported five-fold runs of the extension use the earlier
-$k$-nearest-neighbour graph network with mean and maximum aggregation as
-their branches (\S\ref{app:mm-pde:result}).
+parameters. All reported five-fold runs of the extension use the
+$k$-nearest-neighbour graph network as their branches
+(\S\ref{app:mm-pde:result}). The mesh mover pulls nodes together where the
+lesion border lies, to raise the resolution there, and the correction
+branch has to exchange messages between exactly these close nodes. A
+dilated stencil, which skips the nearest nodes in order to reach further,
+would pass over the nodes the mesh mover has gathered and defeat its
+purpose. On fold~2, a dual model whose uniform branch uses the dilated
+stencil, while its correction branch keeps the $k$-nearest-neighbour
+graph, trails its own single-branch counterpart by 0.031
+(\S\ref{app:mm-pde:result}).
+% 2026-10-22 (tablet review v8 #132, author's argument).
 
 \subsection{Data-Free Mesh Mover for GA}
 \label{app:mm-pde:dmm}
@@ -747,9 +768,7 @@ $49 \times 1024$ grid. At the first step of a rollout this is the observed
 mask. At later steps it is the model's own predicted mask, denormalised and
 thresholded back to binary, so the mesh follows the predicted lesion as it
 would in use. Only the mesh mover reads the mask alone; both solver
-branches process all eleven channels. An earlier version was trained on a
-square $256 \times 256$ mask sampled from the fundus image. The native grid
-replaced it, which removes a resizing step from every step of the rollout.
+branches process all eleven channels.
 
 The architecture follows the DeepONet form \citep{Lu2021} as adapted
 by~\citet{Hu2024}. A convolutional encoder, the branch network of the
@@ -777,19 +796,20 @@ magnitude over the grid, $\alpha_{\text{scale}} = 0.1$ and
 $\epsilon = 10^{-10}$. The gradient is taken in the unit-square
 computational coordinate, which gives the two axes their correct relative
 weight on the anisotropic grid. Two parts of this monitor were necessary.
-The blur ($\sigma = 1.0$\,px) is applied to the monitor only; the encoder
-always receives the raw binary mask. Without the blur, the step of the
-binary mask at the lesion edge made the first GA run diverge to NaN. On the
-native grid, the unblurred monitor no longer diverges but leaves the mesh
-almost unmoved (\S\ref{app:mm-pde:mesh-quality}). The logarithm bounds the
-ratio between the monitor at the lesion border and its value elsewhere, so
-the equidistribution target remains attainable. Two further ideas were
-tested and left out. A blur kernel stretched along the columns to match the
-physical spacing gave no gain ($p = 0.95$) and folded the mesh
-intermittently, and a penalty on the Jacobian determinant made folding
-worse.
+On the binary mask, the gradient is a step at the lesion edge: zero
+everywhere except for one jump. The monitor then consists of a single sharp
+ridge that the mesh cannot equidistribute, and training became unstable. A
+Gaussian blur ($\sigma = 1.0$\,px), applied to the monitor only, spreads the
+step over a few pixels and makes the gradient finite; without it, the mesh
+on the native grid barely moves (\S\ref{app:mm-pde:mesh-quality}). The
+logarithm bounds how far the monitor at the lesion border rises above its
+value elsewhere, so that the equidistribution target remains attainable.
+The encoder always receives the raw binary mask.
+% 2026-10-22 (tablet review v8 #133-#135): blur paragraph rewritten; the
+% anisotropic-blur and Jacobian-penalty sentences removed (author).
 
-The loss has three terms with weights 1, 1000 and 1. The first is the
+The loss has three terms, weighted 1, 1000 and 1 as in the
+original \citep{Hu2024}. The first is the
 Monge--Amp\`ere residual at sampled interior points,
 $\operatorname{MSE}\big(M(\xi + \nabla\phi)\,\det(I + \nabla^2\phi) /
 \bar M,\ 1\big)$. It requires the monitor at the moved point times the
@@ -804,18 +824,33 @@ refinement of~\citet{Hu2024} was not used.
 Each iteration samples 5 masks and 1000 points per mask, 90\,\% of them in
 proportion to the monitor and 10\,\% uniformly. The mesh mover was trained
 on all 478 masks of the cohort, the start mask of every training window of
-all 75 eyes. Because it never sees a future state, this leaks no label, and
-the same mesh mover is in-distribution for every fold. It was trained with
-Adam, learning rate $2 \times 10^{-4}$ and weight decay $10^{-5}$, for 500
-epochs, with the learning rate multiplied by 0.2 at epochs 333 and 467. The
-configuration was selected from a 55-run search on the native grid. Mesh
-quality (\S\ref{app:mm-pde:mesh-quality}) improved with the number of
-epochs up to 500. The two settings with the largest effect were the extra
-head layer and the sharper blur of $\sigma = 1$ instead of 2, and they
-helped only in combination. The architecture of the encoder made no
-measurable difference across five variants; the pooling encoder is kept
-because it accepts any grid size. Table~\ref{tab:appendix:dmm-config}
-summarises the configuration.
+all 75 eyes. It was trained with Adam, learning rate $2 \times 10^{-4}$
+and weight decay $10^{-5}$, for 500 epochs, with the learning rate
+multiplied by 0.2 at epochs 333 and 467. The configuration was selected
+from a 55-run search on the native grid. Mesh quality
+(\S\ref{app:mm-pde:mesh-quality}) improved with the number of epochs up to
+500. The two settings with the largest effect were the extra head layer
+and the sharper blur of $\sigma = 1$ instead of 2. The sharper blur raised
+the edge gain by 0.24 with the deeper head, but by only 0.003 without it.
+The architecture of the encoder made no measurable difference across five
+variants; the pooling encoder is kept because it accepts any grid size.
+Table~\ref{tab:appendix:dmm-config} summarises the configuration.
+
+Training on every mask of the cohort, including the validation eyes, does
+not leak information into the forecast. The mesh mover has no target: its
+loss measures only how evenly the mesh distributes the monitor of the mask
+it is given, a property of that mask alone. It never sees a later visit,
+and it is frozen while the solver is trained. A held-out set of masks is
+not needed either, because the mesh mover is not a predictor whose accuracy
+on new data is in question. A classical mesh mover computes the mesh for
+each mask directly, by solving the Monge--Amp\`ere equation for that mask,
+without any training data. The network takes this role for the masks of
+the cohort, and whether its meshes are valid and concentrate nodes at the
+lesion border is checked directly on these masks (\S\ref{app:mm-pde:mesh-quality}).
+From the second rollout step on, it receives predicted masks, on which it
+was not trained and whose meshes were not scored separately. The same mesh
+mover is used for every fold.
+% 2026-10-22 (tablet review v8 #137, #138).
 
 \begin{table}[t]
   \centering
@@ -885,9 +920,9 @@ The moved nodes lie off the lattice, where the dilated stencil
 of~\S\ref{sec:method:graph} is not defined. The correction branch therefore
 builds its own $k$-nearest-neighbour graph ($k = 12$) on the moved
 positions, searched in index space, that is, with the coordinates divided
-by the grid spacing. A search in physical millimetres would return only
-neighbours from the same row on this grid. The implementation did so until
-6 August 2026, and dual-branch results from before that date are not used.
+by the grid spacing. A search in physical coordinates would return only
+neighbours from the same row, because the rows lie about 21 times further
+apart than the columns (Figure~\ref{fig:method:stencils}a).
 
 The interpolation is a learned network (ItpNet). For each query point, a
 tanh multilayer perceptron with widths 26, 128, 64 and 12 and a linear
@@ -907,9 +942,9 @@ the pretraining, the gradients are clipped and the gate is disabled.
 
 The mesh is recomputed from the current state at every step, because a
 mesh built at the start of a multi-step window would no longer match the
-lesion at the later steps. The dual-branch model therefore predicts one
-step at a time. This is a second reason for one-step prediction, in
-addition to the short visit sequences of~\S\ref{sec:method:framework}.
+lesion at the later steps. The dual-branch model is therefore one more
+operator that cannot predict several steps in one pass, the reason why the
+framework predicts one step at a time (\S\ref{sec:method:framework}).
 
 Gradients are clipped to a norm of 1.0 separately in five groups: the
 uniform branch, the correction branch, the ItpNet weights, the gate
@@ -922,7 +957,8 @@ The dual-branch model has $175\,663$ trainable parameters against
 $75\,339$ for the single-branch model in the configuration of the
 five-fold runs, about $100\,000$ more for the second network and ItpNet.
 With the dilated stencil the counts are $159\,279$ and $67\,147$. The
-frozen mesh mover is not counted.
+frozen mesh mover is not counted, because it is not trained with the
+solver.
 
 The bypass control loads the same mesh mover and runs the second network
 and the full ItpNet round trip, but places the correction branch on the
@@ -958,40 +994,43 @@ the map folds nowhere, not only at the grid nodes.
 \begin{table}[t]
   \centering
   \caption[Quality of the moved meshes.]{%
-    Quality of the meshes of the canonical mesh mover at epoch 500, on two
-    pools of 16 masks: head-16, the first 16 masks, which cover few eyes,
-    and spread-16, spread over the eyes of the cohort. Edge gain as mean
+    Quality of the meshes of the canonical mesh mover at epoch 500, scored
+    on 16 masks spread over 13 eyes of the cohort. Edge gain as mean
     $\pm$ sd over three seeds; the other columns are three-seed means. All
     values are in-sample, because the mesh mover is trained on every mask
-    of the cohort. The two pools are not comparable with each other.}
+    of the cohort.}
   \label{tab:appendix:mesh-quality}
   \small
-  \begin{tabular}{l c c c c}
+  \begin{tabular}{c c c c}
     \toprule
-    Pool & Edge gain & Tangled cells & \texttt{cov\_ref} & \texttt{det\_min} \\
+    Edge gain & Tangled cells & \texttt{cov\_ref} & \texttt{det\_min} \\
     \midrule
-    head-16   & $1.9854 \pm 0.0580$ & 0 & 0.313 & 0.203 \\
-    spread-16 & $2.6307 \pm 0.0607$ & 0 & 0.311 & 0.115 \\
+    $2.6307 \pm 0.0607$ & 0 & 0.311 & 0.115 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
 Table~\ref{tab:appendix:mesh-quality} gives the result. No mesh folds: the
 number of tangled cells is zero on every scored mask, at every seed and
-every scored epoch. The values are in-sample and do not show how the mesh
-mover generalises to unseen lesions. The two pools cannot be compared with
-each other, because the edge gain and the determinant margin depend on the
-masks scored; the spread pool is the unbiased one.
+every scored epoch. The values are in-sample (\S\ref{app:mm-pde:dmm}).
+% 2026-10-22 (tablet review v8 #144, author): only the fixed scoring set is
+% reported. The head-16 set came from a scorer bug (the first 16 masks, 4 eyes
+% of 3 patients; DMM_HPSEARCH_NATIVE.md 2.4); its values were edge gain
+% 1.9854 +/- 0.0580, cov_ref 0.313, det_min 0.203.
 
-On the spread pool, the configuration before the changes of head and blur
+On these masks, the configuration before the changes of head and blur
 reaches an edge gain of 2.24, the same mesh mover without blur 1.34, and
 the same without the logarithmic compression 0.94, below the unmoved mesh.
 The seed spread of the selected configuration, a standard deviation of
-about 0.06, is the largest in the search. One choice is unverified. The
-boundary weight of 1000 was kept although a weight of 100 scored higher on
-edge gain, by 0.029 on head-16 and 0.105 on spread-16. It was rejected on a
-check of lesion specificity that was computed only on the biased head-16
-pool.
+about 0.06, is the largest in the search. The boundary weight of 1000
+from the original was kept, although a weight of 100 scored higher on edge
+gain, by 0.105. Edge gain alone does not judge the mesh: with a weaker
+boundary term the boundary condition is met less well
+\citep[Appendix~C.3]{Hu2024}, so boundary nodes can be pulled inward,
+which edge gain does not penalise.
+% 2026-10-22 (tablet review v8 #145, author's reasoning). The earlier text
+% said the weight was rejected on a lesion-specificity check computed only on
+% the biased head-16 pool; head-16 difference was +0.029.
 
 Figure~\ref{fig:appendix:moved-mesh} shows the moved mesh for three eyes
 with a small, a medium and a large lesion. In all three, nodes move from
@@ -1032,19 +1071,16 @@ result of~\S\ref{app:mm-pde:result}.
 The single-branch model, the dual-branch model and the bypass control were
 compared over the five folds at seed 42, with the evaluation protocol of
 the main text (\S\ref{sec:experiments:protocol:stats}) and the criteria
-of~\S\ref{app:full-results:criteria}. All three arms use the earlier
-$k$-nearest-neighbour graph network with mean and maximum aggregation. This
-is neither the canonical dilated stencil nor the $k$-nearest-neighbour arm
-of Table~\ref{tab:experiments:arms}, which uses mean aggregation and scores
-0.4623. Table~\ref{tab:appendix:dual-result} lists the arms.
+of~\S\ref{app:full-results:criteria}. All three arms use the
+$k$-nearest-neighbour graph network, not the dilated stencil.
+Table~\ref{tab:appendix:dual-result} lists the arms.
 
 \begin{table}[t]
   \centering
   \caption[Single branch, dual branch and bypass control.]{%
     Change-region Dice at the one-year anchor, mean $\pm$ sd over the five
-    folds, seed 42. All arms use the earlier $k$-nearest-neighbour graph
-    network with mean and maximum aggregation, not the configurations of
-    Table~\ref{tab:experiments:arms}. Cost is the minimum epoch time over
+    folds, seed 42. All arms use the $k$-nearest-neighbour graph network,
+    not the dilated stencil. Cost is the minimum epoch time over
     the folds and supports order-of-magnitude statements only.}
   \label{tab:appendix:dual-result}
   \small
@@ -1062,14 +1098,18 @@ of Table~\ref{tab:experiments:arms}, which uses mean aggregation and scores
 % Values: THESIS_FRAMEWORK.md section 5.1 and 7.5 (T4); epoch times from the
 % arm table of PROJECT_CONTEXT.md section 6.
 
-The dual branch gives no measurable gain. Against the bypass control, the
-fold-paired difference is $-0.0001 \pm 0.0060$~SE (higher on 3 of 5 folds)
-and the per-eye difference $+0.0001 \pm 0.0038$ (33 of 75 eyes). This is
-the tightest null result of the project: its standard error is less than
-half the difference of 0.016 that a five-fold paired mean must exceed.
-Against the single branch, the difference is $-0.0013 \pm 0.0086$~SE (3 of
-5 folds) and per eye $-0.0018 \pm 0.0064$ (32 of 75). The dual branch
-costs about ten times the training time per epoch of the single branch.
+The dual branch gives no measurable gain. It is lower than the bypass
+control by 0.0001 on average ($z = 0.0$), higher on three of the five folds
+and on 33 of the 75 eyes, and lower than the single branch by 0.0013
+($z = -0.2$), higher on three folds and on 32 eyes. Both differences lie
+far within the noise level of~\S\ref{sec:experiments:protocol:stats}. The
+dual branch costs about ten times the training time per epoch of the
+single branch.
+% 2026-10-22 (tablet review v8 #148): reported in the words of Chapter 5.
+% Statistics: dual - bypass -0.0001 +/- 0.0060 SE (3/5), per eye
+% +0.0001 +/- 0.0038 (33/75); dual - single -0.0013 +/- 0.0086 SE (3/5), per
+% eye -0.0018 +/- 0.0064 (32/75); z with sigma_Delta = 0.008 (two graph
+% networks, App. E.3).
 
 The gate stays shut, with and without the moving mesh. In every fold of
 both arms, $\alpha$ moves from zero to exactly $\pm 0.0020$ in the first
@@ -1080,29 +1120,25 @@ ends near zero in every fold. The range of the peaks in the bypass control
 encloses that of the dual branch, and the largest peak of either arm,
 0.1005, belongs to a bypass fold.
 
-A probe on the trained dual model explains why a gate near zero stays
-there. The gradient that reaches the correction branch is proportional to
-$\alpha$. Its norm is 0 at $\alpha = 0$, 0.0034 at $\alpha = 0.002$ and
-1.799 at $\alpha = 1$, against about 2.09 for the uniform branch. At the
-$|\alpha| \approx 0.02$ that the runs reach, the correction branch receives
-a learning signal about 60 times weaker than the uniform branch. While the
-gate is near zero, the correction branch therefore learns little, and its
-output gives the training no reason to increase $\alpha$.
-
-Three further runs on fold~2 tested this reading, and in none of them did
-the correction branch engage. Without the gate, with the decoder
-zero-initialised instead, the change-region Dice falls to 0.3148 against
-0.4878 for the gated dual model. This loss of 0.173 is about five times the
-single-fold noise floor of 0.036, and the gradient of the correction branch
-is still zero at the median. The gate therefore keeps an untrained
-correction from being added at full weight. Without weight decay on the
+% 2026-10-22 (tablet review v8 #149, #150, author): the gradient-probe
+% paragraph (correction-branch gradient proportional to alpha, ~60x weaker
+% at |alpha| ~ 0.02) and the sentence "The gate therefore keeps an untrained
+% correction from being added at full weight" were removed: they read as if
+% the architecture were configured so that it cannot learn. The clause "the
+% gradient of the correction branch is still zero at the median" went with
+% them (logged zeros are not evidence, see PROJECT_CONTEXT section 3).
+Three further runs on fold~2 varied the design, and in none of them did
+the correction branch improve the forecast. Without the gate, with the
+decoder zero-initialised instead, the change-region Dice falls to 0.3148
+against 0.4878 for the gated dual model, a loss of 0.173, about five times
+the single-fold noise level of 0.036. Without weight decay on the
 correction branch and ItpNet, the Dice is 0.0092 higher than its
-counterpart, under the single-fold floor. The gate peaks lower (0.058
+counterpart, within the noise level. The gate peaks lower (0.058
 against 0.067), and the parameters of the correction branch grow instead
 of shrinking, so weight decay does not keep the gate shut. On the dilated
 stencil, the dual model scores 0.5754 against 0.6060 for its own
-single-branch counterpart, a difference of $-0.031$ (per eye
-$-0.0305 \pm 0.0086$, 3 of 16 eyes), at roughly nine times the cost. The
+single-branch counterpart, a difference of $-0.031$, higher on only 3 of
+the 16 eyes of the fold, at roughly nine times the cost. The
 gain of the stencil carries over to the dual model, but the correction
 branch still does not engage.
 
@@ -1113,12 +1149,29 @@ valid, because its gate behaves in the same way without any mesh. The
 experiments support a narrower statement. The gated correction branch did
 not engage in any tested variant: on the moved mesh and on the uniform
 grid, without weight decay, and without the gate. The dual-branch model
-gave no measurable gain at about ten times the cost. This statement
-concerns this implementation and not mesh adaptation for GA in general.
-\citet{Hu2024} report that their dual branch improves on the uniform grid
-on their benchmarks. The probe explains why a gate near zero stays there,
-but the experiments here do not show why the correction branch fails to
-engage in the first place.
+gave no measurable gain at about ten times the cost. \citet{Hu2024}
+report that their dual branch improves on the uniform grid on their
+benchmarks.
+
+A likely reason lies in reach, the property that separates the operators
+of Chapter~\ref{ch:experiments} (\S\ref{sec:experiments:ingredients:reach}).
+The mesh mover pulls nodes towards the current lesion border, so the moved
+mesh resolves the border more finely, and one message-passing step on it
+reaches even less far than on the uniform grid. The GA front, however,
+advances a median of 12 and up to about 23 columns between two visits
+(\S\ref{sec:method:graph}), and the new atrophy appears beyond the current
+border. A correction branch that sees the border in finer detail but over
+a shorter distance therefore adds little that the uniform branch does not
+already provide, which is consistent with a gate that stays shut. With the
+dilated stencil, the uniform branch reaches the front on its own, and the
+dual model still lies below its single-branch counterpart.
+
+The result therefore concerns this method on this task. One dual-branch
+design, adapted to a slowly growing lesion on an anisotropic grid, need not
+be representative of adaptive meshes, and the experiment is not a general
+statement on how well adaptive meshes work, for GA or elsewhere.
+% 2026-10-22 (tablet review v8 #151, author): reach reasoning and scope
+% paragraph replace the probe sentence.
 
 \section{Outlook}
 \label{app:mm-pde:outlook}
