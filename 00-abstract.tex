@@ -117,65 +117,72 @@ rates of the 75 eyes correlate at $r = 0.40$.
 \cleardoubleoddpage%  Make sure to start abstract on a new odd page
 \begin{otherlanguage}{ngerman}
 \begin{abstract*}
-Die Geographische Atrophie (GA) ist die fortgeschrittene Form der
-altersabhängigen Makuladegeneration und äußert sich in einem allmählichen,
-irreversiblen Verlust von Netzhautgewebe. Eine Vorhersage, wo und wie
-schnell die Läsion eines einzelnen Auges wachsen wird, würde die Betreuung
-der Betroffenen unterstützen, ist aber schwer zu modellieren: Muster und
-Geschwindigkeit des Fortschreitens unterscheiden sich stark zwischen
-Patienten, die Kontrollen finden in unregelmäßigen Abständen statt, und die
-Kohorten sind klein. Diese Arbeit untersucht das Fortschreiten der GA aus
-Sicht der rechnergestützten Modellierung und bestimmt, was eine Vorhersage
-aus longitudinaler optischer Kohärenztomographie (OCT) benötigt: einen
-Rahmen um das Modell und einen Operator darin, der eine Kontrolle auf die
-nächste abbildet. Sie liefert einen Rahmen für unregelmäßige
-Kontrollintervalle, in dem Modelle jeder Architekturklasse gleich trainiert
-und ausgewertet werden, sowie einen kontrollierten Vergleich solcher Modelle
-für die GA. Der Vergleich zeigt, welche Eigenschaft die Modelle
-unterscheidet: ob ein einzelner Aktualisierungsschritt so weit sieht, wie
-sich die Läsionsgrenze zwischen zwei Kontrollen bewegt.
+Die Geographische Atrophie (GA) ist eine Spätform der altersabhängigen
+Makuladegeneration, bei der Netzhautgewebe allmählich und unwiederbringlich
+zugrunde geht. Ließe sich für ein einzelnes Auge vorhersagen, wo und wie
+schnell die Läsion wächst, käme das der Betreuung der Betroffenen zugute.
+Eine solche Vorhersage zu lernen ist jedoch schwierig: Verlaufsmuster und
+Wachstumsgeschwindigkeit unterscheiden sich stark von Patient zu Patient,
+die Kontrolluntersuchungen erfolgen in unregelmäßigen Abständen, und die
+verfügbaren Kohorten sind klein. Die vorliegende Arbeit betrachtet die
+GA-Progression aus Sicht der rechnergestützten Modellierung und untersucht,
+was eine Vorhersage auf Basis longitudinaler optischer Kohärenztomographie
+(OCT) braucht: einen Rahmen, in den das Modell eingebettet ist, und einen
+Operator, der den Zustand einer Untersuchung auf den der nächsten abbildet.
+Dazu wird ein Rahmen für unregelmäßige Untersuchungsintervalle entwickelt,
+in dem sich Modelle beliebiger Architekturklassen unter identischen
+Bedingungen trainieren und bewerten lassen, und darin ein kontrollierter
+Vergleich solcher Modelle durchgeführt. Dieser Vergleich zeigt, worin sich
+die Modelle wesentlich unterscheiden: ob ein einzelner Vorhersageschritt so
+weit reicht, wie sich der Läsionsrand zwischen zwei Untersuchungen
+verschiebt.
 
-Die Daten umfassen 75 Augen von 51 Patienten der Medizinischen Universität
-Wien mit 553 Kontrollen über eine mediane Beobachtungszeit von drei Jahren.
-Jede Kontrolle wird auf dem En-face-Gitter des OCT-Scans durch eine binäre,
-von Befundern annotierte GA-Maske und die Tiefenkarten von zehn
-segmentierten retinalen Schichtgrenzen dargestellt. Der Rahmen sagt diesen
-Zustand bei der nächsten Kontrolle als aktuellen Zustand plus ein Update
-voraus, das mit der Zeit $\Delta t$ zwischen den Kontrollen skaliert wird,
-und trainiert alle Modelle mit einer gemeinsamen Verlustfunktion und einem
-gemeinsamen Curriculum, teils auf ihren eigenen früheren Vorhersagen. Der
-Operator wurde nacheinander mit Graph-Neural-Networks, einem U-Net, Fourier
-Neural Operators und Finite-Elemente-Netzwerken bei ähnlicher Parameterzahl
-besetzt. Alle Modelle wurden mit fünffacher Kreuzvalidierung auf
-Patientenebene anhand des Change-Region-Dice verglichen, der Überlappung
-zwischen vorhergesagter und tatsächlicher Veränderung der Läsion ein Jahr
-nach der Ausgangsuntersuchung, angegeben als Mittelwert $\pm$
-Standardabweichung über die Folds; eine Vorhersage ohne Veränderung erreicht
-null. Unterschiede wurden an der Schwankung durch erneutes Training gemessen
-und mit einem zweiten Seed wiederholt.
+Datengrundlage sind 75 Augen von 51 Patientinnen und Patienten der
+Medizinischen Universität Wien mit insgesamt 553 Untersuchungen bei einer
+medianen Nachbeobachtung von drei Jahren. Jede Untersuchung wird auf dem
+En-face-Raster der OCT durch eine binäre, von Befundern eingezeichnete
+GA-Maske sowie durch Tiefenkarten von zehn segmentierten
+Netzhautschichtgrenzen beschrieben. Der Rahmen bestimmt den Zustand bei der
+nächsten Untersuchung als den aktuellen Zustand zuzüglich einer Änderung, die
+mit dem zeitlichen Abstand $\Delta t$ skaliert wird. Alle Modelle werden mit
+derselben Verlustfunktion und demselben Trainingscurriculum trainiert, bei
+dem sie teilweise von ihren eigenen früheren Vorhersagen ausgehen. Als
+Operator wurden nacheinander Graph Neural Networks, ein U-Net, Fourier Neural
+Operators und Finite-Elemente-Netzwerke mit vergleichbarer Parameterzahl
+eingesetzt. Ausgewertet wurde mit fünffacher Kreuzvalidierung, deren
+Aufteilung nach Patienten erfolgt. Hauptmaß ist der Change-Region-Dice, also
+die Überlappung zwischen vorhergesagter und tatsächlicher Veränderung der
+Läsion ein Jahr nach der Ausgangsuntersuchung, angegeben als Mittelwert
+$\pm$ Standardabweichung über die fünf Folds; eine Vorhersage ohne jede
+Veränderung erreicht hier den Wert null. Ob ein Unterschied zwischen zwei
+Modellen über die Streuung hinausgeht, die schon ein erneutes Training
+verursacht, wurde statistisch geprüft; die Vergleiche wurden mit einem
+zweiten Zufallsseed wiederholt.
 
-Der stärkste Operator, ein Finite-Elemente-Netzwerk mit gelerntem
+Der beste Operator, ein Finite-Elemente-Netzwerk mit gelerntem
 Transportterm, erreicht $0{,}54 \pm 0{,}04$, gefolgt von einem
 Graph-Netzwerk mit $0{,}53 \pm 0{,}05$ und einem U-Net mit
-$0{,}50 \pm 0{,}06$; Modelle dreier Klassen erreichen also ähnliche Werte.
-Räumlicher Kontext und eine Verlustfunktion, die die Läsion betont, sind
-beide nötig; fehlt eines davon, sagt ein Modell keine Veränderung voraus.
-Weder ein Runge--Kutta-Schritt vierter Ordnung noch größere Modelle helfen.
-Unter den Operatoren mit räumlichem Kontext ist die Reichweite der
-wichtigste Unterschied. Auf dem anisotropen Gitter liegen die B-Scans
-121\,\textmu{}m auseinander, die Pixel entlang eines B-Scans nur
-5,7\,\textmu{}m. In einem aus Pixelindizes gebauten Graphen liegen die
-Nachbarn eines Pixels entlang des B-Scans daher höchstens etwa
-11\,\textmu{}m entfernt, während sich die Läsionsgrenze zwischen zwei
-Kontrollen typischerweise um etwa 70\,\textmu{}m verschiebt. Ein gedehnter
-Stencil, dessen Nachbarn in beide Richtungen etwa 120\,\textmu{}m weit
-reichen, hebt den Dice bei identischer Parameterzahl um 0,064, auf allen
-fünf Folds. Der Transportterm schließt dieselbe Lücke über einen anderen
-Mechanismus (+0,062 gegenüber demselben Netzwerk ohne ihn). In dieser
-Kohorte lokalisieren die Modelle neue Atrophie besser, als sie deren
-Geschwindigkeit vorhersagen: Ihr Dice auf der neu atrophierten Region allein
-liegt in jedem Beobachtungsjahr bei etwa 0,5 bis 0,65, während vorhergesagte
-und gemessene Wachstumsraten der 75 Augen mit $r = 0{,}40$ korrelieren.
+$0{,}50 \pm 0{,}06$; Modelle aus drei verschiedenen Klassen liegen damit
+nahe beieinander. Unverzichtbar sind räumlicher Kontext und eine
+Verlustfunktion, die die Läsion stärker gewichtet: Fehlt eines von beiden,
+sagt das Modell überhaupt keine Veränderung voraus. Weder ein
+Runge--Kutta-Schritt vierter Ordnung noch größere Modelle verbessern die
+Vorhersage messbar. Unter den Operatoren mit räumlichem Kontext entscheidet
+vor allem die Reichweite. Das Raster ist stark anisotrop: Die B-Scans liegen
+121\,\textmu{}m auseinander, die Bildpunkte innerhalb eines B-Scans dagegen
+nur 5,7\,\textmu{}m. In einem Graphen, der über Pixelindizes aufgebaut ist,
+liegen die Nachbarn eines Pixels entlang des B-Scans deshalb höchstens etwa
+11\,\textmu{}m entfernt, während sich der Läsionsrand zwischen zwei
+Untersuchungen typischerweise um etwa 70\,\textmu{}m verschiebt. Ein
+gedehnter Stencil, dessen Nachbarn in beiden Richtungen bis etwa
+120\,\textmu{}m reichen, steigert den Dice bei gleicher Parameterzahl um
+0,064, und zwar in allen fünf Folds. Der Transportterm schließt dieselbe
+Lücke auf anderem Weg (+0,062 gegenüber demselben Netzwerk ohne
+Transportterm). In dieser Kohorte lokalisieren die Modelle neue Atrophie
+besser, als sie deren Ausbreitungsgeschwindigkeit vorhersagen: Auf der neu
+atrophierten Fläche allein liegt ihr Dice in jedem Beobachtungsjahr bei etwa
+0,5 bis 0,65, während die vorhergesagten und gemessenen Wachstumsraten der
+75 Augen mit $r = 0{,}40$ korrelieren.
 \end{abstract*}
 \end{otherlanguage}
 
