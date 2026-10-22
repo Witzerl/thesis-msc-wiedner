@@ -119,17 +119,18 @@ rates of the 75 eyes correlate at $r = 0.40$.
 \begin{abstract*}
 Die Geographische Atrophie (GA) ist eine Spätform der altersabhängigen
 Makuladegeneration, bei der Netzhautgewebe allmählich und unwiederbringlich
-zugrunde geht. Ließe sich für ein einzelnes Auge vorhersagen, wo und wie
+verloren geht. Ließe sich für ein einzelnes Auge vorhersagen, wo und wie
 schnell die Läsion wächst, käme das der Betreuung der Betroffenen zugute.
 Eine solche Vorhersage zu lernen ist jedoch schwierig: Verlaufsmuster und
 Wachstumsgeschwindigkeit unterscheiden sich stark von Patient zu Patient,
 die Kontrolluntersuchungen erfolgen in unregelmäßigen Abständen, und die
 verfügbaren Kohorten sind klein. Die vorliegende Arbeit betrachtet die
-GA-Progression aus Sicht der rechnergestützten Modellierung und untersucht,
-was eine Vorhersage auf Basis longitudinaler optischer Kohärenztomographie
-(OCT) braucht: einen Rahmen, in den das Modell eingebettet ist, und einen
-Operator, der den Zustand einer Untersuchung auf den der nächsten abbildet.
-Dazu wird ein Rahmen für unregelmäßige Untersuchungsintervalle entwickelt,
+GA-Progression aus der Perspektive des Computational Modelling und
+untersucht, was eine Vorhersage auf Basis longitudinaler optischer
+Kohärenztomographie (OCT) braucht: ein Framework, in das das Modell
+eingebettet ist, und einen Operator, der den Zustand einer Untersuchung auf
+den der nächsten abbildet. Dazu wird ein Framework für unregelmäßige
+Untersuchungsintervalle entwickelt,
 in dem sich Modelle beliebiger Architekturklassen unter identischen
 Bedingungen trainieren und bewerten lassen, und darin ein kontrollierter
 Vergleich solcher Modelle durchgeführt. Dieser Vergleich zeigt, worin sich
@@ -138,19 +139,20 @@ weit reicht, wie sich der Läsionsrand zwischen zwei Untersuchungen
 verschiebt.
 
 Datengrundlage sind 75 Augen von 51 Patientinnen und Patienten der
-Medizinischen Universität Wien mit insgesamt 553 Untersuchungen bei einer
-medianen Nachbeobachtung von drei Jahren. Jede Untersuchung wird auf dem
+Medizinischen Universität Wien mit insgesamt 553 Untersuchungen und einer
+Nachbeobachtungszeit von im Median drei Jahren. Jede Untersuchung wird auf dem
 En-face-Raster der OCT durch eine binäre, von Befundern eingezeichnete
 GA-Maske sowie durch Tiefenkarten von zehn segmentierten
-Netzhautschichtgrenzen beschrieben. Der Rahmen bestimmt den Zustand bei der
-nächsten Untersuchung als den aktuellen Zustand zuzüglich einer Änderung, die
-mit dem zeitlichen Abstand $\Delta t$ skaliert wird. Alle Modelle werden mit
-derselben Verlustfunktion und demselben Trainingscurriculum trainiert, bei
-dem sie teilweise von ihren eigenen früheren Vorhersagen ausgehen. Als
-Operator wurden nacheinander Graph Neural Networks, ein U-Net, Fourier Neural
-Operators und Finite-Elemente-Netzwerke mit vergleichbarer Parameterzahl
-eingesetzt. Ausgewertet wurde mit fünffacher Kreuzvalidierung, deren
-Aufteilung nach Patienten erfolgt. Hauptmaß ist der Change-Region-Dice, also
+Netzhautschichtgrenzen beschrieben. Das Framework bestimmt den Zustand bei
+der nächsten Untersuchung als den aktuellen Zustand zuzüglich einer
+Änderung, die mit dem zeitlichen Abstand $\Delta t$ skaliert wird. Alle
+Modelle werden mit derselben Loss-Funktion und demselben Curriculum
+trainiert. Darin dienen ihnen teilweise ihre eigenen früheren Vorhersagen als
+Input. Als Operator wurden nacheinander Graph Neural Networks, ein U-Net,
+Fourier Neural Operators und Finite-Elemente-Netzwerke mit vergleichbarer
+Parameterzahl eingesetzt. Ausgewertet wurde mit einer Five-Fold
+Cross-Validation, deren Aufteilung nach Patienten erfolgt. Primäre Metrik
+ist der Change-Region-Dice, also
 die Überlappung zwischen vorhergesagter und tatsächlicher Veränderung der
 Läsion ein Jahr nach der Ausgangsuntersuchung, angegeben als Mittelwert
 $\pm$ Standardabweichung über die fünf Folds; eine Vorhersage ohne jede
@@ -164,7 +166,7 @@ Transportterm, erreicht $0{,}54 \pm 0{,}04$, gefolgt von einem
 Graph-Netzwerk mit $0{,}53 \pm 0{,}05$ und einem U-Net mit
 $0{,}50 \pm 0{,}06$; Modelle aus drei verschiedenen Klassen liegen damit
 nahe beieinander. Unverzichtbar sind räumlicher Kontext und eine
-Verlustfunktion, die die Läsion stärker gewichtet: Fehlt eines von beiden,
+Loss-Funktion, die die Läsion stärker gewichtet: Fehlt eines von beiden,
 sagt das Modell überhaupt keine Veränderung voraus. Weder ein
 Runge--Kutta-Schritt vierter Ordnung noch größere Modelle verbessern die
 Vorhersage messbar. Unter den Operatoren mit räumlichem Kontext entscheidet
