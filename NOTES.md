@@ -2541,9 +2541,9 @@ Pulled from the code repository (`masterthesis-docker/NOTES.md` + `PROJECT_CONTE
 
 ### Front matter
 
-- [ ] TODO: write English abstract covering problem, approach, contributions, headline results (`00-abstract.tex`).
-- [ ] TODO: write German `Kurzfassung` (translation of the English abstract) (`00-abstract.tex`).
-- [ ] TODO: write acknowledgements to MUW, Hrvoje Bogunović, and Dmitrii Lachinov (`acknowledgements.tex`).
+- [x] (2026-10-22, see Supervisor review 1) TODO: write English abstract covering problem, approach, contributions, headline results (`00-abstract.tex`).
+- [x] (2026-10-23: idiomatic German, author's term choices: Framework, Loss-Funktion, Curriculum, Five-Fold Cross-Validation, Dilated Stencil) TODO: write German `Kurzfassung` (translation of the English abstract) (`00-abstract.tex`).
+- [x] (2026-10-23: MUW, Hrvoje Bogunović as supervisor, Dmitrii Lachinov for the joint work; first person) TODO: write acknowledgements to MUW, Hrvoje Bogunović, and Dmitrii Lachinov (`acknowledgements.tex`).
 
 ### Chapter 1 - Introduction (`01-introduction.tex`)
 
