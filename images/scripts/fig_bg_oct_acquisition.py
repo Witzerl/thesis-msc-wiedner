@@ -171,7 +171,7 @@ def draw_sequence(ax):
         ax.plot([x, x + s], [yc + yy, yc + yy], lw=1.0 if i == 0 else 0.4,
                 color=PAL["primary"] if i == 0 else PAL["primary_700"], zorder=4)
     label(ax, "lesion", (x + 0.62, yc + 0.62), (x + s + 0.12, yc + 0.85))
-    label(ax, "B-scans", (x + s - 0.06, yc + rows[1]), (x + s + 0.12, yc + 0.25))
+    label(ax, "B-scans", (x + s - 0.15, yc + rows[2]), (x + s + 0.12, yc + 0.12))  # angled, mirrors "lesion" (review v8 #26)
     caption(x + s / 2, "En-face view", "volume seen from the front")
     x += s
     ax.set_xlim(-0.32, x + 0.55)

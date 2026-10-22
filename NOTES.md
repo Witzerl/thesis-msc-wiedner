@@ -2335,7 +2335,7 @@ at a time, as dictated by the author.
 - [ ] TODO (tablet review v8 #39, author: probably not run): no pushforward ablation exists (every final
   run uses unrolling 2 at a 180-day base; the code-side depth sweep was left unrun). If wanted: stencil
   network with unrolling 0, 5 folds, cluster; otherwise one sentence in 6.3.
-- [ ] Open from review v8 #26: Fig. 2.2, the "B-scans" label should get an angled leader line.
+- [x] (done 2026-10-22: anchor on the third scan line, label below right, mirrors "lesion") Open from review v8 #26: Fig. 2.2, the "B-scans" label should get an angled leader line.
 - [ ] TODO (author, review v8 #48/#65): review the new §5.3 "Forecasts Beyond One Year"
   (`sec:experiments:horizon`, Table `tab:experiments:horizon`; growth-region Dice per year bin for eight
   operators from `thesis_numbers.py horizon`, 2026-10-22). Chapter 5 renumbers from §5.4 on.

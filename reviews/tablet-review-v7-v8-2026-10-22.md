@@ -54,7 +54,7 @@ Decoded from `main-thesis_v7_261019_191032.sdocx` (marks on the thesis build of 
 | # | Page | Col | Marked | Note | Now | Status |
 |---|---|---|---|---|---|---|
 | 25 | v8 p.6 | B | struck: “Both drawings were generated with an image-generation model …” | this necessary? (Fig. 2.1 caption; same sentence highlighted in Figs. 2.2 and 2.4) | `02-background.tex:57; 02-background.tex:312` | done 2026-10-22: Figs 2.1, 2.2, 2.4: "Drawings generated with ChatGPT; labels added and verified by the author." |
-| 26 | v8 p.8 | B | highlight: B-scans (label in Fig. 2.2b) | this was specifically made bigger(?); line should come at an angle | `02-background.tex:160` | figure file images/scripts/fig_bg_oct_acquisition.py |
+| 26 | v8 p.8 | B | highlight: B-scans (label in Fig. 2.2b) | this was specifically made bigger(?); line should come at an angle | `02-background.tex:160` | done 2026-10-22: leader line angled down-right, mirroring "lesion" |
 | 27 | v8 p.15 | B | note: Fig. 2.5 placeholder | TODO next | `02-background.tex:585` | done (drawn 2026-10-20); author ok |
 
 ## Chapter 3 Data
