@@ -21,7 +21,8 @@ extracellular deposits of cellular debris \citep{Boyer2017}. The atrophic
 late form without neovascularisation is termed \emph{Geographic Atrophy}
 (GA). It is an advanced, irreversible and progressive atrophy of the
 macula, the central region of the retina that provides sharp vision. GA
-causes a marked loss of visual acuity once the fovea, the centre of the
+causes a marked loss of visual acuity, the sharpness of vision, once the
+fovea, the centre of the
 macula, is involved \citep{Vallino2024}. Approximately one million
 people in the United States and five million worldwide are affected by GA
 \citep{Singh2025}, with around 160{,}000 new diagnoses per year in the United
@@ -58,8 +59,8 @@ approved in the United States but not in the European Union
 \citep{EMA2024Syfovre,EMA2024Izelvay}.
 In the phase 3 trials, both drugs reduced the rate of GA enlargement by
 roughly 14\,\% to 27\,\% over twelve to twenty-four months. The lesions
-nevertheless continued to grow. Best-corrected visual acuity, the
-sharpness of vision with spectacles, did not differ significantly from a
+nevertheless continued to grow. Best-corrected visual acuity, measured
+with the best optical correction, did not differ significantly from a
 sham (simulated) injection at the trial endpoints \citep{Lad2023}. Hence,
 two things matter for clinical practice. First, treatment timing: an intervention that only slows progression is
 most valuable when administered before foveal involvement, because central
@@ -91,21 +92,23 @@ thesis pursues that avenue.
 % the PDE argument moved to Background, Modelling Approach.
 
 Predicting GA progression from imaging is framed as a
-\emph{spatiotemporal forecasting} task on the en-face (frontal,
-two-dimensional) projection of OCT volumes. For each eye, longitudinal
-imaging yields a sequence of macula-centred grids on which the lesion
-outline and the depths of the boundaries between the retinal layers are
-traced. Given the
+\emph{spatiotemporal forecasting} task on the en-face grid of the OCT
+scan, the retina seen from the front. For each eye, longitudinal imaging
+yields a sequence of macula-centred grids that carry the outline of the
+lesion, annotated by graders, and the depths of the boundaries between the
+retinal layers. Given the
 most recent observed state and a target horizon $\Delta t$, the task is to
-predict the extent and shape of the lesion at the later visit. This differs from
-earlier work on AMD, which predicts or characterises the conversion of an eye
-to a later disease stage \citep{SchmidtErfurth2018, Vogl2021}. The forecast
-of this thesis is instead a complete map of the lesion at the future visit,
-not a single risk score.
+predict the extent and shape of the lesion at the later visit. Earlier
+learning-based work on AMD predicts the conversion of an eye to a later
+disease stage \citep{SchmidtErfurth2018, Vogl2021}; more recent models
+forecast the GA lesion itself, among them that of~\citet{Mai2024} on the
+cohort used here (Section~\ref{sec:background:related-work}). Like these,
+this thesis forecasts a complete map of the lesion at the future visit.
 
 
-Such a forecast requires a learned map from the state at one visit to the
-state at a later one. In this thesis, this map is called the operator.
+Such a forecast is made by a learned update from the state at one visit to
+the state at a later one. Its learned part, the change it adds per unit
+time, is called the operator in this thesis.
 Many architectures can serve as the operator, among them the neural
 solvers for partial differential equations on which this thesis builds
 (Chapter~\ref{ch:background}). Which architecture GA progression requires
@@ -152,20 +155,25 @@ second by comparing different operators within that framework.
 The main contributions of this thesis are the following.
 \begin{itemize}
   \item A framework for irregular visit schedules that is independent of
-    the architecture inside it: a $\Delta t$-scaled residual update, a
-    pushforward curriculum measured in elapsed days, and a shared loss and
-    evaluation. Operators from unrelated literatures are trained and
-    evaluated in it under identical conditions, so that a difference in
-    accuracy can be attributed to the operator rather than to the
-    framework.
-  \item A controlled comparison of operators of several architectures for
-    forecasting GA from longitudinal OCT, at matched parameter counts and
-    with five-fold cross-validation.
-  \item The identification of physical reach at the scale of the lesion
-    front and an explicit transport term as two independent routes to the
-    same deficit: a single update that cannot see as far as the lesion
-    front moves between two visits. This identifies the property an
-    operator for forecasting GA has to provide.
+    the architecture inside it: a residual update conditioned on the
+    interval $\Delta t$ between visits, a training curriculum that also
+    feeds the model its own earlier predictions, with its depth measured in
+    elapsed days, and one loss and evaluation for all models. Inside it,
+    every operator with spatial context learned to predict change, and the
+    loss decided whether any change was learned at all.
+  \item A controlled comparison of operators from four architecture
+    families (graph networks, a U-Net, Fourier Neural Operators and Finite
+    Element Networks) for forecasting GA on 75 eyes, at matched parameter
+    counts and with patient-level five-fold cross-validation. The highest
+    operators of three families score within about 0.04 of each other at
+    one year.
+  \item The finding that, among operators with spatial context, the score
+    depends mainly on how far one update reaches compared with how far the
+    lesion front moves between two visits. Placing the neighbours of a
+    graph network at lesion scale and adding a transport term, on a mesh
+    with the same spacing, to a Finite Element Network each raise the score
+    by about 0.06 against their own controls; this is consistent with, but
+    does not prove, the reach explanation.
   \item Results on what did not help, each within the noise level: larger
     operators, a higher integration order and a monotonic-growth penalty.
     An extension with an adaptive moving mesh gave no measurable gain

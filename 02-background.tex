@@ -20,6 +20,16 @@ the forecasting of GA and states the problem formally.
 \section{Medical Background}
 \label{sec:background:ga-oct}
 
+This section introduces the medical terms on which the data and the
+forecast rely. \S\ref{sec:background:ga-oct:anatomy} describes the
+anatomy of the eye and the layered retina,
+\S\ref{sec:background:ga-oct:oct} the imaging of the retina, from the OCT
+volume to the en-face maps the model operates on, and
+\S\ref{sec:background:ga-oct:disease} the disease and how it appears on
+these images. Together they explain the structure of the data: a binary
+lesion mask with the geometry of the surrounding retinal layers
+(Chapter~\ref{ch:data}).
+
 
 \subsection{Eye Anatomy}
 \label{sec:background:ga-oct:anatomy}
@@ -114,15 +124,6 @@ layered, that GA destroys a specific \emph{outer}-retinal stack of three
 layers (\S\ref{sec:background:ga-oct:disease}), and that the surrounding
 layer geometry, given as ten boundary depth maps, is passed to the model
 together with the lesion mask (\S\ref{sec:background:ga-oct:state-rep}).
-
-The remaining subsections build on this vocabulary.
-\S\ref{sec:background:ga-oct:oct} outlines the technical side of retinal
-imaging, from the acquisition of an OCT volume to the 2D en-face maps
-that the model operates on. \S\ref{sec:background:ga-oct:disease}
-describes how GA appears in these OCT images. From this, the structure
-of the data follows: a binary lesion mask together with the geometry of
-the surrounding retinal layers, which will be further elaborated in
-Chapter~\ref{ch:data}.
 
 
 \subsection{Retinal Imaging}
@@ -1041,9 +1042,9 @@ update,
   \label{eq:bg:problem-update}
 \end{equation}
 where $f_\theta$ is a learned map with parameters $\theta$. Throughout this
-thesis, $f_\theta$ is called the \emph{operator}. The term is used in its
-general sense, a map from the state at one time to the state at a later
-time. It is not used in the narrower sense of the neural-operator
+thesis, $f_\theta$ is called the \emph{operator}. The term is used in a
+general sense: through Equation~\eqref{eq:bg:problem-update} it maps the
+state at one time to the state at a later time. It is not used in the narrower sense of the neural-operator
 literature (\S\ref{sec:background:neural-pde}), where it denotes models
 such as the FNO or DeepONet that learn maps between function spaces. A
 U-Net and a graph network are operators in the first sense but not in the

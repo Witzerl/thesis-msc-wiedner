@@ -90,21 +90,19 @@ term, reaches $0.54 \pm 0.04$, followed by a graph network at
 $0.53 \pm 0.05$ and a U-Net at $0.50 \pm 0.06$, so models of three classes
 reach similar scores. Spatial context and a loss that emphasises the lesion
 are both required; without either, a model predicts no change. Neither a
-fourth-order Runge--Kutta step nor larger models help. Among operators with spatial context, the main difference
-is reach. On the anisotropic grid, the cross-sectional scans (B-scans) of
-the OCT volume lie 121\,\textmu{}m apart, the pixels along a scan only
+fourth-order Runge--Kutta step nor larger models help. On the anisotropic grid, the cross-sectional scans (B-scans)
+lie 121\,\textmu{}m apart, the pixels along a scan only
 5.7\,\textmu{}m. In a graph
 built from pixel indices, the neighbours of a pixel therefore lie within
 about 11\,\textmu{}m along the B-scan, whereas the lesion front typically
 advances by about 70\,\textmu{}m between visits. A dilated stencil whose
 neighbours reach about 120\,\textmu{}m in both directions raises the Dice by
 0.064 at an identical parameter count, on all five folds. A learned
-transport term, evaluated on a mesh with the same seven-column spacing,
-raises the Finite Element Network by a similar 0.062 over the same network
-without it. In this cohort, the models locate new atrophy better than they predict
-its speed: their Dice on the newly atrophic region alone is about 0.5 to
-0.65 in each year of follow-up, while the predicted and measured growth
-rates of the 75 eyes correlate at $r = 0.40$.
+transport term on a mesh with the same seven-column spacing raises the
+Finite Element Network by a similar 0.062. In this cohort, the Dice on the
+newly atrophic region alone is about 0.5 to 0.65 in each year of
+follow-up, and predicted and measured growth rates correlate at
+$r = 0.40$.
 \end{abstract*}
 
 %%
@@ -168,10 +166,8 @@ $0{,}50 \pm 0{,}06$; Modelle aus drei Architekturklassen liegen damit nahe
 beieinander. Unverzichtbar sind räumlicher Kontext und eine Loss-Funktion,
 die die Läsion stärker gewichtet: Fehlt eines von beiden, sagt das Modell
 keine Veränderung voraus. Weder ein Runge--Kutta-Schritt vierter Ordnung noch
-größere Modelle verbessern die Vorhersage messbar. Unter den Operatoren mit
-räumlichem Kontext entscheidet vor allem die räumliche Reichweite. Das Raster
-ist stark anisotrop: Die Querschnittsaufnahmen (B-Scans) des OCT-Volumens
-liegen 121\,\textmu{}m auseinander, die Bildpunkte innerhalb eines B-Scans
+größere Modelle verbessern die Vorhersage messbar. Das Raster
+ist stark anisotrop: Die Querschnittsaufnahmen (B-Scans) liegen 121\,\textmu{}m auseinander, die Bildpunkte innerhalb eines B-Scans
 nur 5,7\,\textmu{}m. In einem Graphen,
 dessen Nachbarschaften über Pixelindizes definiert sind, liegen die Nachbarn
 eines Pixels entlang des B-Scans daher höchstens etwa 11\,\textmu{}m entfernt,
@@ -179,14 +175,12 @@ während sich der Läsionsrand zwischen zwei Untersuchungen typischerweise um
 etwa 70\,\textmu{}m verschiebt. Ein Dilated Stencil, dessen Nachbarschaft in
 beiden Richtungen bis etwa 120\,\textmu{}m reicht, steigert den
 Change-Region-Dice bei gleicher Parameterzahl um 0,064, und zwar in allen
-fünf Folds. Ein gelernter Transportterm, ausgewertet auf einem Gitter mit
-demselben Abstand von sieben Spalten, steigert das Finite-Elemente-Netzwerk
-um vergleichbare 0,062 gegenüber demselben Netzwerk ohne Transportterm. In
-dieser Kohorte erfassen die Modelle die Lage neu auftretender Atrophie besser
-als deren Ausbreitungsgeschwindigkeit: Auf der neu atrophierten Fläche allein
-erreichen sie in jedem Beobachtungsjahr einen Dice von etwa 0,5 bis 0,65,
-während die vorhergesagten und gemessenen Wachstumsraten der 75 Augen mit
-$r = 0{,}40$ korrelieren.
+fünf Folds. Ein gelernter Transportterm auf einem Gitter mit demselben
+Abstand von sieben Spalten steigert das Finite-Elemente-Netzwerk um
+vergleichbare 0,062. In dieser Kohorte liegt der Dice auf der neu
+atrophierten Fläche allein in jedem Beobachtungsjahr bei etwa 0,5 bis 0,65,
+und vorhergesagte und gemessene Wachstumsraten korrelieren mit
+$r = 0{,}40$.
 \end{abstract*}
 \end{otherlanguage}
 

@@ -15,14 +15,14 @@
 % the framework defines, and that holding it fixed removes confounders).
 This chapter answers the first part of the research question: what kind
 of framework the forecast needs. The framework defines everything except
-the update operator: how the state is represented, how the elapsed time
+the operator: how the state is represented, how the elapsed time
 between visits enters the prediction, and how every model is trained and
 evaluated. Holding these parts fixed removes them as confounding factors
 when operators are compared. If every candidate architecture came with its
 own training pipeline, differences in data handling, time representation
 or optimisation would be confounded with the architectural differences
 under test. A single pipeline therefore provides one swappable slot for
-the update operator $f_\theta$, the only component that changes between
+the operator $f_\theta$, the only component that changes between
 experiments. Each setting of the slot is referred to below as an
 \emph{arm} of the comparison.
 
