@@ -616,6 +616,12 @@ and the cost grows faster than the resolution.
 
 \label{sec:background:pde-solvers:neural}
 
+This section introduces the learned counterparts of these mechanisms: how
+learned solvers keep or replace parts of the classical computation, the
+two ways of using them in time, the error accumulation of autoregressive
+rollouts and the training remedies against it, and the architecture
+families that Chapter~\ref{ch:experiments} compares.
+
 Every mechanism of~\S\ref{sec:background:pde-solvers} is a function from a neighbourhood of grid values
 to a number: the stencil coefficients, the WENO weights, the rate that
 the time step applies. Any of them can be learned from data instead of
@@ -657,15 +663,17 @@ convergence proof, and in a rollout it consumes its own predictions, so
 its errors can accumulate from step to step. This problem and its
 remedies are discussed later in this section.
 
-Learned solvers also differ in what they predict, and in this respect
-they separate into two paradigms. Neural
-operators learn a continuous map
+Learned solvers also differ in how they use time. A direct approach
+learns a continuous map
 $M: [0, T] \times \mathcal{F} \to \mathcal{F}$ such that
-$M(t, u_0) = u(t)$, and so predict the solution at any time directly
+$M(t, u_0) = u(t)$, and so predicts the solution at any time directly
 from the initial condition. By contrast, autoregressive
 solvers learn the update $\mathcal{A}$ of
 \eqref{eq:bg:update-operator} and apply it repeatedly to unroll a
-trajectory. When the step size $\Delta t$ is fixed by the dataset, the
+trajectory. The two framings concern the use of a network, not its
+architecture: a neural operator such as the FNO can serve as a direct map
+or, applied step by step, as an update \citep{Li2021}, which is how it is
+used in this thesis (\S\ref{sec:method:family:dense}). When the step size $\Delta t$ is fixed by the dataset, the
 dependence on it is usually omitted from the notation. Here it cannot be
 omitted, because the intervals between clinical visits are irregular.
 
@@ -676,8 +684,8 @@ independently of the spatial discretisation. The Fourier Neural Operator
 domain, which gives the network global spatial support within a single
 layer. DeepONet \citep{Lu2021} instead factorises the operator into a
 branch network that encodes the input function and a trunk network that
-encodes the continuous query coordinate. Both share a well-known
-limitation: a trained operator is tied to the equation family it was
+encodes the continuous query coordinate. Used as direct maps, both share
+a well-known limitation: a trained operator is tied to the equation family it was
 trained on, and its extrapolation beyond the temporal horizon seen during
 training is consistently poor.
 
@@ -768,7 +776,8 @@ Chapter~\ref{ch:experiments} measures the four properties one at a time.
 % time-adaptive GA prediction with explicit time factors).
 
 % TODO (author, 2026-10-22, tablet review v7 #16): review Section 2.4 again.
-Related work is discussed in four groups.
+This section places the thesis among four groups of prior work and
+identifies what they leave open.
 Section~\ref{sec:background:related-work:rate} covers models that predict
 the risk or the rate of AMD and GA progression,
 \S\ref{sec:background:related-work:spatial} models that forecast where a
@@ -779,18 +788,15 @@ forecasts from irregularly sampled longitudinal data in general, and
 \subsection{Predicting the Risk and Rate of Progression}
 \label{sec:background:related-work:rate}
 
-Learning-based models of AMD and GA progression on OCT fall broadly into
-models that predict a risk or a rate for each eye and models that
-predict where the lesion will grow.
-\citet{SchmidtErfurth2018} reported on the prediction of individual
-disease conversion in intermediate AMD using artificial intelligence.
-\citet{Bogunovic2017} used machine learning to predict the regression of
-individual drusen, a sign of disease activity, in intermediate AMD from OCT
-imaging. \citet{Vogl2021} provided a topographic analysis of the retinal
+\citet{SchmidtErfurth2018} predicted from OCT, demographic and genetic
+features whether an eye with intermediate AMD converts to neovascular AMD
+or GA within two years (495 eyes; area under the curve 0.80 for
+conversion to GA). \citet{Bogunovic2017} predicted the regression of
+individual drusen, a sign of disease activity, in intermediate AMD from
+OCT (61 eyes; area under the curve 0.75 within two years).
+\citet{Vogl2021} provided a topographic analysis of the retinal
 and choroidal layer changes that precede the conversion of intermediate
-AMD to macular atrophy or neovascularisation. \citet{Vallino2024} noted that
-artificial intelligence applied to OCT has the potential to provide
-predictive probabilities of GA development over time.
+AMD to macular atrophy or neovascularisation.
 
 Deep-learning models have also been trained to predict the growth rate
 of GA in an individual eye. From OCT volumes, four different approaches
@@ -813,7 +819,8 @@ spread of GA was slowest at regular borders, at about 63\,\textmu{}m per
 year, faster at irregular borders, at about 91\,\textmu{}m per year, and
 fastest at splitting borders, at about 183\,\textmu{}m per year
 \citep{Lindner2018}. Closer to the task of this thesis are therefore
-models that forecast the lesion itself. \citet{Gigon2021} predicted the progression of RORA from OCT
+models that forecast the lesion itself. \citet{Gigon2021} predicted the progression of RPE and outer retinal
+atrophy (RORA; cf.\ cRORA, \S\ref{sec:background:ga-oct:disease}) from OCT
 en-face maps of layer thicknesses, mean reflectivity and drusen height in
 129 eyes of 119 patients. Their model gives each en-face pixel a
 probability of atrophy over time, from which a map of the time to
@@ -823,7 +830,7 @@ RORA area and from 0.46 to 0.72 for the growth region.
 vector and evolve these vectors with a Neural ODE \citep{Chen2018} to any
 requested time point, using a fourth-order Runge--Kutta scheme. Their
 model was developed on 967 OCT volumes of 100 patients with GA and also
-applied to brain MRI in Alzheimer's disease. The Runge--Kutta-integrated
+applied to brain magnetic resonance imaging (MRI) in Alzheimer's disease. The Runge--Kutta-integrated
 operators of this thesis (\S\ref{sec:method:family:rk}) are related to
 this continuous-time formulation.
 
@@ -831,7 +838,8 @@ this continuous-time formulation.
 % cohort, with tighter registration bounds and cleaner segmentations.
 The closest prior work on the specific prediction task addressed here
 is by \citet{Mai2024}, who predicted individual GA progression from a
-single baseline OCT on the MUW GA cohort (184 eyes of 100 patients). The
+single baseline OCT with this Neural ODE model, on the MUW GA cohort
+(184 eyes of 100 patients). The
 data of this thesis are drawn from the same cohort, with tighter
 registration bounds and cleaner segmentations (75 eyes of 51 patients,
 \S\ref{sec:data:dataset}). The input regime, however, is different. That
@@ -851,7 +859,7 @@ longitudinal clinical data. Latent ODE and ODE-RNN models let a hidden
 state evolve in continuous time between observations and so handle
 arbitrary time gaps \citep{Rubanova2019}. For images, ImageFlowNet learns
 a multiscale latent representation and a flow field in it with a neural
-ODE or SDE, and forecasts image-level trajectories of disease
+ODE or a stochastic differential equation (SDE), and forecasts image-level trajectories of disease
 progression. It was evaluated on FAF images of GA, on multiple sclerosis
 and on glioblastoma, an aggressive brain tumour
 \citep{Liu2025ImageFlowNet}. In brain imaging,
@@ -860,8 +868,11 @@ neurodegeneration in ageing and dementia \citep{Ravi2022}, and BrLP
 combines a latent diffusion model with an auxiliary model of regional
 volume changes to predict the evolution of individual 3-D brain MRIs
 \citep{Puglisi2024}. These models treat time continuously or condition
-on it; the operators of this thesis take the interval as an input to a
-single residual step (\S\ref{sec:background:approach}).
+on it. The default update of this thesis takes the interval as an input
+to a single residual step (\S\ref{sec:background:approach}); the
+Runge--Kutta wrapper of~\S\ref{sec:method:family:rk} instead integrates
+an operator without a $\Delta t$ input over the interval, which is closer
+to these continuous-time models.
 
 \subsection{PDE-Based Models in Biomedicine}
 \label{sec:background:related-work:pde}
@@ -869,7 +880,8 @@ single residual step (\S\ref{sec:background:approach}).
 Where the governing equation of a disease process is known, PDE models
 are fitted to individual patients. For glioblastoma, tumour growth
 models based on the Fisher--Kolmogorov equation are personalised with
-Bayesian inference from MRI and FET-PET scans to design radiotherapy
+Bayesian inference from MRI and FET positron emission tomography
+(FET-PET) scans to design radiotherapy
 plans \citep{Lipkova2019}. Learned components speed this up: a neural
 surrogate that replaces the numerical solver of such a tumour model is
 about 50 times faster \citep{Ezhov2022}, and a network that solves the
@@ -879,9 +891,12 @@ medical image analysis more broadly has been reviewed in a survey of
 over 80 papers \citep{Banerjee2025}. In all of these, the equation is
 known and the network learns to solve or invert it. Without a known
 equation, GA progression has been modelled with learned continuous-time
-dynamics \citep{Lachinov2024, Liu2025ImageFlowNet}. A controlled
-comparison of operators from different classes inside one framework has,
-to the author's knowledge, not been reported for GA.
+dynamics \citep{Lachinov2024, Liu2025ImageFlowNet}.
+
+Across the four groups, a controlled comparison of operators from
+different architecture classes inside one fixed framework has, to the
+author's knowledge, not been reported for GA. It is the comparison this
+thesis makes.
 
 \section{Modelling Approach and Problem Statement}
 \label{sec:background:approach}
@@ -945,9 +960,10 @@ area and $r(t)$ an effective radius,
 which is consistent with the data within a clinical follow-up horizon of six
 months to slightly over two years \citep{Yehoshua2011}; the square-root
 enlargement rate has been re-used in subsequent biomarker work
-\citep{Chu2022}. The interior of the lesion is already atrophic and the
-exterior is healthy; both are quasi-static, and all dynamics are
-concentrated at the active boundary. Such behaviour is characteristic of
+\citep{Chu2022}. The interior of the lesion is already atrophic, and the
+retina further away changes little. Most of the change between visits
+occurs at the lesion boundary, although new atrophy can also appear at
+some distance from it (\S\ref{sec:experiments:folds}). Such behaviour is characteristic of
 a system governed by a temporal PDE with strong spatial localisation.
 
 
@@ -957,11 +973,11 @@ periphery than towards the fovea, and growth towards the fovea peaks at
 approximately one millimetre from the fovea \citep{Singh2025}. In eyes
 treated monthly with pegcetacoplan, progression towards the fovea was
 slowed more than progression towards the periphery \citep{Singh2025}. The
-forward operator that maps the present state to the future state is
-therefore \emph{local}, but its reach must match the distance the front
-moves between two visits, and this distance differs between directions.
-Classical solvers build such properties in explicitly through the size and
-shape of their stencils.
+map from the present state to the future state is therefore expected to
+act mainly locally, and its reach would have to cover the distance the
+front moves between two visits, which differs between directions. In a
+classical solver, this reach is set by the size and shape of the
+stencil (\S\ref{sec:background:pde-solvers:stencils}).
 
 
 GA progression has no known governing equation, and its data are a few
@@ -991,10 +1007,9 @@ four respects, and the thesis adopts it for these reasons.
 
 Because the governing equation is unknown, the update has to be learned
 from data, as in the neural PDE solvers
-of~\S\ref{sec:background:neural-pde}. These solvers differ
-mainly in their built-in assumptions: how far a single prediction can look
-across the domain, whether it works on a regular grid or on a graph, and
-whether physical terms such as transport are represented explicitly. For
+of~\S\ref{sec:background:neural-pde}. These solvers differ in the
+built-in assumptions named at the end of~\S\ref{sec:background:neural-pde}.
+For
 GA, where the governing equation is unknown and only a few dozen patients
 are available for training, these assumptions are likely to matter more
 than model size.
@@ -1024,7 +1039,7 @@ Chapter~\ref{ch:experiments} compares them.
 
 % TODO (author, 2026-10-22, tablet review v7 #20): review Section 2.5.2 again.
 Each eye of the cohort is observed at a sequence of visits at times
-\mbox{$t_0 < t_1 < \dots < t_K$}, with between five and thirteen visits per eye
+\mbox{$t_0 < t_1 < \dots < t_N$}, with between five and thirteen visits per eye
 and irregular intervals $\Delta t_k = t_{k+1} - t_k$, measured in years.
 At visit $k$, the state of the eye is a tensor
 \begin{equation*}

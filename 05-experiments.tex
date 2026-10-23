@@ -181,8 +181,8 @@ visit schedule, with the actual $\Delta t$ of each window.
 The one-year anchor is taken at the first step whose cumulative time
 reaches it (\S\ref{sec:data:temporal}). For a few eyes this step lies
 beyond one year, where the true change region is larger. This is accepted
-because \citet{Mai2024} also score every follow-up visit by its time since
-baseline and not at a fixed horizon. Persistence is computed inside every
+so that every eye contributes one score at the anchor
+(\S\ref{sec:data:temporal}). Persistence is computed inside every
 rollout by the same code; for the one-year anchor metrics it is the baseline mask
 held constant. Per-step metrics are averaged per eye first and then over
 the eyes, so every eye counts once, whatever its number of visits.

@@ -25,8 +25,9 @@ produce the input that the framework of Chapter~\ref{ch:method} receives.
 
 The data used in this thesis comes from a longitudinal cohort of eyes with
 Geographic Atrophy and was provided by the Medical University of Vienna
-(MUW). It is drawn from the GA cohort described by \citet{Mai2024}, with
-tighter registration bounds and cleaner segmentations, and was acquired in
+(MUW). It is a subset of 75 of the 184 eyes of the GA cohort described
+by \citet{Mai2024}, selected by MUW with tighter registration bounds and
+cleaner segmentations, and was acquired in
 routine clinical practice at a single site in Vienna. The sample unit throughout is the individual eye. The cohort
 contains 75 eyes, which together contribute 553 visits, where a visit is
 one OCT acquisition. Ordering the visits of each eye in time yields 478
@@ -298,9 +299,11 @@ case. In addition, in 31.1\,\% of visits the lesion touches the edge of
 the imaged field inside the window: the border of the window or, for a
 padded visit, the edge of the scan itself. Growth across that edge is
 not observed (it is censored), and no flag in the data marks it. The models
-are therefore trained on censored targets, and the change-region metrics at
-the one-year anchor (\S\ref{sec:data:temporal}) under-measure
-progression for roughly one visit in five. The censoring also limits
+are therefore trained on censored targets. At the one-year anchor
+(\S\ref{sec:data:temporal}), the lesion of 21 of the 75 eyes touches this
+edge (\S\ref{sec:experiments:protocol:metrics}); for these eyes, the
+change-region metrics score only the change inside the window, and areas
+and growth rates measured on the window are biased low. The censoring also limits
 comparability with literature results computed over the whole field of
 view.
 
@@ -345,6 +348,8 @@ the prediction back to the original scale.
 \section{Patient-Level Covariates}
 \label{sec:data:covariates}
 
+Age and sex are included as patient-level covariates because they are
+plausible modulators of how fast GA progresses.
 Each transition window, a pair of consecutive visits of one eye
 (\S\ref{sec:data:temporal}), is accompanied by two patient-level
 covariates, age and sex.
@@ -371,7 +376,8 @@ alone.\footnote{The conversion of elapsed days into years uses 365.25
 days per year for the age covariate but 365 days per year for $\Delta
 t$. The resulting difference is at most 0.07\,\%. It is deliberately
 left unchanged, because aligning the two would invalidate every
-precomputed dataset.}
+precomputed dataset.} How the covariates enter each operator is described
+in~\S\ref{sec:method:covariates}.
 
 \section{Temporal Structure}
 \label{sec:data:temporal}
@@ -430,8 +436,9 @@ one-year anchor, the first rollout step whose cumulative time reaches
 about 347 days. This one-year anchor has no upper bound. For 68 of the 75 eyes, it
 falls at exactly 360 days. The remaining 7 eyes (9.3\,\%) are scored at 450 to
 720 days, where the true change region is 1.3 to 1.7 times larger.
-This is accepted deliberately. \citet{Mai2024} likewise score every follow-up
-visit by its time since baseline, in yearly bins, and not at a fixed horizon.
+This is accepted so that every eye contributes one score at the anchor. It
+departs from the yearly bins of \citet{Mai2024}, which would place these
+visits in the second year.
 The evaluation protocol is defined in~\S\ref{sec:experiments:protocol}.
 
 
@@ -488,6 +495,13 @@ reliable test. Instead, every eye serves as a validation eye in exactly
 one of the five folds. The protocol is therefore 5-fold train/validation
 cross-validation, and every result reported in this thesis is a
 validation result.
+
+In summary, each eye provides a sequence of eleven-channel states on a
+$49 \times 1024$ grid whose rows are about 21 times farther apart than its
+columns, the intervals between its visits and two covariates. Growth is
+censored at the window edge in almost a third of the visits. The 478
+transitions are split into five patient-level folds.
+Chapter~\ref{ch:method} describes the framework that is trained on them.
 % TODO: ensure that no chapter describes the cross-validation results as
 % test-set performance; no test set is held out.
 % Patient counts per fold (SV-3.5) counted 2026-10-14 from

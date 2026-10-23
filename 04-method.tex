@@ -26,10 +26,22 @@ the operator $f_\theta$, the only component that changes between
 experiments. Each setting of the slot is referred to below as an
 \emph{arm} of the comparison.
 
+The framework developed here consists of a residual update conditioned
+on the elapsed time $\Delta t$ (\S\ref{sec:method:dt-residual}), a
+zero-initialised output so that every operator starts from persistence,
+one objective that weights the lesion mask
+(\S\ref{sec:method:training:loss}) and a training curriculum measured in
+elapsed days (\S\ref{sec:method:training:curriculum}). Which of these
+parts the results depend on is tested
+in~\S\ref{sec:experiments:ablations}.
+
 Everything outside the slot is held fixed. The input is the eleven-channel
 state on the $49 \times 1024$ grid of Chapter~\ref{ch:data}. Time is
-handled by a single-step residual update conditioned on the interval
-between visits (\S\ref{sec:method:dt-residual}). The loss, the training
+handled by a residual update conditioned on the interval between visits
+(\S\ref{sec:method:dt-residual}). Every operator takes one Euler step,
+except the FEN, which is integrated with RK4 in 45-day sub-steps without
+$\Delta t$ as an input (\S\ref{sec:method:family:fen},
+\S\ref{sec:method:family:rk}). The loss, the training
 curriculum, the optimiser, the epoch budget, the cross-validation folds,
 the random seeds, the evaluation and the model selection rule are shared
 by every run. An operator placed in the slot contains only its
@@ -113,8 +125,12 @@ This section defines what every arm shares: the input, the time handling
 (\S\ref{sec:method:training:loss}), the training curriculum
 (\S\ref{sec:method:training:curriculum}) and the optimisation
 (\S\ref{sec:method:training:optim}). These parts are the same for every
-operator of the survey; the shared evaluation follows
-in~\S\ref{sec:experiments:protocol}.
+operator, except that the FEN, like any operator run in the Runge--Kutta
+wrapper, replaces the single step by an RK4 integration
+(\S\ref{sec:method:family:rk}); the shared evaluation follows
+in~\S\ref{sec:experiments:protocol}. With these parts, any operator can
+be trained on visits with irregular intervals, starts from exact
+persistence and is optimised under the same loss and curriculum.
 
 Every operator receives exactly one visit, without earlier visits as
 input, and predicts the state at the next visit. With five to thirteen
@@ -474,6 +490,11 @@ reported numbers and why.
   \end{tabular}
 \end{table}
 
+In summary, the framework fixes one input visit, the residual update of
+Equation~\eqref{eq:method:residual-update} with a zero-initialised output,
+the loss of Equation~\eqref{eq:method:loss}, the time-budgeted curriculum
+and the settings of Table~\ref{tab:method:hparams};
+\S\ref{sec:method:family} describes the operators that fill the slot.
 
 \section{The Operators}
 \label{sec:method:family}
