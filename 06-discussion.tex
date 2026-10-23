@@ -130,7 +130,7 @@ The dilated-stencil network nevertheless remains the canonical model, for
 two reasons. First, it trains about four times faster
 (\S\ref{sec:experiments:cost}). Second, it is the reference configuration
 on which the tests of the framework were run: the objective, the time
-handling, the capacity study and the step-size ladder
+handling, the capacity study and the step-size test
 (\S\ref{sec:experiments:ablations},
 \S\ref{sec:experiments:validity:swap}). Replacing it would require
 repeating these tests without changing what they show, because none of
@@ -204,7 +204,7 @@ past growth.
 Every operator of the survey is trained to predict the state at the next
 visit, so its predictions between visits are not constrained by the data.
 Two models nevertheless define a prediction at any time. The T-FEN in its
-energy-conserving form passes the solver-swap test on all five folds and can therefore be read as a continuous-time model
+energy-conserving form passes the step-size test on all five folds and can therefore be read as a continuous-time model
 (\S\ref{sec:experiments:validity:swap}). The network trained inside the
 Runge--Kutta wrapper also defines a vector field, but its training step,
 one RK4 step per interval, resolves that field on only two of the five

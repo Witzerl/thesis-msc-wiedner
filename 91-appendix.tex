@@ -425,11 +425,11 @@ are those of~\S\ref{app:full-results:criteria}.
 
 
 \clearpage
-\section{The Step-Size Ladder}
+\section{The Step-Size Test}
 \label{app:full-results:step-ladder}
 
 Table~\ref{tab:appendix:step-ladder} lists every setting of the
-solver-swap test of~\S\ref{sec:experiments:validity:swap}. Each trained
+step-size test of~\S\ref{sec:experiments:validity:swap}. Each trained
 model is re-evaluated, without retraining, with a fixed step $h$ and with
 explicit Euler or classical RK4. Each visit interval is split into the
 smallest number of equal sub-steps no longer than $h$. Because the median
@@ -440,8 +440,8 @@ leave almost every interval in one piece: on folds 0 to 4, only 2, 0, 3,
 
 \begin{table}[!h]
   \centering
-  \caption[The step-size ladder.]{%
-    The step-size ladder of the solver-swap test, all five folds, seed 42.
+  \caption[Every setting of the step-size test.]{%
+    Every setting of the step-size test, all five folds, seed 42.
     Each cell is the change of the change-region Dice at the one-year
     anchor against the setting the model was trained with, when the same
     weights are evaluated with a fixed step $h$ (in years, with days below)

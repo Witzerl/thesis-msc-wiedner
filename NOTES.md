@@ -2435,6 +2435,15 @@ at a time, as dictated by the author.
   confirmed by the author.
 - [ ] Reply mail to the supervisor, remaining points: how MUW assigned the fold split files; SV-4.2
   (moving mesh into the main text?); SV-5.12 (post-hoc step-size ladder enough?); final thesis title.
+  2026-10-23: the author's draft mail to Dmitrii (with the current PDF) asks the first three; the final
+  title is not in it (raise it with Hrvoje on Monday, or add it to the mail).
+- [x] 2026-10-23 (author): the test is now called **"the step-size test"** everywhere in the thesis (was
+  "solver-swap test" in the text and "step-size ladder" in captions/headings): §5.7.1 heading, the §5.7
+  opener, §4.3.7, §6.1 (two places), Appendix C.5 heading and text, and the four captions (Appendix C.5
+  short caption now "Every setting of the step-size test.", so it no longer duplicates the Chapter 5
+  table's). Labels (`sec:experiments:validity:swap`, `tab:appendix:step-ladder`), file names and LaTeX
+  comments unchanged; "reach ladder" and "locality ladder" are other things and unchanged. Builds clean
+  (127 pages, same warnings as before).
 - [x] (2026-10-22, author: dropped) Empty Appendices B (Extended Derivations) and C (Full Hyperparameters): fill or drop. Appendix A
   still has the TODO for demographic tables, Appendix E the TODO "full tables for every ablation sweep"
   (it already holds the border/interior, criteria, statistics, step-ladder and growth-speed tables).

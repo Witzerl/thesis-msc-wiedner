@@ -1537,14 +1537,14 @@ This section examines two properties of the trained operators that the
 accuracy numbers do not show: whether an operator can be read as a
 continuous-time model, and whether the T-FEN stays stable when it predicts
 far beyond the training horizon. Two tests were designed for this purpose.
-The solver-swap test re-evaluates trained models with smaller integration
+The step-size test re-evaluates trained models with smaller integration
 steps (\S\ref{sec:experiments:validity:swap}), and a stability criterion
 checks the free-running rollout (\S\ref{sec:experiments:validity:tfen}).
 Their results decide which statements about the operators can be made.
 % 2026-10-19 (SV-5.15, AI 5d.1): opener states what is examined and which
 % tests were designed for it.
 
-\subsection{The Solver-Swap Test}
+\subsection{The Step-Size Test}
 \label{sec:experiments:validity:swap}
 
 The update of the framework, $u_t + \Delta t \cdot f_\theta$, has the form
@@ -1561,7 +1561,7 @@ with one another, and $f_\theta$ could be interpreted as a rate of growth.
 A network trained with one fixed discretisation need not have this
 property. It can fit the observed data while its output depends on the
 discretisation it was trained with \citep{Ott2021, Krishnapriyan2023}. The
-solver-swap test determines which of the trained models have the property,
+step-size test determines which of the trained models have the property,
 and therefore for which models continuous-time statements may be made.
 
 The test rests on a basic property of numerical integration. If a model
@@ -1662,8 +1662,8 @@ a first-order scheme.
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.55\textwidth]{images/fig_experiments_swap_tfen.pdf}
-  \caption[The step-size ladder for the T-FEN.]{%
-    The step-size ladder for the T-FEN in its energy-conserving form. The
+  \caption[The step-size test for the T-FEN.]{%
+    The step-size test for the T-FEN in its energy-conserving form. The
     network was trained with RK4 in steps of 45 days (ring) and is
     re-evaluated, without retraining, with RK4 at a fixed internal step of
     365 to 11.4 days (logarithmic axis, finer steps to the right); every
@@ -1711,8 +1711,8 @@ of the T-FEN comes from its transport term
 
 \begin{table}[t]
   \centering
-  \caption[The step-size ladder.]{%
-    The step-size ladder. Each trained model is re-evaluated, without
+  \caption[The step-size test.]{%
+    The step-size test. Each trained model is re-evaluated, without
     retraining, with a fixed step of $h = 1$ to $1/32$ year (365 to 11.4
     days) and with explicit Euler or classical RK4; all five folds, seed 42.
     The table gives the change of the change-region Dice at the one-year
@@ -1763,8 +1763,8 @@ of the T-FEN comes from its transport term
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.85\textwidth]{images/fig_experiments_swap.pdf}
-  \caption[The step-size ladder for the graph network.]{%
-    The step-size ladder for the dilated-stencil graph network, trained in
+  \caption[The step-size test for the graph network.]{%
+    The step-size test for the dilated-stencil graph network, trained in
     two ways (Table~\ref{tab:experiments:swap}). Each trained network is
     re-evaluated, without retraining, with the scheme it was trained with at
     a fixed internal step of 365 to 11.4 days (logarithmic axis, finer steps
