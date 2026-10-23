@@ -129,12 +129,11 @@ of this thesis their order matters little.
 The dilated-stencil network nevertheless remains the canonical model, for
 two reasons. First, it trains about four times faster
 (\S\ref{sec:experiments:cost}). Second, it is the reference configuration
-on which the tests of the framework were run: the objective, the time
-handling, the capacity study and the step-size test
-(\S\ref{sec:experiments:ablations},
-\S\ref{sec:experiments:validity:swap}). Replacing it would require
-repeating these tests without changing what they show, because none of
-them depends on which of the two operators fills the slot.
+on which the tests of the objective and the time handling were run
+(\S\ref{sec:experiments:ablations}); replacing it would require repeating
+these tests on the T-FEN. The capacity study and the step-size test
+already include the T-FEN, and the step-size test gives the two operators
+different verdicts (\S\ref{sec:experiments:validity:swap}).
 % 2026-10-22 (author): resolves the TODO on the borderline T-FEN; aligned
 % with the canonical-model paragraph of 5.2. Not used as reasons: the
 % chronology, the >3-year bin, numerical delicacy (dropped in 5.2, #57/#58).

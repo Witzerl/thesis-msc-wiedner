@@ -55,21 +55,21 @@
 % cohort, long sentences split. German Kurzfassung translated from it.
 \cleardoubleoddpage%  Make sure to start abstract on a new odd page
 \begin{abstract*}
-Geographic Atrophy (GA) is the advanced form of age-related macular
+Geographic Atrophy (GA) is the atrophic late form of age-related macular
 degeneration, manifested as a gradual and irreversible loss of retinal
 tissue. A forecast of where and how fast the lesion of an individual eye
 will grow would support patient management, but it is difficult to model:
 patterns and rates of progression vary widely between patients, visits are
 irregularly spaced, and cohorts are small. This thesis studies GA
-progression from the perspective of computational modelling and determines
-what a forecast from longitudinal optical coherence tomography (OCT)
-requires: a framework around the model, and an operator inside it that maps
-one visit to the next. It contributes a framework for irregular visit
+progression from the perspective of computational modelling and asks what
+kind of framework a forecast from longitudinal optical coherence tomography
+(OCT) needs around the model, and what kind of operator, the learned map
+from one visit to the next, it needs inside it. It contributes a framework for irregular visit
 schedules in which models of any architecture class are trained and
 evaluated alike, and a controlled comparison of such
-models for GA. The comparison identifies the property that separates them:
-whether one update can see as far as the lesion front moves between two
-visits.
+models for GA. Among operators with spatial context, the score depends
+mainly on whether one update reaches as far as the lesion front moves
+between two visits.
 
 The data comprise 75 eyes of 51 patients from the Medical University of
 Vienna, with 553 visits over a median follow-up of three years. Each visit is represented on the en-face grid of the OCT
@@ -91,15 +91,17 @@ $0.53 \pm 0.05$ and a U-Net at $0.50 \pm 0.06$, so models of three classes
 reach similar scores. Spatial context and a loss that emphasises the lesion
 are both required; without either, a model predicts no change. Neither a
 fourth-order Runge--Kutta step nor larger models help. Among operators with spatial context, the main difference
-is reach. On the anisotropic grid, B-scans lie 121\,\textmu{}m
-apart, pixels along a B-scan only 5.7\,\textmu{}m. In a graph
+is reach. On the anisotropic grid, the cross-sectional scans (B-scans) of
+the OCT volume lie 121\,\textmu{}m apart, the pixels along a scan only
+5.7\,\textmu{}m. In a graph
 built from pixel indices, the neighbours of a pixel therefore lie within
 about 11\,\textmu{}m along the B-scan, whereas the lesion front typically
 advances by about 70\,\textmu{}m between visits. A dilated stencil whose
 neighbours reach about 120\,\textmu{}m in both directions raises the Dice by
-0.064 at an identical parameter count, on all five folds. The transport term
-closes the same gap by another mechanism (+0.062 over the network without
-it). In this cohort, the models locate new atrophy better than they predict
+0.064 at an identical parameter count, on all five folds. A learned
+transport term, evaluated on a mesh with the same seven-column spacing,
+raises the Finite Element Network by a similar 0.062 over the same network
+without it. In this cohort, the models locate new atrophy better than they predict
 its speed: their Dice on the newly atrophic region alone is about 0.5 to
 0.65 in each year of follow-up, while the predicted and measured growth
 rates of the 75 eyes correlate at $r = 0.40$.
@@ -126,16 +128,17 @@ jedoch anspruchsvoll: Verlaufsmuster und Wachstumsgeschwindigkeit
 unterscheiden sich stark von Patient zu Patient, die Kontrolluntersuchungen
 erfolgen in unregelmäßigen Abständen, und die verfügbaren Kohorten sind
 klein. Die vorliegende Arbeit betrachtet die GA-Progression aus der
-Perspektive des Computational Modelling und untersucht, was eine Vorhersage
-auf Basis longitudinaler optischer Kohärenztomographie (OCT) erfordert: ein
-Framework, in das das Modell eingebettet ist, und einen Operator, der den
-Zustand von einer Untersuchung zur nächsten fortschreibt. Dazu wird ein
+Perspektive des Computational Modelling und fragt, welche Art von Framework
+eine Vorhersage auf Basis longitudinaler optischer Kohärenztomographie (OCT)
+um das Modell herum benötigt und welche Art von Operator, also welche
+gelernte Abbildung von einer Untersuchung zur nächsten, darin. Dazu wird ein
 Framework für unregelmäßige Untersuchungsintervalle entwickelt, in dem sich
 Modelle unterschiedlicher Architekturklassen unter identischen Bedingungen
 trainieren und vergleichen lassen, und darin ein kontrollierter Vergleich
-solcher Modelle durchgeführt. Dieser Vergleich zeigt, worin sich die Modelle
-wesentlich unterscheiden: ob ein einzelner Vorhersageschritt so weit reicht,
-wie sich der Läsionsrand zwischen zwei Untersuchungen verschiebt.
+solcher Modelle durchgeführt. Unter den Operatoren mit räumlichem Kontext
+hängt das Ergebnis vor allem davon ab, ob ein einzelner Vorhersageschritt so
+weit reicht, wie sich der Läsionsrand zwischen zwei Untersuchungen
+verschiebt.
 
 Datengrundlage sind 75 Augen von 51 Patientinnen und Patienten der
 Medizinischen Universität Wien mit insgesamt 553 Untersuchungen und einer
@@ -167,16 +170,18 @@ die die Läsion stärker gewichtet: Fehlt eines von beiden, sagt das Modell
 keine Veränderung voraus. Weder ein Runge--Kutta-Schritt vierter Ordnung noch
 größere Modelle verbessern die Vorhersage messbar. Unter den Operatoren mit
 räumlichem Kontext entscheidet vor allem die räumliche Reichweite. Das Raster
-ist stark anisotrop: Die B-Scans liegen 121\,\textmu{}m auseinander, die
-Bildpunkte innerhalb eines B-Scans nur 5,7\,\textmu{}m. In einem Graphen,
+ist stark anisotrop: Die Querschnittsaufnahmen (B-Scans) des OCT-Volumens
+liegen 121\,\textmu{}m auseinander, die Bildpunkte innerhalb eines B-Scans
+nur 5,7\,\textmu{}m. In einem Graphen,
 dessen Nachbarschaften über Pixelindizes definiert sind, liegen die Nachbarn
 eines Pixels entlang des B-Scans daher höchstens etwa 11\,\textmu{}m entfernt,
 während sich der Läsionsrand zwischen zwei Untersuchungen typischerweise um
 etwa 70\,\textmu{}m verschiebt. Ein Dilated Stencil, dessen Nachbarschaft in
 beiden Richtungen bis etwa 120\,\textmu{}m reicht, steigert den
 Change-Region-Dice bei gleicher Parameterzahl um 0,064, und zwar in allen
-fünf Folds. Der Transportterm behebt dasselbe Defizit über einen anderen
-Mechanismus (+0,062 gegenüber demselben Netzwerk ohne Transportterm). In
+fünf Folds. Ein gelernter Transportterm, ausgewertet auf einem Gitter mit
+demselben Abstand von sieben Spalten, steigert das Finite-Elemente-Netzwerk
+um vergleichbare 0,062 gegenüber demselben Netzwerk ohne Transportterm. In
 dieser Kohorte erfassen die Modelle die Lage neu auftretender Atrophie besser
 als deren Ausbreitungsgeschwindigkeit: Auf der neu atrophierten Fläche allein
 erreichen sie in jedem Beobachtungsjahr einen Dice von etwa 0,5 bis 0,65,

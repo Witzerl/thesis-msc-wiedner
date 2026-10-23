@@ -728,9 +728,12 @@ of the correction computed on the moved mesh enters the prediction, so its
 trajectory shows whether the correction is used. A parameter-matched
 bypass control runs the same machinery on the uniform grid, which
 separates the effect of the mesh geometry from the effect of the extra
-parameters. All reported five-fold runs of the extension use the
-$k$-nearest-neighbour graph network as their branches
-(\S\ref{app:mm-pde:result}). The mesh mover pulls nodes together where the
+parameters. All reported five-fold runs of the extension use an earlier
+configuration of the $k$-nearest-neighbour graph network as their
+branches, which aggregates the messages of the neighbours by their mean
+and their maximum ($75\,339$ parameters, against $67\,147$ for the $k$-NN
+arm of Table~\ref{tab:experiments:arms}); their scores are therefore
+compared only with each other (\S\ref{app:mm-pde:result}). The mesh mover pulls nodes together where the
 lesion border lies, to raise the resolution there, and the correction
 branch has to exchange messages between exactly these close nodes. A
 dilated stencil, which skips the nearest nodes in order to reach further,
@@ -1049,16 +1052,17 @@ result of~\S\ref{app:mm-pde:result}.
 The single-branch model, the dual-branch model and the bypass control were
 compared over the five folds at seed 42, with the evaluation protocol of
 the main text (\S\ref{sec:experiments:protocol:stats}) and the criteria
-of~\S\ref{app:full-results:criteria}. All three arms use the
-$k$-nearest-neighbour graph network, not the dilated stencil.
+of~\S\ref{app:full-results:criteria}. All three arms use the earlier
+$k$-NN configuration of~\S\ref{app:mm-pde}, not the dilated stencil.
 Table~\ref{tab:appendix:dual-result} lists the arms.
 
 \begin{table}[t]
   \centering
   \caption[Single branch, dual branch and bypass control.]{%
     Change-region Dice at the one-year anchor, mean $\pm$ sd over the five
-    folds, seed 42. All arms use the $k$-nearest-neighbour graph network,
-    not the dilated stencil. Cost is the minimum epoch time over
+    folds, seed 42. All arms use the earlier $k$-nearest-neighbour
+    configuration of~\S\ref{app:mm-pde} (mean and maximum aggregation), not
+    the dilated stencil. Cost is the minimum epoch time over
     the folds and supports order-of-magnitude statements only.}
   \label{tab:appendix:dual-result}
   \small
