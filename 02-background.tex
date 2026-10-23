@@ -62,9 +62,8 @@ lesion mask with the geometry of the surrounding retinal layers
     region of the macula) \citep{Koksaldi2025}. The panel is scaled so
     that the fovea lies 4.36\,mm horizontally from the centre of the
     optic disc, the mean measured in healthy right eyes
-    \citep{Nair2021}. The dashed square is the
-    $6 \times 6$\,mm fovea-centred OCT scanning window used in this
-    thesis (\S\ref{sec:background:ga-oct:muw}). Drawings generated with
+    \citep{Nair2021}. The dashed square is the modelling window of about
+    $6 \times 6$\,mm used in this thesis (\S\ref{sec:data:spatial}). Drawings generated with
     ChatGPT; labels added and verified by the author.}
   \label{fig:bg:eye-anatomy}
 \end{figure}
@@ -90,11 +89,10 @@ The retina is not uniform across its surface. A small disc-shaped
 region, the \emph{macula}, is specialised for
 high-acuity central vision, while the rest of the retina handles
 peripheral vision at lower resolution. The macula has a diameter of
-roughly five to six millimetres and is the only part of the retina
-that GA affects clinically (\S\ref{sec:background:ga-oct:disease}). The
-OCT scanning window used throughout the thesis
-(\S\ref{sec:background:ga-oct:oct}) is therefore centred on the macula and covers a $6 \times 6$\,mm field
-(\S\ref{sec:background:ga-oct:muw}). Within the macula, four
+roughly five to six millimetres and is where GA develops
+(\S\ref{sec:background:ga-oct:disease}). The OCT scans of the cohort are
+centred on the macula; how they are brought to one modelling window of
+about $6 \times 6$\,mm is described in~\S\ref{sec:data:spatial}. Within the macula, four
 concentric anatomical zones are conventionally distinguished, in
 order of increasing radius from the centre: the \emph{foveola}, the
 \emph{fovea}, the \emph{parafovea}, and the \emph{perifovea}
@@ -119,9 +117,13 @@ layers, the inner nuclear and outer plexiform layers, the outer
 nuclear layer, the photoreceptor inner- and outer-segment bands, the
 retinal pigment epithelium (RPE), and Bruch's membrane;
 Figure~\ref{fig:bg:retinal-anatomy}(a) gives a labelled schematic.
+The RPE is a single layer of pigmented cells that supports the
+photoreceptors, and Bruch's membrane is the thin sheet that separates it
+from the choroid beneath.
 For the purposes of this thesis, it suffices to note that the retina is
-layered, that GA destroys a specific \emph{outer}-retinal stack of three
-layers (\S\ref{sec:background:ga-oct:disease}), and that the surrounding
+layered, that GA destroys the outer retina together with the
+choriocapillaris beneath it (\S\ref{sec:background:ga-oct:disease}), and
+that the surrounding
 layer geometry, given as ten boundary depth maps, is passed to the model
 together with the lesion mask (\S\ref{sec:background:ga-oct:state-rep}).
 
@@ -150,8 +152,8 @@ together with the lesion mask (\S\ref{sec:background:ga-oct:state-rep}).
     and the volume seen from the front of the eye is the en-face view, in
     which every line marks the position of one B-scan and a GA lesion
     appears as a patch. The highlighted A-scan, B-scan and line correspond
-    to each other. The lateral footprint of the scans used in this thesis
-    is approximately $6 \times 6$\,mm (\S\ref{sec:background:ga-oct:muw}).
+    to each other. The modelling window of this thesis covers about
+    $6 \times 6$\,mm (\S\ref{sec:data:spatial}).
     Drawings generated with ChatGPT; labels added and verified by the
     author.}
   \label{fig:bg:oct-acquisition}
@@ -185,9 +187,10 @@ through the retina, called a \emph{B-scan}
 (Figure~\ref{fig:bg:oct-acquisition}(b)). Scanning in both lateral
 directions yields a three-dimensional \emph{OCT volume}
 (Figure~\ref{fig:bg:oct-acquisition}(b)), in which each voxel records
-the reflectivity of one small block of tissue. The MUW cohort uses an
-acquisition protocol that produces volumes with a lateral footprint of
-approximately $6 \times 6$\,mm. How such a volume is summarised as a
+the reflectivity of one small block of tissue. The MUW volumes are
+macular scans whose lateral extent differs between eyes
+(\S\ref{sec:data:dataset}); all are brought to a common window of about
+$6 \times 6$\,mm (\S\ref{sec:data:spatial}). How such a volume is summarised as a
 two-dimensional en-face image is described below, and how the varying
 native grids are brought to one modelling grid in~\S\ref{sec:data:spatial}.
 
@@ -238,23 +241,21 @@ OCT-based area measurements are also reproducible and consistent with FAF:
 \citet{Pilotto2015} report inter-reader intraclass correlation coefficients
 of 0.97--0.98 for en-face OCT at the outer-retinal level and find the
 resulting GA areas at that level statistically equivalent to blue-light and
-near-infrared FAF measurements in a small cohort. The thesis therefore works on the OCT en-face grid.
+near-infrared FAF measurements in a small cohort. In this thesis, the
+lesion mask and the layer maps are both given on the OCT en-face grid; how
+the mask was annotated is described in~\S\ref{sec:data:dataset}.
 
 A single OCT volume shows both the lesion and the retinal layers around it.
-The lesion itself is
-visible on the B-scan as a region of outer-retinal layer dropout with
-choroidal hypertransmission; the surrounding retinal layer geometry is
-recoverable from the same volume by segmentation; and the
-choroidal slab beneath Bruch's membrane provides an additional view of
-the GA extent through the hypertransmission signature
-\citep{Vallino2024,Chu2022}.
+\S\ref{sec:background:ga-oct:disease} describes how the lesion appears in
+it.
 
 
 \paragraph{From OCT volumes to en-face maps.}
 \label{sec:background:ga-oct:enface}
 
-The full OCT volume of a GA eye is too large and too redundant to be
-modelled at native voxel resolution. The clinical literature works with an \emph{en-face} image instead: a two-dimensional map of the
+Models of GA progression have also been trained on full OCT volumes
+\citep{Mai2024,Lachinov2024}. The clinical literature on GA area and
+growth, however, works with an \emph{en-face} image: a two-dimensional map of the
 retina seen from the front, as in a fundus photograph, in which every pixel
 corresponds to one A-scan of the volume and summarises what lies along it
 \citep{Pilotto2015,Chu2022,Yehoshua2011,Vallino2024}
@@ -298,7 +299,8 @@ chapters.
     abbreviations \citep{Abramoff2010,Sadda2018}. In the foveal pit the inner
     layers thin out, while the layers from the ELM downwards continue
     underneath. \emph{(b)}~The same strip with a GA lesion, marked with
-    the three OCT signatures described in the text: (i)~the
+    the two OCT signatures and the margin feature described in the
+    text: (i)~the
     photoreceptors and the RPE are lost and the ONL is reduced to a
     remnant, so the layers above it lie closer to Bruch's membrane, which
     remains; (ii)~the choroid beneath the lesion appears brighter
@@ -312,10 +314,10 @@ chapters.
 
 Figure~\ref{fig:bg:retinal-anatomy}(a) sketches the principal
 anatomical strata of the retina in the macula. Geographic atrophy is the
-disease in which three tightly coupled \emph{outer}-retinal layers die
-together in a localised patch of the macula: the retinal pigment
-epithelium (RPE), the photoreceptor outer segments just above it, and the
-choriocapillaris, a dense capillary bed immediately below it
+disease in which three tightly coupled layers die together in a
+localised patch of the macula: the retinal pigment epithelium (RPE), the
+photoreceptors just above it, and the choriocapillaris, the innermost
+capillary bed of the choroid below it
 \citep{Boopathiraj2024,Boyer2017}. These three layers are
 anatomically interdependent: the RPE supports the photoreceptors, and
 the choriocapillaris supplies both. Atrophy of one layer therefore leads
@@ -350,8 +352,8 @@ the state tensor used in this thesis marks the GA lesion as a binary
 mask (\S\ref{sec:background:ga-oct:state-rep}); iRORA is not represented
 as a separate label.
 
-An established GA lesion is identified on a B-scan by three principal
-direct OCT signatures \citep{Boopathiraj2024,Yehoshua2011,Vallino2024}.
+An established GA lesion is identified on a B-scan by two direct OCT
+signatures \citep{Boopathiraj2024,Yehoshua2011,Vallino2024}.
 \emph{(i)} The outer-retinal layers are missing: the photoreceptor
 inner-segment / outer-segment junction (the \emph{ellipsoid zone}) and
 the RPE band drop out of the B-scan, leaving a structurally collapsed
@@ -362,14 +364,15 @@ penetrates deeper into the choroid, and the column-summed signal is
 higher than in the surrounding intact tissue. This is the same optical
 effect that makes GA appear bright on summed-voxel en-face projections,
 discussed in~\S\ref{sec:background:ga-oct:enface}.
+A third feature lies just outside the lesion:
 \emph{(iii)} \emph{RPE--Bruch's-membrane (BM) thickening} is
 concentrated in a narrow rim just outside the lesion margin and is
 thought to reflect, at
 least in part, basal-laminar deposits accumulated in the diseased tissue;
 the thickness of this rim correlates significantly with the eye's subsequent
 annual square-root lesion enlargement rate \citep{Chu2022}.
-The first two signatures delineate the lesion itself. The third is a
-predictive biomarker located at the lesion boundary and motivates
+The two signatures delineate the lesion; the third feature is a
+predictive biomarker at its boundary and motivates
 encoding the surrounding layer geometry in addition to the lesion mask.
 
 
@@ -520,7 +523,7 @@ higher accuracy by evaluating $f$ several times within a step and
 combining the results; the classical fourth-order scheme (RK4) uses four
 evaluations.
 
-Spatial stencil and time integrator together define an update operator
+Spatial stencil and time integrator together define one update step
 \begin{equation}
   u^{k+1} \;=\; \mathcal{A}\!\left(\Delta t, u^{k}\right),
   \label{eq:bg:update-operator}
@@ -537,7 +540,8 @@ $\lim_{\Delta t \to 0} \lVert \mathcal{A}(\Delta t, u^{0}) - u(\Delta t) \rVert 
 \citep{Brandstetter2022}. An update written as the current state plus
 $\Delta t$ times a rate, as in~\eqref{eq:bg:euler}, is said to be in
 \emph{residual} form; it returns the current state at $\Delta t = 0$
-whatever the rate. The second is \emph{stability}: errors made in one
+whatever the rate. Consistency in the stricter sense used for
+convergence also requires the rate to approach the right-hand side $F$. The second is \emph{stability}: errors made in one
 step must not grow from step to step. For explicit schemes this bounds
 the step size.
 The Courant--Friedrichs--Lewy (CFL) condition \citep{Courant1928}
@@ -640,8 +644,8 @@ its own value; it thus acts as a learned, non-linear stencil
 (Figure~\ref{fig:bg:solver-path}, panel~4). The authors show that one, two and three rounds can
 represent finite differences, finite volumes and WENO respectively, so
 the classical schemes are special cases of the learned one. The output
-is applied in the residual form of~\eqref{eq:bg:euler}, which keeps the
-update consistent. The graph operator of this thesis is built on this
+is applied in the residual form of~\eqref{eq:bg:euler}, so the update
+reduces to the current state as the step shrinks. The graph operator of this thesis is built on this
 solver and is described in~\S\ref{sec:method:mppde}.
 
 A learned solver does not require $f$ to be written down, because $f$
@@ -659,7 +663,7 @@ operators learn a continuous map
 $M: [0, T] \times \mathcal{F} \to \mathcal{F}$ such that
 $M(t, u_0) = u(t)$, and so predict the solution at any time directly
 from the initial condition. By contrast, autoregressive
-solvers learn the update operator $\mathcal{A}$ of
+solvers learn the update $\mathcal{A}$ of
 \eqref{eq:bg:update-operator} and apply it repeatedly to unroll a
 trajectory. When the step size $\Delta t$ is fixed by the dataset, the
 dependence on it is usually omitted from the notation. Here it cannot be
@@ -708,11 +712,11 @@ as well would teach the model to make its errors small rather than to
 correct them.
 
 The authors relate the pushforward trick to zero stability. An update
-operator is zero-stable if a small perturbation of its input changes the
+is zero-stable if a small perturbation of its input changes the
 output only by a bounded multiple,
 $\lVert \mathcal{A}(u^0 + \epsilon) - u^1 \rVert \leq \kappa \lVert
 \epsilon \rVert$, and the pushforward loss reduces the constant
-$\kappa$. Together with the consistency of the residual form
+$\kappa$. Together with consistency
 (\S\ref{sec:background:pde-solvers:time}), zero stability is the
 classical basis of a convergence argument. Chapter~\ref{ch:method}
 describes how the framework of this thesis treats temporal bundling and
