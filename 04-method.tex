@@ -157,11 +157,11 @@ consecutive visits, $\Delta t$, measured in years (\S\ref{sec:data:temporal}).
 
 The update of the problem statement (\S\ref{sec:background:problem},
 Equation~\eqref{eq:bg:problem-update}) writes the transition from the
-current state $u_t$ to the next state $u_{t+\Delta t}$ as a residual update
-scaled by the interval:
+current state $u_k$ to the predicted next state $\hat u_{k+1}$ as a
+residual update scaled by the interval:
 \begin{equation}
-  u_{t+\Delta t} \;=\; u_t \;+\; \Delta t \cdot
-  f_\theta\!\left(u_t,\, \Delta t,\, \mathbf{z}\right),
+  \hat u_{k+1} \;=\; u_k \;+\; \Delta t_k \cdot
+  f_\theta\!\left(u_k,\, \Delta t_k,\, \mathbf{z}\right),
   \label{eq:method:residual-update}
 \end{equation}
 where $f_\theta$ is the operator in the swappable slot and $\mathbf{z}$
@@ -174,7 +174,7 @@ length of the interval. It is also the multiplier of the network output.
 % now states its assumption.
 If $f_\theta$ stays bounded as $\Delta t$ approaches zero, the predicted
 change $\Delta t \cdot f_\theta$ vanishes and the prediction collapses to
-$u_{t+\Delta t} = u_t$. Because $\Delta t$ is also an input of $f_\theta$,
+$\hat u_{k+1} = u_k$. Because $\Delta t$ is also an input of $f_\theta$,
 this is not automatic. It is guaranteed if $f_\theta$ is
 Lipschitz-continuous in $\Delta t$ with a constant $L$, since then
 \begin{align*}
@@ -192,7 +192,7 @@ operator in fact learns to scale its output with $1/\Delta t$ within the
 observed intervals (\S\ref{sec:experiments:ablations:time}). The statement
 therefore concerns only the limit and says nothing about how quickly it is
 approached. The
-leading $u_t$ term is also a deliberate prior: consecutive visits are
+leading $u_k$ term is also a deliberate prior: consecutive visits are
 almost identical, because GA progresses little over a typical interval
 between visits. Passing the current state through unchanged relieves the
 network of reproducing the whole state. It only has to model the change
@@ -310,17 +310,18 @@ The loss is computed on the normalised state (\S\ref{sec:data:normalization})
 and has two terms, a channel-weighted mean squared error (MSE) and a
 soft-Dice term on the mask channel:
 \begin{equation}
-  \mathcal{L} \;=\; \frac{1}{\bar{w}} \sum_{c=0}^{10} w_c\,
+  \mathcal{L} \;=\; \frac{1}{\sum_{c} w_c} \sum_{c=0}^{10} w_c\,
   \mathcal{L}_{\text{MSE}}^{(c)} \;+\; \lambda_{\text{Dice}}\,
   \mathcal{L}_{\text{Dice}},
   \label{eq:method:loss}
 \end{equation}
 where $\mathcal{L}_{\text{MSE}}^{(c)}$ is the mean squared error of
-channel~$c$, $w_c$ its weight and $\bar{w}$ the mean of the weights.
+channel~$c$ and $w_c$ its weight.
 The mask channel ($c = 0$), which is the clinical target, has the weight
 $w_0 = 5$, and each of the ten layer channels has the weight $w_c = 1$.
-Dividing by the mean weight keeps the scale of the term comparable to an
-unweighted MSE. The layer channels are auxiliary targets, but the operator
+Dividing by the sum of the weights keeps the term on the scale of an
+unweighted MSE; with equal weights it equals the MSE averaged over the
+eleven channels. The layer channels are auxiliary targets, but the operator
 must still predict them, because they are part of the next state that is
 fed back during a rollout. The same loss is used in training and in
 validation.
@@ -430,6 +431,10 @@ predicted mask. An eye whose sequence ends is dropped from the chain. The
 group then receives one forward pass with gradients, and the loss is taken
 against the observed next state. The group losses are combined, each
 weighted by the share of the batch its group holds.
+
+The curriculum is used in every reported run; no run trains without
+unrolling or with a curriculum counted in steps, so its effect on the
+forecast is not measured.
 % Reorder 2026-10-18: "Because the rollout runs in training mode, no operator
 % may use batch statistics (4.3.1)" removed; the operator contract in 4.3.1
 % states this rule and refers back to this curriculum.
@@ -444,6 +449,9 @@ learning rate of $2 \times 10^{-3}$ and a weight decay of
 $1 \times 10^{-2}$ on all trainable parameters. The learning rate is
 multiplied by 0.4 at the start of epoch 5 and again at the start of epoch
 20, counting from 0, so the first five epochs run at the initial rate.
+These settings were not tuned per operator. A shared recipe prevents
+differences in training from being confounded with the architectural
+differences, but it may suit some architectures better than others.
 
 Training runs for 30 epochs of 20 passes each, with a batch size of four
 eyes. Because the number of training eyes differs between the folds
@@ -554,9 +562,9 @@ The graph operator is the message-passing neural PDE solver (MP-PDE) of
 \citet{Brandstetter2022}, the learned-stencil solver introduced
 in~\S\ref{sec:background:pde-solvers:neural}. It builds on the graph
 neural network model of \citet{Scarselli2009} and the message-passing
-formulation of \citet{Gilmer2017}. Several of its design decisions also
-became part of the shared framework: the time handling, the output layer
-and the one-step prediction. The original is summarised first, followed by
+formulation of \citet{Gilmer2017}. Three choices made in adapting it
+became part of the shared framework: the $\Delta t$-scaled residual
+update, the zero-initialised output layer and the one-step prediction. The original is summarised first, followed by
 the modifications proposed in this work and a summary of them.
 % Supervisor review 2, SV-4.5/SV-4.6 (2026-10-17): forward references to
 % Sections 4.3.3 and 4.3.5 removed; headings renamed as he suggested.
@@ -673,10 +681,9 @@ All normalisation layers are per-node layer normalisations
 operator keeps no batch statistics, as the contract
 of~\S\ref{sec:method:family:contract} requires.
 
-Because the framework predicts one step ($K = 1$,
-\S\ref{sec:method:framework}), the one-dimensional convolutional head of
-the original, which exists to emit the $K$ bundled steps, was replaced by
-an MLP decoder. It maps the final hidden vector $f_i^{M}$ to the eleven
+The one-dimensional convolutional head of the original, which exists to
+emit several bundled steps, was replaced by an MLP decoder, because the
+framework predicts one step per pass (\S\ref{sec:method:framework}). It maps the final hidden vector $f_i^{M}$ to the eleven
 channels: a linear layer, layer normalisation and a ReLU, applied twice,
 followed by a final linear layer whose full-rank output gives every channel
 its own independent prediction. The final layer has no normalisation or
@@ -787,7 +794,8 @@ from at most four columns away, about $\pm 23$\,\textmu{}m along the row.
 For comparison, the GA front advances a median of about 12 columns
 (68\,\textmu{}m) between two visits 180 days apart; the upper quartile is
 17 columns (97\,\textmu{}m) and the 90th percentile 23 columns
-(131\,\textmu{}m). A single hop along a row therefore covers only a small
+(131\,\textmu{}m). These values are the per-eye growth rate of the
+effective lesion radius, $\sqrt{A/\pi}$, over 180 days, for the 75 eyes. A single hop along a row therefore covers only a small
 fraction of the distance the front typically moves between two visits, and
 the four columns reached after two rounds are about a third of the median
 advance. The index-space graph restores connectivity but not reach, which
@@ -798,7 +806,11 @@ The dilated stencil is designed to close this gap
 (Figure~\ref{fig:method:stencils}c). Each interior node is connected to the
 nodes at row offsets $\{-1, 0, +1\}$ and column offsets
 $\{0, \pm 7, \pm 14, \pm 21\}$, excluding the node itself: 20 neighbours in
-total. It follows the idea of dilated convolutions \citep{Yu2016}, which
+total. Because every column offset is a multiple of seven, a node
+exchanges messages, at any depth, only with columns whose index differs
+from its own by a multiple of seven; the grid splits into seven
+interleaved sub-lattices 40\,\textmu{}m apart, which share the network
+weights. It follows the idea of dilated convolutions \citep{Yu2016}, which
 apply the same kernel at a larger range by spacing its taps apart, so that
 the receptive field grows while the number of parameters stays the same;
 here the dilation is seven along rows and one across rows. Dilated
@@ -816,7 +828,8 @@ reach from the physical scale of the lesion. The dilated stencil changes
 only the edge set; the network architecture and every other component are
 the same as on the index-space graph, and the stencil adds no parameters.
 Chapter~\ref{ch:experiments} tests this choice against smaller and larger
-reaches.
+reaches. The offsets were fixed from the front-advance statistic before
+this comparison was run.
 % Moved-mesh graph (own k-NN off the lattice) moved to Appendix G.
 
 % Figure: images/scripts/fig_method_stencils.py (geometry only: the grid
@@ -855,7 +868,10 @@ reaches.
 \subsection{Dense Operators: U-Net, FNO and a Local-Kernel Hybrid}
 \label{sec:method:family:dense}
 
-The three operators of this subsection are dense grid operators: they act
+The three dense operators provide properties that the graph network does
+not have: multiscale local detail (U-Net), global spectral support (FNO)
+and global support with a local path (the local-kernel hybrid).
+They are dense grid operators: they act
 on the state as an image on the full $49 \times 1024$ grid and receive
 sixteen input channels: the eleven state channels, $\Delta t$, the two
 covariates and two coordinate ramps (\S\ref{sec:method:family:contract}). The first
@@ -884,9 +900,9 @@ $(2, 2)$ and $(2, 2)$, so the grid shrinks from $49 \times 1024$ through
 $49 \times 512$, $49 \times 256$ and $24 \times 128$ to $12 \times 64$. Rows
 are downsampled by a factor of four in total and columns by a factor of
 sixteen, which reduces the 21:1 ratio of row to column spacing to about
-5:1 without removing it. The schedule was deliberately not tuned further:
-a comparison model whose geometry had been optimised on this dataset would
-make a weaker control. Third, upsampling is nearest-neighbour instead of an
+5:1 without removing it. The schedule was fixed before training and not
+tuned, because a setting chosen on the validation folds would carry a
+selection bias, as there is no test split (\S\ref{sec:data:splits}). Third, upsampling is nearest-neighbour instead of an
 up-convolution, and the output has the grid size of the input. Fourth, the
 final $1 \times 1$ layer is zero-initialised and returns a residual rather
 than class scores. A base width of five, that is, five channels at the
@@ -944,7 +960,9 @@ discrete-continuous convolutions, so it is not the resolution-consistent
 operator of that paper. The spectral path keeps
 global support and the local path gains one ring of neighbours, at a cost
 of 800 parameters (79\,960 in total). With a kernel size of one, the model
-reduces exactly to the plain FNO.
+reduces exactly to the plain FNO. All three dense operators lie within a
+factor of 1.25 of the canonical parameter count
+(\S\ref{sec:method:family:params}).
 
 \subsection{The Locality Floors}
 \label{sec:method:family:floors}
@@ -1268,7 +1286,8 @@ The framework is implemented in Python with PyTorch 2.4.1 and CUDA 12.1
 All dependencies are pinned in a fixed container image. Every reported run
 was trained on a single NVIDIA RTX A6000 GPU on a cluster managed by
 Slurm, and the five folds of an experiment were submitted together as a job
-array.
+array. The structure of the code and its availability are described in
+Appendix~\ref{app:code}.
 
 The windows of each fold are precomputed once before training. This step
 performs the crop and pad, the normalisation and the extraction of

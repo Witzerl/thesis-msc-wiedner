@@ -93,8 +93,9 @@ A local path for the global FNO brought it level with the U-Net at one
 seed but not at the second, and its own effect is not established.
 
 Reach and transport are the most informative pair. The GA front advances
-about 57 to 142\,\textmu{}m between two visits, 10 to 25 columns of the
-grid, while one hop of the index-space graph reaches about 11\,\textmu{}m
+a median of 68\,\textmu{}m (12 columns of the grid) between two visits 180
+days apart, and 131\,\textmu{}m (23 columns) at the 90th percentile, while
+one hop of the index-space graph reaches about 11\,\textmu{}m
 along a row (\S\ref{sec:method:graph}). The dilated stencil lets one hop
 reach about 119\,\textmu{}m, and the transport term moves the state along
 a learned velocity. These two unrelated constructions each remove the same
@@ -381,7 +382,8 @@ The evaluation has limits of its own. The one-year anchor is the first
 visit at or after about one year, and its time
 has no upper bound, so a few eyes are scored later, where more change has
 accumulated. Several findings rest on one
-seed.
+seed. The training curriculum is used in every run, so its effect on the
+forecast is not measured.
 
 The scope of the models is limited as well. Every operator sees one visit
 and has no memory of the trajectory so far,

@@ -13,7 +13,10 @@
 
 
 This chapter answers the second part of the research question: what kind
-of operator the framework of Chapter~\ref{ch:method} needs. The operators
+of operator the framework of Chapter~\ref{ch:method} needs. Inside the
+fixed framework, operators of three different classes reach similar scores
+at the one-year anchor, and what separates them is how far they reach in
+one step (\S\ref{sec:experiments:ingredients}). The operators
 of~\S\ref{sec:method:family} are run through the same slot under identical
 conditions. Section~\ref{sec:experiments:protocol} defines the evaluation,
 \S\ref{sec:experiments:main-results} compares all operators at one year,
@@ -34,7 +37,9 @@ Section~\ref{sec:experiments:summary} summarises the chapter.
 \label{sec:experiments:protocol}
 
 This section defines how the operators are scored and how two scores are
-compared.
+compared. Every operator is scored by the late-epoch mean of the
+change-region Dice at the one-year anchor, and two operators are compared
+fold by fold against the variation caused by retraining.
 
 % Supervisor review 2, SV-5.1 (2026-10-18): heading was "Why Not Per-Pixel Error".
 \subsection{Evaluation Challenges}
@@ -61,9 +66,10 @@ RMSE measures how far each predicted value lies from its target. A
 prediction can therefore be correct for the Dice and still carry a large
 RMSE. Under autoregressive rollout, the dense operators, such as the U-Net
 and the Fourier Neural Operator, produce more mask values far from the two
-mask values than the graph network: the late-epoch mask RMSE of the rollout
-is roughly twice as large for the U-Net as for the graph network, while its
-thresholded metrics are higher. A raw-error comparison across architecture
+mask values than the graph networks: the late-epoch mask RMSE of the rollout
+is roughly twice as large for the U-Net as for either graph network, while
+its thresholded metrics are higher than those of the $k$-NN graph network
+and close to those of the dilated-stencil network. A raw-error comparison across architecture
 classes would therefore measure how far the raw values stray, not whether
 the lesion is predicted correctly. In
 addition, the soft-Dice term of the loss stretches the raw mask values away
@@ -141,7 +147,7 @@ counterpart. It is used for the eye counts of
 \S\ref{sec:experiments:protocol:stats}. It is also computed at every
 rollout step and grouped by the time since baseline into $(0, 1]$,
 $(1, 2]$, $(2, 3]$ and more than three years. These horizon bins show how
-the prediction degrades beyond the one-year anchor. \citet{Mai2024} report
+the growth-region Dice changes beyond the one-year anchor. \citet{Mai2024} report
 the same metric in the same bins.
 
 Because growth across the edge of the imaged field is censored
@@ -184,8 +190,10 @@ beyond one year, where the true change region is larger. This is accepted
 so that every eye contributes one score at the anchor
 (\S\ref{sec:data:temporal}). Persistence is computed inside every
 rollout by the same code; for the one-year anchor metrics it is the baseline mask
-held constant. Per-step metrics are averaged per eye first and then over
-the eyes, so every eye counts once, whatever its number of visits.
+held constant. Metrics at the one-year anchor are computed once per eye
+and averaged over the eyes, so every eye counts once. The horizon bins
+of~\S\ref{sec:experiments:horizon} instead pool all follow-up visits in a
+bin, so an eye with several visits in a bin contributes several values.
 
 \subsection{Late-Epoch Mean}
 \label{sec:experiments:protocol:late}
@@ -244,7 +252,8 @@ epochs 10 to 19 and 20 to 29 differ by at most 0.014 for every arm.
 
 The late-epoch mean therefore measures every operator after it has reached
 its level and over the same epochs for every arm. Because no epoch is
-chosen on the validation scores, it carries no selection bias, and
+chosen on the validation scores, it carries no bias from selecting an
+epoch, and
 averaging twenty epochs reduces the noise of a single epoch. It does not
 remove the variation between repeated training runs of the same
 configuration; this variation sets the noise level against which
@@ -291,7 +300,8 @@ A difference between two arms is tested against the variation caused by
 retraining. Repeated runs of the same configuration on the same fold give a
 standard deviation of $\sigma \approx 0.0127$ for the late-epoch
 change-region Dice of one graph network
-(Appendix~\ref{app:full-results:criteria}). If two arms did not differ, the
+(Appendix~\ref{app:full-results:criteria}). This value is assumed for every
+arm except the U-Net, whose spread is measured separately below. If two arms did not differ, the
 mean of their five fold-wise differences would vary with a standard
 deviation of $\sigma_\Delta = \sqrt{2}\,\sigma / \sqrt{5} \approx 0.008$.
 The ratio $z = \bar{\Delta} / \sigma_\Delta$ is compared with a standard
@@ -303,20 +313,22 @@ read against a mean difference of about 0.020. A difference is called
 established only when, in addition, it holds on most folds, the
 comparison over the 75 validation eyes points the same way clearly (a
 paired $t$ of about 2.5 or larger,
-Appendix~\ref{app:full-results:criteria}), it does not depend on a single
-fold, and it holds at the second seed. Results are stated in these terms,
+Appendix~\ref{app:full-results:criteria}), it does not change sign when any
+one fold is left out, and, where the comparison was run at both seeds, it
+holds at both. Results are stated in these terms,
 for example ``higher by 0.064 on average ($z = 7.9$), on all five folds and
 on 70 of the 75 eyes''. The eye counts and the per-eye test use the
 growth-region Dice at the one-year anchor, which is recorded per eye. In tables, ``mean $\pm$ sd'' is the mean and the
 standard deviation over the five fold values, each the late-epoch mean of
 one run.
 
-The main comparisons were repeated with a second random seed, and the
-conclusions drawn in this chapter hold at both. All numbers in this
-chapter are for the first seed. Appendix~\ref{app:full-results:criteria}
+The comparisons listed in Appendix~\ref{app:full-results:seeds} were
+repeated with a second random seed, and their conclusions hold at both;
+the other experiments use seed 42 only. All numbers in this chapter are for
+seed 42 unless marked as seed 7. Appendix~\ref{app:full-results:criteria}
 gives the exact criteria, and Appendix~\ref{app:full-results:seeds} the
 standard errors and test statistics of every comparison together with the
-values at the second seed.
+values at seed 7.
 % Reporting scheme agreed 2026-10-01 (NOTES #23/#25/#31), applied 2026-10-02:
 % seed 42 only in the text, one noise level as an intuition, results in
 % words, statistics in Appendix E. The thresholds (0.0127 replicate sd;
@@ -461,8 +473,8 @@ dilated-stencil network is higher than the U-Net by 0.021 on average, but
 on only three of the five folds. Because the scores of the U-Net vary more
 between runs than those of the graph networks
 (Appendix~\ref{app:full-results:criteria}), this lies just beyond the
-variation of retraining at the first seed ($z = 2.1$) and within it at the
-second ($z = 0.8$), and the two cannot be told apart. The T-FEN is higher than
+variation of retraining at seed 42 ($z = 2.1$) and within it at
+seed 7 ($z = 0.8$), and the two cannot be told apart. The T-FEN is higher than
 the U-Net by 0.038 on average, on all five folds and on 51 of the 75 eyes,
 and this lead is real.
 
@@ -479,7 +491,7 @@ Although the T-FEN scores highest at one year, the dilated-stencil graph
 network serves as the canonical model of this thesis. The lead of the
 T-FEN, 0.017, only just passes the fold-paired test at both seeds
 ($z = 2.1$ against a bar of 1.96). In the per-eye test it passes at the
-second seed ($t = 3.1$) but not at the first ($t = 2.2$ against a bar of
+seed 7 ($t = 3.1$) but not at seed 42 ($t = 2.2$ against a bar of
 about 2.5), so by the criteria of~\S\ref{sec:experiments:protocol:stats}
 it is not established. The graph network also trains about four times
 faster, at 91 against 367\,s per epoch (\S\ref{sec:experiments:cost}),
@@ -898,9 +910,9 @@ brings the first-year values to those of the dilated stencil.
 
 Two of the tested properties improve an operator against its own control,
 and both concern how far an operator reaches in one step. The GA front
-advances about 10 to 25 columns (57 to 142\,\textmu{}m) between two visits,
-with a median of 12 (68\,\textmu{}m) and a 90th percentile of 23 columns
-(131\,\textmu{}m, \S\ref{sec:method:graph}). One hop on
+advances a median of 12 columns (68\,\textmu{}m) between two visits 180
+days apart, with a 90th percentile of 23 columns (131\,\textmu{}m,
+\S\ref{sec:method:graph}). One hop on
 the index-space graph reaches only $\pm 2$ columns, about 11\,\textmu{}m
 along a row, so a single step of such an operator covers only a small part
 of that advance.
@@ -1808,7 +1820,7 @@ The T-FEN was first trained with the Galerkin form of its transport
 operator (\S\ref{sec:method:family:fen}). Four of its five runs are
 unstable in the sense defined above
 (Table~\ref{tab:experiments:tfen-stability}), and so are most of the runs
-repeated with the second seed, whereas the free-form FEN, which lacks only the transport term, is stable on every
+repeated with seed 7, whereas the free-form FEN, which lacks only the transport term, is stable on every
 fold. Tracing the rollouts step by step showed where the divergence comes
 from. It starts at the edge of the crop, in a layer channel, driven by the
 transport term, after about 1.6 to 2 years. In 14 of
@@ -1842,7 +1854,7 @@ identical in every other respect, at seed 42 on all five folds. It passes the st
 every fold, with a largest late-epoch error of 2.32 on the mask channel and
 1.13 on the layer channels (Table~\ref{tab:experiments:tfen-stability},
 Figure~\ref{fig:experiments:tfen-stability}).
-Repeated with the second seed, it passes on every fold as well. The
+Repeated with seed 7, it passes on every fold as well. The
 energy-conserving form is also at least as accurate as the Galerkin form:
 $0.5428 \pm 0.0401$ against $0.5337 \pm 0.0453$, higher on all five folds,
 by
