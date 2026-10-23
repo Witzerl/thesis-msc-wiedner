@@ -11,7 +11,7 @@ one-year anchor, late-epoch mean (thesis_numbers.eye_late), averaged over seeds 
       area      baseline lesion area (mm^2)
       pieces    connected components of the baseline lesion >= 0.02 mm^2 (8-connectivity)
       irreg     perimeter / perimeter of a circle of equal area (1 = circle), physical units
-      edge      baseline or one-year lesion touches the window edge
+      edge      one-year lesion touches the edge of the imaged field (on_border, as in Section 5.1.2)
       far       fraction of the new atrophy at one year lying > REACH_MM from the baseline lesion
                 (two message-passing rounds of the dilated stencil reach about 0.24 mm)
       grow      new atrophy at one year (mm^2)
@@ -83,17 +83,36 @@ def perimeter(m):
     return (np.abs(np.diff(p, axis=1)).sum() * DY + np.abs(np.diff(p, axis=0)).sum() * DX)
 
 
+def on_border(vdir):
+    """Border-touching as in GraphPDE/train.py (the split of thesis Section 5.1.2): the lesion
+    touches the outermost ring of the 49 x 1024 window, or is 4-adjacent to a position without
+    data (all eleven channels zero: zero padding, or no layer segmentation inside the scan)."""
+    m = np.array(Image.open(vdir / "mask_oct.png")) > 0
+    layers = np.load(vdir / "layers_oct.npz.npy")
+    valid = crop((np.abs(layers).sum(-1) > 0) | m)
+    t = crop(m)
+    if t[0].any() or t[-1].any() or t[:, 0].any() or t[:, -1].any():
+        return True
+    inv = ~valid
+    adj = np.zeros_like(inv)
+    adj[1:] |= inv[:-1]; adj[:-1] |= inv[1:]; adj[:, 1:] |= inv[:, :-1]; adj[:, :-1] |= inv[:, 1:]
+    return bool((t & adj).any())
+
+
 def features(eye):
     v = visits(eye)
     b = mask(v[0][1])
-    one = next(vd for t, vd in v if t >= 0.95 * 365 - 1e-6)
+    # one-year anchor: first visit at least ~one year after this eye's own baseline
+    # (corrected 2026-10-23: the time was taken from day 0, which picked a visit only
+    # 180 days after baseline for the eyes whose first visit is not at day 0)
+    one = next(vd for t, vd in v if t - v[0][0] >= 0.95 * 365 - 1e-6)
     g = mask(one)
     area = b.sum() * DX * DY
     lab, n = ndimage.label(b, structure=np.ones((3, 3)))
     sizes = ndimage.sum(b, lab, range(1, n + 1)) * DX * DY
     pieces = int((sizes >= MIN_PIECE_MM2).sum())
     irreg = perimeter(b) / (2 * np.sqrt(np.pi * area)) if area > 0 else np.nan
-    edge = any(m[0].any() or m[-1].any() or m[:, 0].any() or m[:, -1].any() for m in (b, g))
+    edge = on_border(one)
     new = g & ~b
     dist = ndimage.distance_transform_edt(~b, sampling=(DY, DX))
     far = (dist[new] > REACH_MM).mean() if new.any() else 0.0

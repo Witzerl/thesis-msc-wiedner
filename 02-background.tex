@@ -678,8 +678,10 @@ training is consistently poor.
 
 The autoregressive framing is the natural fit for clinical
 longitudinal data. Each visit-to-visit transition constitutes one step. Since there is no
-shared temporal origin ($t = 0$) across patients, a direct
-time-dependent mapping is ill-posed. In addition, the prediction horizon
+shared temporal origin ($t = 0$) across patients, time can only be
+measured from each eye's own visits, not on a time axis shared by all
+eyes; an autoregressive update needs only the interval to the next visit.
+In addition, the prediction horizon
 is set by the clinic rather than by the model, so the model has to
 support as many steps as a patient's visit schedule requires.
 
@@ -870,10 +872,11 @@ inverse problem infers the patient-specific tumour cell distribution
 within minutes \citep{Ezhov2023}. Physics-informed machine learning in
 medical image analysis more broadly has been reviewed in a survey of
 over 80 papers \citep{Banerjee2025}. In all of these, the equation is
-known and the network learns to solve or invert it. Learned neural PDE
-solvers trained directly on longitudinal clinical images without a known
-equation have, to the author's knowledge, not been applied to GA and are
-rare in medical imaging.
+known and the network learns to solve or invert it. Without a known
+equation, GA progression has been modelled with learned continuous-time
+dynamics \citep{Lachinov2024, Liu2025ImageFlowNet}. A controlled
+comparison of operators from different classes inside one framework has,
+to the author's knowledge, not been reported for GA.
 
 \section{Modelling Approach and Problem Statement}
 \label{sec:background:approach}

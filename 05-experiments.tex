@@ -332,9 +332,9 @@ values at the second seed.
 
 This section compares all arms on the headline metric, the change-region
 Dice at the one-year anchor (Table~\ref{tab:experiments:arms}, seed 42).
-The three highest arms
-come from three different architecture classes and lie within about 0.04
-of each other.
+The highest arms of three different architecture classes, the T-FEN, the
+dilated-stencil graph network and the U-Net, lie within about 0.04 of each
+other.
 
 \begin{table}[t]
   \centering
@@ -447,8 +447,10 @@ folds differ is examined in~\S\ref{sec:experiments:folds}. Adjacent rows
 mostly lie within the noise level of each other, so the order of the table
 alone does not rank them.
 
-The three highest arms are a finite-element network, a graph network and a
-U-Net. The T-FEN reported here uses the energy-conserving form of its
+The highest arms of the three leading classes are a finite-element network,
+a graph network and a U-Net. The Runge--Kutta variant of the graph network,
+third in the table, is compared with its single-step version
+in~\S\ref{sec:experiments:ablations:time}. The T-FEN reported here uses the energy-conserving form of its
 transport operator (\S\ref{sec:method:family:fen}). Its first version, with
 the Galerkin form, is not stable beyond the training horizon; the two forms
 are compared in~\S\ref{sec:experiments:validity:tfen}. The T-FEN is higher
@@ -499,9 +501,8 @@ only the band of change along its border. Four further eyes with lesions
 of different size, number and growth rate are shown in
 Appendix~\ref{app:rollouts}.
 
-In summary, operators of different classes reach similar scores: the three
-highest arms come from three classes and lie within about 0.04 of each
-other, and of the comparisons between them only the lead of the T-FEN over
+In summary, operators of different classes reach similar scores: the
+highest arms of three classes lie within about 0.04 of each other, and of the comparisons between them only the lead of the T-FEN over
 the U-Net is established. The two highest arms share one property. Both
 extend the reach of a local operator on this grid
 (\S\ref{sec:method:graph}): the T-FEN through its transport term, the
@@ -630,8 +631,7 @@ global context needs a local path
 transport term helps (\S\ref{sec:experiments:ingredients:transport}).
 Section~\ref{sec:experiments:ingredients:convergence} brings the results
 together. All comparisons are taken fold by fold
-(\S\ref{sec:experiments:protocol:stats}); one control trains on only four
-folds (\S\ref{sec:experiments:ingredients:transport}).
+(\S\ref{sec:experiments:protocol:stats}).
 
 \subsection{Spatial Context}
 \label{sec:experiments:ingredients:context}
@@ -882,8 +882,8 @@ in~\S\ref{sec:experiments:validity:tfen}.
 % records in section 9.20.
 
 The transport term therefore improves the finite-element network, also
-against a control of the same size, and it brings the first-year values to
-those of the dilated stencil.
+when the T-FEN has fewer parameters than its control (width 48), and it
+brings the first-year values to those of the dilated stencil.
 % 2026-10-19 (SV-5.9, AI 5b.19-5b.27; author): opening expanded; no
 % paragraph-opening "This control"; Galerkin instability scoped; fold-4
 % failure interpreted (optimisation, not overfitting; cause open); the matched
@@ -912,9 +912,11 @@ of the T-FEN moves the state along a learned velocity
 (\S\ref{sec:experiments:ingredients:transport}). Each is established
 against its own control, and the two arms lie within about 0.017 of each
 other as the two highest arms of Table~\ref{tab:experiments:arms}
-(\S\ref{sec:experiments:main-results}). That two unrelated constructions
-aimed at the same limit reach about the same score is the central
-architectural result of the survey. It is consistent with the reach
+(\S\ref{sec:experiments:main-results}). That a graph with dilated edges and
+a transport term on a mesh with the same seven-column spacing reach about
+the same score is the central architectural result of the survey. The
+transport comparison does not separate the transport mechanism from the
+coarser mesh on which it runs. The result is consistent with the reach
 explanation but does not prove the mechanism.
 
 Spatial context is necessary (\S\ref{sec:experiments:ingredients:context}),
@@ -938,8 +940,8 @@ in~\S\ref{sec:experiments:ablations}.
 % from the raw masks cropped to 49 x 1024; every eye id checked against the
 % logged baseline area). Exploratory: six eye properties were tested on two
 % comparisons, so the p values are not corrected for multiple testing
-% (rho -0.32 for the far share: p = 0.006; rho -0.39 for edge contact:
-% p = 0.001; rho 0.79 within fold 4: p = 0.002, 12 eyes).
+% (rho -0.32 for the far share: p = 0.005; rho -0.37 for edge contact:
+% p = 0.001; recomputed 2026-10-23 after the anchor fix in analysis_folds.py; rho 0.79 within fold 4: p = 0.002, 12 eyes).
 The scores of the five folds differ by more than most operators differ from
 each other (\S\ref{sec:experiments:main-results}). This section asks why
 the folds differ, and whether some eyes suit one kind of operator better
@@ -996,9 +998,10 @@ message-passing rounds of the dilated stencil
 lower the dilated-stencil network scores relative to the mean of the T-FEN,
 the U-Net and the FNO (Figure~\ref{fig:experiments:far-atrophy}; Spearman
 $\rho = -0.32$ over the 75 eyes). Eyes with little distant atrophy favour
-the graph network, eyes with much of it the other three: on the third of
-the eyes with the least distant atrophy, the graph network scores 0.035
-higher than their mean, and on the third with the most, 0.010 lower. Fold~1 holds the most eyes of the second kind, with a
+the graph network: on the third of the eyes with the least distant
+atrophy, it scores 0.037 higher than their mean, and its lead shrinks as
+the share grows, to 0.005 below their mean on the third with the most,
+within one standard error of zero. Fold~1 holds the most eyes of the second kind, with a
 median share of 22\,\% against 5 to 16\,\% on the other folds, and its
 three largest deficits of the graph network are eyes of this kind at both
 seeds. Two of them are the two eyes of one patient. The pattern is
@@ -1008,8 +1011,8 @@ limited reach cannot place atrophy that appears beyond it.
 
 % Figure: images/scripts/fig_experiments_far_atrophy.py
 % (analysis_folds.far_terciles; thirds of the far share 0.00-0.05,
-% 0.05-0.16, 0.18-0.67, 25 eyes each: +0.035 +/- 0.011, +0.018 +/- 0.010,
-% -0.010 +/- 0.012 SE).
+% 0.05-0.18, 0.19-0.67, 25 eyes each: +0.037 +/- 0.010, +0.011 +/- 0.011,
+% -0.005 +/- 0.012 SE; recomputed 2026-10-23 after the anchor fix).
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.6\textwidth]{images/fig_experiments_far_atrophy.pdf}
@@ -1020,15 +1023,15 @@ limited reach cannot place atrophy that appears beyond it.
     the FNO, per eye and averaged over seeds 42 and 7. The 75 validation
     eyes are split into thirds by the share of their new atrophy that lies
     more than 0.24\,mm from the baseline lesion (low: 0 to 5\,\%, medium:
-    5 to 16\,\%, high: 18 to 67\,\%). Points are means over the 25 eyes of
+    5 to 18\,\%, high: 19 to 67\,\%). Points are means over the 25 eyes of
     a third; bars are standard errors.}
   \label{fig:experiments:far-atrophy}
 \end{figure}
 
 The second property is contact with the edge of the window. The dense
 operators fall behind the local ones most when the lesion touches the
-window edge, by 0.079 on the 18 such eyes against 0.022 on the other 57
-($\rho = -0.39$). A possible reason is how the operators treat the edge:
+edge of the imaged field (\S\ref{sec:experiments:protocol:metrics}), by
+0.073 on these 21 eyes against 0.021 on the other 54 ($\rho = -0.37$). A possible reason is how the operators treat the edge:
 both dense operators see zeros beyond it, the U-Net through the padding of
 its convolutions and the FNO through the zero padding before its Fourier
 transform, whereas a graph node at the edge simply has fewer neighbours.
@@ -1050,10 +1053,10 @@ shortfall (Spearman $\rho = 0.79$, 12 eyes). Relative growth does not
 explain the extra shortfall: across all eyes, the gap between the two
 operators' predicted amounts does not depend on it. On fold~3 the new
 atrophy lies closer to the existing lesion than on any other fold. This is
-where the dense operators fall behind most, by 0.055 on the half of all
-eyes with the least distant atrophy against 0.016 on the other half, and
+where the dense operators fall behind most, by 0.052 on the half of all
+eyes with the least distant atrophy against 0.019 on the other half, and
 within the fold they lose most on its two smallest lesions (0.11 and
-0.20\,mm$^2$). Together these properties account for about a quarter of the
+0.20\,mm$^2$). Together these properties account for about a fifth of the
 fold-3 gap.
 
 In short, the folds differ mainly because they contain different eyes.
@@ -1822,9 +1825,9 @@ A smaller step left the divergence in place, and the velocities at the onset
 were within the stability limit of RK4. The divergence therefore comes from
 the defect of the Galerkin operator at the domain edge
 (\S\ref{sec:method:family:fen}, Figure~\ref{fig:method:fen-toy}), not from
-the step size. Because the divergence starts after the
-one-year anchor and away from the lesion, it did not affect the change-region Dice
-of the Galerkin T-FEN at one year.
+the step size. Because the divergence typically starts after the one-year
+anchor and away from the lesion, it changed the change-region Dice of the
+Galerkin T-FEN at one year little.
 % Details (SOLVER_FINAL_RUNS 9.19, three runs traced): onset within 7 columns
 % of the left/right crop edge in 79-93 % of eyes, often next to the padded
 % rows, never inside the lesion; layer channel in 33 of 34 onsets; transport
@@ -1843,8 +1846,9 @@ Repeated with the second seed, it passes on every fold as well. The
 energy-conserving form is also at least as accurate as the Galerkin form:
 $0.5428 \pm 0.0401$ against $0.5337 \pm 0.0453$, higher on all five folds,
 by
-$+0.009$, which is under the noise level. The gain lies on the lesions that
-touch the crop border, where the defect acted: their change-region Dice
+$+0.009$, which is under the noise level. The difference lies mainly on the
+lesions that touch the crop border, which is consistent with the location
+of the defect: their change-region Dice
 rises from 0.516 to 0.544, while interior lesions are unchanged (0.535 and
 0.536). The growth-region Dice beyond three years rises from 0.537 to
 0.611, still below the dilated stencil (0.655,
