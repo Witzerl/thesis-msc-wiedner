@@ -542,12 +542,17 @@ column is discussed in~\S\ref{sec:experiments:cost}.
 
 The one-year anchor scores every eye once. The rollout, however, continues
 over the whole follow-up of an eye, up to about six years. This section
-follows the forecast over that time. For every rollout step, the
+follows the forecast over that time. The dilated-stencil network and the
+T-FEN are the two highest operators in each of the first three years, and
+every operator scores higher after the first year than within it. For
+every rollout step, the
 growth-region Dice of the predicted against the observed visit is assigned
 to a bin by the time since baseline; the values are averaged over the late
 epochs and pooled over the five folds (Table~\ref{tab:experiments:horizon});
 Figure~\ref{fig:experiments:horizon} shows the profile of four of them.
-The four bins hold 149, 149, 109 and 71 follow-up visits.
+The four bins hold 149, 149, 109 and 71 follow-up visits. The values are
+descriptive: no difference between bins or operators is tested, and the
+later bins hold only the eyes with the longest follow-up.
 
 \begin{table}[h]
   \centering
@@ -577,10 +582,9 @@ The four bins hold 149, 149, 109 and 71 follow-up visits.
 \end{table}
 
 Every operator scores higher after the first year than within it. Within
-the first year, the operators fall into three groups. The three whose
-single step reaches less far than the lesion front advances between two
-visits, the $k$-NN graph network, the one-hop floor and the free-form FEN,
-score 0.388 to 0.397. The dense operators score 0.446 to 0.464, and the
+the first year, the operators fall into three groups. The three operators
+without a construction for long reach, the $k$-NN graph network, the
+one-hop floor and the free-form FEN, score 0.388 to 0.397. The dense operators score 0.446 to 0.464, and the
 two operators that extend the reach of a local update, the dilated stencil
 and the T-FEN, score 0.503 and 0.519.
 
@@ -600,10 +604,10 @@ and the T-FEN, score 0.503 and 0.519.
     data here are drawn; it is a reference, not a head-to-head
     comparison (\S\ref{sec:experiments:qualitative:mai}).
     \emph{(b)}~The first-year bin alone, on the same scale: the three
-    operators whose single step reaches less far than the per-visit front
-    advance (the $k$-NN graph network, the one-hop floor and the free-form
-    FEN) against the two constructions that remedy this deficit, the
-    dilated stencil and the transport term of the T-FEN.}
+    operators without a construction for long reach (the $k$-NN graph
+    network, the one-hop floor and the free-form FEN) against the two
+    constructions that extend the reach, the dilated stencil and the
+    transport term of the T-FEN.}
   \label{fig:experiments:horizon}
 \end{figure}
 
@@ -611,16 +615,14 @@ In the second and third year, the dilated stencil and the T-FEN stay level
 with each other and above all other operators. Beyond three years, the
 dilated stencil scores highest (0.655), followed by the T-FEN (0.611) and
 the FNO (0.594); the FNO now lies above the U-Net, which it trailed in the
-first two years (\S\ref{sec:experiments:ingredients:global}). The
-operators with short reach close part of their gap: the $k$-NN graph
-network and the one-hop floor lie 0.106 and 0.108 below the dilated stencil
-in the first year but 0.095 and 0.084 below it beyond three years. This
+first two years (\S\ref{sec:experiments:ingredients:global}). This
 last bin holds the fewest visits.
 
-The properties that raise the score at the one-year anchor, reach and transport,
-thus keep their lead over the whole follow-up. Among the other operators,
-the order changes with the horizon, and global context appears to matter
-more for long forecasts than for the first year.
+The dilated stencil and the T-FEN score highest in the first three years;
+beyond three years the T-FEN lies only 0.017 above the FNO. Among the
+other operators, the order changes with the horizon: beyond three years
+the FNO (0.594) lies above the U-Net (0.555) and the FNO with local path
+(0.553), which it trailed in the first year.
 
 
 \section{Ablation Studies}
@@ -757,9 +759,13 @@ the dilated stencil, the two cannot be told apart
 (\S\ref{sec:experiments:main-results}).
 
 Reach along the rows therefore decides how well the graph network does.
-The best tested reach, $\pm 21$ columns (about 119\,\textmu{}m), lies close
-to the 90th percentile of the per-visit front advance, 23 columns
-(\S\ref{sec:method:graph}). Shorter and longer reaches score lower, and
+No tested geometry scores higher than the default hop of $\pm 21$ columns
+(about 119\,\textmu{}m), which was set from the 90th percentile of the
+per-visit front advance, 23 columns (\S\ref{sec:method:graph}). With two
+rounds, one update of the default network reaches $\pm 42$ columns (about
+238\,\textmu{}m), about twice that advance; the $\pm 12$ variant, whose
+update reaches $\pm 24$ columns, scores lower. Shorter and longer reaches
+score lower, and
 more neighbours at the same reach add nothing. More reach through more
 message-passing rounds does not help either: four rounds instead of two,
 which double the reach of the stencil, lower the canonical network by
@@ -788,8 +794,10 @@ while the eyes lean consistently one way, so the effect is not
 established.
 
 Against the other operators, the plain FNO lies below the U-Net at the
-one-year anchor: lower by 0.022 on average, higher on only one of the five
-folds and on 30 of the 75 eyes. It is higher than the $k$-NN graph network
+one-year anchor at seed 42: lower by 0.022 on average, higher on only one
+of the five folds and on 30 of the 75 eyes. At seed 7 it is lower as well,
+but within the noise level, so the difference is not established
+(Appendix~\ref{app:full-results:seeds}). It is higher than the $k$-NN graph network
 by 0.021 on average, but fold 4 carries all of it (without it, $-0.001$),
 so this is not established. With the local path, the FNO cannot be told
 apart from the U-Net ($-0.006$ on average). It is higher than the $k$-NN
@@ -806,11 +814,10 @@ which suggests that the FNO gains on the U-Net at longer horizons.
 % 0.553 / 0.571 / 0.553. Section 9.8a's per-eye-bin means for the same arms
 % use a different aggregation and must not be mixed with these.
 
-Global context alone therefore does not reach the U-Net at the one-year
-anchor. With a local path of 800 parameters, the FNO can no longer be told
+Global context alone scores below the U-Net at the one-year anchor at both
+seeds, beyond the noise level at one of them. With a local path of 800 parameters, the FNO can no longer be told
 apart from the U-Net, but the effect of the local path itself is not
-established. The values beyond one year suggest that global context may
-matter more at longer horizons than at the one-year anchor.
+established.
 % Author decision (b), 2026-10-01: global + local is reported as an
 % observation, not as an established property (5.3.5, 6.1, Ch. 7,
 % abstracts). Values: thesis_numbers.py pair, 2026-10-01; recomputed
@@ -830,8 +837,9 @@ transport term, which moves the state along a velocity predicted by a
 second network (\S\ref{sec:method:family:fen}). The comparison pairs the
 T-FEN with the same network without the transport term, at the same width
 of 96. Both arms start at persistence, because their output heads are
-zero-initialised (\S\ref{sec:method:dt-residual}), so the transport term is
-the only difference.
+zero-initialised (\S\ref{sec:method:dt-residual}). The T-FEN adds the
+transport term, the velocity network that drives it (33\,718 parameters)
+and the coarser mesh on which it runs (\S\ref{sec:method:family:fen}).
 
 The T-FEN is higher by 0.062 on average, on all five folds and on 68 of the
 75 eyes. With the earlier Galerkin form of the transport operator, the
@@ -955,7 +963,10 @@ in~\S\ref{sec:experiments:ablations}.
 % (rho -0.32 for the far share: p = 0.005; rho -0.37 for edge contact:
 % p = 0.001; recomputed 2026-10-23 after the anchor fix in analysis_folds.py; rho 0.79 within fold 4: p = 0.002, 12 eyes).
 The scores of the five folds differ by more than most operators differ from
-each other (\S\ref{sec:experiments:main-results}). This section asks why
+each other (\S\ref{sec:experiments:main-results}). The folds differ mainly
+in the eyes they hold; two properties of an eye, the distance at which new
+atrophy appears and contact with the window edge, also go with differences
+between the operators. This section asks why
 the folds differ, and whether some eyes suit one kind of operator better
 than another, which links the fold differences to the reach argument
 of~\S\ref{sec:experiments:ingredients:convergence}. The analysis uses the
@@ -999,8 +1010,7 @@ U-Net and the FNO on folds~1 and~4 and above it on folds~0, 2 and~3; the
 $k$-nearest-neighbour network, below it on most folds, falls furthest
 behind on fold~4. On fold~3 the U-Net and the FNO fall behind the
 dilated-stencil network and the T-FEN, at both seeds and on 14 of the
-fold's 15 eyes. Two properties of the eyes separate the local
-from the global operators.
+fold's 15 eyes. Two properties of the eyes separate the operators.
 
 The first is the distance at which new atrophy appears. For every eye, the
 share of its new atrophy at the one-year anchor that lies more than 0.24\,mm from
@@ -1028,8 +1038,8 @@ limited reach cannot place atrophy that appears beyond it.
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.6\textwidth]{images/fig_experiments_far_atrophy.pdf}
-  \caption[The graph network falls behind where new atrophy appears far from
-    the lesion.]{%
+  \caption[The lead of the graph network shrinks where new atrophy appears
+    far from the lesion.]{%
     Difference in growth-region Dice at the one-year anchor between the
     dilated-stencil graph network and the mean of the T-FEN, the U-Net and
     the FNO, per eye and averaged over seeds 42 and 7. The 75 validation
@@ -1073,11 +1083,11 @@ fold-3 gap.
 
 In short, the folds differ mainly because they contain different eyes.
 Fold~2 holds large, slowly growing lesions, which every operator forecasts
-well. Two properties of an eye also decide which kind of operator
-forecasts it better. Where new atrophy appears far from the existing
-lesion, the global operators do better, because one step of the graph
-network does not reach that far. Where the lesion touches the edge of the
-window, the graph network does better. The comparisons of the previous
+well. Two properties of an eye also go with which operator forecasts it
+better. Where new atrophy appears far from the existing lesion, the T-FEN,
+the U-Net and the FNO do better than the dilated-stencil network, whose lead
+shrinks, which is consistent with its limited reach per step. Where the
+lesion touches the edge of the window, the graph network does better. The comparisons of the previous
 sections are taken fold by fold, so the shift that all operators share
 does not affect them. Whether the remaining dips on folds~3 and~4 come
 from their validation eyes or from their training sets would need
@@ -1113,14 +1123,14 @@ The framework handles time in a simple way
 (\S\ref{sec:method:dt-residual}). The operator makes one step over the
 whole interval to the next visit, and $\Delta t$ enters twice: as an input
 of the operator and as a multiplier of its output,
-$u_{t+\Delta t} = u_t + \Delta t \cdot f_\theta(u_t, \Delta t, z)$.
+$\hat u_{k+1} = u_k + \Delta t_k \cdot f_\theta(u_k, \Delta t_k, \mathbf{z})$.
 Because every operator shares this update, two of its details were tested
 on the canonical dilated-stencil network: the multiplication by
 $\Delta t$, and the single step. The single step was also tested on the
 FNO, a global operator.
 
 Without the multiplication, the update becomes
-$u_t + f_\theta(u_t, \Delta t, z)$, while $\Delta t$ remains an input of
+$u_k + f_\theta(u_k, \Delta t_k, \mathbf{z})$, while $\Delta t$ remains an input of
 the operator. The change-region Dice does not change: $-0.0006$ on
 average, higher on two of the five folds and on 30 of the 75 eyes.
 % Values: thesis_numbers.py pair ANISOGNN_final_dilmean_nodts
@@ -1165,6 +1175,34 @@ scores between 0.016 lower and 0.018 higher, depending on the fold, and
 % this post-hoc ladder is what he meant, or training at different step sizes.
 % TODO (author): review this placement explicitly once 5.6.1 is rewritten.
 
+\begin{table}[h]
+  \centering
+  \caption[The time-handling tests.]{%
+    The time-handling tests. Change-region Dice at the one-year anchor,
+    five folds, seed 42; the mean $\pm$ sd is over the five fold values. The
+    difference is against the one-step version of the same operator, as the
+    mean over the five folds of the per-fold difference; the columns Folds
+    and Eyes count the folds and the eyes on which the variant is higher.}
+  \label{tab:experiments:time}
+  \footnotesize
+  \begin{tabular}{l c c c c}
+    \toprule
+    Variant & Mean $\pm$ sd & Difference & Folds & Eyes \\
+    \midrule
+    Dilated-stencil network, one Euler step & $0.526 \pm 0.050$ & --- & --- & --- \\
+    \quad without the multiplication by $\Delta t$ & $0.525 \pm 0.043$
+      & $-0.001$ & 2/5 & 30/75 \\
+    \quad RK4, autonomous & $0.514 \pm 0.050$ & $-0.012$ & 1/5 & 28/75 \\
+    FNO, one Euler step & $0.483 \pm 0.048$ & --- & --- & --- \\
+    \quad RK4, autonomous & $0.489 \pm 0.040$ & $+0.006$ & 4/5 & 43/75 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+% Values: solver_results.csv late_change_region_dice_360d_mean (dilmean,
+% dilmean_nodts, oderk4n1, FNO_final_w5, FNO_final_w5rk4), 2026-10-24;
+% differences and counts as in the comments above.
+
+Table~\ref{tab:experiments:time} collects the three comparisons.
 Neither the multiplication by $\Delta t$ nor the integration scheme
 changes the result. In every tested variant the length of the interval
 reaches the operator, either as an input to a single step or through an
@@ -1359,8 +1397,10 @@ monotonic penalty adds nothing.
 \subsection{Capacity}
 \label{sec:experiments:ablations:capacity}
 
-Every architecture arm of Table~\ref{tab:experiments:arms} has 67 to 83
-thousand parameters (\S\ref{sec:method:family:params}). The capacity study
+The four architecture classes scaled here (the dilated-stencil graph
+network, the U-Net, the FNO with a local path and the T-FEN) have 67 to 83
+thousand parameters at their original size
+(\S\ref{sec:method:family:params}). The capacity study
 tests whether the comparisons of~\S\ref{sec:experiments:main-results}
 and~\S\ref{sec:experiments:ingredients} depend on that size. Each class was
 scaled in one size setting at a time, with the loss, curriculum, epoch
@@ -1453,16 +1493,19 @@ is level with width 96.
 Depth does not help where it was tested. Four message-passing rounds
 instead of two, which also double the reach of the dilated stencil, lower
 the graph network on every fold, by 0.009 on average, within the noise
-level. The T-FEN with an eight-layer free-form network does not train on
-any fold: its training error barely falls.
+level. The T-FEN with an eight-layer free-form network trains poorly on
+every fold: its training error barely falls, and it ends 0.285 lower than
+at depth four (0.257 against 0.543).
 
-More parameters therefore improve none of the four classes, and the
-comparisons at matched size in~\S\ref{sec:experiments:main-results}
-and~\S\ref{sec:experiments:ingredients} do not depend on the size at which
-they were made. The result is scoped to one seed. The failures of the
+At the shared learning rate and 30-epoch budget
+(\S\ref{sec:method:training:optim}), more parameters improve none of the
+four classes. The larger T-FEN networks do not train reliably under these
+settings, so the study does not show whether larger models with retuned
+optimisation would score higher. The result is scoped to one seed. The
+failures of the
 larger T-FEN networks occur in both forms of the transport operator: at
 width 192 the T-FEN diverges during training on folds 1 and 4 and ties
-width 96 on the other three, and the eight-layer network fails to train in
+width 96 on the other three, and the eight-layer network trains poorly in
 both forms. They therefore come from training the larger
 network rather than from the form of the operator; their cause was not
 tested.
@@ -1544,6 +1587,11 @@ the graph mattered (\S\ref{sec:experiments:ingredients:reach}); the
 settings of the message function did not, at this precision.
 \fi
 
+Of the settings tested in this section, only the objective changes the
+result: the loss must emphasise the mask, and the soft-Dice term raises the
+score by 0.050. The time handling and the size of the operators can stay
+as they are.
+
 
 \section{Validity Diagnostics}
 \label{sec:experiments:validity}
@@ -1588,17 +1636,16 @@ as the step $h$ shrinks, in proportion to $h^p$ for a scheme of order $p$
 step or a scheme of higher order, must therefore approach one prediction.
 Two criteria make this operational:
 \begin{itemize}
-  \item \textbf{C1, convergence:} when the step is refined, the change in
-    the prediction becomes smaller;
+  \item \textbf{C1, convergence:} at the two finest steps the prediction
+    has settled; from 22.8 to 11.4 days it changes by less than the
+    run-to-run noise with both schemes, and the two schemes agree to within
+    it at 11.4 days;
   \item \textbf{C2, agreement:} all settings that are at least as fine as
     the one used in training in both step and order agree to within the
     run-to-run noise, the standard deviation of 0.0127 between repeated runs of one
     configuration (Appendix~\ref{app:full-results:criteria}).
 \end{itemize}
-A model is read as a continuous-time model only if it satisfies both. C1
-is read at the two finest steps: from 22.8 to 11.4 days the prediction
-changes by less than the run-to-run noise with both schemes, and the two
-schemes agree to within it at 11.4 days.
+A model is read as a continuous-time model only if it satisfies both.
 
 The test requires no retraining. A trained checkpoint is rebuilt from its
 own configuration and evaluated with the unmodified evaluation code; only
@@ -1696,14 +1743,21 @@ a first-order scheme.
 The canonical network, and with it every headline result, may therefore
 not be described as a continuous-time model: no statement about an ordinary
 differential equation, a learned rate of growth or learned dynamics is made
-for it. The energy-conserving T-FEN can be read as a continuous-time model,
-within the scope of one seed. The network trained inside the
+for it. Within the scope of one seed and of the change-region Dice at the
+one-year anchor, the energy-conserving T-FEN behaves as a continuous-time
+model; its 45-day training step lies slightly above the RK4 stability limit
+on the mask channel (\S\ref{sec:experiments:validity:tfen}), so this
+reading does not extend to rollouts over several years. The T-FEN is also
+the only model of the three trained with sub-steps, so the difference
+between the models may come from the training step rather than from the
+operator. The network trained inside the
 Runge--Kutta wrapper defines a vector field as well, but one RK4 step per
 interval is too coarse to resolve it on three of the five folds, where
-finer steps change its Dice by 0.016 to 0.018 in either direction. Neither property decides
-the accuracy. The Runge--Kutta network is not more accurate than the
-canonical network (\S\ref{sec:experiments:ablations:time}), and the score
-of the T-FEN comes from its transport term
+finer steps change its Dice by 0.016 to 0.018 in either direction. A
+continuous-time reading does not come with higher accuracy: the
+Runge--Kutta network scores no higher than the canonical network
+(\S\ref{sec:experiments:ablations:time}), and the advantage of the T-FEN
+over the free-form FEN comes from its transport term
 (\S\ref{sec:experiments:ingredients:transport}).
 % Sources: images/scripts/table_step_ladder.py (cache of
 % images/scripts/step_ladder.py, 2026-10-17; NOTES.md, SV-5.12 entry). The
@@ -2264,9 +2318,9 @@ controls, and the two arms built in these ways are the two highest
 (\S\ref{sec:experiments:ingredients}). Of the framework's own settings,
 the objective matters: it must emphasise the mask. The time handling, the
 integration scheme and the size of the operators do not change the result
-(\S\ref{sec:experiments:ablations}). The energy-conserving T-FEN can be
-read as a continuous-time model, the canonical network cannot, and this
-property does not decide the accuracy
+(\S\ref{sec:experiments:ablations}). The energy-conserving T-FEN behaves
+as a continuous-time model up to the one-year anchor, the canonical
+network does not, and this reading does not come with higher accuracy
 (\S\ref{sec:experiments:validity}). Against prior work, the canonical
 model forecasts where the lesion grows within the range of other models,
 but agrees less well on how fast (\S\ref{sec:experiments:qualitative}).

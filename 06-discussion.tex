@@ -153,10 +153,11 @@ may bring in tissue unrelated to the next visit's change.
 % stop helping.
 
 Global context behaves differently. The FNO sees the whole grid in every
-layer but lies below the U-Net at one year. Beyond one year it catches up,
-and after three years it lies above the U-Net
-(\S\ref{sec:experiments:ingredients:global}). This suggests that global
-context matters more for long forecasts than at one year.
+layer but lies below the U-Net at one year, beyond the noise level at one
+of the two seeds. Beyond three years it lies above the U-Net
+(\S\ref{sec:experiments:horizon}), but the FNO with a local path, which has
+the same global context, does not, so the horizon values do not show that
+global context matters more for long forecasts.
 
 
 \subsection{Capacity}
