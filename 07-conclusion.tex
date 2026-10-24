@@ -12,18 +12,16 @@ forecast the progression of Geographic Atrophy from longitudinal OCT?} It
 was split into two parts: (1) What kind of framework does the forecast
 need? (2) What kind of operator does that framework need?
 
-For the first part, the forecast requires a setup that accommodates the
-irregular visit schedules of clinical data and treats every candidate
-model equally. The framework of Chapter~\ref{ch:method} implements these
-requirements with a residual update conditioned on the elapsed time
-$\Delta t$, a zero-initialised output so that every model starts from
-persistence, a training curriculum measured in elapsed days, and one loss
-and one evaluation for all models. The same framework served operators
-from unrelated literatures without modification, and every operator with
-spatial context learned to predict change and scored far above
-persistence. Learning depended on a loss that weights the lesion mask:
-trained with a plain mean squared error, the canonical operator learned no
-change. A soft-Dice term on the mask added about 0.05 to the change-region
+For the first part, one framework was sufficient for every operator with
+spatial context: the framework of Chapter~\ref{ch:method}, with a residual
+update conditioned on the elapsed time $\Delta t$, a zero-initialised
+output so that every model starts from persistence, a training curriculum
+measured in elapsed days, and one loss and one evaluation for all models.
+It served operators from unrelated literatures without modification, and
+every operator with spatial context learned to predict change. Of its
+parts, the emphasis of the loss on the mask was shown to be necessary; the
+curriculum and the zero initialisation were not ablated. Trained with a
+plain mean squared error, the canonical operator learned no change. A soft-Dice term on the mask added about 0.05 to the change-region
 Dice. The interval length has to reach the operator, but the form in which
 it does so mattered little: a fourth-order Runge--Kutta step gave no
 measurable gain over a single Euler step.
@@ -51,11 +49,10 @@ a time, separate the operators:
     over the same network without the term, and a smaller T-FEN with
     fewer parameters than that network scored the same.
 \end{itemize}
-Reach and transport are two unrelated ways to correct the same deficit: a
+Reach and transport are two different ways to correct the same deficit: a
 single update that cannot see as far as the disease moves between two
-visits. That two independent routes lead to the same level is the central
-architectural result of this thesis; it is more informative than the score
-of any single model. A third candidate, a local path for the global FNO,
+visits. Both routes lead to about the same score, and this agreement is
+the central architectural result of this thesis. A third candidate, a local path for the global FNO,
 is not established. The FNO scores below the U-Net at one year at both
 seeds, and a small local path brought it level at one seed but not at the
 second.
@@ -81,11 +78,10 @@ segmented masks, 0.52 for \citet{Gigon2021} and about 0.57 to 0.59 for
 
 Every conclusion drawn here is limited by the small cohort, the censoring
 by the fixed crop and the lack of memory of past visits. Within these
-limits, for forecasts from longitudinal medical imaging in a low-data
-clinical setting, the framework around the model and the properties of
-the operator placed in it mattered more than the choice of operator
-family. Of these properties, the most important was whether one update can
-see as far as the disease moves between two visits.
+limits, operators of different families reached similar scores once they
+shared one framework. Among the operators with spatial context, the
+property with the largest effect was whether one update can see as far as
+the disease moves between two visits.
 % 2026-10-19 rewritten (supervisor review 2, SV-7.1-SV-7.5; AI 6-7.44-6-7.56):
 % "requires", "equally", "implements these requirements"; no participle
 % opener, no "is not what decides", no "What separates ... are", no slogan

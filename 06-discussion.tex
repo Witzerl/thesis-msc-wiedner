@@ -8,13 +8,11 @@
 % and audited line by line against that fact sheet (see NOTES.md).
 
 
-\section{Interpretation of Results}
-\label{sec:discussion:interpretation}
 % 2026-10-19 rewritten (supervisor review 2, SV-6.1: self-contained for a
 % reader who skipped the thesis; SV-6.2 micrometres; SV-6.5, SV-6.6; AI S14,
 % S20, 6-7.1-6-7.12, 6-7.22-6-7.24). Run-in headings replaced by subsections;
 % the paragraphs on capacity and on the equation features kept as they were
-% (SV-6.3).
+% (SV-6.3). 2026-10-24: the summary paragraph now opens the chapter.
 
 This thesis asked what is needed to forecast the progression of GA from
 longitudinal OCT. The question had two parts: what kind of framework the
@@ -27,8 +25,18 @@ eyes of 51 patients from the Medical University of Vienna, evaluated in
 five-fold cross-validation. Every model was scored by the change-region
 Dice at one year: the overlap between the pixels the model predicts to
 change and the pixels that do change. Predicting no change, persistence,
-scores 0 by construction. This section interprets the results for each
-part of the question and then draws the implications for modelling.
+scores 0 by construction. Inside the shared framework, operators from
+unrelated classes reached similar scores. The objective decided whether
+any change was learned, and among operators with spatial context the reach
+of one update relative to the advance of the front separated them most.
+Section~\ref{sec:discussion:interpretation} interprets these results for
+each part of the question, \S\ref{sec:discussion:clinical} discusses their
+clinical implications, \S\ref{sec:discussion:limitations} the limitations
+and \S\ref{sec:discussion:future} future work.
+
+
+\section{Interpretation of Results}
+\label{sec:discussion:interpretation}
 
 \subsection{The Framework}
 \label{sec:discussion:framework}
@@ -37,7 +45,7 @@ The framework is everything that stays fixed while the operator changes
 (\S\ref{sec:method:framework}). It predicts the next visit from the
 current one by a residual update,
 \begin{equation*}
-  u_{t+\Delta t} = u_t + \Delta t \cdot f_\theta(u_t, \Delta t, z),
+  \hat u_{k+1} = u_k + \Delta t_k \cdot f_\theta(u_k, \Delta t_k, \mathbf{z}),
 \end{equation*}
 whose operator $f_\theta$ starts at zero, so that every model begins at
 persistence. It trains with a loss that weights the mask channel five
@@ -47,8 +55,10 @@ spatial context learned to predict change: the eleven such arms reach a
 change-region Dice of 0.45 to 0.54 at one year
 (Table~\ref{tab:experiments:arms}), while the per-pixel floor, which sees
 no neighbours, stays at 0. One framework thus served operators from
-unrelated literatures without change. This is the answer to the first
-part of the question.
+unrelated literatures without modification. The answer to the first part
+of the question is therefore a framework that conditions a residual update
+on the interval $\Delta t$, starts every model at persistence and trains it
+with a loss that weights the mask channel.
 
 Its parts do not matter equally. The objective matters most. Trained with
 a plain mean squared error, without the weighting of the mask channel and
@@ -75,16 +85,17 @@ classes: the T-FEN, a finite-element network with a transport term, at
 0.543; the dilated-stencil graph network at 0.526; and a U-Net at 0.505
 (\S\ref{sec:experiments:main-results}). The T-FEN lies above the U-Net at
 both seeds, and its lead of 0.017 over the graph network is not
-established. The class of an operator therefore does not decide its
-score. The ablations of~\S\ref{sec:experiments:ingredients} tested three
-properties one at a time on otherwise unchanged operators:
+established. Operators from three unrelated classes thus reach scores
+within 0.04 of each other. The ablations
+of~\S\ref{sec:experiments:ingredients} tested properties one at a time on
+otherwise unchanged operators:
 \begin{itemize}
   \item Spatial context is required: a graph network that sees only each
     pixel itself predicts no change.
   \item The reach of one update along the direction in which the lesion
-    front moves is the largest lever. Replacing the index-space
-    neighbourhood of the graph network by the dilated stencil raises its
-    score by 0.064, at the same parameter count.
+    front moves raises the score: replacing the index-space
+    neighbourhood of the graph network by the dilated stencil raises it
+    by 0.064, at the same parameter count.
   \item An explicit transport term raises the finite-element network by
     0.062 against the same network without it; a T-FEN with fewer
     parameters than that control scores the same.
@@ -159,6 +170,12 @@ of the two seeds. Beyond three years it lies above the U-Net
 the same global context, does not, so the horizon values do not show that
 global context matters more for long forecasts.
 
+The answer to the second part of the question is therefore an operator
+with spatial context whose single update reaches about as far as the
+lesion front moves between two visits, through the placement of its
+neighbours or through an explicit transport term. Operators of different
+classes that meet this condition reach similar scores.
+
 
 \subsection{Capacity}
 \label{sec:discussion:capacity}
@@ -211,21 +228,24 @@ Runge--Kutta wrapper also defines a vector field, but its training step,
 one RK4 step per interval, resolves that field on only two of the five
 folds. Neither is more accurate than the canonical network at one year,
 and the wrapper costs about $4.8\times$ the training time. If predictions
-between visits are needed clinically, these two models give predictions
-between visits that are consistent with those at the visits; the wrapper
-network would need a finer step, which changes its predictions at the
-visits by up to 0.018 on single folds but not on average. Whether these predictions are
+between visits are needed clinically, the T-FEN provides them consistently
+with its predictions at the visits. The wrapper network does so only when
+it is integrated with a finer step than in training, which changes its
+change-region Dice at one year by up to 0.018 on single folds and by 0.004
+on average. Whether these predictions are
 correct cannot be checked, because no ground truth exists between two
 observations. An earlier attempt to constrain them, a regulariser that
 penalised predictions between visits against the linear interpolation of
 the two visits, brought no benefit and was removed before the experiments
-of Chapter~\ref{ch:experiments}.
+of Chapter~\ref{ch:experiments}. Predictions between visits are therefore
+available from the T-FEN, but their correctness cannot be assessed with
+these data.
 
 \subsection{Implications for Modelling}
 \label{sec:discussion:implications}
 
-Across the survey, the largest effects came from two changes to the
-operator: extending the reach of one update along the direction in which
+Among operators with spatial context, the largest effects came from two
+changes to the operator: extending the reach of one update along the direction in which
 the front moves, and adding a mechanism that transports the state. Larger
 models, a higher integration order, a penalty against lesion shrinkage and
 the moving-mesh extension of Appendix~\ref{app:mm-pde}, whose correction
@@ -242,7 +262,8 @@ compared with how far the disease moves between visits.
 
 The survey was designed around the change-region Dice at one year, which
 measures whether a model predicts change where change actually happens. On
-this measure the operators are well above persistence. The speed of
+this measure the operators predict change where it happens, which
+persistence cannot. The speed of
 growth of an individual eye over its whole follow-up is captured less
 well. The correlation between predicted and true growth rates is 0.40 for
 the canonical model, against 0.52 to 0.61 for the comparable models
@@ -271,9 +292,9 @@ Several explanations are possible:
   \item The operators are not trained on the growth rate. It is computed
     afterwards from their predicted maps, whereas some models
     of~\S\ref{sec:experiments:qualitative} regress the rate directly.
-  \item The operators predict less change than occurs in most eyes, 35 of
-    48 on folds 0 to 2 at a median of 0.73 of the true change
-    (Figure~\ref{fig:experiments:rollout}), and about half the true rate
+  \item The canonical model predicts less change than occurs in most
+    eyes, 35 of 48 on folds 0 to 2 at a median of 0.73 of the true change
+    (\S\ref{sec:experiments:main-results}), and about half the true rate
     for the fastest eyes (\S\ref{sec:experiments:qualitative}). A
     deterministic model trained with a pixel-wise loss may favour such
     cautious predictions.
@@ -299,12 +320,14 @@ a different way, for example to judge whether growth is heading towards
 the fovea, but that use was not evaluated here.
 
 A second clinical question is how far ahead the forecast remains useful.
-All comparisons in this thesis are made at the one-year anchor, the
-first visit about one year after baseline. Beyond one year, the
+All tested comparisons between operators
+(\S\ref{sec:experiments:protocol:stats}) are made at the one-year anchor,
+the first visit about one year after baseline; beyond it, only descriptive
+values exist (\S\ref{sec:experiments:horizon}). Beyond one year, the
 growth-region Dice of the canonical model, which scores only new atrophy,
 does not fall; it
 lies at about 0.60 to 0.66 in the second, third and later years
-(\S\ref{sec:experiments:ingredients:transport}). These values are
+(Table~\ref{tab:experiments:horizon}). These values are
 descriptive and pooled over rollout steps. Whether any of these levels is
 clinically sufficient cannot be judged from the data: no clinically
 established Dice threshold for GA progression forecasts is known to the
@@ -331,12 +354,20 @@ graders outlined existing images rather than predicting a future one.
 Finally, because every model starts from segmented masks and layer
 depths, a clinical use would place it behind a segmentation model. Errors of that
 segmentation would pass into the forecast, and this thesis does not model
-them. Forecast failures are most likely where the method is known to be
-weak:
-lesions that touch the border of the crop, where growth is censored
-(\S\ref{sec:experiments:folds}); fast progressors, whose growth is
-under-predicted (\S\ref{sec:experiments:qualitative}); and eyes with
-sparse visit schedules, where each step must bridge a long interval.
+them. Forecast failures were observed where new atrophy appears far from
+the existing lesion or as new separate lesions
+(\S\ref{sec:experiments:folds}, Appendix~\ref{app:rollouts}), and for fast
+progressors, whose growth is under-predicted
+(\S\ref{sec:experiments:qualitative}). Lesions that touch the edge of the
+imaged field are censored in the reference itself. Whether long intervals
+between visits degrade the forecast was not analysed.
+
+In summary, the forecast locates growth along the lesion border at a level
+within the range of prior work, but predicts the growth speed of an
+individual eye less well than comparable models and was evaluated on one
+cohort only. It would need external validation and a measure of its own
+uncertainty (\S\ref{sec:discussion:future}) before it could support
+treatment decisions.
 % 2026-10-19: the former TODO (link to a qualitative section) resolved by
 % pointers; the qualitative section was dropped (author), Appendix D holds
 % further eyes.
@@ -345,10 +376,12 @@ sparse visit schedules, where each step must bridge a long interval.
 \section{Limitations}
 \label{sec:discussion:limitations}
 
-The cohort is small: 75 eyes of 51 patients, with 12 to 20 validation
-eyes per fold. Every result is a validation result of a five-fold
-cross-validation; there is no held-out test split
-(\S\ref{sec:data:splits}). Twenty-four patients contribute both eyes, and
+The conclusions of this thesis are limited by the data, the evaluation and
+the scope of the models. The cohort is small and comes from a single site:
+75 eyes of 51 patients, with 12 to 20 validation eyes per fold. Every
+result is a validation result of a five-fold cross-validation; there is no
+held-out test split (\S\ref{sec:data:splits}), and no external cohort was
+available for testing. Twenty-four patients contribute both eyes, and
 fellow eyes are not independent, so the per-eye statistics are somewhat
 optimistic.
 
@@ -383,8 +416,11 @@ The evaluation has limits of its own. The one-year anchor is the first
 visit at or after about one year, and its time
 has no upper bound, so a few eyes are scored later, where more change has
 accumulated. Several findings rest on one
-seed. The training curriculum is used in every run, so its effect on the
-forecast is not measured.
+seed. The training curriculum and the zero-initialised output are used in
+every run, so their effect on the forecast is not measured. No
+non-learned growth model, such as a uniform dilation of the baseline
+lesion, was evaluated, so the scores do not show how much the operators
+add beyond the average growth of the cohort.
 
 The scope of the models is limited as well. Every operator sees one visit
 and has no memory of the trajectory so far,
@@ -414,6 +450,10 @@ about mesh adaptation is drawn from it.
 
 \section{Future Work}
 \label{sec:discussion:future}
+
+The following directions follow from the results
+of~\S\ref{sec:discussion:interpretation} and the limitations
+of~\S\ref{sec:discussion:limitations}.
 
 \paragraph{Spatial pre-processing.}
 The fixed centre crop censors growth at the window border

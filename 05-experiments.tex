@@ -511,7 +511,11 @@ Figure~\ref{fig:experiments:rollout} shows the rollout of the canonical
 model for one eye. Most of the lesion stays as it is, and the metric scores
 only the band of change along its border. Four further eyes with lesions
 of different size, number and growth rate are shown in
-Appendix~\ref{app:rollouts}.
+Appendix~\ref{app:rollouts}. Across the 48 validation eyes of folds 0 to 2,
+the canonical model predicts less change than occurs in 35, at a median of
+0.73 of the true change.
+% Source: NOTES.md 2026-10-18 (epoch-29 rollouts of folds 0-2,
+% images/data/rollouts/; ratio predicted / true change area).
 
 In summary, operators of different classes reach similar scores: the
 highest arms of three classes lie within about 0.04 of each other, and of the comparisons between them only the lead of the T-FEN over
@@ -1960,9 +1964,9 @@ around day 1\,260 and grow by a factor of about 1.04 per sub-step. This
 growth matches the step-size limit of RK4. It is a minor effect compared
 with the defect of the Galerkin form, which produced growth by a factor of
 about 1.3 per sub-step from around day 585. The run still passes the
-stability criterion. An evaluation step of 30 days, at which the Courant
-number of the mask channel falls to about 1.8, removes the residual
-without changing the Dice (\S\ref{sec:experiments:validity:swap}). Only the
+stability criterion. On fold 0, a re-evaluation with RK4 in 30-day steps,
+at which the Courant number of the mask channel falls to about 1.8,
+removes the residual and leaves the change-region Dice unchanged. Only the
 first, Galerkin form of the T-FEN is therefore unstable; the
 energy-conserving form reported in this thesis is stable on every fold at
 both seeds.
@@ -2053,9 +2057,11 @@ values of~\citet{Mai2024} in every bin, by 0.18 to 0.29.
 
 \citet{Gigon2021} predicted the progression of RORA from OCT en-face maps
 of layer thicknesses and reflectivity, an input close to the one used here,
-and report the same quantity in the same bins. Their values, 0.46 in the
-first year rising to 0.72 after four years, lie close to those of the
-canonical network, 0.50 rising to 0.66.
+and report the growth-region Dice of RORA by year since baseline; their
+bins match those used here up to three years and then split into 3 to 4
+and more than 4 years. Their values, 0.46 in the first year rising to 0.72
+after four years, lie close to those of the canonical network, 0.50 rising
+to 0.66.
 
 \citet{Salvi2025} report a Dice of 0.70 on their test set for the one-year region of growth, predicted from fundus
 autofluorescence images. Their setting differs in two ways that favour a
@@ -2113,7 +2119,8 @@ where $T$ is the time from the baseline visit to the eye's last visit.
 Taking the square root of the area removes the dependence of the growth
 rate on the baseline lesion size \citep{Feuer2013}. The rate is computed
 once from the ground truth and once from the model's rollout, over the
-eye's whole follow-up as in~\citet{Mai2024}, not at the one-year anchor.
+eye's whole follow-up, not at the one-year anchor; unlike~\citet{Mai2024},
+one rate per eye is used (see above).
 Two measures compare the two rates over the cohort. The Pearson
 correlation $r$ measures how closely the predicted rates follow a linear
 relation with the true rates across eyes: $r = 1$ is a perfect linear
@@ -2167,7 +2174,9 @@ interval, 0.20 to 0.57, excludes zero
 is not correlated with the growth rate in this cohort ($r = -0.10$), as
 intended by the square-root transform. The
 model therefore predicts part of the differences in growth speed between
-eyes, but less of them than the model of~\citet{Mai2024}, on both measures.
+eyes. Its correlation is lower than that of~\citet{Mai2024}, whose value of
+0.61 lies outside the bootstrap interval. Its AUCs are also lower, but each
+value of~\citet{Mai2024} lies inside the corresponding interval.
 The AUCs rest on 8 to 15 positive eyes, and their intervals reach down to
 values close to chance. The fastest eyes are under-predicted: of the 15
 eyes with the highest true rates, 14 receive a lower predicted rate, with a
@@ -2205,7 +2214,9 @@ itself, defined as the annual slope of the lesion area in square
 millimetres, fitted over all visits and measured on fundus
 autofluorescence images with a larger field of view than the OCT scan.
 The canonical model, with $r = 0.40$, lies below all three models on growth
-speed, which differ from it in the setup as described above.
+speed in its point estimate; the values of~\citet{Gigon2021}
+and~\citet{Yoshida2025} lie inside or at the upper edge of its interval of
+0.20 to 0.57. All three differ from it in the setup as described above.
 % Sources (checked 2026-10-19): Gigon2021 p. 5 ("The correlation coefficient
 % between manual and predicted progression rates calculated over the whole
 % follow-up period was 0.52."); Yoshida2025 p. 5 (holdout r2 0.33, 0.33,
@@ -2225,7 +2236,8 @@ has to find the lesion in the raw OCT volume. Together with the
 differences listed above, this means that the comparison mainly shows how
 much of the spatial forecast the segmented mask already carries. On how
 fast the lesion grows, the canonical model lies below every comparable
-model, with $r = 0.40$ against 0.52 to 0.61. Possible reasons are discussed
+model in its point estimate, with $r = 0.40$ against 0.52 to 0.61, and
+outside its interval only against~\citet{Mai2024}. Possible reasons are discussed
 in~\S\ref{sec:discussion:clinical}.
 
 
@@ -2310,15 +2322,16 @@ about the same level at about a quarter of the cost.
 This chapter answered the second part of the research question. Inside
 the fixed framework, operators of three different classes reach similar
 scores at the one-year anchor, and every point of change-region Dice comes
-from spatial context (\S\ref{sec:experiments:main-results}). What
-separates the operators is how far they reach in one step: placing the
+from spatial context (\S\ref{sec:experiments:main-results}). Placing the
 neighbours of the graph network at lesion scale and adding an explicit
 transport term each raise the score by 0.06 to 0.07 against their own
 controls, and the two arms built in these ways are the two highest
-(\S\ref{sec:experiments:ingredients}). Of the framework's own settings,
-the objective matters: it must emphasise the mask. The time handling, the
-integration scheme and the size of the operators do not change the result
-(\S\ref{sec:experiments:ablations}). The energy-conserving T-FEN behaves
+(\S\ref{sec:experiments:ingredients}); this is consistent with an operator
+needing one update that reaches about as far as the lesion front advances
+between two visits. Of the framework's own settings, the objective
+matters: it must emphasise the mask. The time handling and the
+integration scheme do not change the result, and larger operators do not
+improve it (\S\ref{sec:experiments:ablations}). The energy-conserving T-FEN behaves
 as a continuous-time model up to the one-year anchor, the canonical
 network does not, and this reading does not come with higher accuracy
 (\S\ref{sec:experiments:validity}). Against prior work, the canonical
