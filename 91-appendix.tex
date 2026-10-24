@@ -117,8 +117,20 @@ and~\S\ref{sec:experiments:qualitative}.
 \chapter{Ablation Details}
 \label{app:ablations}
 
+This appendix collects the material behind Chapter~\ref{ch:experiments}:
+the scores on border-touching and interior eyes
+(\S\ref{app:full-results:border}), the growth-speed measures of every arm
+(\S\ref{app:full-results:growth-speed}), the criteria and statistics of all
+comparisons (\S\ref{app:full-results:criteria},
+\S\ref{app:full-results:seeds}) and every setting of the step-size test
+(\S\ref{app:full-results:step-ladder}).
+
 \section{Border-Touching and Interior Eyes}
 \label{app:full-results:border}
+
+Table~\ref{tab:appendix:border-interior} shows whether the order of the
+arms changes when the eyes whose lesion touches the crop border are
+separated from the others.
 
 \begin{table}[h]
   \centering
@@ -164,6 +176,10 @@ operators score about the same on both groups
 \clearpage
 \section{Growth-Speed Measures for All Arms}
 \label{app:full-results:growth-speed}
+
+Table~\ref{tab:appendix:growth-speed} shows whether the arms differ in how
+well they predict the growth speed of an eye, which
+\S\ref{sec:experiments:qualitative} reports for the canonical model only.
 
 \begin{table}[!h]
   \centering
@@ -227,12 +243,18 @@ $\sigma \approx 0.019$ for the parameter-matched U-Net, estimated from its
 two seeds on the five folds.
 
 Two arms are compared in two ways. The fold-paired test averages the
-differences of the two arms over the five folds. Without a real
-difference, this mean $\bar{\Delta}$ varies only through retraining, with
+differences of the two arms over the five folds. If the two arms
+performed identically on every fold, this mean $\bar{\Delta}$ would vary
+only through retraining, with
 a standard deviation $\sigma_\Delta = \sqrt{\sigma_A^2 + \sigma_B^2} /
 \sqrt{n}$ over $n$ folds: about 0.008 for two graph networks and about
 0.010 when one arm is the U-Net. The tables give
-$z = \bar{\Delta} / \sigma_\Delta$. A value of $|z| > 1.96$ ($p < 0.05$)
+$z = \bar{\Delta} / \sigma_\Delta$. The $z$ statistic therefore tests the
+difference on these five folds against retraining noise. It does not
+include the variation of the difference between folds, which the SE column
+of the tables shows to be larger for most comparisons; that variation is
+covered by the fold count, the per-eye test and the leave-one-fold-out
+condition. A value of $|z| > 1.96$ ($p < 0.05$)
 corresponds to a mean difference of about 0.016, or 0.020 with a U-Net,
 and to about 0.036 for a difference on a single fold. The per-eye test
 compares the two arms on each of the 75 validation eyes, using the
@@ -697,11 +719,14 @@ interpolation would pass meaningless values to the uniform branch.
 
 \citet{Hu2024} report four ablations of the dual-branch solver: removing
 the uniform branch, replacing the moved branch by a second branch on the
-original mesh, removing the residual-cut network of their model (not used
-in this thesis), and replacing the DMM mesh by the uniform mesh. Each of
-them increases the error. They conclude that the branch on the original
-mesh, the residual cut and a well-defined moving mesh are all needed for
-accuracy. The original method thus has two parts that a GA version has to
+original mesh, removing the residual-cut network of their model, and
+replacing the DMM mesh by the uniform mesh. Each of them increases the
+error. They conclude that the branch on the original mesh, the residual
+cut and a well-defined moving mesh are all needed for accuracy. The
+residual cut, a convolutional network that corrects the interpolation
+error between the two meshes, was implemented for GA as well, but its
+correction accumulated over the autoregressive rollout and made the dual
+model diverge, so it was removed. The original method thus has two parts that a GA version has to
 provide: a mesh mover for the GA state and a dual-branch composition.
 
 % 2026-10-22 (tablet review v8 #129, #131): a paragraph judging the gains of
@@ -740,8 +765,9 @@ dilated stencil, which skips the nearest nodes in order to reach further,
 would pass over the nodes the mesh mover has gathered and defeat its
 purpose. On fold~2, a dual model whose uniform branch uses the dilated
 stencil, while its correction branch keeps the $k$-nearest-neighbour
-graph, trails its own single-branch counterpart by 0.031
-(\S\ref{app:mm-pde:result}).
+graph, scores 0.031 below its own single-branch counterpart, within the
+single-fold noise level of 0.036; no five-fold run and no bypass control
+exist for this configuration (\S\ref{app:mm-pde:result}).
 % 2026-10-22 (tablet review v8 #132, author's argument).
 
 \subsection{Data-Free Mesh Mover for GA}
@@ -762,9 +788,9 @@ $4 \times 4$ and a linear layer to a 512-dimensional latent vector. Because
 of the pooling, it accepts any grid size. The trunk network, a tanh
 multilayer perceptron with widths 2, 32 and 512, reads the continuous
 coordinate $\xi \in [0,1]^2$. A head maps the concatenated outputs of
-encoder and trunk to the scalar potential $\phi$ through widths 1024, 512,
+encoder and trunk to the scalar potential $\psi$ through widths 1024, 512,
 512 and 1, one layer deeper than the base head. The moved mesh is
-$x(\xi) = \xi + \nabla\phi(\xi)$, computed by automatic differentiation.
+$x(\xi) = \xi + \nabla\psi(\xi)$, computed by automatic differentiation.
 The mesh mover has $1\,394\,273$ parameters. They are frozen during solver
 training and excluded from the optimiser.
 
@@ -795,10 +821,10 @@ The encoder always receives the raw binary mask.
 The loss has three terms, weighted 1, 1000 and 1 as in the
 original \citep{Hu2024}. The first is the
 Monge--Amp\`ere residual at sampled interior points,
-$\operatorname{MSE}\big(M(\xi + \nabla\phi)\,\det(I + \nabla^2\phi) /
+$\operatorname{MSE}\big(M(\xi + \nabla\psi)\,\det(I + \nabla^2\psi) /
 \bar M,\ 1\big)$. It requires the monitor at the moved point times the
 change of cell area to be the same everywhere. The second, a soft boundary
-term, penalises the normal derivative of $\phi$ on the four edges, so that
+term, penalises the normal derivative of $\psi$ on the four edges, so that
 boundary nodes stay on the boundary. The third penalises negative diagonal
 entries of the Hessian of $\phi$, an early sign of folding. This term stays
 close to zero throughout training. Validity is enforced instead when a
@@ -807,8 +833,8 @@ refinement of~\citet{Hu2024} was not used.
 
 Each iteration samples 5 masks and 1000 points per mask, 90\,\% of them in
 proportion to the monitor and 10\,\% uniformly. The mesh mover was trained
-on all 478 masks of the cohort, the start mask of every training window of
-all 75 eyes. It was trained with Adam, learning rate $2 \times 10^{-4}$
+on 478 of the 553 masks of the cohort, the start masks of all windows of
+the 75 eyes (the last visit of an eye starts no window). It was trained with Adam, learning rate $2 \times 10^{-4}$
 and weight decay $10^{-5}$, for 500 epochs, with the learning rate
 multiplied by 0.2 at epochs 333 and 467. The configuration was selected
 from a 55-run search on the native grid. Mesh quality
@@ -820,11 +846,15 @@ The architecture of the encoder made no measurable difference across five
 variants; the pooling encoder is kept because it accepts any grid size.
 Table~\ref{tab:appendix:dmm-config} summarises the configuration.
 
-Training on every mask of the cohort, including the validation eyes, does
-not leak information into the forecast. The mesh mover has no target: its
-loss measures only how evenly the mesh distributes the monitor of the mask
-it is given, a property of that mask alone. It never sees a later visit,
-and it is frozen while the solver is trained. A held-out set of masks is
+Training on masks of every eye, including the validation eyes, does not
+give the forecast access to future observations. The mesh mover has no
+target: its loss measures only how evenly the mesh distributes the monitor
+of the mask it is given, a property of that mask alone. Its weights were
+also fitted to masks of later visits of the validation eyes, but only to
+mesh each mask, never to relate one visit to the next. At use, it receives
+the current mask only, and it is frozen while the solver is trained. Any
+advantage from this would favour the dual branch, which still shows no
+gain (\S\ref{app:mm-pde:result}). A held-out set of masks is
 not needed either, because the mesh mover is not a predictor whose accuracy
 on new data is in question. A classical mesh mover computes the mesh for
 each mask directly, by solving the Monge--Amp\`ere equation for that mask,
@@ -861,7 +891,7 @@ mover is used for every fold.
       $10^{-5}$ \\
     Schedule & 500 epochs, learning rate $\times 0.2$ at epochs 333 and
       467 \\
-    Training data & All 478 masks of the cohort \\
+    Training data & 478 window-start masks, all 75 eyes \\
     Parameters & $1\,394\,273$, frozen during solver training \\
     \bottomrule
   \end{tabular}
@@ -969,7 +999,7 @@ nodes on the border. The reference coefficient of variation,
 cell areas weighted by one fixed reference monitor, the equidistribution
 measure of~\citet{HuangRussell2011}; lower values mean a more even mesh.
 The determinant margin, \texttt{det\_min}, is the minimum of
-$\det(I + \nabla^2\phi)$ over random points. A positive value means that
+$\det(I + \nabla^2\psi)$ over random points. A positive value means that
 the map folds nowhere, not only at the grid nodes.
 
 \begin{table}[t]
@@ -978,8 +1008,8 @@ the map folds nowhere, not only at the grid nodes.
     Quality of the meshes of the canonical mesh mover at epoch 500, scored
     on 16 masks spread over 13 eyes of the cohort. Edge gain as mean
     $\pm$ sd over three seeds; the other columns are three-seed means. All
-    values are in-sample, because the mesh mover is trained on every mask
-    of the cohort.}
+    values are in-sample, because the mesh mover is trained on masks of
+    every eye of the cohort.}
   \label{tab:appendix:mesh-quality}
   \small
   \begin{tabular}{c c c c}
@@ -1041,7 +1071,7 @@ result of~\S\ref{app:mm-pde:result}.
     (b)~7.79\,mm$^2$, (c)~10.24\,mm$^2$. Their edge gain is 2.65, 3.07 and
     2.01 (1 for the uniform grid), and no cell of the three meshes is
     folded. The meshes are in-sample, because the mesh mover was trained on
-    all 478 masks of the cohort, these three included. The hatched strip at
+    478 masks of the cohort, these three included. The hatched strip at
     the bottom of (c) is a zero-padded row.}
   \label{fig:appendix:moved-mesh}
 \end{figure}
@@ -1119,8 +1149,9 @@ counterpart, within the noise level. The gate peaks lower (0.058
 against 0.067), and the parameters of the correction branch grow instead
 of shrinking, so weight decay does not keep the gate shut. On the dilated
 stencil, the dual model scores 0.5754 against 0.6060 for its own
-single-branch counterpart, a difference of $-0.031$, higher on only 3 of
-the 16 eyes of the fold, at roughly nine times the cost. The
+single-branch counterpart, a difference of $-0.031$, within the
+single-fold noise level, although higher on only 3 of the 16 eyes of the
+fold, at roughly nine times the cost. The
 gain of the stencil carries over to the dual model, but the correction
 branch still does not engage.
 
@@ -1128,28 +1159,36 @@ Before the runs, $\alpha \to 0$ had been fixed as a reportable outcome, to
 be read as evidence that mesh adaptation does not help GA forecasting. The
 bypass control, part of the same design, shows that this reading is not
 valid, because its gate behaves in the same way without any mesh. The
-experiments support a narrower statement. The gated correction branch did
-not engage in any tested variant: on the moved mesh and on the uniform
-grid, without weight decay, and without the gate. The dual-branch model
+experiments support a narrower statement. The correction branch did not
+improve the forecast in any tested variant. With the gate, the gate stayed
+shut on the moved mesh and on the uniform grid, and on fold~2 also without
+weight decay. Without the gate, the correction entered at full weight and
+lowered the change-region Dice on fold~2 by 0.173. The dual-branch model
 gave no measurable gain at about ten times the cost. \citet{Hu2024}
 report that their dual branch improves on the uniform grid on their
 benchmarks.
 
-A likely reason lies in reach, the property that separates the operators
-of Chapter~\ref{ch:experiments} (\S\ref{sec:experiments:ingredients:reach}).
+One possible contributing reason, not tested here, lies in reach
+(\S\ref{sec:experiments:ingredients:reach}).
 The mesh mover pulls nodes towards the current lesion border, so the moved
 mesh resolves the border more finely, and one message-passing step on it
 reaches even less far than on the uniform grid. The GA front, however,
-advances a median of 12 and up to about 23 columns between two visits
+advances a median of 12 and, at the 90th percentile, 23 columns between
+two visits
 (\S\ref{sec:method:graph}), and the new atrophy appears beyond the current
 border. A correction branch that sees the border in finer detail but over
 a shorter distance therefore adds little that the uniform branch does not
-already provide, which is consistent with a gate that stays shut. With the
-dilated stencil, the uniform branch reaches the front on its own, and the
-dual model still lies below its single-branch counterpart.
+already provide, which is consistent with a gate that stays shut. Reach
+does not explain the bypass control, whose correction branch has the same
+reach as the uniform branch and whose gate also stays shut; a second
+branch that sees the same information as the first adds little in either
+case. With the dilated stencil, the uniform branch reaches the front on
+its own, and in the one fold-2 run the dual model did not improve on its
+single-branch counterpart.
 
 The result therefore concerns this method on this task. One dual-branch
-design, adapted to a slowly growing lesion on an anisotropic grid, need not
+design, without the residual cut of the original and adapted to a slowly
+growing lesion on an anisotropic grid, need not
 be representative of adaptive meshes, and the experiment is not a general
 statement on how well adaptive meshes work, for GA or elsewhere.
 % 2026-10-22 (tablet review v8 #151, author): reach reasoning and scope
