@@ -616,8 +616,9 @@ The original paper names two limitations: it needs high-quality
 numerical ground truth for training, and it has no formal accuracy
 guarantees. A further one, not named by its authors, is that a uniform mesh
 is wasteful in smooth regions and under-resolved at sharp gradients; it
-motivates the moving-mesh extension of \citet{Hu2024}
-(Appendix~\ref{app:mm-pde}).
+motivates the moving-mesh extension of~\citet{Hu2024}, which was tested
+once as an additional experiment (\S\ref{sec:experiments:mesh},
+Appendix~\ref{app:mm-pde}).
 
 \paragraph{Proposed modifications.}
 The forward pass consists of an encoder, a number of message-passing

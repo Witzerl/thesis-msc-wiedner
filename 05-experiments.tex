@@ -1625,7 +1625,8 @@ This section explains the idea, what was tested and what it gave.
   \centering
   \includegraphics[width=\textwidth]{images/fig_appendix_moved_mesh.png}
   \caption[Moved meshes of three representative eyes.]{%
-    Meshes of the canonical mesh mover (seed 42, epoch 500) for the
+    Meshes of the selected mesh mover (Appendix~\ref{app:mm-pde:dmm};
+    seed 42, epoch 500) for the
     baseline masks of three validation eyes of fold~2, drawn over the GA
     lesion at the physical aspect ratio of the $5.94 \times 5.82$\,mm
     window. Top row: the uniform $49 \times 1024$ grid; bottom row: the
@@ -2489,7 +2490,10 @@ needing one update that reaches about as far as the lesion front advances
 between two visits. Of the framework's own settings, the objective
 matters: it must emphasise the mask. The time handling and the
 integration scheme do not change the result, and larger operators do not
-improve it (\S\ref{sec:experiments:ablations}). The energy-conserving T-FEN behaves
+improve it (\S\ref{sec:experiments:ablations}). A single additional
+experiment with an adaptive mesh, which gathers the nodes of a second
+graph branch at the lesion border, gave no measurable gain at about ten
+times the training cost (\S\ref{sec:experiments:mesh}). The energy-conserving T-FEN behaves
 as a continuous-time model up to the one-year anchor, the canonical
 network does not, and this reading does not come with higher accuracy
 (\S\ref{sec:experiments:validity}). Against prior work, the canonical

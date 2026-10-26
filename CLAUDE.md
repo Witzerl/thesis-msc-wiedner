@@ -10,6 +10,8 @@ The contribution is applied, not methodological: irregular visit intervals ($\De
 
 **Decided 2026-09-25:** the research question reads "What is needed to forecast the progression of GA from longitudinal OCT? (1) What kind of framework does the forecast need? (2) What kind of operator does that framework need?", and **everything MM-PDE (mesh mover, dual branch, α gate, mesh quality) is reported in an appendix** as an additional experiment, not in the main chapters. See THESIS_STRUCTURE.md → Framing.
 
+**Revised 2026-10-26:** following the supervisor's reply (moving parts into the main text is up to the author), the moving-mesh experiment is reported as one self-contained section, §5.7 "Additional Experiment: Adaptive Meshes" (idea, data-free mesh mover, dual branch with gate, bypass control, moved-mesh figure, result table), and §6.1.2 gives reach as the reason it was not developed further. It is a single experiment, not an arm of the comparison and not part of the framework. Background, full design, mesh quality and result details stay in Appendix E.
+
 ## Context Files
 
 - See @THESIS_STRUCTURE.md for the chapter outline. Confirm where requested content belongs before writing.

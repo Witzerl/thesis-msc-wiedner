@@ -898,17 +898,12 @@ mover is used for every fold.
 \subsection{Dual-Branch Composition}
 \label{app:mm-pde:dual}
 
-The dual-branch model predicts
-\begin{equation}
-  \hat u_{t+\Delta t} \;=\; u_t + \Delta t\, f_\theta(u_t)
-  \;+\; \alpha \cdot \tilde I\big[\Delta t\, g_\theta(u_t)\big],
-  \label{eq:appendix:dual}
-\end{equation}
-where $f_\theta$ runs on the uniform grid and $g_\theta$ on the moved mesh.
-The uniform branch alone gives the full next state,
-$u_t + \Delta t\, f_\theta$. The correction branch gives an increment
-scaled by $\Delta t$, which the interpolation $\tilde I$ carries back to
-the uniform grid. Both branches are the graph network
+The dual-branch model predicts the next state by
+Equation~\eqref{eq:experiments:dual}: $f_\theta$ runs on the uniform grid
+and $g_\theta$ on the moved mesh. The uniform branch alone gives the full
+next state, $u_k + \Delta t_k\, f_\theta$. The correction branch gives an
+increment scaled by $\Delta t_k$, which the interpolation $\tilde I$
+carries back to the uniform grid. Both branches are the graph network
 of~\S\ref{sec:method:mppde}, with two message-passing rounds of width 64.
 
 The gate $\alpha$ is a learnable scalar initialised to zero. At the start, the dual model is
