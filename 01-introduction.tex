@@ -176,9 +176,10 @@ The main contributions of this thesis are the following.
     does not prove, the reach explanation.
   \item Results on what did not help, each within the noise level: larger
     operators, a higher integration order and a monotonic-growth penalty.
-    An extension with an adaptive moving mesh gave no measurable gain
-    either; it is reported as one tested design
-    (Appendix~\ref{app:mm-pde}), not as a verdict on mesh adaptation.
+    An adaptive moving mesh, tried in a single additional experiment on
+    the $k$-NN graph network, gave no measurable gain either
+    (\S\ref{sec:experiments:mesh}); it is not a verdict on mesh
+    adaptation.
 \end{itemize}
 % Author decision (d), 2026-10-01: Section 1.4 "Contributions" merged into
 % this paragraph; its stale pre-survey bullets were deleted (nothing
@@ -199,12 +200,13 @@ and how each visit is turned into an eleven-channel state.
 Chapter~\ref{ch:method} addresses the first part of the research question
 by developing the framework, and describes the operators that fill its one
 free component. Chapter~\ref{ch:experiments} addresses the second part by
-comparing these operators. Chapter~\ref{ch:discussion} discusses what the
+comparing these operators, and reports one additional experiment with an
+adaptive moving mesh. Chapter~\ref{ch:discussion} discusses what the
 results mean clinically and methodologically, together with their
 limitations, and Chapter~\ref{ch:conclusion} concludes. The appendices give
 further details on the data, additional rollouts, the statistics of the
-comparisons and the code; Appendix~\ref{app:mm-pde} reports an additional
-experiment with an adaptive moving mesh.
+comparisons and the code; Appendix~\ref{app:mm-pde} gives the background
+and design of the experiment with the adaptive mesh.
 
 
 

@@ -81,16 +81,13 @@ reference point of the comparison (\S\ref{sec:method:family:floors}).
 original is summarised before its adaptation to the framework.
 \S\ref{sec:method:implementation} closes with the implementation.
 Figure~\ref{fig:method:pipeline} summarises the pipeline.
-% TODO (supervisor review 2, SV-4.2): he suggests reporting the moving-mesh
-% extension in the main text as a negative result. Author (2026-10-17): not
-% convinced yet (argumentation still loose, no comparison against it on the
-% canonical backbone -- only one fold-2 dual run on the dilated stencil, the
-% 5-fold dual and bypass arms are on the k-NN graph -- and it would take
-% defence time); think about it once more.
-A moving-mesh
-extension of the graph operator, following MM-PDE \citep{Hu2024}, is
-reported separately as an additional experiment in
-Appendix~\ref{app:mm-pde}.
+% SV-4.2 resolved 2026-10-26 (supervisor: appendix is fine, moving parts
+% into the main text is up to the author): the experiment is reported as one
+% self-contained section in Chapter 5, the design stays in Appendix E.
+A moving-mesh extension of the graph operator, following MM-PDE
+\citep{Hu2024}, was tested once as an additional experiment. It is not
+part of the framework and is reported in~\S\ref{sec:experiments:mesh},
+with its design in Appendix~\ref{app:mm-pde}.
 
 % Figure: images/fig_method_pipeline.tex (TikZ, drafted 2026-10-18). Only the
 % update loop is drawn; precomputation (Chapter 3) and the moving-mesh path

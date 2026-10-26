@@ -59,9 +59,10 @@ second.
 
 Several other changes did not improve the forecast. Larger models did not
 help in any of the four classes tested, and neither did a penalty against
-lesion shrinkage. The moving-mesh extension, reported in
-Appendix~\ref{app:mm-pde}, did not improve accuracy, because its
-correction branch never engaged. The validity diagnostics also restrict
+lesion shrinkage. A single experiment with an adaptive moving mesh
+(\S\ref{sec:experiments:mesh}) gave no measurable gain: its adaptive branch
+never engaged, and the mesh, by gathering nodes at the border, reduces the
+reach the operators need. The validity diagnostics also restrict
 how the canonical model may be described: it is a one-step map conditioned
 on the step length and does not behave as a continuous-time model. A model
 that does behave as one, the energy-conserving T-FEN, can be trained, but

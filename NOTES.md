@@ -2075,7 +2075,7 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
   Courant1928 C175 (§6.1.2, reworded) checked by hand, quote PASS / scan as before; the §6.3 Mai citation was removed
   with the FAF hedge. **Chapters 4-7 worklist: every supervisor item done or decided, except SV-4.2 (author TODO) and
   SV-5.12 (question to the supervisor).**
-- [ ] **Reply mail (2026-10-20): ask the supervisor about SV-5.12** -- is the post-hoc step-size ladder (trained
+- [x] (2026-10-26: supervisor confirmed, "exactly what I had in mind": finer time steps at inference) **Reply mail (2026-10-20): ask the supervisor about SV-5.12** -- is the post-hoc step-size ladder (trained
   networks re-evaluated with fixed steps h = 1 ... 1/32 year, no retraining; three networks, folds 0-2) what he
   meant, or did he want networks trained at different step sizes?
 - [x] (2026-10-19: in §6.1.2, "More reach does not keep helping") TODO (inline in §6.1, author 2026-10-19): discuss why more message-passing rounds or more reach stop
@@ -2090,7 +2090,7 @@ e-mail points E1-E6, cross-cutting X1-X8, the open AI structure items, 263 open 
   The conclusion "no width step raises a class" holds; check that "the smaller versions lost little" still fits.
 - [x] (stale, checked 2026-10-20: the redraw of 2026-10-17 already uses µm in the figure and the caption)
   Fig. 4.2 caption still gives distances in mm, while §4.3.3 now uses µm (X4).
-- [ ] TODO (SV-4.2, inline in §4.1): reconsider whether the moving-mesh result goes into the main text as a
+- [x] (2026-10-26: resolved, see the 2026-10-26 entry at the end) TODO (SV-4.2, inline in §4.1): reconsider whether the moving-mesh result goes into the main text as a
   negative result. Author 2026-10-17: not convinced (argumentation still loose; on the dilated stencil only one
   fold-2 dual run exists, no bypass control; the 5-fold dual/bypass arms are on the k-NN graph; it would take
   defence time).
@@ -2433,7 +2433,7 @@ at a time, as dictated by the author.
   `26WS-K52001455-Wiedner_Christian-Thesis_MSc-v1-GA_Progression_Prediction.pdf`. Copy the final
   PDF/A build to this name at hand-in (the build keeps producing `main-thesis.pdf`). Short title to be
   confirmed by the author.
-- [ ] Reply mail to the supervisor, remaining points: how MUW assigned the fold split files; SV-4.2
+- [x] (2026-10-26: answered except the title, see the 2026-10-26 entry) Reply mail to the supervisor, remaining points: how MUW assigned the fold split files; SV-4.2
   (moving mesh into the main text?); SV-5.12 (post-hoc step-size ladder enough?); final thesis title.
   2026-10-23: the author's draft mail to Dmitrii (with the current PDF) asks the first three; the final
   title is not in it (raise it with Hrvoje on Monday, or add it to the mail).
@@ -3241,3 +3241,30 @@ External references introduced inline in the LaTeX drafts that still need to be 
   is editing, or pointing LaTeX Workshop at its own `outDir`.
 - [x] 2026-05-02: switched the biblatex configuration in `main-thesis.tex` from `style=ACM-Reference-Format,citestyle=numeric` to `style=authoryear,natbib=true` so that the natbib-style commands `\citet` / `\citep` mandated by `CLAUDE.md` produce author-year output. Other biblatex options (`backend=biber`, `sortcites=true`, `maxcitenames=2`) preserved.
 - [ ] TODO: confirm with supervisor that the JKU technical-report template tolerates the author-year deviation from the bundled ACM numeric default; if not, a one-line revert restores the original style.
+
+### Supervisor reply and adaptive-mesh section (2026-10-26)
+
+- [x] Supervisor reply (D. Lachinov, 2026-10-26): (1) MM-PDE in the appendix is fine, moving parts into the main
+  text is up to the author; (2) the post-hoc step-size test is what he meant; (3) patients were assigned to the
+  folds at random, stratified by quartiles of the per-patient mean GA area over all visits.
+- [x] Folds: §3.7 now states the random, area-stratified assignment; §5.5 replaces "without a recorded
+  criterion" by "at random, stratified by lesion area". Source comment in both places. Closes item (ii) of the
+  fold-section TODO.
+- [x] SV-4.2 resolved (author): new §5.7 "Additional Experiment: Adaptive Meshes" (`sec:experiments:mesh`),
+  a self-contained section after Negative Results: what adaptive meshes are for, the data-free mesh mover, the
+  dual-branch graph architecture with its two learned interpolations and the gate, the bypass control, the moved
+  mesh (Figure `fig:experiments:moved-mesh`, moved from Appendix E) and the result (Table
+  `tab:experiments:mesh`, parameters relative to the single branch because the earlier k-NN version differs from
+  Table 5.1). Validity Diagnostics and later sections renumber to 5.8-5.11. Appendix E keeps background, design,
+  mesh quality, the detailed result (now "Details of the Result": z values, gate trajectories, the three fold-2
+  variants, pre-registration, scope) and the outlook; its reach paragraph moved to §6.1.2 as the reason the
+  experiment was not developed further (author: argued from the construction of the mesh). Pointers updated in
+  §1.3 bullet, §1.4 outline, §4.1, the Ch. 5 opener, §6.1.6, §6.3 and Ch. 7, each calling it a single experiment.
+  Build clean, no undefined references, 131 pages.
+- [ ] Ledger: new citations in §5.7 to check (Phase 4): Hu2024 (several), HuangRussell2011 (moving-mesh methods;
+  book not on disk, PENDING), Pfaff2021 + Hu2024 for "graph networks are commonly used to learn solutions on
+  adapted meshes" (Pfaff2021 intro: state encoded into a graph, adaptive remeshing; Hu2024 Sec. 2: "Many works
+  employ graph neural networks to learn solutions on generated meshes"). Also the reworded Hu2024 sentence in §4.1.
+- [x] 2026-10-26 abstract (EN/DE) wording changes by the author: framework/operator sentence, "autoregressive
+  curriculum", German "Tiefenprofile", German mask and comparison clauses shortened. Also §2.5.1 first word,
+  Ch. 3 opener ("images and maps recorded at each visit"), Table 3.2 placed after the first paragraph of §3.7.

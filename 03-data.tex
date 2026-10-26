@@ -6,9 +6,9 @@
 
 This chapter describes the data on which every operator in this thesis is
 trained and evaluated. Section~\ref{sec:data:dataset} introduces the MUW
-cohort: its eyes and patients, the files each visit provides and the
-origin of the lesion mask. Section~\ref{sec:data:state} defines the
-eleven-channel state tensor built from these files, and
+cohort: its eyes and patients, the images and maps recorded at each visit
+and the origin of the lesion mask. Section~\ref{sec:data:state} defines the
+eleven-channel state tensor built from these maps, and
 Section~\ref{sec:data:spatial} explains how native grids of different
 sizes are brought to one common grid and what this costs.
 Sections~\ref{sec:data:normalization} and~\ref{sec:data:covariates}
@@ -446,25 +446,18 @@ The evaluation protocol is defined in~\S\ref{sec:experiments:protocol}.
 \label{sec:data:splits}
 
 The data is partitioned into five folds for a patient-level
-cross-validation. The five validation sets do not overlap, and together
+cross-validation. The folds come from split files supplied with the data,
+in which patients were assigned at random, stratified by quartiles of
+their mean GA area over all visits.
+% Source: e-mail from D. Lachinov, 2026-10-26 (random assignment, strata =
+% quartiles of the per-patient mean lesion area over all visits).
+The five validation sets do not overlap, and together
 they cover all patients. The folds are defined on patient identifiers, so
 both eyes of a patient always fall into the same partition. This prevents leakage
 between the eyes of one patient, which matters because GA is frequently
 bilateral (39\,\% of the patients in one OCT cohort;
 \citealp{Yehoshua2011}) and the two eyes of a patient show a high degree
 of concordance \citep{Boyer2017}.
-
-The per-fold counts are uneven because patients contribute one or two
-eyes; Table~\ref{tab:data:splits} lists them. The folds also differ in
-baseline lesion size. The median baseline lesion area is about
-4.1\,mm$^2$ on fold~4, against 6.0 to 7.9\,mm$^2$ on the other four folds.
-This heterogeneity is one reason why arms are compared fold by fold
-(\S\ref{sec:experiments:protocol}). The table also gives the number of
-windows, pairs of consecutive visits, in each partition.
-% Window counts (2026-10-22): sum over the partition's eyes of (visits - 1),
-% from masterthesis-docker/data/MUW_GA/scans and splits/split_*.json; fold 2
-% reproduces the recorded 378 / 100, and the validation counts of folds 0-2
-% match the step-ladder intervals (135 / 65 / 100). Total 478 = 553 - 75.
 
 \begin{table}[h]
   \centering
@@ -488,6 +481,18 @@ windows, pairs of consecutive visits, in each partition.
     \bottomrule
   \end{tabular}
 \end{table}
+
+The per-fold counts are uneven because patients contribute one or two
+eyes; Table~\ref{tab:data:splits} lists them. The folds also differ in
+baseline lesion size. The median baseline lesion area is about
+4.1\,mm$^2$ on fold~4, against 6.0 to 7.9\,mm$^2$ on the other four folds.
+This heterogeneity is one reason why arms are compared fold by fold
+(\S\ref{sec:experiments:protocol}). The table also gives the number of
+windows, pairs of consecutive visits, in each partition.
+% Window counts (2026-10-22): sum over the partition's eyes of (visits - 1),
+% from masterthesis-docker/data/MUW_GA/scans and splits/split_*.json; fold 2
+% reproduces the recorded 378 / 100, and the validation counts of folds 0-2
+% match the step-ladder intervals (135 / 65 / 100). Total 478 = 553 - 75.
 
 No separate test set is held out. With 75 eyes from 51 patients, a
 held-out test set would leave too few eyes both for training and for a

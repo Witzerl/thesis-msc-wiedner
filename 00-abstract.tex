@@ -60,11 +60,11 @@ degeneration, manifested as a gradual and irreversible loss of retinal
 tissue. A forecast of where and how fast the lesion of an individual eye
 will grow would support patient management, but it is difficult to model:
 patterns and rates of progression vary widely between patients, visits are
-irregularly spaced, and cohorts are small. This thesis studies GA
-progression from the perspective of computational modelling and asks what
-kind of framework a forecast from longitudinal optical coherence tomography
-(OCT) needs around the model, and what kind of operator, the learned map
-from one visit to the next, it needs inside it. It contributes a framework for irregular visit
+irregularly spaced, and cohorts are small. This thesis explores GA
+progression through computational modelling, investigating the framework
+required to forecast from longitudinal optical coherence tomography (OCT)
+data, as well as the optimal operator for mapping the disease state between
+visits. It contributes a framework for irregular visit
 schedules in which models of any architecture class are trained and
 evaluated alike, and a controlled comparison of such
 models for GA. Among operators with spatial context, the score depends
@@ -77,7 +77,7 @@ scan by a binary GA mask, annotated by graders, and the depth maps of ten
 segmented retinal layer boundaries. The framework predicts this state at the
 next visit as the current state plus an update scaled by the time
 $\Delta t$ between visits, and trains all models with one loss and one
-curriculum, partly on their own earlier predictions. The operator was filled in turn with graph
+autoregressive curriculum. The operator was filled in turn with graph
 neural networks, a U-Net, Fourier Neural Operators and Finite Element
 Networks at similar parameter counts. All models were compared by
 patient-level five-fold cross-validation on the change-region Dice, the overlap between predicted and true lesion change one
@@ -126,14 +126,13 @@ jedoch anspruchsvoll: Verlaufsmuster und Wachstumsgeschwindigkeit
 unterscheiden sich stark von Patient zu Patient, die Kontrolluntersuchungen
 erfolgen in unregelmäßigen Abständen, und die verfügbaren Kohorten sind
 klein. Die vorliegende Arbeit betrachtet die GA-Progression aus der
-Perspektive des Computational Modelling und fragt, welche Art von Framework
-eine Vorhersage auf Basis longitudinaler optischer Kohärenztomographie (OCT)
-um das Modell herum benötigt und welche Art von Operator, also welche
-gelernte Abbildung von einer Untersuchung zur nächsten, darin. Dazu wird ein
-Framework für unregelmäßige Untersuchungsintervalle entwickelt, in dem sich
-Modelle unterschiedlicher Architekturklassen unter identischen Bedingungen
-trainieren und vergleichen lassen, und darin ein kontrollierter Vergleich
-solcher Modelle durchgeführt. Unter den Operatoren mit räumlichem Kontext
+Perspektive des Computational Modelling und untersucht, welches Framework
+für Vorhersagen auf Basis longitudinaler optischer Kohärenztomographie (OCT)
+erforderlich ist und welcher Operator sich am besten eignet, um den
+Krankheitszustand von einer Untersuchung zur nächsten abzubilden. Dazu wird
+ein Framework für unregelmäßige Untersuchungsintervalle entwickelt, in dem
+sich Modelle unterschiedlicher Architekturklassen unter identischen
+Bedingungen trainieren und vergleichen lassen. Unter den Operatoren mit räumlichem Kontext
 hängt das Ergebnis vor allem davon ab, ob ein einzelner Vorhersageschritt so
 weit reicht, wie sich der Läsionsrand zwischen zwei Untersuchungen
 verschiebt.
@@ -141,13 +140,13 @@ verschiebt.
 Datengrundlage sind 75 Augen von 51 Patientinnen und Patienten der
 Medizinischen Universität Wien mit insgesamt 553 Untersuchungen und einer
 Nachbeobachtungszeit von im Median drei Jahren. Jede Untersuchung wird auf
-dem En-face-Raster der OCT durch eine binäre, von Befundenden manuell
-eingezeichnete GA-Maske sowie durch Tiefenkarten von zehn segmentierten
+dem En-face-Raster der OCT durch eine binäre GA-Maske sowie durch
+Tiefenprofile von zehn segmentierten
 Netzhautschichtgrenzen beschrieben. Das Framework berechnet den Zustand bei
 der nächsten Untersuchung, indem es zum aktuellen Zustand eine mit dem
 zeitlichen Abstand $\Delta t$ skalierte Änderung addiert. Alle Modelle werden
-mit derselben Loss-Funktion und demselben Curriculum trainiert. Im Curriculum
-erhalten sie teilweise ihre eigenen früheren Vorhersagen als Eingabe. Als
+mit derselben Loss-Funktion und demselben autoregressiven Curriculum
+trainiert. Als
 Operator kamen Graph Neural Networks, ein U-Net, Fourier Neural Operators und
 Finite-Elemente-Netzwerke mit vergleichbarer Parameterzahl zum Einsatz. Die
 Evaluation erfolgte mittels Five-Fold Cross-Validation mit patientenbasierter

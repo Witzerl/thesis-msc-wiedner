@@ -627,17 +627,15 @@ behind each arm; the five folds are the runs \texttt{<name>\_f0} to
 % review 2026-10-01, file 09b-appendix-G.md, items G.1-G.42 and the flow
 % notes). Facts and numbers unchanged; sources as listed in the comments.
 
-This appendix reports the moving-mesh extension of~\citet{Hu2024} as an
-additional experiment. It tests whether adapting the mesh to the lesion
-gives a measurable benefit for a disease that changes as slowly as GA.
+This appendix gives the background and the full design of the experiment
+with adaptive meshes of~\S\ref{sec:experiments:mesh}, which extends the
+graph network by the moving-mesh solver of~\citet{Hu2024}. The main text
+states the idea and the result; the details are collected here.
 Section~\ref{app:mm-pde:background} summarises the original method,
 \S\ref{app:mm-pde:extension} its adaptation to GA,
 \S\ref{app:mm-pde:mesh-quality} the quality of the meshes,
-\S\ref{app:mm-pde:result} the result and \S\ref{app:mm-pde:outlook} an
-outlook. The extension was built in full and evaluated on five folds. It
-gave no measurable gain over the uniform grid. The method also had to be
-modified considerably for GA, and it may not suit the present setup well.
-For these reasons it is reported here and not in the main text.
+\S\ref{app:mm-pde:result} further details of the result and
+\S\ref{app:mm-pde:outlook} an outlook.
 
 \section{Background: MM-PDE}
 \label{app:mm-pde:background}
@@ -758,7 +756,7 @@ configuration of the $k$-nearest-neighbour graph network as their
 branches, which aggregates the messages of the neighbours by their mean
 and their maximum ($75\,339$ parameters, against $67\,147$ for the $k$-NN
 arm of Table~\ref{tab:experiments:arms}); their scores are therefore
-compared only with each other (\S\ref{app:mm-pde:result}). The mesh mover pulls nodes together where the
+compared only with each other (\S\ref{sec:experiments:mesh}). The mesh mover pulls nodes together where the
 lesion border lies, to raise the resolution there, and the correction
 branch has to exchange messages between exactly these close nodes. A
 dilated stencil, which skips the nearest nodes in order to reach further,
@@ -854,7 +852,7 @@ also fitted to masks of later visits of the validation eyes, but only to
 mesh each mask, never to relate one visit to the next. At use, it receives
 the current mask only, and it is frozen while the solver is trained. Any
 advantage from this would favour the dual branch, which still shows no
-gain (\S\ref{app:mm-pde:result}). A held-out set of masks is
+gain (\S\ref{sec:experiments:mesh}). A held-out set of masks is
 not needed either, because the mesh mover is not a predictor whose accuracy
 on new data is in question. A classical mesh mover computes the mesh for
 each mask directly, by solving the Monge--Amp\`ere equation for that mask,
@@ -1043,80 +1041,30 @@ which edge gain does not penalise.
 % said the weight was rejected on a lesion-specificity check computed only on
 % the biased head-16 pool; head-16 difference was +0.029.
 
-Figure~\ref{fig:appendix:moved-mesh} shows the moved mesh for three eyes
-with a small, a medium and a large lesion. In all three, nodes move from
-the surrounding retina towards the lesion, most strongly at its border, and
-no cell folds. The mesh mover thus produces valid meshes that concentrate
-nodes at the lesion border, and a defective mesh does not explain the
-result of~\S\ref{app:mm-pde:result}.
+Figure~\ref{fig:experiments:moved-mesh} in the main text shows the moved
+mesh for three eyes with a small, a medium and a large lesion. In all
+three, nodes move from the surrounding retina towards the lesion, most
+strongly at its border, and no cell folds. The mesh mover thus produces
+valid meshes that concentrate nodes at the lesion border, and a defective
+mesh does not explain the result of~\S\ref{sec:experiments:mesh}.
+% 2026-10-26: the figure moved to Section 5.7 (sec:experiments:mesh).
 
-% Figure: images/scripts/fig_appendix_moved_mesh.py (checkpoint
-% GA_NAT_O512x2_S1, seed 42, epoch 500; edge gain and folded cells computed
-% with the code repo's dmm_metrics). Eye rule fixed before drawing: lower
-% quartile, median and upper quartile of baseline lesion area among the 16
-% validation eyes of fold 2 (PEAT0058_OS, PEA00034_OS, GX511424_OS).
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=\textwidth]{images/fig_appendix_moved_mesh.png}
-  \caption[Moved meshes of three representative eyes.]{%
-    Meshes of the canonical mesh mover (seed 42, epoch 500) for the
-    baseline masks of three validation eyes of fold~2, drawn over the GA
-    lesion at the physical aspect ratio of the $5.94 \times 5.82$\,mm
-    window. Top row: the uniform $49 \times 1024$ grid; bottom row: the
-    moved mesh for the same mask. All 49 rows and every 21st column, plus
-    the last, are drawn, so every drawn node is a grid node and a drawn
-    cell measures about $0.12 \times 0.12$\,mm. The eyes are the lower
-    quartile, the median and the upper quartile of baseline lesion area
-    among the 16 validation eyes of fold~2: (a)~1.95\,mm$^2$,
-    (b)~7.79\,mm$^2$, (c)~10.24\,mm$^2$. Their edge gain is 2.65, 3.07 and
-    2.01 (1 for the uniform grid), and no cell of the three meshes is
-    folded. The meshes are in-sample, because the mesh mover was trained on
-    478 masks of the cohort, these three included. The hatched strip at
-    the bottom of (c) is a zero-padded row.}
-  \label{fig:appendix:moved-mesh}
-\end{figure}
-
-\section{Result}
+\section{Details of the Result}
 \label{app:mm-pde:result}
 
-The single-branch model, the dual-branch model and the bypass control were
-compared over the five folds at seed 42, with the evaluation protocol of
-the main text (\S\ref{sec:experiments:protocol:stats}) and the criteria
-of~\S\ref{app:full-results:criteria}. All three arms use the earlier
-$k$-NN configuration of~\S\ref{app:mm-pde}, not the dilated stencil.
-Table~\ref{tab:appendix:dual-result} lists the arms.
-
-\begin{table}[t]
-  \centering
-  \caption[Single branch, dual branch and bypass control.]{%
-    Change-region Dice at the one-year anchor, mean $\pm$ sd over the five
-    folds, seed 42. All arms use the earlier $k$-nearest-neighbour
-    configuration of~\S\ref{app:mm-pde} (mean and maximum aggregation), not
-    the dilated stencil. Cost is the minimum epoch time over
-    the folds and supports order-of-magnitude statements only.}
-  \label{tab:appendix:dual-result}
-  \small
-  \begin{tabular}{l c r r}
-    \toprule
-    Arm & Dice & Parameters & Epoch time \\
-    \midrule
-    Single branch & $0.4515 \pm 0.0429$ & $75\,339$ & 75\,s \\
-    Dual branch (moving mesh) & $0.4501 \pm 0.0326$ & $175\,663$ & 759\,s \\
-    Bypass control (uniform grid) & $0.4503 \pm 0.0324$
-      & $175\,663$ & 718\,s \\
-    \bottomrule
-  \end{tabular}
-\end{table}
-% Values: THESIS_FRAMEWORK.md section 5.1 and 7.5 (T4); epoch times from the
-% arm table of PROJECT_CONTEXT.md section 6.
-
-The dual branch gives no measurable gain. It is lower than the bypass
-control by 0.0001 on average ($z = 0.0$), higher on three of the five folds
-and on 33 of the 75 eyes, and lower than the single branch by 0.0013
-($z = -0.2$), higher on three folds and on 32 eyes. Both differences lie
-far within the noise level of~\S\ref{sec:experiments:protocol:stats}. The
-dual branch costs about ten times the training time per epoch of the
-single branch.
+The main result, the comparison of the single-branch model, the
+dual-branch model and the bypass control, is given
+in~\S\ref{sec:experiments:mesh} (Table~\ref{tab:experiments:mesh}). All
+three use the earlier $k$-NN configuration of~\S\ref{app:mm-pde:extension},
+with 75\,339 parameters for the single branch and 175\,663 for the two
+two-branch models. With the statistics of~\S\ref{app:full-results:criteria},
+the dual branch is lower than the bypass control by 0.0001 on average
+($z = 0.0$), higher on three of the five folds and on 33 of the 75 eyes,
+and lower than the single branch by 0.0013 ($z = -0.2$), higher on three
+folds and on 32 eyes.
+% 2026-10-26: table and main numbers moved to Section 5.7; the table values
+% are THESIS_FRAMEWORK.md section 5.1 and 7.5 (T4), epoch times from the arm
+% table of PROJECT_CONTEXT.md section 6.
 % 2026-10-22 (tablet review v8 #148): reported in the words of Chapter 5.
 % Statistics: dual - bypass -0.0001 +/- 0.0060 SE (3/5), per eye
 % +0.0001 +/- 0.0038 (33/75); dual - single -0.0013 +/- 0.0086 SE (3/5), per
@@ -1168,23 +1116,9 @@ gave no measurable gain at about ten times the cost. \citet{Hu2024}
 report that their dual branch improves on the uniform grid on their
 benchmarks.
 
-One possible contributing reason, not tested here, lies in reach
-(\S\ref{sec:experiments:ingredients:reach}).
-The mesh mover pulls nodes towards the current lesion border, so the moved
-mesh resolves the border more finely, and one message-passing step on it
-reaches even less far than on the uniform grid. The GA front, however,
-advances a median of 12 and, at the 90th percentile, 23 columns between
-two visits
-(\S\ref{sec:method:graph}), and the new atrophy appears beyond the current
-border. A correction branch that sees the border in finer detail but over
-a shorter distance therefore adds little that the uniform branch does not
-already provide, which is consistent with a gate that stays shut. Reach
-does not explain the bypass control, whose correction branch has the same
-reach as the uniform branch and whose gate also stays shut; a second
-branch that sees the same information as the first adds little in either
-case. With the dilated stencil, the uniform branch reaches the front on
-its own, and in the one fold-2 run the dual model did not improve on its
-single-branch counterpart.
+Why the experiment was not developed further, with reach as the main
+reason, is discussed in~\S\ref{sec:discussion:operator}.
+% 2026-10-26: the reach paragraph moved to Section 6.1.2.
 
 The result therefore concerns this method on this task. One dual-branch
 design, without the residual cut of the original and adapted to a slowly

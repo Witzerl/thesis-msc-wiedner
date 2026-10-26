@@ -163,6 +163,28 @@ may bring in tissue unrelated to the next visit's change.
 % Resolves the TODO of 2026-10-19 (author) on why more rounds or more reach
 % stop helping.
 
+The same property explains why the experiment with adaptive meshes
+(\S\ref{sec:experiments:mesh}) was not developed further. The dilated
+stencil was introduced so that one update reaches further along the
+direction in which the front moves. The adaptive mesh does the opposite.
+The mesh mover gathers nodes at the current lesion border so that the
+second branch sees the border in finer detail. By construction, one
+message-passing step on the moved mesh then reaches less far than on the
+uniform grid. Yet the front advances a median of 12 and, at the 90th
+percentile, 23 columns between visits (\S\ref{sec:method:graph}), and new
+atrophy appears outside the current border. A second branch adds something
+only if it sees what the first one does not. On the moved mesh it sees
+more detail over a shorter distance; in the bypass control it sees the
+same as the uniform branch. In neither case did its gate open.
+Concentrating nodes and reaching far work against each other, and with the
+dilated stencil the uniform branch already reaches the front on its own.
+The extension also more than doubles the trainable parameters, adds a
+frozen mesh mover and takes about ten times as long to train, for no
+measurable gain. Finally, a moving mesh is not available to the
+regular-grid operators, the U-Net and the FNO.
+% 2026-10-26 (author): moved here from Appendix E.4; reach as the main
+% reason, argued from the construction of the mesh.
+
 Global context behaves differently. The FNO sees the whole grid in every
 layer but lies below the U-Net at one year, beyond the noise level at one
 of the two seeds. Beyond three years it lies above the U-Net
@@ -248,8 +270,9 @@ Among operators with spatial context, the largest effects came from two
 changes to the operator: extending the reach of one update along the direction in which
 the front moves, and adding a mechanism that transports the state. Larger
 models, a higher integration order, a penalty against lesion shrinkage and
-the moving-mesh extension of Appendix~\ref{app:mm-pde}, whose correction
-branch never engaged, did not improve accuracy at the available precision.
+the single experiment with adaptive meshes (\S\ref{sec:experiments:mesh}),
+whose adaptive branch never engaged, did not improve accuracy at the
+available precision.
 In the framework, the objective decided whether the model learned any
 change at all. For a new disease-forecasting task of this kind, two
 questions therefore come first: whether the loss puts enough weight on the
@@ -435,13 +458,10 @@ volume.
 Two directions lie outside the survey. Physics-informed neural networks
 were deliberately not run, because the governing equation is unknown and
 the equation residual would have to be taken on a binary mask. The second
-is mesh adaptation: all operators work on the uniform $49 \times 1024$
-grid. Adapting the mesh
-to the lesion, so that grid points concentrate where the front moves, might
-help, but it excludes the operators that need a regular grid, such as the
-U-Net and the FNO. A moving-mesh extension of the graph network was tested
-as one additional experiment (Appendix~\ref{app:mm-pde}); no conclusion
-about mesh adaptation is drawn from it.
+is mesh adaptation: all operators of the comparison work on the uniform
+$49 \times 1024$ grid. Mesh adaptation was tried only in the single
+experiment of~\S\ref{sec:experiments:mesh}, so no general conclusion about
+it is drawn.
 
 % Paragraph "Unfinished replications" removed 2026-10-01 (author review v5
 % #10). The last pending runs (T-FEN capacity in skew form) are in since
