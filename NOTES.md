@@ -3289,4 +3289,13 @@ External references introduced inline in the LaTeX drafts that still need to be 
   require removing the transparency from figures, i.e. changing pixels.
 - [x] 2026-10-28 (author) Saved as **v2**: `builds/...-Thesis_MSc-v2-GA_Progression_Prediction.pdf` is the keyword-free,
   PDF/A-2b file; the v1 file in `builds/` is restored to the 2026-10-26 upload (commit b43841f).
+- [x] 2026-10-28 **v2 is now PDF/A-1b.** The IML hand-in roadmap lists the PAS file rules as "digitally processable
+  text, not encrypted, PDF/A (ISO 19005-1)", i.e. PDF/A-1. Five figures use transparency, which PDF/A-1 forbids:
+  pp. 17, 24, 84, 112 now use the equivalent solid colours (vector, at most a few colour levels different where shapes
+  overlap), p. 87 (Fig. 5.10) is a 1200 dpi image of its original appearance with an invisible text layer. Plus CIDSets
+  for the figure fonts, Info/XMP CreationDate match, sRGB output intent, PDF 1.4 with a classic xref table. veraPDF
+  PDF/A-1b PASS; extracted text identical to v1; 127 of 132 pages pixel-identical to v1 (cover: only the keywords);
+  side-by-side of the five pages checked by the author ("the same"). Scripts and steps: `builds/pdfa/`. The source
+  still declares PDF/A-2b (a PDF/A-1b build from source would need those figures without transparency). The story
+  summary in Appendix A asked for by the IML document is deliberately not added (author).
 - [ ] Author to re-upload `builds/26WS-K52001455-Wiedner_Christian-Thesis_MSc-v2-GA_Progression_Prediction.pdf`.
