@@ -3299,3 +3299,4 @@ External references introduced inline in the LaTeX drafts that still need to be 
   still declares PDF/A-2b (a PDF/A-1b build from source would need those figures without transparency). The story
   summary in Appendix A asked for by the IML document is deliberately not added (author).
 - [ ] Author to re-upload `builds/26WS-K52001455-Wiedner_Christian-Thesis_MSc-v2-GA_Progression_Prediction.pdf`.
+  Form entries of the first submission (receipt AFS-4723-210904-261026, 26.10.2026): `builds/PAS_submission_form.md`.
