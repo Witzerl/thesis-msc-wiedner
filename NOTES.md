@@ -2430,7 +2430,7 @@ at a time, as dictated by the author.
 - [ ] **Hand-in file name** (institute convention:
   `<year-semester>-<Matriculation_number>-<Lastname>_<Firstname>-<report>-<version>-<short title>.pdf`,
   hand-in semester, version counting from v1, short title at most three words):
-  `26WS-K52001455-Wiedner_Christian-Thesis_MSc-v1-GA_Progression_Prediction.pdf`. Copy the final
+  `26WS-K52001455-Wiedner_Christian-Thesis_MSc-v1-GA_Progression_Prediction.pdf` (v2 since 2026-10-28). Copy the final
   PDF/A build to this name at hand-in (the build keeps producing `main-thesis.pdf`). Short title to be
   confirmed by the author.
 - [x] (2026-10-26: answered except the title, see the 2026-10-26 entry) Reply mail to the supervisor, remaining points: how MUW assigned the fold split files; SV-4.2
@@ -3287,5 +3287,6 @@ External references introduced inline in the LaTeX drafts that still need to be 
   the container (TeX Live 2023): builds before and after the change have byte-identical page content streams and
   render pixel-identically on all 132 pages, and the new build passes PDF/A-2b. PDF/A-1b was not pursued: it would
   require removing the transparency from figures, i.e. changing pixels.
-- [ ] Author to re-upload `builds/26WS-K52001455-Wiedner_Christian-Thesis_MSc-v1-GA_Progression_Prediction.pdf`
-  (now keyword-free and valid PDF/A-2b).
+- [x] 2026-10-28 (author) Saved as **v2**: `builds/...-Thesis_MSc-v2-GA_Progression_Prediction.pdf` is the keyword-free,
+  PDF/A-2b file; the v1 file in `builds/` is restored to the 2026-10-26 upload (commit b43841f).
+- [ ] Author to re-upload `builds/26WS-K52001455-Wiedner_Christian-Thesis_MSc-v2-GA_Progression_Prediction.pdf`.
