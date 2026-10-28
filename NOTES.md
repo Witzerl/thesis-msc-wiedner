@@ -3276,4 +3276,16 @@ External references introduced inline in the LaTeX drafts that still need to be 
   the keyword block were removed from page 1's content stream (pikepdf). Checked at 150 dpi: pages 2-132 pixel- and
   content-stream-identical, page 1 differs only in the keyword area, which now matches the cover of the rebuilt source;
   XMP (PDF/A) and document info byte-identical. A local `latexmk` build with TeX Live 2026 should give the same PDF.
-- [ ] Author to re-upload `builds/26WS-K52001455-Wiedner_Christian-Thesis_MSc-v1-GA_Progression_Prediction.pdf`.
+- [x] 2026-10-28 **PDF/A:** veraPDF 1.28.2 showed that the hand-in PDF was never valid PDF/A: it claims PDF/A-1b
+  (template setting `pdfapart=1` in `jkureport.sty`) but failed 10 rules, mainly the missing output intent (colour
+  profile), plus PDF/A-1-only rules (transparency in figures and the cover graphic, CIDSet, xref streams, date
+  mismatch). Fix, metadata only: PDF/A-2b claim and an sRGB output intent (TeX Live `colorprofiles/sRGB.icc`).
+  (i) Hand-in PDF in `builds/`: applied to the keyword-free 2026-10-26 build with pikepdf; veraPDF PDF/A-2b PASS,
+  0 failed rules; pages 2-132 pixel-identical to the 2026-10-26 build, page 1 differs only in the keyword area,
+  extracted text identical; all 44 fonts embedded with ToUnicode (text selectable). (ii) Source: `main-thesis.tex`
+  now sets `\hypersetup{pdfapart=2}` and attaches the output intent via `\AtBeginShipoutFirst` specials. Checked in
+  the container (TeX Live 2023): builds before and after the change have byte-identical page content streams and
+  render pixel-identically on all 132 pages, and the new build passes PDF/A-2b. PDF/A-1b was not pursued: it would
+  require removing the transparency from figures, i.e. changing pixels.
+- [ ] Author to re-upload `builds/26WS-K52001455-Wiedner_Christian-Thesis_MSc-v1-GA_Progression_Prediction.pdf`
+  (now keyword-free and valid PDF/A-2b).

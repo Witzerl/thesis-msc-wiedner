@@ -86,6 +86,18 @@
 %% 
 \usepackage[mathesis,fancyfonts]{jkureport}
 \usepackage{style/thesis-colors} % figure/table colours, see style/README.md
+%% PDF/A-2b instead of the template's PDF/A-1b claim (2026-10-28): the PDF has to
+%% validate for the hand-in, and PDF/A-1 forbids the transparency in some figures.
+%% PDF/A-2 needs an output intent, so an sRGB profile (TeX Live: colorprofiles)
+%% is attached to the catalogue. Metadata only: no page content or layout changes.
+\hypersetup{pdfapart=2}
+\RequirePackage{atbegshi}
+\AtBeginShipoutFirst{%
+  \special{pdf:fstream @thesissrgb (sRGB.icc) <</N 3>>}%
+  \special{pdf:put @catalog <</OutputIntents [<</Type /OutputIntent /S /GTS_PDFA1
+    /DestOutputProfile @thesissrgb /OutputConditionIdentifier (sRGB IEC61966-2.1)
+    /Info (sRGB IEC61966-2.1) /RegistryName (http://www.color.org)>>]>>}%
+}
 %% 
 %% The comma-separated list in square brackets are theme options. Useful options that you
 %% might want to use:
