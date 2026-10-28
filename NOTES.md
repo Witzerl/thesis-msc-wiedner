@@ -3268,3 +3268,8 @@ External references introduced inline in the LaTeX drafts that still need to be 
 - [x] 2026-10-26 abstract (EN/DE) wording changes by the author: framework/operator sentence, "autoregressive
   curriculum", German "Tiefenprofile", German mask and comparison clauses shortened. Also §2.5.1 first word,
   Ch. 3 opener ("images and maps recorded at each visit"), Table 3.2 placed after the first paragraph of §3.7.
+- [x] 2026-10-28 Examinations office (M. Schimbäck, Team TN) asked for the keywords to be removed from the cover page
+  before re-upload. `\keywords{...}` in `main-thesis.tex` replaced by `\hypersetup{pdfkeywords=...}`, so the keywords
+  stay in the PDF metadata only. Hand-in PDF in `builds/` rebuilt (same name, v1; 132 pages, text and fonts identical
+  to the 2026-10-26 build apart from the cover page). Built in the cloud container with TeX Live 2023.
+- [ ] Author to re-upload `builds/26WS-K52001455-Wiedner_Christian-Thesis_MSc-v1-GA_Progression_Prediction.pdf`.
