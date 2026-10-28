@@ -43,4 +43,4 @@ AFS-4723-210904-261026, 26.10.2026, 19:54:14). Reuse them for every re-upload; o
 | Date | File | Note |
 |---|---|---|
 | 2026-10-26 19:54 | v1 | Receipt AFS-4723-210904-261026. PAS (M. Schimbäck, Team TN) asked on 2026-10-28 to remove the keywords from the cover page and re-upload. |
-| 2026-10-28 | v2 | `26WS-K52001455-Wiedner_Christian-Thesis_MSc-v2-GA_Progression_Prediction.pdf`: no cover keywords, PDF/A-1b. Submitted via the form (receipt number: to add). New entries this time: German title, keywords (DE/EN), abstract EN blocks 1-3 and Kurzfassung DE blocks 1-3. |
+| 2026-10-28 | v2 | `26WS-K52001455-Wiedner_Christian-Thesis_MSc-v2-GA_Progression_Prediction.pdf`: no cover keywords, PDF/A-1b. Submitted 28.10.2026, 13:30:15, receipt AFS-4723-210965-261028. New entries this time: German title, keywords (DE/EN), abstract EN blocks 1-3 and Kurzfassung DE blocks 1-3. |
