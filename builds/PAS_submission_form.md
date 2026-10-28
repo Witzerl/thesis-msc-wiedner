@@ -20,6 +20,11 @@ AFS-4723-210904-261026, 26.10.2026, 19:54:14). Reuse them for every re-upload; o
 | Typ der wissenschaftlichen Arbeit | Masterarbeit |
 | **Allgemeine Informationen** | |
 | Titel der Arbeit | Neural PDE Solvers for Geographic Atrophy Progression Prediction from Longitudinal OCT Imaging |
+| Sprache der Arbeit | Englisch |
+| Übersetzter Titel (Deutsch), since v2 | Neuronale PDE-Löser zur Vorhersage der Progression der Geographischen Atrophie aus longitudinaler OCT-Bildgebung |
+| Autorenschlagworte Deutsch, since v2 | Geographische Atrophie / OCT / neuronale PDE-Löser / Graph Neural Networks / U-Net / medizinische Bildgebung / longitudinale Vorhersage |
+| Autorenschlagworte Englisch, since v2 | Geographic Atrophy / OCT / neural PDE solvers / graph neural networks / U-Net / medical imaging / longitudinal prediction |
+| Abstract, since v2 | 1st summary: English, blocks 1-3 = the three abstract paragraphs; 2nd summary: Deutsch, blocks 1-3 = the three Kurzfassung paragraphs (plain text of `00-abstract.tex`) |
 | Angestrebter akademischer Grad | MSc |
 | Name des Autors | Wiedner, Christian |
 | Institut | Institut für Machine Learning |
@@ -38,4 +43,4 @@ AFS-4723-210904-261026, 26.10.2026, 19:54:14). Reuse them for every re-upload; o
 | Date | File | Note |
 |---|---|---|
 | 2026-10-26 19:54 | v1 | Receipt AFS-4723-210904-261026. PAS (M. Schimbäck, Team TN) asked on 2026-10-28 to remove the keywords from the cover page and re-upload. |
-| 2026-10-28 | v2 | `26WS-K52001455-Wiedner_Christian-Thesis_MSc-v2-GA_Progression_Prediction.pdf`: no cover keywords, PDF/A-1b. |
+| 2026-10-28 | v2 | `26WS-K52001455-Wiedner_Christian-Thesis_MSc-v2-GA_Progression_Prediction.pdf`: no cover keywords, PDF/A-1b. Submitted via the form (receipt number: to add). New entries this time: German title, keywords (DE/EN), abstract EN blocks 1-3 and Kurzfassung DE blocks 1-3. |
