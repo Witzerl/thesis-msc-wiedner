@@ -3270,6 +3270,10 @@ External references introduced inline in the LaTeX drafts that still need to be 
   Ch. 3 opener ("images and maps recorded at each visit"), Table 3.2 placed after the first paragraph of §3.7.
 - [x] 2026-10-28 Examinations office (M. Schimbäck, Team TN) asked for the keywords to be removed from the cover page
   before re-upload. `\keywords{...}` in `main-thesis.tex` replaced by `\hypersetup{pdfkeywords=...}`, so the keywords
-  stay in the PDF metadata only. Hand-in PDF in `builds/` rebuilt (same name, v1; 132 pages, text and fonts identical
-  to the 2026-10-26 build apart from the cover page). Built in the cloud container with TeX Live 2023.
+  stay in the PDF metadata only. Hand-in PDF in `builds/` replaced (same name, v1). A rebuild in the cloud container
+  (TeX Live 2023) was not pixel-identical to the author's TeX Live 2026 build (57 pages differ: math delimiter heights,
+  glyph positions), and CTAN is blocked there, so the 2026-10-26 PDF was edited instead: only the 12 text operators of
+  the keyword block were removed from page 1's content stream (pikepdf). Checked at 150 dpi: pages 2-132 pixel- and
+  content-stream-identical, page 1 differs only in the keyword area, which now matches the cover of the rebuilt source;
+  XMP (PDF/A) and document info byte-identical. A local `latexmk` build with TeX Live 2026 should give the same PDF.
 - [ ] Author to re-upload `builds/26WS-K52001455-Wiedner_Christian-Thesis_MSc-v1-GA_Progression_Prediction.pdf`.
